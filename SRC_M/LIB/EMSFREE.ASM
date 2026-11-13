@@ -1,0 +1,186 @@
+;----------------------------------------
+;EMS memory: how much of the EMS heap is free (GAME.EXE 2D5A)
+;----------------------------------------
+
+DGROUP	GROUP _DATA
+_DATA	SEGMENT WORD PUBLIC 'DATA'
+_DATA	ENDS
+
+EXTRN _emsMapped:DWORD,_emsInUse:WORD
+EXTRN _EMS_map:FAR
+
+EMSFREE_TEXT	SEGMENT WORD PUBLIC 'CODE'
+	ASSUME CS:EMSFREE_TEXT,DS:DGROUP
+
+;unsigned long EMS_totalFree(void): the total length of the free blocks of the
+;EMS heap (0 when EMS is not in use)
+PUBLIC _EMS_totalFree
+_EMS_totalFree	PROC FAR	;123D:0008
+	PUSH	BP
+	MOV	BP,SP
+	SUB	SP,0Ch
+	PUSH	SI
+	PUSH	DI
+	CMP	_emsInUse,0
+	JNZ	L_0016
+	JMP	L_009F
+L_0016:
+	LES	AX,_emsMapped
+	MOV	[BP-08],AX
+	MOV	[BP-06],ES
+	XOR	AX,AX
+	MOV	[BP-0Ch],AX
+	MOV	[BP-0Ah],AX
+	MOV	AX,0C000h
+	MOV	[BP-02],AX
+	PUSH	AX
+	XOR	AX,AX
+	MOV	[BP-04],AX
+	PUSH	AX
+	CALL	_EMS_map
+	ADD	SP,4
+L_003D:
+	MOV	ES,DX
+	MOV	SI,AX
+	MOV	AX,ES:[SI]
+	MOV	DX,ES:[SI+02]
+	TEST	AX,1
+	JNZ	L_0053
+	ADD	[BP-0Ch],AX
+	ADC	[BP-0Ah],DX
+L_0053:
+	AND	AL,0FEh
+	ADD	AX,4
+	ADC	DX,0
+	ADD	AX,[BP-04]
+	ADC	DX,0
+	MOV	BH,AH
+	AND	AH,3Fh
+	SHL	BH,1
+	RCL	DX,1
+	SHL	BH,1
+	RCL	DX,1
+	ADD	DX,[BP-02]
+	MOV	[BP-04],AX
+	MOV	[BP-02],DX
+	PUSH	DX
+	PUSH	AX
+	CALL	_EMS_map
+	ADD	SP,4
+	OR	DX,DX
+	JNZ	L_003D
+	PUSH	WORD PTR [BP-06]
+	PUSH	WORD PTR [BP-08]
+	CALL	_EMS_map
+	ADD	SP,4
+	MOV	AX,[BP-0Ch]
+	MOV	DX,[BP-0Ah]
+	POP	DI
+	POP	SI
+	MOV	SP,BP
+	POP	BP
+	RET
+L_009F:
+	XOR	AX,AX
+	XOR	DX,DX
+	POP	DI
+	POP	SI
+	MOV	SP,BP
+	POP	BP
+	RET
+_EMS_totalFree	ENDP
+
+;unsigned long EMS_largestFree(void): the length of the largest free block of the
+;EMS heap, at most FFFCh (0 when EMS is not in use)
+PUBLIC _EMS_largestFree
+_EMS_largestFree	PROC FAR	;123D:00AD
+	PUSH	BP
+	MOV	BP,SP
+	SUB	SP,0Ch
+	PUSH	SI
+	PUSH	DI
+	CMP	_emsInUse,0
+	JNZ	L_00BB
+	JMP	L_015E
+L_00BB:
+	LES	AX,_emsMapped
+	MOV	[BP-08],AX
+	MOV	[BP-06],ES
+	XOR	AX,AX
+	MOV	[BP-0Ch],AX
+	MOV	[BP-0Ah],AX
+	MOV	AX,0C000h
+	MOV	[BP-02],AX
+	PUSH	AX
+	XOR	AX,AX
+	MOV	[BP-04],AX
+	PUSH	AX
+	CALL	_EMS_map
+	ADD	SP,4
+L_00E2:
+	MOV	ES,DX
+	MOV	SI,AX
+	MOV	AX,ES:[SI]
+	MOV	DX,ES:[SI+02]
+	TEST	AX,1
+	JNZ	L_0104
+	CMP	DX,[BP-0Ah]
+	JB	L_0104
+	JA	L_00FE
+	CMP	AX,[BP-0Ch]
+	JBE	L_0104
+L_00FE:
+	MOV	[BP-0Ch],AX
+	MOV	[BP-0Ah],DX
+L_0104:
+	AND	AL,0FEh
+	ADD	AX,4
+	ADC	DX,0
+	ADD	AX,[BP-04]
+	ADC	DX,0
+	MOV	BH,AH
+	AND	AH,3Fh
+	SHL	BH,1
+	RCL	DX,1
+	SHL	BH,1
+	RCL	DX,1
+	ADD	DX,[BP-02]
+	MOV	[BP-04],AX
+	MOV	[BP-02],DX
+	PUSH	DX
+	PUSH	AX
+	CALL	_EMS_map
+	ADD	SP,4
+	OR	DX,DX
+	JNZ	L_00E2
+	PUSH	WORD PTR [BP-06]
+	PUSH	WORD PTR [BP-08]
+	CALL	_EMS_map
+	ADD	SP,4
+	MOV	AX,[BP-0Ch]
+	MOV	DX,[BP-0Ah]
+	CMP	AX,0FFFCh
+	JA	L_0153
+	OR	DX,DX
+	JZ	L_0158
+L_0153:
+	XOR	DX,DX
+	MOV	AX,0FFFCh
+L_0158:
+	POP	DI
+	POP	SI
+	MOV	SP,BP
+	POP	BP
+	RET
+L_015E:
+	XOR	AX,AX
+	XOR	DX,DX
+	POP	DI
+	POP	SI
+	MOV	SP,BP
+	POP	BP
+	RET
+_EMS_largestFree	ENDP
+
+EMSFREE_TEXT	ENDS
+END

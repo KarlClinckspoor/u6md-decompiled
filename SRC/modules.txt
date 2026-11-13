@@ -1,0 +1,77 @@
+# GAME.EXE modules after the run-time library, in link order (tools/md/modmap.py).
+# FRAME AT LEN SOURCE [DS-RANGE]   FRAME: the module code segment (paragraph; an overlaid
+# module: its stub segment); AT: its first byte in the frame (overlay: in the overlay);
+# LEN: bytes up to the next module (hex); SOURCE: the file ("-" while not decompiled).
+02CD D 1009 -
+0000 242 421 -  # in C0M's _TEXT: SE GAME.EXE has OSILIB/OSI_FILE.ASM here, linked after main
+03CE 6 AC8 -
+047A E 356F -
+07D1 D 6456 -
+0E17 4 38 -
+0E1A C 1EAF -
+1005 C 62 -
+100B E 429 -
+104E 7 1093 -
+1157 A B6F -
+120E 9 3257 -
+1534 0 1159 -
+1649 A 8DF -
+16D7 A 358 -
+170D 2 3FC0 -
+1B09 2 4A00 -
+1FA9 2 CE1 -
+2077 3 1B55 -
+222C 8 B8 -
+2238 0 35F2 -
+2597 2 A6C -
+263D E C1 -
+264A 0 1DF -
+2668 0 1A -
+2669 A A8 -
+2674 2 530 -
+26C7 2 78 -
+26CE A 52 -
+26D3 C 1BF -
+26EF C 24 -
+26F2 0 21 -
+26F4 2 11E -
+2706 0 AF -
+2710 F 1C1F -
+28D2 E 11F -
+28E4 E 127 -
+28F7 6 10B -
+2908 2 164 -
+291E 6 5D -
+2924 3 CC6 -
+29F0 9 13C -
+2A04 5 297 -
+2A2D C 290 -
+2A56 C 4C -
+2A5B 8 2B -
+2A5E 4 F0 -
+2A6D 4 38 -
+2A70 C 31D -
+2AA2 9 84 -
+2AAA D 160 -
+2AC0 D EE -
+2ACF B 182 -
+2AE7 D A7 -
+2AF2 4 E8 -
+2B00 C 212 -
+2F52 0 4AD -  # overlay
+2F55 0 232 -  # overlay
+2F58 0 552 -  # overlay
+2F5B 0 8F -  # overlay
+2F5F 0 C13 -  # overlay
+2F63 0 D00 -  # overlay
+2F68 0 1A87 -  # overlay
+2F6E 0 60F -  # overlay
+2F72 0 402 -  # overlay
+2F75 0 16F2 -  # overlay
+2F7C 0 B3D -  # overlay
+2F80 0 268 -  # overlay
+2F83 0 1700 -  # overlay
+2F88 0 1F6B -  # overlay
+2F8D 0 200B -  # overlay
+2F98 0 201A -  # overlay
+2FA1 0 1E99 -  # overlay

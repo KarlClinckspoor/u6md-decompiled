@@ -1,0 +1,462 @@
+/* flags: -mm -c -O -y */
+/*
+ * MARTIAN.EXE segment 0CD9: the title (TITLE.LZC): the letters of the title change and fly
+ * apart, the sun sets behind the mountains, sparkles. Savage Empire's SRC_S/title.c (the
+ * same pictures code); here PlayTitle gets the speed from its caller.
+ */
+
+/*a drawing surface (16 bytes; the fields this module uses)*/
+struct tSurface {
+	int w00;
+	int w02;
+	int w04;
+	int x0;/*+06*/
+	int w08;
+	int y0;/*+0A*/
+	int w0C;
+	int w0E;
+};
+
+/*a sparkle of the last scene (12 bytes; see segment 071C)*/
+struct tSprite {
+	int frame;/*+00 -1: free*/
+	int x;/*+02*/
+	int y;/*+04*/
+	int kind;/*+06*/
+	void far *sound;/*+08*/
+};
+
+/*how a letter of the title moves*/
+struct tLetter {
+	int x;
+	int y;
+	int dx;
+	int dy;
+};
+
+extern unsigned char far C_0F2C_0027;/*nonzero when a key was pressed (the event module's code segment)*/
+extern int soundCard;/*the sound card? (1, 2: sounds are played; 3)*/
+extern int musicMarker;/*how far the music has got?*/
+extern int (*D_0EE2)();/*the graphics driver: draws a shape, reports its rectangle*/
+extern void (pascal *D_23EA)();/*the sound driver: plays a sound*/
+extern int (*D_0EAA)();/*the graphics driver: shows a surface*/
+extern int (*D_0E9A)();/*the graphics driver: draws a shape*/
+extern int (*D_0EDA)();/*the graphics driver: draws a shape, scaled*/
+extern int (*D_0EAE)();
+extern int D_422A;/*nonzero: music?*/
+extern void far *D_4330[13];/*the shapes of TITLE.LZC*/
+extern void far *D_4364;
+extern struct tSprite D_4368[30];
+
+extern void far *LoadLzc(char *name, int n);/*item n of an LZC file, loaded*/
+extern PAL_restore();
+extern pascal FADE_out(struct tSurface *, int, int);
+extern pascal FADE_in(struct tSurface *, struct tSurface *);
+extern StopSound(void far *, int);/*stops a sound*/
+extern FadeOutMusic(int);
+extern PlaySong(void far *);
+extern StopAllSounds();
+extern ClearSprites();/*frees all the sparkles*/
+extern DrawSprites(struct tSurface *, int n);/*draws the first n sparkles; returns how many are free*/
+extern VID_waitRetrace();/*waits for the vertical retrace*/
+extern MEM_free(void far *);/*frees*/
+extern int DrvCalibrate();
+extern int pascal Random(int lo, int hi);/*random number from lo to hi*/
+extern int kbhit(void);
+
+/*0C24*/char D_0C24[] = "opoqopoqopoqopoqqrstrq";/*frames of the sun: p, q play a sound*/
+/*0C3B*/char *D_0C3B[10] = {/*frames of each letter of the title*/
+	"abcdefghijkaakkkkaaaalllllllmmll",
+	"aaaaaaaabcddeeddccffgghhgghhiiih",
+	"aaaaaaaaaabbccbbaaccccccccccaccc",
+	"aaaabbbcccddeeddccffggaaggffcaaa",
+	"aabbbaacccddddddccddeeeeeeddccca",
+	"aaaaaabbbaaabbaaaabbbbaabbbbaccc",
+	"aabbcdbbbeaaaaaaeeaaaaaaaaaabaaa",
+	"abbbaacccdeeaaeeddaaaaaaaaaadacc",
+	"aaaaaaaaabbbccbbbbccddddddccaaaa",
+	"abccdefgghiijjiihhkkllmmllkkhnnn"
+};
+/*0C4F*/struct tLetter D_0C4F[10] = {
+	{0x3a, 0x5e, -1, 1}, {0xba, 0x5e, 0, 1}, {0x116, 0x5e, 1, 1},
+	{0x3a, 0x66, -3, 2}, {0xba, 0x66, 0, 2}, {0x116, 0x66, 3, 2},
+	{0x3a, 0x6e, -5, 3}, {0xba, 0x6e, 0, 3}, {0x116, 0x6e, 5, 3},
+	{0x9e, 0x4a, 0, 4}
+};
+
+/*C_0CD9_0004*/void Show(struct tSurface *surf, struct tSurface *screen) {
+	VID_waitRetrace();
+	(*D_0EAA)(surf, screen);
+}
+
+/*C_0CD9_001A*/void DrawBackground(struct tSurface *surf, int y) {
+	(*D_0E9A)(surf, 0, 0, D_4330[0], 0);
+	(*D_0E9A)(surf, 0xa0, y, D_4330[12], 0);
+}
+
+/*C_0CD9_0052*/void C_0CD9_0052(struct tSurface *surf, struct tSurface *screen) {
+	int i;
+
+	DrawBackground(surf, 0x18);
+	for(i = 0; i < 10; i++)
+		(*D_0E9A)(surf, D_0C4F[i].x, D_0C4F[i].y, D_4330[i + 1], 0);
+	FADE_in(surf, screen);
+}
+
+/*the letters of the title change*/
+/*C_0CD9_00AD*/void C_0CD9_00AD(struct tSurface *surf, struct tSurface *screen, int speed) {
+	int from;
+	int count;
+	int t;
+	int i;
+	int f;
+
+	from = 0;
+	count = 0;
+	t = 1;
+	do {
+		for(f = from; f < 0x20; f++) {
+			if(--t < 1) {
+				t = speed;
+				DrawBackground(surf, 0x18);
+				for(i = 0; i < 10; i++)
+					(*D_0E9A)(surf, D_0C4F[i].x, D_0C4F[i].y, D_4330[i + 1], D_0C3B[i][f] - 'a');
+				Show(surf, screen);
+			}
+			if(kbhit())
+				C_0F2C_0027 = 0xff;
+			if(musicMarker >= 1)
+				return;
+			if(C_0F2C_0027)
+				return;
+			count++;
+		}
+		from = Random(0, 0xd) + 9;
+		for(f = 0x1f; f >= from; f--) {
+			if(--t < 1) {
+				t = speed;
+				DrawBackground(surf, 0x18);
+				for(i = 0; i < 10; i++)
+					(*D_0E9A)(surf, D_0C4F[i].x, D_0C4F[i].y, D_4330[i + 1], D_0C3B[i][f] - 'a');
+				Show(surf, screen);
+			}
+			if(kbhit())
+				C_0F2C_0027 = 0xff;
+			if(musicMarker >= 1)
+				return;
+			if(C_0F2C_0027)
+				return;
+			count++;
+		}
+	} while((D_422A && soundCard != 3) || count <= 30);
+}
+
+/*the sun sets*/
+/*C_0CD9_0256*/void C_0CD9_0256(struct tSurface *surf, struct tSurface *screen, int speed) {
+	int i;
+	int t;
+	int f;
+
+	t = 1;
+	for(f = 0; f < 0x14; f++) {
+		if(D_0C24[f] == 'p') {
+			if(soundCard == 2) {
+				t = 1;
+				(*D_23EA)(0x12, 0x30, 0x60);
+			} else if(soundCard == 1) {
+				t = 1;
+				(*D_23EA)(0xa, 0x25, 0x60);
+			}
+		} else if(D_0C24[f] == 'q') {
+			if(soundCard == 2) {
+				(*D_23EA)(0x12, 0x30, 0);
+				t = 1;
+			} else if(soundCard == 1) {
+				(*D_23EA)(0xa, 0x25, 0);
+				t = 1;
+			}
+		}
+		if(--t < 1) {
+			t = speed;
+			DrawBackground(surf, 0x18);
+			for(i = 0; i < 9; i++)
+				(*D_0E9A)(surf, D_0C4F[i].x, D_0C4F[i].y, D_4330[i + 1], D_0C3B[i][0x1f] - 'a');
+			(*D_0E9A)(surf, D_0C4F[9].x, D_0C4F[9].y, D_4330[10], D_0C24[f] - 'a');
+			Show(surf, screen);
+		}
+		if(kbhit())
+			C_0F2C_0027 = 0xff;
+		if(C_0F2C_0027)
+			return;
+	}
+	DrawBackground(surf, 0x18);
+	(*D_0E9A)(surf, D_0C4F[0].x, D_0C4F[0].y, D_4330[1], D_0C3B[0][0x1f] - 'a');
+	(*D_0E9A)(surf, D_0C4F[1].x, D_0C4F[1].y, D_4330[2], D_0C3B[1][0x1f] - 'a');
+	(*D_0E9A)(surf, D_0C4F[2].x, D_0C4F[2].y, D_4330[3], D_0C3B[2][0x1f] - 'a');
+	(*D_0E9A)(surf, D_0C4F[3].x, D_0C4F[3].y, D_4330[4], D_0C3B[3][0x1f] - 'a');
+	(*D_0E9A)(surf, D_0C4F[4].x, D_0C4F[4].y, D_4330[5], D_0C3B[4][0x1f] - 'a');
+	(*D_0E9A)(surf, D_0C4F[5].x, D_0C4F[5].y, D_4330[6], D_0C3B[5][0x1f] - 'a');
+	(*D_0E9A)(surf, D_0C4F[6].x, D_0C4F[6].y, D_4330[7], D_0C3B[6][0x1f] - 'a');
+	(*D_0E9A)(surf, D_0C4F[7].x, D_0C4F[7].y, D_4330[8], D_0C3B[7][0x1f] - 'a');
+	(*D_0E9A)(surf, D_0C4F[8].x, D_0C4F[8].y, D_4330[9], D_0C3B[8][0x1f] - 'a');
+	(*D_0E9A)(surf, D_0C4F[9].x, D_0C4F[9].y, D_4330[10], D_0C24[20] - 'a');
+	if(D_422A && (soundCard == 2 || soundCard == 1)) {
+		do {
+			if(kbhit())
+				C_0F2C_0027 = 0xff;
+		} while(musicMarker < 2 && C_0F2C_0027 == 0);
+		Show(surf, screen);
+	}
+}
+
+/*draws the mountains in front of the sun at x, y*/
+/*C_0CD9_0565*/void C_0CD9_0565(struct tSurface *surf, int x, int y) {
+	int r[4];
+
+	(*D_0EE2)(surf, 0xa2, x, D_4330[0], 2, 0, y, 0, r);
+	(*D_0EDA)(surf, r[0], x, D_4330[0], 1, 0, y, 0);
+	(*D_0EDA)(surf, 0xa2, x, D_4330[0], 2, 0, y, 0);
+	(*D_0EDA)(surf, r[2], x, D_4330[0], 3, 0, y, 0);
+}
+
+/*the letters fly apart*/
+/*C_0CD9_05FB*/void C_0CD9_05FB(struct tSurface *surf, struct tSurface *screen, int speed) {
+	int x;
+	int y;
+	int t;
+	int d;
+	int i;
+
+	t = 1;
+	for(d = 1; d < 0x78; d = d + d / 4 + 1) {
+		if(--t < 1) {
+			t = speed;
+			DrawBackground(surf, 0x18);
+			for(i = 0; i < 9; i++) {
+				x = D_0C4F[i].x + D_0C4F[i].dx * d;
+				y = D_0C4F[i].y + D_0C4F[i].dy * d;
+				(*D_0EDA)(surf, x, y, D_4330[i + 1], D_0C3B[i][0x1f] - 'a', 0, d * 4 * D_0C4F[i].dy + 0x100, 0);
+			}
+			x = D_0C4F[9].x + d * D_0C4F[9].dx;
+			y = D_0C4F[9].y + d * D_0C4F[9].dy;
+			(*D_0EDA)(surf, x, y, D_4330[10], D_0C24[21] - 'a', 0, d * 4 * D_0C4F[9].dy + 0x100, 0);
+			Show(surf, screen);
+		}
+		if(kbhit())
+			C_0F2C_0027 = 0xff;
+		if(C_0F2C_0027)
+			break;
+	}
+}
+
+/*the mountains rise and the sun sets; returns where the mountains are*/
+/*C_0CD9_0765*/C_0CD9_0765(struct tSurface *surf, struct tSurface *screen, int speed) {
+	int unused;
+	int y;
+	int sunY;
+	int n;
+	int c1;
+	int c2;
+	int moved;
+	int behind;
+	int r[4];
+	int t;
+	int x;
+
+	unused = 0;
+	behind = 0;
+	t = 1;
+	x = 0x3b;
+	for(n = 5000, c1 = 0, c2 = 0; n >= 1000; n--, c1--, c2--) {
+		moved = 0;
+		if(c1 == 0) {
+			moved = 1;
+			sunY = 120000L / n;
+			c1 = 200;
+		}
+		if(c2 == 0) {
+			moved = 1;
+			y = 256000L / n;
+			x = n > 3000 ? x - 2 : x + 2;
+			c2 = 100;
+		}
+		if(moved) {
+			if(--t < 1) {
+				t = speed;
+				(*D_0E9A)(surf, 0, 0, D_4330[0], 0);
+				(*D_0EE2)(surf, 0xa2, x, D_4330[0], 2, 0, y, 0, r);
+				if(r[3] < sunY)
+					behind = 1;
+				if(!behind) {
+					C_0CD9_0565(surf, x, y);
+					(*D_0E9A)(surf, 0xa0, sunY, D_4330[12], 0);
+				} else {
+					(*D_0E9A)(surf, 0xa0, sunY, D_4330[12], 0);
+					C_0CD9_0565(surf, x, y);
+				}
+				Show(surf, screen);
+			}
+		}
+		if(kbhit())
+			C_0F2C_0027 = 0xff;
+		if(C_0F2C_0027)
+			return;
+	}
+	(*D_0E9A)(surf, 0, 0, D_4330[0], 0);
+	C_0CD9_0565(surf, x, y);
+	Show(surf, screen);
+	return x;
+}
+
+/*sparkles over the mountains*/
+/*C_0CD9_0921*/void C_0CD9_0921(struct tSurface *surf, struct tSurface *screen, int x) {
+	int j;
+	int nFree;
+	int done;
+	int add;
+	int count;
+	int i;
+
+	done = 0;
+	count = 0;
+	StopAllSounds();
+	ClearSprites();
+	do {
+		if(!done) {
+			/*DIFFERS: the original does not merge the end of "add = Random(0, 5) == 0"
+			  (0636:0977-0993) with the same code of the last case; this merges it (9 bytes
+			  shorter)*/
+			if(D_422A && (soundCard == 2 || soundCard == 1)) {
+				if(musicMarker >= 4)
+					add = Random(0, 0) == 0;
+				else
+					add = Random(0, 5) == 0;
+			} else
+				add = Random(0, 0) == 0;
+		}
+		if(add && !done) {
+			for(i = 0; i < 5; i++) {
+				if(D_4368[i].frame == -1) {
+					D_4368[i].frame = 0;
+					D_4368[i].x = Random(0, 0x13f);
+					D_4368[i].y = Random(0, 0x7f);
+					D_4368[i].kind = Random(0, 2);
+					break;
+				}
+			}
+		}
+		(*D_0E9A)(surf, 0, 0, D_4330[0], 0);
+		nFree = DrawSprites(surf, 5);
+		C_0CD9_0565(surf, x, 0x100);
+		Show(surf, screen);
+		count++;
+		if(done == 1 && nFree == 5)
+			goto all;
+		/*DIFFERS: the original keeps both "done = 1" (0636:0A9A, 0AA7); this merges them
+		  (2 bytes shorter)*/
+		if(D_422A && (soundCard == 2 || soundCard == 1)) {
+			if(musicMarker >= 5)
+				done = 1;
+		} else if(count > 10)
+			done = 1;
+		if(kbhit())
+			C_0F2C_0027 = 0xff;
+	} while(C_0F2C_0027 == 0);
+	return;
+all:
+	for(i = 0; i < 0x1d; i++) {
+		D_4368[i].frame = 0;
+		D_4368[i].x = Random(0, 0x13f);
+		D_4368[i].y = Random(0, 0x7f);
+		D_4368[i].kind = Random(0, 2);
+	}
+	nFree = 0;
+	j = 0;
+	while(nFree != 0x1e) {
+		if(++j == 4) {
+			D_4368[29].frame = 0;
+			D_4368[29].x = Random(0, 0x13f);
+			D_4368[29].y = Random(0, 0x7f);
+			D_4368[29].kind = Random(0, 2);
+		}
+		(*D_0E9A)(surf, 0, 0, D_4330[0], 0);
+		nFree = DrawSprites(surf, 0x1e);
+		C_0CD9_0565(surf, x, 0x100);
+		Show(surf, screen);
+		if(kbhit())
+			C_0F2C_0027 = 0xff;
+		if(C_0F2C_0027)
+			return;
+	}
+	for(i = 0x1d; i >= 0; i--) {
+		if(D_4368[i].frame != -1)
+			StopSound(D_4368[i].sound, i);
+	}
+}
+
+/*the number of frames between two pictures, from the speed of the computer*/
+/*C_0CD9_0C2A*/C_0CD9_0C2A() {
+	return 2 - DrvCalibrate() / 8 < 1 ? 1 : 2 - DrvCalibrate() / 8;
+}
+
+/*C_0CD9_0C5B*/void far *LoadShape(int n) {
+	return LoadLzc("TITLE.LZC", n);
+}
+
+/*plays the title on surf, shown on screen; mode: the video mode (3: shapes 7-9 are not
+  loaded); music: the song to play during it (or 0); speed: frames between two pictures
+  (the caller's C_0CD9_0C2A())*/
+/*C_0CD9_0C6E*/void PlayTitle(struct tSurface *surf, struct tSurface *screen, int mode, void far *music, int speed) {
+	struct tSurface save;
+	int i;
+
+	save = *screen;
+	screen->x0 = 0x18;
+	screen->y0 = 0x97;
+	for(i = 0; i < 12; i++) {
+		if(mode != 3)
+			D_4330[i] = LoadShape(i);
+		else if(i < 7 || i > 9)
+			D_4330[i] = LoadShape(i);
+	}
+	D_4364 = D_4330[11];
+	D_4330[12] = LoadShape(12);
+	C_0F2C_0027 = 0;
+	if(music)
+		PlaySong(music);
+	C_0CD9_0052(surf, screen);
+	if(C_0F2C_0027 == 0xff)
+		goto end;
+	C_0CD9_00AD(surf, screen, speed);
+	if(C_0F2C_0027 == 0xff)
+		goto end;
+	C_0CD9_0256(surf, screen, speed);
+	if(C_0F2C_0027 == 0xff)
+		goto end;
+	C_0CD9_05FB(surf, screen, speed);
+	if(C_0F2C_0027 != 0xff) {
+		i = C_0CD9_0765(surf, screen, speed);
+		if(D_422A && (soundCard == 2 || soundCard == 1)) {
+			while(musicMarker < 3) {
+				if(kbhit())
+					C_0F2C_0027 = 0xff;
+				if(C_0F2C_0027 == 0xff)
+					break;
+			}
+		}
+		if(C_0F2C_0027 != 0xff)
+			C_0CD9_0921(surf, screen, i);
+	}
+end:
+	C_0F2C_0027 = 0;
+	if(music)
+		FadeOutMusic(0);
+	FADE_out(&save, 0, 1);
+	(*D_0EAE)(&save, 0);
+	PAL_restore();
+	for(i = 0; i < 13; i++)
+		MEM_free(D_4330[i]);
+	if(music)
+		MEM_free(music);
+	*screen = save;
+}

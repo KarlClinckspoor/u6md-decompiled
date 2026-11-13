@@ -1,0 +1,671 @@
+# GAME.EXE function -> closest Savage Empire function (tools/md/mdmatch.py)
+# FRAME   ADDRESS  SIZE  SIM  MD_SOURCE  SE_FILE  SE_ADDRESS
+ 02CD 002CDD   269 0.36 -          SRC/gfx.c                    C_276B_23CA
+ 02CD 002DEA   140 0.82 -          SRC/main.c                   C_0268_000B
+ 02CD 002E76   130 0.98 -          SRC/main.c                   C_0268_00AA
+ 02CD 002EF8   170 0.97 -          SRC/main.c                   C_0268_0128
+ 02CD 002FA2   567 0.94 -          SRC/main.c                   C_0268_01D2
+ 02CD 0031D9   163 0.76 -          SRC/main.c                   C_0268_0456
+ 02CD 00327C    75 0.96 -          SRC/main.c                   C_0268_04C9
+ 02CD 0032C7    87 0.94 -          SRC/main.c                   C_0268_0514
+ 02CD 00331E   488 0.71 -          SRC/main.c                   C_0268_0574
+ 02CD 003506    53 0.78 -          SRC/main.c                   C_0268_0708
+ 02CD 00353B   214 0.73 -          SRC/main.c                   C_0268_073D
+ 02CD 003611  1749 0.93 -          SRC/main.c                   C_0268_0813
+ 0000 000242     3 0.67 -          SRC/OSILIB/OSI_FILE.ASM      C_0000_0242
+ 0000 000245    63 1.00 -          SRC/OSILIB/OSI_FILE.ASM      C_0000_0245
+ 0000 000284    52 1.00 -          SRC/OSILIB/OSI_FILE.ASM      C_0000_0284
+ 0000 0002B8    64 1.00 -          SRC/OSILIB/OSI_FILE.ASM      C_0000_02B8
+ 0000 0002F8    62 1.00 -          SRC/OSILIB/OSI_FILE.ASM      C_0000_02F8
+ 0000 000336   230 1.00 -          SRC/OSILIB/OSI_FILE.ASM      C_0000_0336
+ 0000 00041C   197 1.00 -          SRC/OSILIB/OSI_FILE.ASM      C_0000_041C
+ 0000 0004E1    69 1.00 -          SRC/OSILIB/OSI_FILE.ASM      C_0000_04E1
+ 0000 000526   241 1.00 -          SRC/OSILIB/OSI_FILE.ASM      C_0000_0526
+ 0000 000617    76 1.00 -          SRC/OSILIB/OSI_FILE.ASM      C_0000_0617
+ 03CE 003CE6    56 0.66 -          SRC/objcmd.c                 C_1DBD_71B8
+ 03CE 003D1E    34 0.57 -          SRC_S/main.c                 C_034C_07F8
+ 03CE 003D40    41 0.53 -          SRC/objcmd.c                 C_1DBD_405D
+ 03CE 003D69    87 0.48 -          SRC/talk.c                   C_0F79_00E0
+ 03CE 003DC0    75 0.48 -          SRC_S/main.c                 C_034C_073F
+ 03CE 003E0B   198 0.50 -          SRC_S/main.c                 C_034C_287B
+ 03CE 003ED1    11 0.80 -          SRC/disk.c                   C_2A81_0003
+ 03CE 003EDC   101 0.39 -          SRC/combat.c                 C_1810_3329
+ 03CE 003F41   440 0.33 -          SRC/objcmd.c                 C_1DBD_740E
+ 03CE 0040F9   206 0.56 -          SRC/object.c                 C_0A5D_13D0
+ 03CE 0041C7   433 0.38 -          SRC/objcmd.c                 C_1DBD_6AD8
+ 03CE 004378   291 0.55 -          SRC/objcmd.c                 C_1DBD_1030
+ 03CE 00449B   409 0.45 -          SRC/object.c                 C_0A5D_1506
+ 03CE 004634   238 0.50 -          SRC/object.c                 C_0A5D_13D0
+ 03CE 004722   140 0.41 -          SRC/objcmd.c                 C_1DBD_4225
+ 047A 0047AE    16 0.74 -          SRC/objcmd.c                 C_1DBD_092C
+ 047A 0047BE    24 0.80 -          SRC/objcmd.c                 C_1DBD_094A
+ 047A 0047D6    28 0.83 -          SRC/objcmd.c                 C_1DBD_0970
+ 047A 0047F2    34 1.00 -          SRC/objcmd.c                 C_1DBD_099A
+ 047A 004814    70 1.00 -          SRC/objcmd.c                 C_1DBD_09BC
+ 047A 00485A   181 0.52 -          SRC/objcmd.c                 C_1DBD_0AC3
+ 047A 00490F   220 1.00 -          SRC/objcmd.c                 C_1DBD_0CB3
+ 047A 0049EB   459 0.57 -          SRC/objcmd.c                 C_1DBD_0D8F
+ 047A 004BB6    63 1.00 -          SRC/objcmd.c                 C_1DBD_0F6C
+ 047A 004BF5   133 1.00 -          SRC/objcmd.c                 C_1DBD_0FAB
+ 047A 004C7A   138 1.00 -          SRC/objcmd.c                 C_1DBD_1030
+ 047A 004D04   464 0.78 -          SRC/objcmd.c                 C_1DBD_10BA
+ 047A 004ED4  2623 0.41 -          SRC/objcmd.c                 C_1DBD_12BD
+ 047A 005913   150 0.85 -          SRC/objcmd.c                 C_1DBD_1677
+ 047A 0059A9   284 1.00 -          SRC/objcmd.c                 C_1DBD_172C
+ 047A 005AC5   160 0.83 -          SRC/objcmd.c                 C_1DBD_1848
+ 047A 005B65   153 0.66 -          SRC/objcmd.c                 C_1DBD_1848
+ 047A 005BFE  1968 0.50 -          SRC/objcmd.c                 C_1DBD_1960
+ 047A 0063AE  1854 0.59 -          SRC/objcmd.c                 C_1DBD_1FEA
+ 047A 006AEC   857 0.35 -          SRC/objcmd.c                 C_1DBD_261D
+ 047A 006E45  3800 0.65 -          SRC/objcmd.c                 C_1DBD_26E8
+ 07D1 007D1D   104 0.48 -          SRC/egg.c                    C_2667_0009
+ 07D1 007D85   134 0.62 -          SRC/combat.c                 C_1810_000D
+ 07D1 007E0B    81 0.92 -          SRC/combat.c                 C_1810_0068
+ 07D1 007E5C   111 1.00 -          SRC/combat.c                 C_1810_00BB
+ 07D1 007ECB   265 0.89 -          SRC/combat.c                 C_1810_012A
+ 07D1 007FD4   338 0.90 -          SRC/combat.c                 C_1810_023B
+ 07D1 008126   267 0.78 -          SRC/combat.c                 C_1810_0394
+ 07D1 008231    85 0.68 -          SRC/combat.c                 C_1810_04A0
+ 07D1 008286    74 1.00 -          SRC/combat.c                 C_1810_04E0
+ 07D1 0082D0    56 1.00 -          SRC/combat.c                 C_1810_052A
+ 07D1 008308    35 1.00 -          SRC/combat.c                 C_1810_05D4
+ 07D1 00832B    51 1.00 -          SRC/combat.c                 C_1810_05F7
+ 07D1 00835E   115 0.44 -          SRC/object.c                 C_0A5D_0118
+ 07D1 0083D1  1129 0.39 -          SRC/npctrack.c               C_130F_28BD
+ 07D1 00883A   183 1.00 -          SRC/combat.c                 C_1810_0CA4
+ 07D1 0088F1   225 0.57 -          SRC/objcmd.c                 C_1DBD_1677
+ 07D1 0089D2    58 0.80 -          SRC/object.c                 C_0A5D_0FF9
+ 07D1 008A0C    88 1.00 -          SRC/combat.c                 C_1810_0F19
+ 07D1 008A64   632 0.35 -          SRC/objcmd.c                 C_1DBD_7DA2
+ 07D1 008CDC   495 0.33 -          SRC/combat.c                 C_1810_1A5A
+ 07D1 008ECB   178 0.97 -          SRC/combat.c                 C_1810_1FD9
+ 07D1 008F7D   267 0.89 -          SRC/combat.c                 C_1810_2081
+ 07D1 009088   267 0.89 -          SRC/combat.c                 C_1810_2081
+ 07D1 009193   365 0.33 -          SRC/objcmd.c                 C_1DBD_0AC3
+ 07D1 009300  1908 0.44 -          SRC/combat.c                 C_1810_25AD
+ 07D1 009A74  1649 0.35 -          SRC/objcmd.c                 C_1DBD_458F
+ 07D1 00A0E5   180 0.67 -          SRC/combat.c                 C_1810_2E13
+ 07D1 00A199   442 0.65 -          SRC/combat.c                 C_1810_2F42
+ 07D1 00A353   265 0.92 -          SRC/combat.c                 C_1810_304D
+ 07D1 00A45C   574 0.75 -          SRC/combat.c                 C_1810_3134
+ 07D1 00A69A    88 0.57 -          SRC/combat.c                 C_1810_3329
+ 07D1 00A6F2  1606 0.37 -          SRC/combat.c                 C_1810_337D
+ 07D1 00AD38   146 0.84 -          SRC/combat.c                 C_1810_3840
+ 07D1 00ADCA   966 0.68 -          SRC/combat.c                 C_1810_38E7
+ 07D1 00B190   296 0.80 -          SRC/combat.c                 C_1810_3B65
+ 07D1 00B2B8    77 0.83 -          SRC/combat.c                 C_1810_3CC2
+ 07D1 00B305   301 0.43 -          SRC/npctrack.c               C_130F_3766
+ 07D1 00B432   141 0.49 -          SRC/npctrack.c               C_130F_284B
+ 07D1 00B4BF   478 0.46 -          SRC/combat.c                 C_1810_4277
+ 07D1 00B69D   665 0.73 -          SRC/combat.c                 C_1810_4391
+ 07D1 00B936   316 0.65 -          SRC/combat.c                 C_1810_476D
+ 07D1 00BA72   277 0.85 -          SRC/combat.c                 C_1810_4968
+ 07D1 00BB87   558 0.80 -          SRC/combat.c                 C_1810_4AA9
+ 07D1 00BDB5   685 0.69 -          SRC/combat.c                 C_1810_4D85
+ 07D1 00C062   390 0.97 -          SRC/combat.c                 C_1810_50CA
+ 07D1 00C1E8   314 0.93 -          SRC/combat.c                 C_1810_523E
+ 07D1 00C322   454 0.65 -          SRC/combat.c                 C_1810_5370
+ 07D1 00C4E8   314 0.40 -          SRC/combat.c                 C_1810_476D
+ 07D1 00C622   238 0.47 -          SRC/egg.c                    C_2667_08E0
+ 07D1 00C710   522 0.40 -          SRC/object.c                 C_0A5D_1506
+ 07D1 00C91A   554 0.41 -          SRC/combat.c                 C_1810_523E
+ 07D1 00CB44   638 0.42 -          SRC/combat.c                 C_1810_476D
+ 07D1 00CDC2   564 0.45 -          SRC/spell.c                  C_11FF_00B0
+ 07D1 00CFF6   570 0.37 -          SRC/objcmd.c                 C_1DBD_7580
+ 07D1 00D230  1462 0.28 -          SRC/combat.c                 C_1810_14EA
+ 07D1 00D7E6    51 0.60 -          SRC/npctrack.c               C_130F_004D
+ 07D1 00D819   133 0.53 -          SRC/npctrack.c               C_130F_3930
+ 07D1 00D89E   289 0.47 -          SRC/objcmd.c                 C_1DBD_7F74
+ 07D1 00D9BF   259 0.89 -          SRC/combat.c                 C_1810_59C8
+ 07D1 00DAC2   377 0.37 -          SRC/objcmd.c                 C_1DBD_1030
+ 07D1 00DC3B   196 0.38 -          SRC/combat.c                 C_1810_19C1
+ 07D1 00DCFF   829 0.33 -          SRC/objcmd.c                 C_1DBD_7AB6
+ 07D1 00E03C   311 0.32 -          SRC/gfx.c                    C_276B_1647
+ 0E17 00E174    56 1.00 -          SRC_S/LIB/PTRNORM.ASM        C_0D0E_0004
+ 0E1A 00E1AC     7 1.00 -          SRC/status.c                 C_0E13_10DC
+ 0E1A 00E1B3   290 0.85 -          SRC/gfx.c                    C_276B_0005
+ 0E1A 00E2D5   147 1.00 -          SRC/gfx.c                    C_276B_0212
+ 0E1A 00E368   235 1.00 -          SRC/gfx.c                    C_276B_02A5
+ 0E1A 00E453  3127 0.81 -          SRC/gfx.c                    C_276B_0390
+ 0E1A 00F08A   281 0.93 -          SRC/gfx.c                    C_276B_0E85
+ 0E1A 00F1A3   230 0.36 -          SRC/gfx.c                    C_276B_10AC
+ 0E1A 00F289   130 0.95 -          SRC/gfx.c                    C_276B_1647
+ 0E1A 00F30B   103 1.00 -          SRC/gfx.c                    C_276B_16C7
+ 0E1A 00F372    40 1.00 -          SRC/gfx.c                    C_276B_172E
+ 0E1A 00F39A   353 0.35 -          SRC/gfx.c                    C_276B_23CA
+ 0E1A 00F4FB    77 0.41 -          SRC_S/LIB/MEMORY.C           C_0BC5_0045
+ 0E1A 00F548   482 0.40 -          SRC/gfx.c                    C_276B_1953
+ 0E1A 00F72A    71 0.83 -          SRC/gfx.c                    C_276B_1BAF
+ 0E1A 00F771   217 0.46 -          SRC/gfx.c                    C_276B_1BAF
+ 0E1A 00F84A    72 0.51 -          SRC/combat.c                 C_1810_3329
+ 0E1A 00F892   105 0.51 -          SRC/objcmd.c                 C_1DBD_622F
+ 0E1A 00F8FB   104 0.50 -          SRC/objcmd.c                 C_1DBD_622F
+ 0E1A 00F963   168 0.42 -          SRC/music.c                  C_2701_000A
+ 0E1A 00FA0B   305 0.42 -          SRC/gfx.c                    C_276B_1D87
+ 0E1A 00FB3C   278 0.80 -          SRC/gfx.c                    C_276B_1ED9
+ 0E1A 00FC52   889 0.96 -          SRC/gfx.c                    C_276B_2008
+ 0E1A 00FFCB   144 1.00 -          SRC/gfx.c                    C_276B_23CA
+ 1005 01005C    98 1.00 -          SRC/OSILIB/KBD.ASM           C_29D1_000E
+ 100B 0100BE   120 0.87 -          SRC/combat.c                 C_1810_1F3D
+ 100B 010136    62 0.86 -          SRC/combat.c                 C_1810_0EC7
+ 100B 010174    59 0.97 -          SRC/combat.c                 C_1810_0E39
+ 100B 0101AF    93 0.52 -          SRC/object.c                 C_0A5D_213E
+ 100B 01020C    42 0.72 -          SRC/status.c                 C_0E13_057F
+ 100B 010236    39 0.95 -          SRC/status.c                 C_0E13_057F
+ 100B 01025D    39 0.95 -          SRC/status.c                 C_0E13_057F
+ 100B 010284    39 0.95 -          SRC/status.c                 C_0E13_057F
+ 100B 0102AB    39 0.95 -          SRC/status.c                 C_0E13_057F
+ 100B 0102D2    37 0.73 -          SRC/npctrack.c               C_130F_00ED
+ 100B 0102F7    39 0.95 -          SRC/status.c                 C_0E13_057F
+ 100B 01031E    39 0.95 -          SRC/status.c                 C_0E13_057F
+ 100B 010345    43 0.95 -          SRC/object.c                 C_0A5D_213E
+ 100B 010370   206 0.39 -          SRC/status.c                 C_0E13_04C3
+ 100B 01043E    39 0.95 -          SRC/status.c                 C_0E13_057F
+ 100B 010465    91 0.44 -          SRC/object.c                 C_0A5D_213E
+ 100B 0104C0    39 0.95 -          SRC/status.c                 C_0E13_057F
+ 104E 0104E7   465 0.32 -          SRC/console.c                C_05D0_0D53
+ 104E 0106B8   919 0.29 -          SRC/objcmd.c                 C_1DBD_1848
+ 104E 010A4F  2859 0.35 -          SRC/npctrack.c               C_130F_0265
+ 1157 01157A   156 0.87 -          SRC/visible.c                C_09DA_000E
+ 1157 011616   114 1.00 -          SRC/visible.c                C_09DA_00D2
+ 1157 011688   506 0.81 -          SRC/visible.c                C_09DA_0144
+ 1157 011882  2151 0.69 -          SRC/visible.c                C_09DA_0327
+ 120E 0120E9   123 0.44 -          SRC/combat.c                 C_1810_0E39
+ 120E 012164   413 0.97 -          SRC/gameloop.c               C_0359_0B23
+ 120E 012301    42 0.77 -          SRC/gameloop.c               C_0359_0D8D
+ 120E 01232B    53 1.00 -          SRC/gameloop.c               C_0359_0D58
+ 120E 012360    27 1.00 -          SRC/gameloop.c               C_0359_0D8D
+ 120E 01237B     7 0.89 -          SRC/status.c                 C_0E13_155B
+ 120E 012382  1022 0.38 -          SRC/talkdr.c                 C_0F8D_15A2
+ 120E 012780   352 0.69 -          SRC/gameloop.c               C_0359_1014
+ 120E 0128E0   455 0.44 -          SRC/objcmd.c                 C_1DBD_33A4
+ 120E 012AA7   128 0.50 -          SRC/objcmd.c                 C_1DBD_4225
+ 120E 012B27  3693 0.36 -          SRC/gameloop.c               C_0359_11B6
+ 120E 013994   170 0.81 -          SRC/gameloop.c               C_0359_1806
+ 120E 013A3E   124 1.00 -          SRC/gameloop.c               C_0359_1889
+ 120E 013ABA   161 1.00 -          SRC/gameloop.c               C_0359_1905
+ 120E 013B5B   102 1.00 -          SRC/gameloop.c               C_0359_19A6
+ 120E 013BC1    89 1.00 -          SRC/gameloop.c               C_0359_1A0C
+ 120E 013C1A  5926 0.54 -          SRC/gameloop.c               C_0359_1A65
+ 1534 015340   196 0.98 -          SRC/map.c                    C_08CB_0003
+ 1534 015404   536 0.99 -          SRC/map.c                    C_08CB_00D0
+ 1534 01561C   624 0.93 -          SRC/map.c                    C_08CB_02FA
+ 1534 01588C    35 1.00 -          SRC/map.c                    C_08CB_0517
+ 1534 0158AF    42 1.00 -          SRC/map.c                    C_08CB_053A
+ 1534 0158D9   637 0.84 -          SRC/map.c                    C_08CB_0564
+ 1534 015B56   240 0.76 -          SRC/map.c                    C_08CB_0754
+ 1534 015C46   102 0.82 -          SRC/map.c                    C_08CB_07FE
+ 1534 015CAC   741 0.33 -          SRC/objcmd.c                 C_1DBD_740E
+ 1534 015F91   832 0.82 -          SRC/map.c                    C_08CB_0C73
+ 1534 0162D1   225 1.00 -          SRC/map.c                    C_08CB_0F9A
+ 1534 0163B2   143 0.96 -          SRC/map.c                    C_08CB_107B
+ 1534 016441    40 0.55 -          SRC/objcmd.c                 C_1DBD_099A
+ 1534 016469    48 0.47 -          SRC/object.c                 C_0A5D_0118
+ 1649 01649A    83 1.00 -          SRC/egg.c                    C_2667_004F
+ 1649 0164ED    56 1.00 -          SRC/egg.c                    C_2667_00A2
+ 1649 016525     7 1.00 -          SRC/status.c                 C_0E13_10DC
+ 1649 01652C   255 0.32 -          SRC_S/main.c                 C_034C_073F
+ 1649 01662B  1667 0.35 -          SRC/egg.c                    C_2667_04F7
+ 1649 016CAE   203 0.90 -          SRC/egg.c                    C_2667_08E0
+ 16D7 016D7A    86 0.97 -          SRC/OSILIB/MOUSE.ASM         C_2ABF_0008
+ 16D7 016DD0    73 1.00 -          SRC/OSILIB/MOUSE.ASM         C_2ABF_005E
+ 16D7 016E19   133 1.00 -          SRC/OSILIB/MOUSE.ASM         C_2ABF_00A7
+ 16D7 016E9E   204 1.00 -          SRC/OSILIB/MOUSE.ASM         C_2ABF_012C
+ 16D7 016F6A   167 1.00 -          SRC/OSILIB/MOUSE.ASM         C_2ABF_01F8
+ 16D7 017011    56 1.00 -          SRC/OSILIB/MOUSE.ASM         C_2ABF_029F
+ 16D7 017049   137 1.00 -          SRC/OSILIB/MOUSE.ASM         C_2ABF_02D7
+ 170D 0170D2   124 0.65 -          SRC/rest.c                   C_29D8_00C2
+ 170D 01714E    75 0.47 -          SRC/egg.c                    C_2667_0009
+ 170D 017199   167 0.57 -          SRC/npctrack.c               C_130F_106D
+ 170D 017240  1743 0.51 -          SRC/npctrack.c               C_130F_11F4
+ 170D 01790F    20 0.70 -          SRC/console.c                C_05D0_0E16
+ 170D 017923    21 0.70 -          SRC/console.c                C_05D0_0E16
+ 170D 017938    48 1.00 -          SRC/npctrack.c               C_130F_1DCC
+ 170D 017968   222 0.94 -          SRC/npctrack.c               C_130F_1DFC
+ 170D 017A46  1184 0.66 -          SRC/npctrack.c               C_130F_1EC7
+ 170D 017EE6   641 0.36 -          SRC/npctrack.c               C_130F_2404
+ 170D 018167   853 0.84 -          SRC/npctrack.c               C_130F_24C3
+ 170D 0184BC   114 1.00 -          SRC/npctrack.c               C_130F_284B
+ 170D 01852E   305 0.50 -          SRC/npctrack.c               C_130F_28BD
+ 170D 01865F   896 0.95 -          SRC/npctrack.c               C_130F_2BBD
+ 170D 0189DF   233 0.82 -          SRC/npctrack.c               C_130F_2F03
+ 170D 018AC8   448 0.99 -          SRC/npctrack.c               C_130F_3060
+ 170D 018C88   147 1.00 -          SRC/npctrack.c               C_130F_321A
+ 170D 018D1B  1228 0.87 -          SRC/npctrack.c               C_130F_32AD
+ 170D 0191E7    52 1.00 -          SRC/npctrack.c               C_130F_3732
+ 170D 01921B   230 1.00 -          SRC/npctrack.c               C_130F_3766
+ 170D 019301   519 0.50 -          SRC/npctrack.c               C_130F_384C
+ 170D 019508   185 0.98 -          SRC/npctrack.c               C_130F_3930
+ 170D 0195C1   228 0.95 -          SRC/npctrack.c               C_130F_39DD
+ 170D 0196A5   586 0.98 -          SRC/npctrack.c               C_130F_3AB8
+ 170D 0198EF   162 1.00 -          SRC/npctrack.c               C_130F_3CF6
+ 170D 019991   325 0.96 -          SRC/npctrack.c               C_130F_3D98
+ 170D 019AD6   332 0.67 -          SRC/npctrack.c               C_130F_3ECD
+ 170D 019C22    26 1.00 -          SRC/npctrack.c               C_130F_4079
+ 170D 019C3C    72 1.00 -          SRC/npctrack.c               C_130F_4093
+ 170D 019C84    94 0.64 -          SRC/npctrack.c               C_130F_004D
+ 170D 019CE2  1899 0.48 -          SRC/npctrack.c               C_130F_4121
+ 170D 01A44D   255 1.00 -          SRC/npctrack.c               C_130F_44A3
+ 170D 01A54C   521 0.68 -          SRC/npctrack.c               C_130F_45A2
+ 170D 01A755   252 1.00 -          SRC/npctrack.c               C_130F_4847
+ 170D 01A851   748 0.97 -          SRC/npctrack.c               C_130F_4943
+ 170D 01AB3D   772 0.89 -          SRC/npctrack.c               C_130F_4C0F
+ 170D 01AE41    44 1.00 -          SRC/npctrack.c               C_130F_4EEF
+ 170D 01AE6D   250 0.97 -          SRC/npctrack.c               C_130F_4F1B
+ 170D 01AF67   167 0.57 -          SRC/object.c                 C_0A5D_1B36
+ 170D 01B00E   132 0.65 -          SRC/npctrack.c               C_130F_1003
+ 1B09 01B092    90 1.00 -          SRC/spell.c                  C_11FF_0056
+ 1B09 01B0EC   103 1.00 -          SRC/object.c                 C_0A5D_0001
+ 1B09 01B153    35 0.53 -          SRC/status.c                 C_0E13_155B
+ 1B09 01B176    23 1.00 -          SRC/object.c                 C_0A5D_0145
+ 1B09 01B18D   557 0.49 -          SRC/object.c                 C_0A5D_015C
+ 1B09 01B3BA  1198 0.31 -          SRC/npctrack.c               C_130F_28BD
+ 1B09 01B868   228 0.48 -          SRC/object.c                 C_0A5D_05C4
+ 1B09 01B94C    79 0.49 -          SRC/egg.c                    C_2667_0009
+ 1B09 01B99B   188 0.52 -          SRC/objcmd.c                 C_1DBD_1030
+ 1B09 01BA57   150 1.00 -          SRC/object.c                 C_0A5D_0677
+ 1B09 01BAED   192 0.50 -          SRC/object.c                 C_0A5D_0677
+ 1B09 01BBAD    89 1.00 -          SRC/object.c                 C_0A5D_0739
+ 1B09 01BC06   120 1.00 -          SRC/object.c                 C_0A5D_0792
+ 1B09 01BC7E   182 0.50 -          SRC/object.c                 C_0A5D_080A
+ 1B09 01BD34   144 0.62 -          SRC/object.c                 C_0A5D_0792
+ 1B09 01BDC4   163 0.38 -          SRC/object.c                 C_0A5D_0118
+ 1B09 01BE67   263 0.74 -          SRC/object.c                 C_0A5D_0873
+ 1B09 01BF6E   159 0.56 -          SRC/object.c                 C_0A5D_0943
+ 1B09 01C00D   169 1.00 -          SRC/object.c                 C_0A5D_099C
+ 1B09 01C0B6    91 1.00 -          SRC/object.c                 C_0A5D_0A45
+ 1B09 01C111   136 0.96 -          SRC/object.c                 C_0A5D_0AA0
+ 1B09 01C199   101 0.86 -          SRC/object.c                 C_0A5D_0E57
+ 1B09 01C1FE   300 0.98 -          SRC/object.c                 C_0A5D_0EB6
+ 1B09 01C32A    35 1.00 -          SRC/object.c                 C_0A5D_0FD6
+ 1B09 01C34D    49 1.00 -          SRC/object.c                 C_0A5D_0FF9
+ 1B09 01C37E   729 0.87 -          SRC/object.c                 C_0A5D_102A
+ 1B09 01C657   317 0.96 -          SRC/object.c                 C_0A5D_12B4
+ 1B09 01C794   110 1.00 -          SRC/object.c                 C_0A5D_13D0
+ 1B09 01C802   256 0.68 -          SRC/object.c                 C_0A5D_143E
+ 1B09 01C902   427 0.94 -          SRC/object.c                 C_0A5D_1506
+ 1B09 01CAAD   550 0.49 -          SRC/object.c                 C_0A5D_1727
+ 1B09 01CCD3   434 0.84 -          SRC/object.c                 C_0A5D_19BF
+ 1B09 01CE85   218 0.79 -          SRC/object.c                 C_0A5D_1B36
+ 1B09 01CF5F    50 1.00 -          SRC/object.c                 C_0A5D_1BF3
+ 1B09 01CF91    81 1.00 -          SRC/object.c                 C_0A5D_1C25
+ 1B09 01CFE2  1098 0.56 -          SRC/object.c                 C_0A5D_1C76
+ 1B09 01D42C   753 0.78 -          SRC/object.c                 C_0A5D_1EDB
+ 1B09 01D71D   358 0.45 -          SRC/object.c                 C_0A5D_1506
+ 1B09 01D883    68 0.95 -          SRC/object.c                 C_0A5D_2169
+ 1B09 01D8C7   375 0.62 -          SRC/object.c                 C_0A5D_21AC
+ 1B09 01DA3E   350 0.73 -          SRC/object.c                 C_0A5D_22F7
+ 1B09 01DB9C    80 1.00 -          SRC/object.c                 C_0A5D_2406
+ 1B09 01DBEC    37 1.00 -          SRC/object.c                 C_0A5D_2456
+ 1B09 01DC11   337 1.00 -          SRC/object.c                 C_0A5D_247B
+ 1B09 01DD62    70 0.95 -          SRC/object.c                 C_0A5D_25CC
+ 1B09 01DDA8   362 0.99 -          SRC/object.c                 C_0A5D_261B
+ 1B09 01DF12   359 0.95 -          SRC/object.c                 C_0A5D_278E
+ 1B09 01E079   353 1.00 -          SRC/object.c                 C_0A5D_28D6
+ 1B09 01E1DA   169 1.00 -          SRC/object.c                 C_0A5D_2A37
+ 1B09 01E283   734 0.85 -          SRC/object.c                 C_0A5D_2AE0
+ 1B09 01E561   207 0.98 -          SRC/object.c                 C_0A5D_2CFD
+ 1B09 01E630   247 0.98 -          SRC/object.c                 C_0A5D_2DD5
+ 1B09 01E727   253 1.00 -          SRC/object.c                 C_0A5D_2EC0
+ 1B09 01E824   189 0.98 -          SRC/object.c                 C_0A5D_2FBD
+ 1B09 01E8E1   585 1.00 -          SRC/object.c                 C_0A5D_3083
+ 1B09 01EB2A   419 0.64 -          SRC/object.c                 C_0A5D_32CC
+ 1B09 01ECCD   266 0.99 -          SRC/object.c                 C_0A5D_339C
+ 1B09 01EDD7   209 1.00 -          SRC/object.c                 C_0A5D_34A6
+ 1B09 01EEA8  1986 0.49 -          SRC/object.c                 C_0A5D_3577
+ 1B09 01F66A   110 0.96 -          SRC/object.c                 C_0A5D_38A9
+ 1B09 01F6D8   156 0.82 -          SRC/object.c                 C_0A5D_390D
+ 1B09 01F774   117 0.97 -          SRC/object.c                 C_0A5D_39F8
+ 1B09 01F7E9   271 0.95 -          SRC/object.c                 C_0A5D_3A76
+ 1B09 01F8F8   251 0.45 -          SRC/objcmd.c                 C_1DBD_6AD8
+ 1B09 01F9F3   159 0.42 -          SRC/object.c                 C_0A5D_16BE
+ 1FA9 01FA92   155 0.85 -          SRC/music.c                  C_2701_000A
+ 1FA9 01FB2D   279 0.75 -          SRC/music.c                  C_2701_009B
+ 1FA9 01FC44   188 0.64 -          SRC/music.c                  C_2701_0190
+ 1FA9 01FD00    69 0.55 -          SRC/music.c                  C_2701_01F1
+ 1FA9 01FD45    25 0.73 -          SRC_S/main.c                 C_034C_1537
+ 1FA9 01FD5E    93 0.52 -          SRC/music.c                  C_2701_023F
+ 1FA9 01FDBB   175 0.53 -          SRC/music.c                  C_2701_0355
+ 1FA9 01FE6A   164 0.60 -          SRC/music.c                  C_2701_0355
+ 1FA9 01FF0E   111 0.61 -          SRC/music.c                  C_2701_045E
+ 1FA9 01FF7D   104 0.62 -          SRC/music.c                  C_2701_0190
+ 1FA9 01FFE5   174 0.53 -          SRC/music.c                  C_2701_0355
+ 1FA9 020093   790 0.33 -          SRC/status.c                 C_0E13_0254
+ 1FA9 0203A9   140 0.51 -          SRC/music.c                  C_2701_0648
+ 1FA9 020435   229 0.34 -          SRC_S/title.c                C_0636_05FA
+ 1FA9 02051A   115 0.48 -          SRC/main.c                   C_0268_0456
+ 1FA9 02058D   231 0.41 -          SRC/music.c                  C_2701_000A
+ 1FA9 020674    49 0.65 -          SRC/music.c                  C_2701_0648
+ 1FA9 0206A5   189 0.40 -          SRC/main.c                   C_0268_0514
+ 1FA9 020762    17 0.82 -          SRC/gameloop.c               C_0359_0D8D
+ 2077 020773   154 0.36 -          SRC/status.c                 C_0E13_000A
+ 2077 02080D   622 0.49 -          SRC/status.c                 C_0E13_000A
+ 2077 020A7B   230 0.96 -          SRC/status.c                 C_0E13_016E
+ 2077 020B61   854 0.75 -          SRC/status.c                 C_0E13_0254
+ 2077 020EB7    86 1.00 -          SRC/status.c                 C_0E13_05A6
+ 2077 020F0D    60 0.95 -          SRC/status.c                 C_0E13_05FC
+ 2077 020F49    80 0.88 -          SRC/status.c                 C_0E13_0637
+ 2077 020F99   155 1.00 -          SRC/status.c                 C_0E13_0672
+ 2077 021034   259 0.98 -          SRC/status.c                 C_0E13_070D
+ 2077 021137  1071 0.86 -          SRC/status.c                 C_0E13_080F
+ 2077 021566    62 1.00 -          SRC/status.c                 C_0E13_0B63
+ 2077 0215A4   837 0.89 -          SRC/status.c                 C_0E13_0BA1
+ 2077 0218E9   116 1.00 -          SRC/status.c                 C_0E13_0E54
+ 2077 02195D   901 0.71 -          SRC/status.c                 C_0E13_0EC8
+ 2077 021CE2   177 1.00 -          SRC/status.c                 C_0E13_10EA
+ 2077 021D93   226 1.00 -          SRC/status.c                 C_0E13_119B
+ 2077 021E75    39 0.95 -          SRC/status.c                 C_0E13_127D
+ 2077 021E9C   673 0.59 -          SRC/status.c                 C_0E13_12D4
+ 2077 02213D   162 0.69 -          SRC/status.c                 C_0E13_14F3
+ 2077 0221DF     9 1.00 -          SRC/status.c                 C_0E13_155B
+ 2077 0221E8   224 0.63 -          SRC/status.c                 C_0E13_1564
+ 222C 0222C8    43 0.65 -          SRC/gfx.c                    C_276B_1EB2
+ 222C 0222F3    44 0.64 -          SRC/npctrack.c               C_130F_0070
+ 222C 02231F    69 0.57 -          SRC/objcmd.c                 C_1DBD_0A29
+ 222C 022364    28 0.62 -          SRC/objcmd.c                 C_1DBD_428E
+ 2238 022380    73 0.97 -          SRC/console.c                C_05D0_0004
+ 2238 0223C9    25 0.89 -          SRC/console.c                C_05D0_004D
+ 2238 0223E2   399 1.00 -          SRC/console.c                C_05D0_0066
+ 2238 022571   270 0.61 -          SRC/console.c                C_05D0_01F5
+ 2238 02267F   114 1.00 -          SRC/console.c                C_05D0_028B
+ 2238 0226F1   165 1.00 -          SRC/console.c                C_05D0_02FD
+ 2238 022796   155 0.83 -          SRC/console.c                C_05D0_03A2
+ 2238 022831  2061 0.66 -          SRC/console.c                C_05D0_047A
+ 2238 02303E   872 0.92 -          SRC/console.c                C_05D0_08B7
+ 2238 0233A6    66 1.00 -          SRC/console.c                C_05D0_0BF5
+ 2238 0233E8    83 0.86 -          SRC/console.c                C_05D0_0BF5
+ 2238 02343B   108 1.00 -          SRC/console.c                C_05D0_0C37
+ 2238 0234A7   188 0.97 -          SRC/console.c                C_05D0_0CA3
+ 2238 023563   237 0.92 -          SRC/console.c                C_05D0_0D53
+ 2238 023650    23 1.00 -          SRC/console.c                C_05D0_0E16
+ 2238 023667    28 0.82 -          SRC/console.c                C_05D0_0E16
+ 2238 023683   205 0.92 -          SRC/console.c                C_05D0_0E2D
+ 2238 023750   218 1.00 -          SRC/console.c                C_05D0_0F0E
+ 2238 02382A    41 1.00 -          SRC/console.c                C_05D0_0FE8
+ 2238 023853   183 0.87 -          SRC/console.c                C_05D0_1011
+ 2238 02390A   280 0.99 -          SRC/console.c                C_05D0_10C0
+ 2238 023A22   136 0.74 -          SRC/console.c                C_05D0_11D2
+ 2238 023AAA   130 0.86 -          SRC/console.c                C_05D0_1247
+ 2238 023B2C   642 0.90 -          SRC/console.c                C_05D0_12B1
+ 2238 023DAE   174 0.45 -          SRC/console.c                C_05D0_14F0
+ 2238 023E5C   571 0.85 -          SRC/console.c                C_05D0_1668
+ 2238 024097   850 0.91 -          SRC/console.c                C_05D0_1834
+ 2238 0243E9    68 0.51 -          SRC_S/main.c                 C_034C_0627
+ 2238 02442D  2079 0.91 -          SRC/console.c                C_05D0_1B11
+ 2238 024C4C   549 0.76 -          SRC/console.c                C_05D0_22C8
+ 2238 024E71   206 1.00 -          SRC/console.c                C_05D0_2494
+ 2238 024F3F    75 1.00 -          SRC/console.c                C_05D0_2562
+ 2238 024F8A    55 1.00 -          SRC/console.c                C_05D0_25AD
+ 2238 024FC1   107 1.00 -          SRC/console.c                C_05D0_25E4
+ 2238 02502C  1027 0.98 -          SRC/console.c                C_05D0_264F
+ 2238 02542F    26 1.00 -          SRC/console.c                C_05D0_2A70
+ 2238 025449    34 1.00 -          SRC/console.c                C_05D0_2A8A
+ 2238 02546B   172 1.00 -          SRC/console.c                C_05D0_2AAC
+ 2238 025517   575 0.95 -          SRC/console.c                C_05D0_2B58
+ 2238 025756    34 1.00 -          SRC/console.c                C_05D0_2A8A
+ 2238 025778   506 0.98 -          SRC/console.c                C_05D0_2DB9
+ 2597 025972   557 0.35 -          SRC/objcmd.c                 C_1DBD_8184
+ 2597 025B9F    91 0.57 -          SRC/combat.c                 C_1810_0F19
+ 2597 025BFA    55 0.49 -          SRC_S/OSILIB/VMODE.C         C_07C3_00B3
+ 2597 025C31   205 0.35 -          SRC/object.c                 C_0A5D_1B36
+ 2597 025CFE   117 0.45 -          SRC/object.c                 C_0A5D_1BF3
+ 2597 025D73    90 0.44 -          SRC/object.c                 C_0A5D_1BF3
+ 2597 025DCD   122 0.40 -          SRC/rest.c                   C_29D8_0027
+ 2597 025E47    38 0.58 -          SRC/npctrack.c               C_130F_1199
+ 2597 025E6D   160 0.33 -          SRC/object.c                 C_0A5D_13D0
+ 2597 025F0D   671 0.43 -          SRC/status.c                 C_0E13_080F
+ 2597 0261AC   562 0.40 -          SRC/objcmd.c                 C_1DBD_740E
+ 263D 0263DE   193 0.31 -          SRC/OSILIB/LOW.ASM           C_2AF5_001B
+ 264A 0264A0   479 0.16 -          SRC_S/main.c                 C_034C_0592
+ 2668 026680    26 0.67 -          SRC/OSILIB/LOW.ASM           C_2AFB_0006
+ 2669 02669A   168 0.96 -          SRC_S/LIB/OSIWRITE.ASM       C_0C12_0000
+ 2674 026742  1328 0.99 -          SRC/OSILIB/LOW.ASM           C_2AFC_000A
+ 26C7 026C72   120 0.99 -          SRC/OSILIB/DELAY.ASM         C_2B4F_000A
+ 26CE 026CEA    29 1.00 -          SRC/OSILIB/RAND.ASM          C_2B57_0002
+ 26CE 026D07    37 1.00 -          SRC/OSILIB/RAND.ASM          C_2B57_001F
+ 26CE 026D2C    16 1.00 -          SRC_S/LIB/RANDOM.ASM         C_0D23_004B
+ 26D3 026D3C   151 0.94 -          SRC/../SRC_S/LIB/PIT.ASM     C_2F0D_0000
+ 26D3 026DD3    97 0.94 -          SRC_S/LIB/PIT.ASM            C_0CED_00A5
+ 26D3 026E34    74 1.00 -          SRC_S/LIB/PIT.ASM            C_0CED_0106
+ 26D3 026E7E   125 1.00 -          SRC_S/LIB/PIT.ASM            C_0CED_0150
+ 26EF 026EFC    36 1.00 -          SRC_S/LIB/LINPTR.ASM         C_0D09_000E
+ 26F2 026F20    33 1.00 -          SRC_S/LIB/PTRLIN.ASM         C_0D0C_0002
+ 26F4 026F42    60 1.00 -          SRC_S/LIB/CALIB.ASM          C_0D11_000C
+ 26F4 026F7E   186 1.00 -          SRC_S/LIB/CALIB.ASM          C_0D11_0048
+ 26F4 027038    40 1.00 -          SRC_S/LIB/CALIB.ASM          C_0D11_0102
+ 2706 027060     1 1.00 -          SRC_S/LIB/MEMMOVE.ASM        C_0CAC_000A
+ 2706 027061   174 0.77 -          SRC_S/LIB/MEMMOVE.ASM        C_0CAC_000B
+ 2710 02710F    49 1.00 -          SRC_S/music.c                C_08E4_000F
+ 2710 027140   153 0.96 -          SRC_S/music.c                C_08E4_0040
+ 2710 0271D9    98 0.98 -          SRC_S/music.c                C_08E4_00D4
+ 2710 02723B    72 1.00 -          SRC_S/music.c                C_08E4_0134
+ 2710 027283   539 0.84 -          SRC_S/music.c                C_08E4_017C
+ 2710 02749E   349 0.93 -          SRC_S/music.c                C_08E4_038A
+ 2710 0275FB   395 0.96 -          SRC_S/music.c                C_08E4_04DA
+ 2710 027786   374 0.97 -          SRC_S/music.c                C_08E4_065D
+ 2710 0278FC   110 1.00 -          SRC_S/music.c                C_08E4_07CB
+ 2710 02796A   114 0.95 -          SRC_S/music.c                C_08E4_0839
+ 2710 0279DC    75 0.93 -          SRC_S/music.c                C_08E4_08A7
+ 2710 027A27    75 1.00 -          SRC_S/music.c                C_08E4_08F0
+ 2710 027A72   148 0.88 -          SRC/../SRC_S/music.c         C_2B5C_0930
+ 2710 027B06    50 1.00 -          SRC_S/music.c                C_08E4_09D8
+ 2710 027B38    65 1.00 -          SRC_S/music.c                C_08E4_0A0A
+ 2710 027B79   171 1.00 -          SRC/../SRC_S/music.c         C_2B5C_0A40
+ 2710 027C24    26 1.00 -          SRC/../SRC_S/music.c         C_2B5C_0AEB
+ 2710 027C3E   164 0.94 -          SRC/../SRC_S/music.c         C_2B5C_0B05
+ 2710 027CE2  1675 0.86 -          SRC/../SRC_S/music.c         C_2B5C_0BB5
+ 2710 02836D    61 1.00 -          SRC_S/music.c                C_08E4_123F
+ 2710 0283AA   344 1.00 -          SRC_S/music.c                C_08E4_127C
+ 2710 028502   164 1.00 -          SRC/../SRC_S/music.c         C_2B5C_13C9
+ 2710 0285A6    90 1.00 -          SRC_S/music.c                C_08E4_1478
+ 2710 028600   358 0.77 -          SRC_S/music.c                C_08E4_14D2
+ 2710 028766   372 0.99 -          SRC_S/music.c                C_08E4_164A
+ 2710 0288DA   130 1.00 -          SRC_S/music.c                C_08E4_17BE
+ 2710 02895C   518 0.82 -          SRC/../SRC_S/music.c         C_2B5C_1835
+ 2710 028B62    44 1.00 -          SRC_S/music.c                C_08E4_19FF
+ 2710 028B8E   108 1.00 -          SRC_S/music.c                C_08E4_1A2B
+ 2710 028BFA    36 1.00 -          SRC_S/music.c                C_08E4_1A97
+ 2710 028C1E    31 0.72 -          SRC_S/music.c                C_08E4_1ABB
+ 2710 028C3D    74 1.00 -          SRC_S/music.c                C_08E4_1AD6
+ 2710 028C87   167 0.96 -          SRC_S/music.c                C_08E4_1B20
+ 28D2 028D2E   287 0.25 -          SRC/combat.c                 C_1810_1941
+ 28E4 028E4E   163 1.00 -          SRC_S/LIB/EMSINIT.ASM        C_0AA0_0002
+ 28E4 028EF1   132 1.00 -          SRC_S/LIB/EMSINIT.ASM        C_0AA0_00A5
+ 28F7 028F76    28 1.00 -          SRC_S/LIB/EMSMAP.ASM         C_0AD2_0008
+ 28F7 028F92   239 1.00 -          SRC_S/LIB/EMSMAP.ASM         C_0AD2_0024
+ 2908 029082   165 1.00 -          SRC_S/LIB/EMSFREE.ASM        C_0AE3_0004
+ 2908 029127   191 1.00 -          SRC_S/LIB/EMSFREE.ASM        C_0AE3_00A9
+ 291E 0291E6    93 0.42 -          SRC_S/LIB/EMSALLOC.ASM       C_0AB2_01B8
+ 2924 029243   258 1.00 -          SRC_S/LIB/HEAP.C             C_0AF9_0008
+ 2924 029345   152 0.93 -          SRC_S/LIB/HEAP.C             C_0AF9_010A
+ 2924 0293DD   243 0.99 -          SRC_S/LIB/HEAP.C             C_0AF9_01AD
+ 2924 0294D0   329 0.83 -          SRC_S/LIB/HEAP.C             C_0AF9_029D
+ 2924 029619    99 1.00 -          SRC_S/LIB/HEAP.C             C_0AF9_03DE
+ 2924 02967C   865 0.99 -          SRC_S/LIB/HEAP.C             C_0AF9_0441
+ 2924 0299DD   865 0.99 -          SRC_S/LIB/HEAP.C             C_0AF9_078E
+ 2924 029D3E   180 1.00 -          SRC_S/LIB/HEAP.C             C_0AF9_0ADB
+ 2924 029DF2   279 0.63 -          SRC_S/LIB/HEAP.C             C_0AF9_0ADB
+ 29F0 029F09   143 1.00 -          SRC_S/LIB/HEAPFREE.C         C_0BB1_000F
+ 29F0 029F98   173 1.00 -          SRC_S/LIB/HEAPFREE.C         C_0BB1_009E
+ 2A04 02A045    58 1.00 -          SRC_S/LIB/MEMORY.C           C_0BC5_000B
+ 2A04 02A07F    55 0.97 -          SRC_S/LIB/MEMORY.C           C_0BC5_0045
+ 2A04 02A0B6    52 1.00 -          SRC_S/LIB/MEMORY.C           C_0BC5_0045
+ 2A04 02A0EA   133 0.97 -          SRC_S/LIB/MEMORY.C           C_0BC5_00AD
+ 2A04 02A16F    57 0.89 -          SRC_S/LIB/MEMORY.C           C_0BC5_0126
+ 2A04 02A1A8   114 0.59 -          SRC_S/LIB/MEMORY.C           C_0BC5_0126
+ 2A04 02A21A    85 1.00 -          SRC_S/LIB/MEMORY.C           C_0BC5_0151
+ 2A04 02A26F   109 1.00 -          SRC_S/LIB/MEMORY.C           C_0BC5_01A6
+ 2A2D 02A2DC   656 0.76 -          SRC_S/LIB/LZW.ASM            C_0BE6_0004
+ 2A56 02A56C    45 1.00 -          SRC_S/LIB/OSIOPEN.ASM        C_0C02_0000
+ 2A56 02A599    31 1.00 -          SRC_S/LIB/OSIOPEN.ASM        C_0C02_002D
+ 2A5B 02A5B8    43 0.77 -          SRC_S/LIB/OSIOPEN.ASM        C_0C02_0000
+ 2A5E 02A5E4   240 0.87 -          SRC_S/LIB/OSIREAD.ASM        C_0C06_000C
+ 2A6D 02A6D4    56 1.00 -          SRC_S/LIB/OSISEEK.ASM        C_0C1C_0002
+ 2A70 02A70C   797 0.96 -          SRC_S/LIB/LZC.C              C_0C58_0005
+ 2AA2 02AA29   132 0.88 -          SRC_S/LIB/LIBSIZE.C          C_0C1F_000A
+ 2AAA 02AAAD   352 0.72 -          SRC_S/LIB/LZC.C              C_0C58_0305
+ 2AC0 02AC0D   238 0.97 -          SRC_S/LIB/LZC.C              C_0C58_0305
+ 2ACF 02ACFB   369 0.96 -          SRC_S/LIB/LIBOPEN.C          C_0C27_000A
+ 2ACF 02AE6C    17 1.00 -          SRC_S/LIB/LIBOPEN.C          C_0C27_0176
+ 2AE7 02AE7D   167 1.00 -          SRC_S/LIB/LIBREAD.C          C_0C3F_0007
+ 2AF2 02AF24   232 0.99 -          SRC_S/LIB/LIBSEEK.C          C_0C49_000E
+ 2B00 02B00C   444 0.98 -          SRC_S/LIB/EMSALLOC.ASM       C_0AB2_000A
+ 2B00 02B1C8    86 0.95 -          SRC_S/LIB/EMSALLOC.ASM       C_0AB2_01B8
+O2F52 100000  1139 0.34 -          SRC/objcmd.c                 C_1DBD_458F
+O2F52 100473    58 0.53 -          SRC_S/title.c                C_0636_0C5A
+O2F55 100500   562 0.97 -          SRC/spell.c                  C_11FF_00B0
+O2F58 100750   567 0.35 -          SRC/map.c                    C_08CB_0B8B
+O2F58 100987   335 0.35 -          SRC/objcmd.c                 C_1DBD_7F74
+O2F58 100AD6   460 0.35 -          SRC/combat.c                 C_1810_1101
+O2F5B 100CF0     7 1.00 -          SRC/disk.c                   C_2A81_0003
+O2F5B 100CF7     5 0.89 -          SRC/disk.c                   C_2A81_0003
+O2F5B 100CFC    81 1.00 -          SRC/disk.c                   C_2A81_0255
+O2F5B 100D4D    50 0.55 -          SRC_S/title.c                C_0636_0C5A
+O2F5F 100D90   718 0.29 -          SRC/objcmd.c                 C_1DBD_01A0
+O2F5F 10105E   425 0.33 -          SRC/gfx.c                    C_276B_1647
+O2F5F 101207   529 0.33 -          SRC/spell.c                  C_11FF_0D96
+O2F5F 101418  1081 0.33 -          SRC/objcmd.c                 C_1DBD_458F
+O2F5F 101851   338 0.37 -          SRC/objcmd.c                 C_1DBD_785B
+O2F63 101A60    67 0.47 -          SRC_S/title.c                C_0636_0C5A
+O2F63 101AA3    67 0.53 -          SRC_S/title.c                C_0636_0C5A
+O2F63 101AE6  1449 0.32 -          SRC/objcmd.c                 C_1DBD_458F
+O2F63 10208F   247 0.40 -          SRC/spell.c                  C_11FF_05AE
+O2F63 102186   278 0.36 -          SRC/objcmd.c                 C_1DBD_1848
+O2F63 10229C   471 0.45 -          SRC/combat.c                 C_1810_5370
+O2F63 102473   188 0.55 -          SRC/objcmd.c                 C_1DBD_666A
+O2F63 10252F   317 0.46 -          SRC/objcmd.c                 C_1DBD_4E58
+O2F63 10266C   244 0.83 -          SRC/objcmd.c                 C_1DBD_4F8E
+O2F68 102840   681 0.31 -          SRC/objcmd.c                 C_1DBD_78EC
+O2F68 102AE9   213 0.41 -          SRC/status.c                 C_0E13_016E
+O2F68 102BBE   111 0.48 -          SRC_S/main.c                 C_034C_07F8
+O2F68 102C2D   167 0.46 -          SRC/objcmd.c                 C_1DBD_3F24
+O2F68 102CD4   753 0.35 -          SRC/objcmd.c                 C_1DBD_48B8
+O2F68 102FC5    97 0.57 -          SRC/objcmd.c                 C_1DBD_3F24
+O2F68 103026  1219 0.34 -          SRC/objcmd.c                 C_1DBD_5141
+O2F68 1034E9   631 0.34 -          SRC/objcmd.c                 C_1DBD_7AB6
+O2F68 103760   193 0.52 -          SRC/npctrack.c               C_130F_1003
+O2F68 103821   946 0.37 -          SRC/objcmd.c                 C_1DBD_458F
+O2F68 103BD3   713 0.35 -          SRC_S/main.c                 C_034C_1264
+O2F68 103E9C  1067 0.28 -          SRC/objcmd.c                 C_1DBD_0304
+O2F6E 104420   118 0.53 -          SRC/talk.c                   C_0F79_00E0
+O2F6E 104496   725 0.31 -          SRC/map.c                    C_08CB_0B8B
+O2F6E 10476B   523 0.36 -          SRC/objcmd.c                 C_1DBD_33A4
+O2F6E 104976   185 0.48 -          SRC/objcmd.c                 C_1DBD_4225
+O2F72 104A90   528 0.37 -          SRC/objcmd.c                 C_1DBD_3AA1
+O2F72 104CA0   398 0.33 -          SRC/objcmd.c                 C_1DBD_1677
+O2F72 104E2E   100 0.49 -          SRC/combat.c                 C_1810_1F3D
+O2F75 104EA0   737 0.73 -          SRC/gfx.c                    C_276B_245A
+O2F75 105181    76 0.54 -          SRC/gfx.c                    C_276B_172E
+O2F75 1051CD   256 0.45 -          SRC/objcmd.c                 C_1DBD_01A0
+O2F75 1052CD   261 0.41 -          SRC/objcmd.c                 C_1DBD_05DC
+O2F75 1053D2   549 0.37 -          SRC/objcmd.c                 C_1DBD_05DC
+O2F75 1055F7    83 0.52 -          SRC/gfx.c                    C_276B_172E
+O2F75 10564A    80 0.54 -          SRC/gfx.c                    C_276B_172E
+O2F75 10569A   343 0.43 -          SRC/objcmd.c                 C_1DBD_4F8E
+O2F75 1057F1   275 0.41 -          SRC/objcmd.c                 C_1DBD_05DC
+O2F75 105904   300 0.41 -          SRC/objcmd.c                 C_1DBD_01A0
+O2F75 105A30  2201 0.27 -          SRC_S/main.c                 C_034C_0D1E
+O2F75 1062C9   337 0.39 -          SRC/npctrack.c               C_130F_4847
+O2F75 10641A   141 0.40 -          SRC/gameloop.c               C_0359_0CD4
+O2F75 1064A7    80 0.54 -          SRC/gfx.c                    C_276B_172E
+O2F75 1064F7    81 0.52 -          SRC/gfx.c                    C_276B_172E
+O2F75 106548    74 0.54 -          SRC_S/main.c                 C_034C_0508
+O2F7C 106700   135 0.95 -          SRC/rest.c                   C_29D8_00C2
+O2F7C 106787   170 0.94 -          SRC/rest.c                   C_29D8_014B
+O2F7C 106831   614 0.57 -          SRC/rest.c                   C_29D8_01F8
+O2F7C 106A97  1958 0.42 -          SRC/rest.c                   C_29D8_050B
+O2F80 1072F0   450 0.38 -          SRC/objcmd.c                 C_1DBD_447A
+O2F80 1074B2   166 0.50 -          SRC/objcmd.c                 C_1DBD_4225
+O2F83 107570   359 0.61 -          SRC/talk.c                   C_0F79_000E
+O2F83 1076D7  1878 0.32 -          SRC/objcmd.c                 C_1DBD_48B8
+O2F83 107E2D   149 0.66 -          SRC/talkdr.c                 C_0F8D_0094
+O2F83 107EC2    61 1.00 -          SRC/talkdr.c                 C_0F8D_011C
+O2F83 107EFF   246 0.66 -          SRC/talkdr.c                 C_0F8D_0159
+O2F83 107FF5   253 0.94 -          SRC/talkdr.c                 C_0F8D_0290
+O2F83 1080F2   318 0.99 -          SRC/talkdr.c                 C_0F8D_03B4
+O2F83 108230   106 0.83 -          SRC/talkdr.c                 C_0F8D_04FB
+O2F83 10829A  2518 0.29 -          SRC/objcmd.c                 C_1DBD_48B8
+O2F88 108DE0   122 1.00 -          SRC/talkdr.c                 C_0F8D_0004
+O2F88 108E5A    43 0.52 -          SRC/talkdr.c                 C_0F8D_007E
+O2F88 108E85  4030 0.98 -          SRC/talkdr.c                 C_0F8D_0543
+O2F88 109E43   167 1.00 -          SRC/talkdr.c                 C_0F8D_14FB
+O2F88 109EEA  1612 0.85 -          SRC/talkdr.c                 C_0F8D_18A3
+O2F88 10A536   188 0.97 -          SRC/talkdr.c                 C_0F8D_1EEC
+O2F88 10A5F2   288 1.00 -          SRC/talkdr.c                 C_0F8D_1FA8
+O2F88 10A712  1593 0.90 -          SRC/talkdr.c                 C_0F8D_20C8
+O2F8D 10AE00   449 0.40 -          SRC/gameloop.c               C_0359_1014
+O2F8D 10AFC1   571 0.39 -          SRC/status.c                 C_0E13_0EC8
+O2F8D 10B1FC    67 0.43 -          SRC/gameloop.c               C_0359_1806
+O2F8D 10B23F    55 0.47 -          SRC/object.c                 C_0A5D_0DEF
+O2F8D 10B276   110 0.47 -          SRC/objcmd.c                 C_1DBD_622F
+O2F8D 10B2E4   250 0.51 -          SRC/gfx.c                    C_276B_012F
+O2F8D 10B3DE   227 0.51 -          SRC/objcmd.c                 C_1DBD_740E
+O2F8D 10B4C1   392 0.45 -          SRC/objcmd.c                 C_1DBD_5641
+O2F8D 10B649    76 0.56 -          SRC/objcmd.c                 C_1DBD_405D
+O2F8D 10B695   308 0.35 -          SRC/combat.c                 C_1810_3B65
+O2F8D 10B7C9   158 0.44 -          SRC/egg.c                    C_2667_00DA
+O2F8D 10B867   240 0.48 -          SRC/objcmd.c                 C_1DBD_447A
+O2F8D 10B957    70 0.58 -          SRC_S/main.c                 C_034C_07F8
+O2F8D 10B99D   351 0.49 -          SRC/objcmd.c                 C_1DBD_3AA1
+O2F8D 10BAFC   258 0.46 -          SRC/objcmd.c                 C_1DBD_447A
+O2F8D 10BBFE   221 0.36 -          SRC/gfx.c                    C_276B_1D87
+O2F8D 10BCDB    65 0.62 -          SRC/objcmd.c                 C_1DBD_3E75
+O2F8D 10BD1C   553 0.42 -          SRC/objcmd.c                 C_1DBD_7580
+O2F8D 10BF45   506 0.44 -          SRC/objcmd.c                 C_1DBD_3AA1
+O2F8D 10C13F   381 0.42 -          SRC/objcmd.c                 C_1DBD_4297
+O2F8D 10C2BC   137 0.53 -          SRC/combat.c                 C_1810_0068
+O2F8D 10C345   220 0.45 -          SRC/npctrack.c               C_130F_01C6
+O2F8D 10C421   776 0.39 -          SRC/objcmd.c                 C_1DBD_3866
+O2F8D 10C729    90 0.55 -          SRC/status.c                 C_0E13_14F3
+O2F8D 10C783   422 0.36 -          SRC/objcmd.c                 C_1DBD_33A4
+O2F8D 10C929   247 0.45 -          SRC/objcmd.c                 C_1DBD_8184
+O2F8D 10CA20   882 0.35 -          SRC/objcmd.c                 C_1DBD_5794
+O2F8D 10CD92   121 0.46 -          SRC/objcmd.c                 C_1DBD_0FAB
+O2F98 10D080   615 0.38 -          SRC/objcmd.c                 C_1DBD_63CE
+O2F98 10D2E7   323 0.46 -          SRC/objcmd.c                 C_1DBD_740E
+O2F98 10D42A   345 0.43 -          SRC/objcmd.c                 C_1DBD_7F74
+O2F98 10D583   628 0.37 -          SRC/objcmd.c                 C_1DBD_5794
+O2F98 10D7F7    76 0.61 -          SRC/objcmd.c                 C_1DBD_71B8
+O2F98 10D843   876 0.33 -          SRC/objcmd.c                 C_1DBD_7AB6
+O2F98 10DBAF   452 0.42 -          SRC/combat.c                 C_1810_523E
+O2F98 10DD73   352 0.38 -          SRC/objcmd.c                 C_1DBD_8184
+O2F98 10DED3   309 0.42 -          SRC/objcmd.c                 C_1DBD_5641
+O2F98 10E008   256 0.48 -          SRC/objcmd.c                 C_1DBD_6F30
+O2F98 10E108   431 0.44 -          SRC/objcmd.c                 C_1DBD_33A4
+O2F98 10E2B7   253 0.48 -          SRC/objcmd.c                 C_1DBD_740E
+O2F98 10E3B4   277 0.53 -          SRC/objcmd.c                 C_1DBD_33A4
+O2F98 10E4C9   287 0.39 -          SRC/objcmd.c                 C_1DBD_5641
+O2F98 10E5E8   258 0.50 -          SRC/objcmd.c                 C_1DBD_6F30
+O2F98 10E6EA   331 0.45 -          SRC/combat.c                 C_1810_523E
+O2F98 10E835   467 0.48 -          SRC/objcmd.c                 C_1DBD_3866
+O2F98 10EA08    53 0.59 -          SRC_S/main.c                 C_034C_07F8
+O2F98 10EA3D   184 0.49 -          SRC/objcmd.c                 C_1DBD_730F
+O2F98 10EAF5   321 0.45 -          SRC/objcmd.c                 C_1DBD_5641
+O2F98 10EC36   594 0.34 -          SRC/object.c                 C_0A5D_1506
+O2F98 10EE88   123 0.52 -          SRC/objcmd.c                 C_1DBD_622F
+O2F98 10EF03    68 0.62 -          SRC_S/main.c                 C_034C_07F8
+O2F98 10EF47   339 0.40 -          SRC/objcmd.c                 C_1DBD_4297
+O2FA1 10F340   247 0.39 -          SRC/objcmd.c                 C_1DBD_4297
+O2FA1 10F437   135 0.49 -          SRC/talk.c                   C_0F79_00E0
+O2FA1 10F4BE   668 0.29 -          SRC/objcmd.c                 C_1DBD_5794
+O2FA1 10F75A   116 0.46 -          SRC/combat.c                 C_1810_3840
+O2FA1 10F7CE   212 0.45 -          SRC/objcmd.c                 C_1DBD_4297
+O2FA1 10F8A2   359 0.43 -          SRC/objcmd.c                 C_1DBD_33A4
+O2FA1 10FA09   850 0.34 -          SRC/combat.c                 C_1810_4AA9
+O2FA1 10FD5B   551 0.37 -          SRC/objcmd.c                 C_1DBD_5641
+O2FA1 10FF82   851 0.38 -          SRC/objcmd.c                 C_1DBD_5794
+O2FA1 1102D5   587 0.40 -          SRC/objcmd.c                 C_1DBD_5794
+O2FA1 110520   344 0.40 -          SRC/spell.c                  C_11FF_05AE
+O2FA1 110678   416 0.46 -          SRC/objcmd.c                 C_1DBD_4F8E
+O2FA1 110818   764 0.31 -          SRC/spell.c                  C_11FF_0F07
+O2FA1 110B14   242 0.44 -          SRC/objcmd.c                 C_1DBD_4297
+O2FA1 110C06    45 0.52 -          SRC/gfx.c                    C_276B_172E
+O2FA1 110C33    96 0.46 -          SRC/objcmd.c                 C_1DBD_622F
+O2FA1 110C93   265 0.40 -          SRC/objcmd.c                 C_1DBD_6AD8
+O2FA1 110D9C   164 0.50 -          SRC/status.c                 C_0E13_14F3
+O2FA1 110E40    24 0.50 -          SRC_S/title.c                C_0636_0C5A
+O2FA1 110E58   164 0.53 -          SRC/objcmd.c                 C_1DBD_33A4
+O2FA1 110EFC   114 0.47 -          SRC/status.c                 C_0E13_14F3
+O2FA1 110F6E   136 0.44 -          SRC/talkdr.c                 C_0F8D_0004
+O2FA1 110FF6   248 0.48 -          SRC/gfx.c                    C_276B_1D87
+O2FA1 1110EE   235 0.40 -          SRC/objcmd.c                 C_1DBD_4297
