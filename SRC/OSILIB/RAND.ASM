@@ -1,0 +1,67 @@
+INCLUDE OSI.INC
+
+DSegStart
+D_2B1A	dw 1	;random seed 1
+D_2B1C	dw 0	;random seed 2
+DSegEnd
+
+CSegStart	SEG_2B57_TEXT
+	
+C_26CE_000A	PROC FAR
+	MOV	CX,D_2B1A
+	MOV	BX,CX
+	MOV	AX,D_2B1C
+	ADD	CX,CX
+	RCL	AX,1
+	ADD	CX,BX
+	ADC	AX,D_2B1C
+	ADD	AX,BX
+	MOV	D_2B1A,CX
+	MOV	D_2B1C,AX
+	RET
+C_26CE_000A	ENDP
+
+PUBLIC OSI_rand
+OSI_rand	PROC FAR	;26CE:0027
+	PUSH	BP
+	MOV	BP,SP
+	;--
+	CALL	C_26CE_000A
+	;--
+	MOV	BX,[BP+06]
+	MOV	CX,[BP+08]
+	CMP	BX,CX
+	JNB	C_003D
+	XCHG	BX,CX
+C_003D:
+	XOR	DX,DX
+	SUB	BX,CX
+	INC	BX
+	JZ	C_0046
+	DIV	BX
+C_0046:
+	ADD	DX,CX
+	MOV	AX,DX
+	POP	BP
+	RET	4
+OSI_rand	ENDP
+
+PUBLIC OSI_randomize	;26CE:004C
+OSI_randomize	PROC FAR	;26CE:004C
+	PUSH	BP
+	MOV	BP,SP
+	;--
+	MOV	AX,[BP+06]
+	OR	AX,1
+	MOV	D_2B1A,AX
+	;--
+	POP	BP
+	RET	2
+OSI_randomize	ENDP
+
+CSegEnd	SEG_2B57_TEXT
+
+
+;(Ultima VI has OSI_timeSeed here, in a second code segment: Savage Empire left it out)
+
+END

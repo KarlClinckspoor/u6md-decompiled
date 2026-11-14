@@ -8,7 +8,8 @@ Martian Dreams addresses the comparison found.
                               [--se-target savage|game] [--flags ...]
 
 SE_FILE is a file of the SE decompilation (default checkout ../u6se-decompiled, or
-SE_ROOT). Its own position (frame, first byte, _DATA range) is read from SE's
+SE_ROOT), or of this repository's SRC_M (MARTIAN.EXE, to carry it over to GAME.EXE with
+--target game). Its own position (frame, first byte, _DATA range) is read from its
 modules.txt. Only what the comparison can vouch for is renamed: external names at fixups
 before the first real difference (and in _DATA), the module's own functions that start
 before it, its own initialised data when _DATA matched up to them. Everything else keeps
@@ -26,8 +27,8 @@ SE_ROOT = os.environ.get('SE_ROOT') or os.path.join(os.path.dirname(target.ROOT)
 def se_module(path):
     """(SE target, frame, at, len, (d0, d1) or None) of an SE source file"""
     ap = os.path.normcase(os.path.abspath(path))
-    for name, src in (('savage', 'SRC_S'), ('game', 'SRC')):
-        d = os.path.join(SE_ROOT, src)
+    for name, d in (('savage', os.path.join(SE_ROOT, 'SRC_S')), ('game', os.path.join(SE_ROOT, 'SRC')),
+                    ('martian', os.path.join(target.ROOT, 'SRC_M'))):
         p = os.path.join(d, 'modules.txt')
         if not os.path.exists(p):
             continue
@@ -57,7 +58,8 @@ def main():
         args = [sys.executable, os.path.join(HERE, 'mdcmp.py'), '--target', target.T['name'], a.file,
                 '--seg', a.seg, '--at', a.at, '--map-out', mp,
                 '--include', os.path.dirname(os.path.abspath(a.file)),
-                '--include', os.path.join(SE_ROOT, 'SRC_S' if se_t == 'savage' else 'SRC')]
+                '--include', {'savage': os.path.join(SE_ROOT, 'SRC_S'), 'game': os.path.join(SE_ROOT, 'SRC'),
+                              'martian': os.path.join(target.ROOT, 'SRC_M')}[se_t]]
         if a.flags:
             args += ['--flags', a.flags]
         r = subprocess.run(args, capture_output=True, text=True)
