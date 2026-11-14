@@ -72,7 +72,7 @@
 2F7C 0 B3D -  # overlay
 2F80 0 268 -  # overlay
 2F83 0 1700 -  # overlay
-2F88 0 1F6B -  # overlay
+2F88 0 1F6B talkdr.c 2802-28F0  # overlay
 2F8D 0 200B -  # overlay
 2F98 0 201A -  # overlay
 2FA1 0 1E99 -  # overlay

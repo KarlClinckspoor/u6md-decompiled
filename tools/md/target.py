@@ -5,7 +5,10 @@ Pick one with --target or the MD_TARGET environment variable (default: martian).
 GAME.EXE is an overlaid program (Borland VROOMM, TLINK /o): its overlaid code is not in
 the MZ image but in the FBOV block after it. load_image() returns one address space for
 both: the MZ image as it is, then each overlay's code at OVL_BASE + its offset in the
-FBOV block (as tools/md/mdmatch_proto.py numbered them). overlays() lists them.
+FBOV block (as tools/md/mdmatch_proto.py numbered them). overlays() lists them. An
+overlay's relocated words hold an offset into the segment table (entry * 8), which the
+overlay manager replaces by that entry's segment; load_image() does the same, so an
+overlay's far pointers read like the MZ image's (stub segment for overlaid code).
 """
 import os, struct
 
@@ -94,7 +97,8 @@ def load_image(path):
     """(image bytes, set of image addresses holding relocated segment words, header bytes)
 
     For an overlaid program the image continues with its overlays' code at OVL_BASE +
-    file offset (zeros in between); their relocations are in the set too."""
+    file offset (zeros in between); their relocations are in the set too, each relocated
+    word turned from its segment-table offset into the segment it stands for."""
     d = open(path, 'rb').read()
     hdrp, size = mz(d)
     nrel, relofs = struct.unpack_from('<H', d, 6)[0], struct.unpack_from('<H', d, 0x18)[0]
@@ -111,8 +115,14 @@ def load_image(path):
         for o in ovl:
             code = d[size + 16 + o['fileofs']:size + 16 + o['fileofs'] + o['size']]
             big[o['addr']:o['addr'] + o['size']] = code
+        tab = segment_table(path)
+        for o in ovl:
             for k in range(o['nrel']):
-                relocs.add(o['addr'] + struct.unpack_from('<H', d, o['relofs'] + 2 * k)[0])
+                a = o['addr'] + struct.unpack_from('<H', d, o['relofs'] + 2 * k)[0]
+                relocs.add(a)
+                v = struct.unpack_from('<H', big, a)[0]
+                if v % 8 == 0 and v // 8 < len(tab):
+                    struct.pack_into('<H', big, a, tab[v // 8][0])
         img = bytes(big)
     return img, relocs, d[:hdrp]
 

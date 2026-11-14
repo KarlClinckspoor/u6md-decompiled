@@ -3,7 +3,8 @@
 
     python3 tools/md/mddis.py [--target martian|game] SEG [END_SEG] > listing.txt     (hex paragraphs)
 
-Offsets are relative to SEG (the module's code segment, as its far calls see it).
+Offsets are relative to SEG (the module's code segment, as its far calls see it). SEG can
+be an overlay's stub segment (GAME.EXE): the whole overlay is listed, offsets in it.
 Annotations:
   - far calls and far pointers: the target's name from the target's symbol file, else
     C_SSSS_OOOO (the convention of the GAME.EXE decompilation);
@@ -16,7 +17,7 @@ import os, re, struct, subprocess, sys, tempfile
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
-from mdcmp import find_exe, load_image, load_syms, DGROUP  # noqa: E402
+from mdcmp import find_exe, load_image, load_syms, DGROUP, STUBS, resolve_far  # noqa: E402
 
 
 def strings_at(img):
@@ -53,6 +54,8 @@ def main():
         segvals = sorted({struct.unpack_from('<H', img, r)[0] for r in relocs})
         end = min([s for s in segvals if s > seg] or [DGROUP])
     base, length = seg * 16, (end - seg) * 16
+    if seg in STUBS:  # an overlay: its code is at OVL_BASE + its file offset
+        base, length = STUBS[seg]['addr'], STUBS[seg]['size']
     code = img[base:base + length]
     strs = strings_at(img)
 
@@ -90,6 +93,7 @@ def main():
         note = []
         if hexb.startswith('9A') and len(hexb) == 10:
             o, s = struct.unpack('<HH', bytes.fromhex(hexb[2:]))
+            s, o = resolve_far(s, o)
             nm = names.get((s, o)) or ('C_%04X_%04X' % (s, o))
             if s == seg:
                 nm = names.get((s, o)) or 'C_%04X_%04X' % (s, o)

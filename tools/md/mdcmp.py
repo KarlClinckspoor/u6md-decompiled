@@ -18,6 +18,11 @@ fixup is checked against what the original holds there instead:
 The module's initialised data (_DATA) is compared with the original data segment at the
 base found (or given), fixups inside it checked the same way.
 
+An overlaid module (GAME.EXE) is given by its stub segment (--seg 2F88 --at 0): its code
+is compared with the overlay's (target.load_image()), far calls to overlaid code through
+a stub entry count as the function it stands for, and TLINK /o's `nop / push cs / call
+near` stands for a 9A far call to the module's own code.
+
 Exit status 0 when everything matches. On a difference, prints where (segment offset and
 the function containing it) with both disassemblies around it.
 """
@@ -351,6 +356,26 @@ def main():
                 problems.append((where, 'fixup type %d unchecked' % f.loc))
 
     # ---- code ----
+    if segp in STUBS:
+        # TLINK /o turns an overlaid module's far call to its own code (9A + fixup) into
+        # nop / push cs / call near: accept that form and skip the fixup
+        own = {n: o for n, (si, o) in m.pubs.items() if m.segs[si] is cs}
+        keep = []
+        for f in cs.fixups:
+            t = None
+            if f.loc == 3 and f.offset >= 1 and cs.data[f.offset - 1] == 0x9A and f.offset + 4 <= len(cs.data):
+                if f.tkind == 'seg' and f.target == cs.name:
+                    t = (f.disp + struct.unpack_from('<H', cs.data, f.offset)[0]) & 0xFFFF
+                elif f.tkind == 'ext' and f.target in own:
+                    t = own[f.target]
+            p = f.offset - 1
+            o = img[base + p:base + p + 5]
+            if t is not None and o[:3] == b'\x90\x0e\xe8' and \
+                    (p + 5 + struct.unpack_from('<H', o, 3)[0]) & 0xFFFF == t:
+                cs.data[p:p + 5] = o
+                continue
+            keep.append(f)
+        cs.fixups = keep
     fixmask = bytearray(cs.length)
     for f in cs.fixups:
         for k in range(f.size):
