@@ -14,8 +14,8 @@
 104E 7 1093 -
 1157 A B6F -
 120E 9 3257 -
-1534 0 1159 -
-1649 A 8DF -
+1534 0 1159 map.c 132E-13F0
+1649 A 8DF egg.c 13F0-1412
 16D7 A 358 OSILIB/MOUSE.ASM 1412-1420
 170D 2 3FC0 -
 1B09 2 4A00 -
@@ -70,7 +70,7 @@
 2F72 0 402 -  # overlay
 2F75 0 16F2 -  # overlay
 2F7C 0 B3D -  # overlay
-2F80 0 268 -  # overlay
+2F80 0 268 jet.c 2408-247A  # overlay
 2F83 0 1700 talk.c 247A-2802  # overlay
 2F88 0 1F6B talkdr.c 2802-28F0  # overlay
 2F8D 0 200B -  # overlay
