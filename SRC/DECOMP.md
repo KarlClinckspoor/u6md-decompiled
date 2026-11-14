@@ -32,7 +32,8 @@ the library's C files name their own flags (cdecl) and often Turbo C++ 1.01.
   MOUSE, DELAY, RAND, OSI_FILE.
 - Done by workers: OSILIB (DRVLOAD, VIDRESET, LOW, CLIP, OSIWRITE, OSICREAT,
   drvnames.c), main.c, console.c, talkdr.c (overlay 2F88, the first overlay done),
-  talk.c (overlay 2F83), status.c (2077).
+  talk.c (overlay 2F83), status.c (2077), objtype.c (100B), typetest.c (222C),
+  revive.c (overlay 2F55), disk.c (overlay 2F5B).
 - Next: the SE-like modules, then the new code and the other overlays (docs/PLAN.md
   Phase 4). SRC/se.h is SE's.
 

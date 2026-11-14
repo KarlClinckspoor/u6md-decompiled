@@ -315,7 +315,8 @@ def main():
                         problems.append((where, 'offset %s+%x: original %04x, base %04x gives %04x' % (
                             tgt, f.disp, v, b, b + f.disp)))
                 elif f.tkind == 'seg' and f.target == cs.name:
-                    if v != f.disp + at:
+                    # an overlaid module holds the offset of its own function as the stub entry's
+                    if v != f.disp + at and resolve_far(segp, v) != (segp, f.disp + at):
                         problems.append((where, 'offset in own code +%x: original %04x' % (f.disp, v)))
                 elif f.tkind == 'ext' and syms.get(f.target) is not None and dsyms.get(f.target) is None:
                     # the offset of a far function (mov ax,OFFSET f)
