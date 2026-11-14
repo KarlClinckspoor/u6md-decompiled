@@ -31,7 +31,8 @@ the library's C files name their own flags (cdecl) and often Turbo C++ 1.01.
   (2706-2B00), CALIB, LINPTR, PTRLIN, PTRNORM, PIT; from SE's GAME.EXE: OSILIB/KBD,
   MOUSE, DELAY, RAND, OSI_FILE.
 - Done by workers: OSILIB (DRVLOAD, VIDRESET, LOW, CLIP, OSIWRITE, OSICREAT,
-  drvnames.c), main.c, console.c, talkdr.c (overlay 2F88, the first overlay done).
+  drvnames.c), main.c, console.c, talkdr.c (overlay 2F88, the first overlay done),
+  talk.c (overlay 2F83).
 - Next: the SE-like modules, then the new code and the other overlays (docs/PLAN.md
   Phase 4). SRC/se.h is SE's.
 
