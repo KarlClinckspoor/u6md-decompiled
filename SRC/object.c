@@ -341,7 +341,7 @@ extern int16 D_EBC0;/*GiveObj: when set, refuse instead of dropping what does no
 /*158C*/int16 LoadedZ = -1;
 /*FindLoc/NextLoc state: a list cursor and a location for the square and
   the squares right, below and below-right of it*/
-/*158E*/static int16 LocCursor[4] = {1, 1, 1, 1};
+/*158E*/int16 LocCursor[4] = {1, 1, 1, 1};
 /*unused (SE's LocCursor and LocOnNextRow)*/
 /*1596*/static int16 D_1596 = -1;
 /*1598*/static int16 D_1598 = 0;

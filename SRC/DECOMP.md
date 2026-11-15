@@ -40,7 +40,7 @@ the library's C files name their own flags (cdecl) and often Turbo C++ 1.01.
   gfx.c (0E1A), canmove.c (104E), dream.c (overlay 2F5F), dreamobj.c (overlay 2F63),
   dreamstg.c (overlay 2F68),
   cutscene.c (overlay 2F75), gameloop.c (120E), npctrack.c (170D), object.c (1B09),
-  gamestat.c (data only, DS 1672-16DA).
+  gamestat.c (data only, DS 1672-16DA), objcmd.c (047A).
 - Next: the SE-like modules, then the new code and the other overlays (docs/PLAN.md
   Phase 4). SRC/se.h is SE's.
 
