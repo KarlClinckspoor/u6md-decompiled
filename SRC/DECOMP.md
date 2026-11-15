@@ -43,9 +43,10 @@ the library's C files name their own flags (cdecl) and often Turbo C++ 1.01.
   gamestat.c (data only, DS 1672-16DA), objcmd.c (047A), combat.c (07D1, the largest
   module; SE's combat.c reworked, DS 06BA-07FA; docs/GAME_NOTES.md M30, M31),
   useact1.c (overlay 2F8D, the first of the "use" actions, new code; M32), useact2.c
-  (overlay 2F98, the second of them, new code; M33).
-- Next: the SE-like modules, then the new code and the other overlays (docs/PLAN.md
-  Phase 4). SRC/se.h is SE's.
+  (overlay 2F98, the second of them, new code; M33), useact3.c (overlay 2FA1, the
+  third and last of them, new code; M34).
+- Every code module of GAME.EXE now has an identical source (75 of 75 in mdcheck).
+  SRC/se.h is SE's.
 
 ## Rules of the sources
 

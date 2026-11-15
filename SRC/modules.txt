@@ -76,4 +76,4 @@
 2F88 0 1F6B talkdr.c 2802-28F0  # overlay
 2F8D 0 200B useact1.c 28F0-2990  # overlay
 2F98 0 201A useact2.c 2990-29A2  # overlay
-2FA1 0 1E99 -  # overlay
+2FA1 0 1E99 useact3.c 29A2-29F4  # overlay

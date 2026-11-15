@@ -66,11 +66,11 @@ def main():
         t = struct.unpack('<H', mm.group(1))[0]
         before = code[max(0, mm.start() - 24):mm.start()]
         n = None
-        c = list(re.finditer(rb'\x3d(..)\x77|\x83\xf8(.)\x77|\x3d(..)\x76|\x83\xf8(.)\x76', before, re.S))
+        # cmp ax/any reg, imm16 or imm8 (sign-extended); ja/jbe
+        c = list(re.finditer(rb'(?:\x3d|\x81[\xf8-\xff])(..)[\x76\x77]|\x83[\xf8-\xff](.)[\x76\x77]', before, re.S))
         if c:
             g = c[-1]
-            v = g.group(1) or g.group(3)
-            n = struct.unpack('<H', v)[0] + 1 if v else (g.group(2) or g.group(4))[0] + 1
+            n = struct.unpack('<H', g.group(1))[0] + 1 if g.group(1) else g.group(2)[0] + 1
         if n is None or n > 256 or t + 2 * n > length:
             continue
         tables[t] = [struct.unpack_from('<H', code, t + 2 * k)[0] for k in range(n)]
@@ -102,7 +102,7 @@ def main():
             tgt = int(ins.split()[-1], 16)
             ins = 'call far %s (push cs/call near)' % (names.get((seg, tgt)) or 'C_%04X_%04X' % (seg, tgt))
         prev_push_cs = hexb == '0E'
-        if 'jmp [cs:bx+' in ins:
+        if re.search(r'jmp (word )?\[cs:bx\+', ins):
             t = int(ins.split('+')[-1].rstrip(']'), 16)
             if t in tables:
                 note.append('switch: ' + ', '.join('%d:%X' % (k, v) for k, v in enumerate(tables[t])))
