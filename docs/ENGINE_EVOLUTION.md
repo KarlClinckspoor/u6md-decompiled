@@ -316,9 +316,15 @@ Three sources bear on the claim, and they are not equally strong.
   Empire was Origin's first attempt to reuse an engine. Stripping out the original assets was
   so much work that it cost about as much as Ultima VI. Martian Dreams was meant to learn from
   that and cost as much again, and both sold less than the mainline games. This is a
-  paraphrase in a blog post, not a transcript. I found no primary interview with those words.
+  paraphrase in a blog post, not a transcript: Pix's own summary, written about a week after
+  an unrecorded Q&A that followed a tour of Portalarium's Austin offices. The same account
+  was reposted on the Ultima Codex, which does not make it independent. A second search
+  (Garriott, Spector and the spin-off teams' interviews, the Digital Antiquarian, forums)
+  found no primary source and no independent corroboration; every repetition of the claim
+  traces back to this post.
 
-So the claim is as reported: it rests on one second-hand account of Garriott, and on the
+So the claim is as reported: it rests on one second-hand account of Garriott (Spector
+confirms the aim, the tight budgets and the poor sales, not a cost overrun), and on the
 fact that the series stopped after two games. The rest of this part argues from the code
 about why reuse might have cost more than planned. It is hypothesis throughout. Each
 hypothesis gets a confidence rating.
