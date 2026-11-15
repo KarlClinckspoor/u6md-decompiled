@@ -12,7 +12,7 @@
 1005 C 62 OSILIB/KBD.ASM
 100B E 429 objtype.c 0BB2-0E96
 104E 7 1093 -
-1157 A B6F -
+1157 A B6F visible.c 0EA0-0F10
 120E 9 3257 -
 1534 0 1159 map.c 132E-13F0
 1649 A 8DF egg.c 13F0-1412
@@ -23,7 +23,7 @@
 2077 3 1B55 status.c 1A8A-1B84
 222C 8 B8 typetest.c
 2238 0 35F2 console.c 1B84-1CBA
-2597 2 A6C -
+2597 2 A6C use.c 1CBA-1CD6
 - - 0 OSILIB/drvnames.c 29F4-2A28
 263D E C1 OSILIB/DRVLOAD.ASM 2A28-2A6C
 264A 0 1DF OSILIB/CLIP.ASM 2A6C-2A7A
@@ -67,7 +67,7 @@
 2F63 0 D00 -  # overlay
 2F68 0 1A87 -  # overlay
 2F6E 0 60F -  # overlay
-2F72 0 402 -  # overlay
+2F72 0 402 power.c  # overlay
 2F75 0 16F2 -  # overlay
 2F7C 0 B3D -  # overlay
 2F80 0 268 jet.c 2408-247A  # overlay
