@@ -91,32 +91,32 @@ extern char far C_2BB4_03F1[];
 extern char far C_2BB4_0402[];
 
 /*variables of other modules*/
-extern char DirIncrX[];/*DirIncrX*/
-extern char DirIncrY[];/*DirIncrY*/
+extern char DirIncrX[];
+extern char DirIncrY[];
 extern unsigned char D_0F12;/*StatusDirty*/
 extern unsigned char D_0F13;/*PromptFlag*/
 extern char D_0F15;/*IsArmageddon: 1 the game cannot be won any more, 2 (some NPCs)*/
-extern int16 D_1431;/*VisibilityDirty*/
-extern int16 D_1437;/*EnemyWarningGiven*/
-extern unsigned char Active;/*Active*/
-extern int16 D_167C, D_167E, D_1680;/*MapX, MapY, MapZ*/
+extern int16 VisibilityDirty;
+extern int16 EnemyWarningGiven;
+extern unsigned char Active;
+extern int16 MapX, MapY, MapZ;
 extern unsigned char D_1684, D_1685;/*where the dreamer wakes up (x, y)*/
 extern unsigned char D_16A3;/*creatures left to kill in the dream stage*/
-extern char D_16A4;/*InCombat*/
-extern char D_16A5;/*SoloMember: -1 in party mode*/
-extern unsigned char D_16A6;/*SavedNPCMode*/
+extern char InCombat;
+extern char SoloMember;/*SoloMember: -1 in party mode*/
+extern unsigned char SavedNPCMode;
 extern unsigned char D_16A8;/*the player is a woman*/
 extern int32 D_16AA;/*flags (0x10: the dream)*/
 extern struct { unsigned a:4, b:4, c:4, d:4; } D_16B0[];/*talents*/
-extern int16 D_16D4;/*DreamStage*/
-extern unsigned char PartyListTop;/*PartyListTop*/
-extern char SelectMode;/*SelectMode*/
-extern int16 TextOn;/*TextOn*/
-extern int16 EndPagingAtPrompt;/*EndPagingAtPrompt*/
-extern int16 LastAttackTarget;/*LastAttackTarget*/
+extern int16 DreamStage;
+extern unsigned char PartyListTop;
+extern char SelectMode;
+extern int16 TextOn;
+extern int16 EndPagingAtPrompt;
+extern int16 LastAttackTarget;
 extern int16 StatusDisplay;/*StatusDisplay: 0x92 when the equipment view is shown*/
-extern int16 StatusMember;/*StatusMember*/
-extern unsigned char D_2805;/*IsInConversation*/
+extern int16 StatusMember;
+extern unsigned char IsInConversation;
 extern struct tSurface D_3232;/*Screen*/
 extern unsigned char D_3266[];/*ObjStatus*/
 extern char D_44C4[];/*MovePts*/
@@ -184,7 +184,7 @@ extern C_2F5F_0AC1(int16);
 extern DreamWakeUp();
 extern C_2F75_0B90();/*a cut scene*/
 extern int16 D_C0FA, D_C0FC;/*AreaX, AreaY*/
-extern int16 D_14F2;/*LocPartOffset*/
+extern int16 LocPartOffset;
 extern int16 InsertObj(int16, int16, int16);
 extern int16 OBJ_FindNPCAt(int16, int16, int16);/*OBJ_FindNPCAt(startNum, x, y)*/
 extern int16 C_170D_0002(int16);
@@ -235,13 +235,13 @@ extern int16 Missiles(int16, int16, int16, int16 *, int16 *, int16, int16, int16
 extern int16 far *C_0E1A_1003(int16, int16, int16, int16, int16);/*a spray of 12 missiles: the objects hit, -1 terminated*/
 extern C_2F63_0086(void);/*the dreamer passes out*/
 extern C_2F63_062F(int16);
-extern char *C_1B09_46E4(int16);/*GetTileString*/
-extern int16 C_2238_0062(int16, int16);/*MkDirection*/
+extern char *GetTileString(int16);
+extern int16 MkDirection(int16, int16);
 extern C_170D_083F(int16, int16);/*UpdateMoveFrame(npc, direction)*/
 extern far CON_UpdateMousePointer();
 extern int16 CON_getch();
-extern C_170D_0868(int16, int16);/*SubMov(npc, points)*/
-extern C_120E_18B4();/*RefreshStatus*/
+extern SubMov(int16, int16);/*SubMov(npc, points)*/
+extern RefreshStatus();
 
 extern char AimX, AimY;
 extern char SelectRange;
@@ -255,11 +255,7 @@ extern int16 D_EBF6, D_EBF8;/*Selection.x, Selection.y*/
 extern int16 D_EC44;/*SelectionIsDark*/
 extern unsigned char far *D_6DBA;/*TileFlag*/
 
-#define GetTileString C_1B09_46E4
-#define MkDirection C_2238_0062
 #define UpdateMoveFrame C_170D_083F
-#define SubMov C_170D_0868
-#define RefreshStatus C_120E_18B4
 #define MapAnimEnabled D_0F18
 #define PointerX D_EB74
 #define PointerY D_EB76
@@ -269,21 +265,10 @@ extern unsigned char far *D_6DBA;/*TileFlag*/
 #define TileFlag D_6DBA
 #define AreaX D_C0FA
 #define AreaY D_C0FC
-#define LocPartOffset D_14F2
 
 #define StatusDirty D_0F12
 #define PromptFlag D_0F13
 #define IsArmageddon D_0F15
-#define VisibilityDirty D_1431
-#define EnemyWarningGiven D_1437
-#define MapX D_167C
-#define MapY D_167E
-#define MapZ D_1680
-#define InCombat D_16A4
-#define SoloMember D_16A5
-#define SavedNPCMode D_16A6
-#define DreamStage D_16D4
-#define IsInConversation D_2805
 #define Screen D_3232
 #define ObjStatus D_3266
 #define MovePts D_44C4
@@ -378,7 +363,7 @@ extern unsigned char far *D_6DBA;/*TileFlag*/
 /*this module's functions used before their definition*/
 C_07D1_1378(int16);
 C_07D1_1483(int16, int16, int16, int16);
-C_07D1_274C(int16, int16, int16, int16);
+__DoHit(int16, int16, int16, int16);
 extern int16 C_07D1_35F5(int16, int16, int16);/*distance of (x, y) from an object*/
 extern COMBAT_beginAttacked(void);/*C_07D1_5CAF*/
 extern C_07D1_5DB2(int16);
@@ -413,7 +398,7 @@ extern int16 C_07D1_5FEF(int16, int16, int16, int16);
 /*0704*/char D_0704 = 0;
 
 /*the spraying weapons (C_07D1_0D54): their type, missile tile (0xff:
-  none), kind of hit (C_07D1_274C), damage and sound; 0xf1 freezes*/
+  none), kind of hit (__DoHit), damage and sound; 0xf1 freezes*/
 /*0705*/int16 SprayTypes[] = {0x2b, 0x2d, 0xf0, 0xf1, 0};
 /*070F*/int16 SprayTiles[] = {0x106, 0x106, 0x14e, 0x14f, 0xff};
 /*0719*/unsigned char SprayKinds[] = {0, 0, 3, 1, 0};
@@ -824,7 +809,7 @@ extern int16 C_07D1_5FEF(int16, int16, int16, int16);
 
 /*a spraying weapon of type weapType fired by attacker at (x, y)
   (C_0E1A_1003: 12 missiles): every object hit is hurt
-  (C_07D1_274C(attacker, obj, SprayDamages, SprayKinds)), actors may dodge
+  (__DoHit(attacker, obj, SprayDamages, SprayKinds)), actors may dodge
   (OSI_rand(1, 60) against their dexterity); 0xf1 freezes the water
   (0xa0 frame 1 to frame 2) and paralyzes the actors of class flag 0x4000
   or 0x80 (0x80 alone also hurts, 0x4000 shows the hit)*/
@@ -850,7 +835,7 @@ extern int16 C_07D1_5FEF(int16, int16, int16, int16);
 						NPCStatus[*hits] |= 2;
 						CON_printf(C_2BB4_13B1, GetObjectString(*hits));
 						if((MonsterFlags[objCls] & 0x80) && !(MonsterFlags[objCls] & 0x4000))
-							C_07D1_274C(attacker, *hits, SprayDamages[i], 1);
+							__DoHit(attacker, *hits, SprayDamages[i], 1);
 						else
 							C_07D1_1378(*hits);
 					} else {
@@ -863,7 +848,7 @@ extern int16 C_07D1_5FEF(int16, int16, int16, int16);
 			}
 		} else {
 			if(!IsNPC(*hits) || OSI_rand(1, 60) > GetDex(*hits)) {
-				C_07D1_274C(attacker, *hits, SprayDamages[i], SprayKinds[i]);
+				__DoHit(attacker, *hits, SprayDamages[i], SprayKinds[i]);
 			} else {
 				CON_printf("%s dodges!\n", GetObjectString(*hits));
 				MUS_PlaySfx(3);
@@ -1310,9 +1295,9 @@ extern int16 C_07D1_5FEF(int16, int16, int16, int16);
 			HitPoints[objNum] = 0xff;
 			if(GetType(objNum) == 0x187) {
 				CON_printf("How dare you, young %sman!\n", D_16A8?"wo":"");
-				C_07D1_274C(objNum, 0, 0x2d, 0);
-				C_07D1_274C(objNum, 0, 0x2d, 0);
-				C_07D1_274C(objNum, 0, 0x2d, 0);
+				__DoHit(objNum, 0, 0x2d, 0);
+				__DoHit(objNum, 0, 0x2d, 0);
+				__DoHit(objNum, 0, 0x2d, 0);
 			} else if(objNum == 0x6d || objNum == 0x67) {
 				TalkFlags[0x6b] |= 8;
 				PartyTeleport(D_1684, D_1685, MapZ, 1);
@@ -1534,7 +1519,7 @@ extern int16 C_07D1_5FEF(int16, int16, int16, int16);
   sure kill), subtract 1..armour (none for kind 2; 2 for an object 0x184
   of frame 0), apply it, print the messages; a creature of class flag 4
   paralyzes, 0x17b calls C_07D1_5DB2 when its victim left a body*/
-/*C_07D1_274C*/static __DoHit(int16 attacker, int16 defender, int16 hitPts, int16 kind) {
+/*C_07D1_274C*/__DoHit(int16 attacker, int16 defender, int16 hitPts, int16 kind) {
 	char *pObjStr;
 	int16 armorPts, defTyp, attCls, defCls;
 
@@ -1570,7 +1555,7 @@ extern int16 C_07D1_5FEF(int16, int16, int16, int16);
 		PromptFlag = 1;
 	} else {
 		if(Is_ATKPLR(attacker) && IsNPC(defender) && IsPlrControl(defender) && !InCombat && SoloMember == -1)
-			C_07D1_5CAF();
+			COMBAT_beginAttacked();
 		AddXP(attacker, LoseHP(defender, hitPts, kind));
 	}
 	if(!IsNPC(defender))
@@ -1620,7 +1605,7 @@ extern int16 C_07D1_5FEF(int16, int16, int16, int16);
   charges or one 0x3a), 0xf1 freezes and paralyzes, 0x81/0x105 with a
   quality make invisible actors visible (0x91 becomes 0x16c), 0x28 charms.
   returns 0: done, 1: no ammunition, 2: out of range*/
-/*C_07D1_29E2*/static __TryHit(int16 att_objNum, int16 x, int16 y, int16 weap_objNum) {
+/*C_07D1_29E2*/__TryHit(int16 att_objNum, int16 x, int16 y, int16 weap_objNum) {
 	int16 damage, didHit, isRanged, tmp, range, objCls, kind, doHit, doSpray;
 	int16 objTyp, opp_objNum;
 

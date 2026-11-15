@@ -110,28 +110,28 @@ extern cdecl MOUSE_POINTER(void far *, int16);
 extern cdecl MOUSE_SHOW();
 
 /*other game modules*/
-extern int16 D_13F2;/*HatchingDisabled*/
-extern int16 D_1687;/*SoundFlag: music on*/
-extern char D_16A9;/*AvatarPortrait: 0 = no character*/
-extern char D_1B8D;/*AnimateAtPrompt*/
-extern struct tClipInfo *D_1BDB;/*CurClip*/
-extern C_120E_1B3A();/*GameLoop*/
-extern far C_2238_01F1();/*CON_UpdateMousePointer*/
-extern C_2238_04B1();/*GAME_Load*/
-extern int16 C_2238_28CC();/*CON_getch*/
-extern C_2238_2BBF(struct tClipInfo *, int16, int16, int16, int16);/*CON_createClip*/
-extern C_2238_2C0A(struct tClipInfo *);/*CON_setClip*/
-extern cdecl C_2238_33F8(char far *, ...);/*CON_printf*/
-extern C_1534_054C();/*MAP_InitChunkCache*/
-extern C_1B09_2CD2();/*OBJ_DeleteTmpBlocks*/
-extern C_1B09_45DA();/*OBJ_InitLists*/
-extern C_1FA9_0002();/*MUS_InitDriver*/
-extern C_1FA9_01B4(int16);/*MUS_PlaySong*/
-extern C_1FA9_02B5();/*MUS_PlayAreaSong*/
-extern C_0E1A_0013(int16);/*InitGraphicsDriver*/
+extern int16 HatchingDisabled;
+extern int16 SoundFlag;/*SoundFlag: music on*/
+extern char AvatarPortrait;/*AvatarPortrait: 0 = no character*/
+extern char AnimateAtPrompt;
+extern struct tClipInfo *CurClip;
+extern GameLoop();
+extern far CON_UpdateMousePointer();
+extern GAME_Load();
+extern int16 CON_getch();
+extern CON_createClip(struct tClipInfo *, int16, int16, int16, int16);
+extern CON_setClip(struct tClipInfo *);
+extern cdecl CON_printf(char far *, ...);
+extern MAP_InitChunkCache();
+extern OBJ_DeleteTmpBlocks();
+extern OBJ_InitLists();
+extern MUS_InitDriver();
+extern MUS_PlaySong(int16);
+extern MUS_PlayAreaSong();
+extern InitGraphicsDriver(int16);
 extern C_0E1A_17C3();
-extern C_2F5B_005D();/*DISK_init*/
-extern C_2F5B_000C();/*DISK_full*/
+extern DISK_init();
+extern DISK_full();
 
 /*library*/
 extern int16 cdecl soundCard;
@@ -325,18 +325,18 @@ extern struct tClipInfo D_EBD0[4];/*TextWindows*/
 	if(OSI_ErrorCode == 2 && OSI_ErrorFunc == 4/*OSI_delete*/)
 		return;
 	if(ConsoleReady) {
-		savedClip = D_1BDB;
-		C_2238_2C0A(&(D_EBD0[3]));
+		savedClip = CurClip;
+		CON_setClip(&(D_EBD0[3]));
 		if(OSI_ErrorCode == -1 && OSI_ErrorFunc == 6/*OSI_write*/) {
-			C_2F5B_000C();
+			DISK_full();
 		} else {
-			C_2238_33F8("DISK ERROR!!!! Function: %d, error: %d, file: ", OSI_ErrorFunc, OSI_ErrorCode);
-			C_2238_33F8(OSI_ErrorFile);
-			C_2238_33F8("\n");
+			CON_printf("DISK ERROR!!!! Function: %d, error: %d, file: ", OSI_ErrorFunc, OSI_ErrorCode);
+			CON_printf(OSI_ErrorFile);
+			CON_printf("\n");
 			/*wait for a key (flushing the keyboard buffer)*/
 			while(!(key = KBD_GetKey(1)));
 		}
-		C_2238_2C0A(savedClip);
+		CON_setClip(savedClip);
 	}
 	/*not <CTRL+C>/<ESC>: retry*/
 	if(key != 3 && key != 27)
@@ -508,10 +508,10 @@ extern struct tClipInfo D_EBD0[4];/*TextWindows*/
 			case 'T': GrAdapter = 2; break;
 			case 'M': MouseOn = 1; break;
 			case 'K': MouseOn = 0; break;
-			case 'N': MusicAdapter = 0; soundCard = 0; D_1687 = 0; break;
-			case 'A': MusicAdapter = 1; soundCard = 2; D_1687 = 1; break;
-			case 'R': MusicAdapter = 1; soundCard = 1; D_1687 = 1; break;
-			case 'P': MusicAdapter = 0; soundCard = 3; D_1687 = 1; break;
+			case 'N': MusicAdapter = 0; soundCard = 0; SoundFlag = 0; break;
+			case 'A': MusicAdapter = 1; soundCard = 2; SoundFlag = 1; break;
+			case 'R': MusicAdapter = 1; soundCard = 1; SoundFlag = 1; break;
+			case 'P': MusicAdapter = 0; soundCard = 3; SoundFlag = 1; break;
 		}
 	}
 }
@@ -547,7 +547,7 @@ extern struct tClipInfo D_EBD0[4];/*TextWindows*/
 		InitError();
 	lzcWorkArea = D_3E80;
 
-	C_2F5B_005D();
+	DISK_init();
 	OSI_lowInit();
 	/*install the file error handler*/
 	OSI_ErrorHandler.f = FileErrorHandler;
@@ -620,31 +620,31 @@ extern struct tClipInfo D_EBD0[4];/*TextWindows*/
 		D_3E66.shapes = D_50C6;
 		D_3E66.surface = &D_3232;
 		MOUSE_INIT(&D_3E66);
-		D_3E66.onMove = C_2238_01F1;
+		D_3E66.onMove = CON_UpdateMousePointer;
 		MOUSE_POINTER(D_50C6, 0);
 	}
-	C_0E1A_0013(GrAdapter);/*init gr*/
+	InitGraphicsDriver(GrAdapter);/*init gr*/
 	LoadPalette();
 	/*font*/
 	__MemAlloc(&pFont, LIB_entrySize("system.lzc", 3));
 	D_BA66->font = LZC_loadType("system.lzc", 3, pFont, 0, D_3E80);
 	ConsoleReady = 1;
 	/*text windows: [0] whole screen, [1] status area, [3] message area*/
-	C_2238_2BBF(&(D_EBD0[0]), 0, 0, 39, 24);
-	C_2238_2C0A(&(D_EBD0[0]));
-	D_1BDB->attrFlags |= 1;
-	D_1BDB->attrFlags |= 0x20;
-	D_1BDB->attrFlags |= 4;
+	CON_createClip(&(D_EBD0[0]), 0, 0, 39, 24);
+	CON_setClip(&(D_EBD0[0]));
+	CurClip->attrFlags |= 1;
+	CurClip->attrFlags |= 0x20;
+	CurClip->attrFlags |= 4;
 	ShowMainScreen();
-	C_2238_2BBF(&(D_EBD0[1]), 23, 1, 38, 13);
-	C_2238_2BBF(&(D_EBD0[3]), 23, 16, 38, 23);
-	C_2238_2BBF(&(D_EBD0[2]), 2, 3, 19, 18);
-	C_2238_2C0A(&(D_EBD0[3]));
+	CON_createClip(&(D_EBD0[1]), 23, 1, 38, 13);
+	CON_createClip(&(D_EBD0[3]), 23, 16, 38, 23);
+	CON_createClip(&(D_EBD0[2]), 2, 3, 19, 18);
+	CON_setClip(&(D_EBD0[3]));
 	/*message area: word wrap, scroll, capitalize*/
-	D_1BDB->attrFlags |= 1;
-	D_1BDB->attrFlags |= 0x20;
-	D_1BDB->attrFlags |= 4;
-	C_1FA9_0002();
+	CurClip->attrFlags |= 1;
+	CurClip->attrFlags |= 0x20;
+	CurClip->attrFlags |= 4;
+	MUS_InitDriver();
 
 	__MemAlloc(&D_B4C4, 0x800);
 	__MemAlloc(&D_6DBA, 0x800);
@@ -688,21 +688,21 @@ extern struct tClipInfo D_EBD0[4];/*TextWindows*/
 			D_774E[i] = D_774E[i - 1] + 0x50;
 	}
 
-	C_1B09_45DA();
+	OBJ_InitLists();
 	C_0E1A_17C3();
 
 	InitGraphicsData();
 
 	OSI_Started = 1;
-	C_1534_054C();/*empty the map chunk cache*/
-	D_13F2 = 1;
-	C_2238_04B1();/*load the game*/
+	MAP_InitChunkCache();/*empty the map chunk cache*/
+	HatchingDisabled = 1;
+	GAME_Load();/*load the game*/
 
 	/*no character in the saved game: go back to MARTIAN.EXE*/
-	if(D_16A9 == 0) {
-		C_2238_33F8("You must first create a character. ");
-		D_1B8D = 0;
-		C_2238_28CC();
+	if(AvatarPortrait == 0) {
+		CON_printf("You must first create a character. ");
+		AnimateAtPrompt = 0;
+		CON_getch();
 		ShutdownSound();
 		BuildConfigString(cfgString);
 		MEM_shutdown(8);
@@ -714,15 +714,15 @@ extern struct tClipInfo D_EBD0[4];/*TextWindows*/
 
 	if(MouseOn)
 		MOUSE_SHOW();
-	C_1FA9_02B5();
+	MUS_PlayAreaSong();
 
 	/*-- game loop --*/
-	C_120E_1B3A();
+	GameLoop();
 	/*-- --*/
 
 	/*exit: stop the music, delete the temporary files*/
-	C_1FA9_01B4(0);
-	C_1B09_2CD2();
+	MUS_PlaySong(0);
+	OBJ_DeleteTmpBlocks();
 	ShutdownSound();
 	MEM_shutdown(8);
 	UnhookAll();

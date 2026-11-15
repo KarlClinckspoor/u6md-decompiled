@@ -59,28 +59,28 @@
 #define BLK_OBJNUM(i) (*(int16 far *)&ScratchBuf[((i) << 1) + 0x4000])
 
 /*OSI file routines (asm)*/
-extern int16 OSI_open(char *);/*OSI_open*/
-extern OSI_close(int16);/*OSI_close*/
-extern int16 OSI_create(char *);/*OSI_create*/
-extern OSI_delete(char *);/*OSI_delete*/
-extern int32 OSI_read(int16, int32, int32, void far *);/*OSI_read*/
-extern int32 OSI_write(int16, int32, int32, void far *);/*OSI_write*/
-extern OSI_rename(char *, char *);/*OSI_rename*/
+extern int16 OSI_open(char *);
+extern OSI_close(int16);
+extern int16 OSI_create(char *);
+extern OSI_delete(char *);
+extern int32 OSI_read(int16, int32, int32, void far *);
+extern int32 OSI_write(int16, int32, int32, void far *);
+extern OSI_rename(char *, char *);
 extern void far *LZC_loadType(char far *name, int16 index, void far *out, int16 memflags, char far *work);
 
 /*other game modules*/
-extern char DirIncrX[];/*DirIncrX*/
-extern char DirIncrY[];/*DirIncrY*/
+extern char DirIncrX[];
+extern char DirIncrY[];
 extern unsigned char D_0F12;/*StatusDirty*/
 extern int16 D_0F18;/*MapAnimEnabled*/
 extern int16 D_0F1A;/*Erupting*/
-extern int16 StatusMember;/*StatusMember*/
+extern int16 StatusMember;
 extern int16 StatusDisplay;/*StatusDisplay: 0x92 when the equipment view is shown*/
-extern int16 MapCoordMask;/*MapCoordMask*/
-extern int16 ViewX, ViewY;/*ViewX, ViewY*/
-extern int16 VisibilityDirty;/*VisibilityDirty*/
-extern int16 D_167C, D_167E, D_1680;/*MapX, MapY, MapZ*/
-extern int16 DiskFullChoice;/*DiskFullChoice*/
+extern int16 MapCoordMask;
+extern int16 ViewX, ViewY;
+extern int16 VisibilityDirty;
+extern int16 MapX, MapY, MapZ;
+extern int16 DiskFullChoice;
 extern unsigned char D_3266[];/*ObjStatus*/
 extern char far *D_3E80;/*the .lzc loader's work area*/
 extern unsigned char D_3E84[AREA_H][AREA_W];/*AreaFlags*/
@@ -121,31 +121,18 @@ extern int16 D_EB16;/*WeightEquip*/
 extern int16 D_EB1A;/*WeightInven*/
 extern int16 D_EC4A;/*an NPC charmed (gameloop.c)*/
 
-extern ApplyTerrainEffects(int16, int16, int16);/*ApplyTerrainEffects*/
-extern cdecl CON_printf(char far *, ...);/*CON_printf*/
-extern int16 GetWeight(int16);/*GetWeight*/
-extern int16 GetTypeWeight(int16, int16);/*GetTypeWeight*/
-extern STAT_ComputeWeights(int16);/*STAT_ComputeWeights*/
-extern STAT_RefreshInventory(int16);/*STAT_RefreshInventory*/
-extern C_170D_0868(int16, int16);/*SubMov(npc, points)*/
-#define SubMov C_170D_0868
-extern int16 IsContainerType(int16);/*IsContainerType*/
+extern ApplyTerrainEffects(int16, int16, int16);
+extern cdecl CON_printf(char far *, ...);
+extern int16 GetWeight(int16);
+extern int16 GetTypeWeight(int16, int16);
+extern STAT_ComputeWeights(int16);
+extern STAT_RefreshInventory(int16);
+extern SubMov(int16, int16);/*SubMov(npc, points)*/
+extern int16 IsContainerType(int16);
 
 #define StatusDirty D_0F12
 #define MapAnimEnabled D_0F18
 #define Erupting D_0F1A
-#define MapX D_167C
-#define MapY D_167E
-#define MapZ D_1680
-#define DirIncrX DirIncrX
-#define DirIncrY DirIncrY
-#define StatusMember StatusMember
-#define StatusDisplay StatusDisplay
-#define MapCoordMask MapCoordMask
-#define ViewX ViewX
-#define ViewY ViewY
-#define VisibilityDirty VisibilityDirty
-#define DiskFullChoice DiskFullChoice
 #define ObjStatus D_3266
 #define AreaFlags D_3E84
 #define NPCFlag D_45CC
@@ -180,20 +167,6 @@ extern int16 IsContainerType(int16);/*IsContainerType*/
 #define WeightEquip D_EB16
 #define WeightInven D_EB1A
 
-#define OSI_open OSI_open
-#define OSI_close OSI_close
-#define OSI_create OSI_create
-#define OSI_delete OSI_delete
-#define OSI_read OSI_read
-#define OSI_write OSI_write
-#define OSI_rename OSI_rename
-#define ApplyTerrainEffects ApplyTerrainEffects
-#define CON_printf CON_printf
-#define GetWeight GetWeight
-#define GetTypeWeight GetTypeWeight
-#define STAT_ComputeWeights STAT_ComputeWeights
-#define STAT_RefreshInventory STAT_RefreshInventory
-#define IsContainerType IsContainerType
 
 /*this module*/
 static OBJ_FindListPos(int16, int16, int16);
@@ -213,33 +186,23 @@ C_1B09_4868();
 
 /*more of the other modules*/
 extern int16 QuanType(int16);/*QuanType (objtype.c)*/
-#define QuanType QuanType
 extern int16 WrapDelta(int16);/*WrapDelta (map.c)*/
-#define WrapDelta WrapDelta
 extern int16 MapDistance(int16, int16);/*MapDistance (map.c)*/
-#define MapDistance MapDistance
-extern unsigned char C_1534_1072(int16, int16, int16);/*GetTileAtXYZ*/
-#define GetTileAtXYZ C_1534_1072
-extern int16 C_222C_0008(int16);/*InRange_10_17_C0_C3: water tiles*/
-#define InRange_10_17_C0_C3 C_222C_0008
-extern int16 C_07D1_0521(int16);/*GetStr*/
-#define GetStr C_07D1_0521
-extern C_120E_0221();/*DisplayTick*/
-#define DisplayTick C_120E_0221
+extern unsigned char GetTileAtXYZ(int16, int16, int16);
+extern int16 InRange_10_17_C0_C3(int16);/*InRange_10_17_C0_C3: water tiles*/
+extern int16 GetStr(int16);
+extern DisplayTick();
 extern void cdecl TimerDelay(int32);/*wait (2383 per millisecond)*/
 extern C_1FA9_09A5(int16);/*start a looping sound effect (-1 stops)*/
 extern C_1FA9_0A8A();/*a sweep sound*/
 extern C_1FA9_0AFD();/*machinery sound*/
 extern C_1FA9_0BE4();/*sound effect 35*/
-extern unsigned char D_1675;/*Time_H*/
-#define Time_H D_1675
-extern unsigned char D_167A;/*Active*/
-#define Active D_167A
+extern unsigned char Time_H;
+extern unsigned char Active;
 extern int32 D_16AA;/*flags (0x10: the dream)*/
 #define IN_DREAM (D_16AA & 0x10)
 extern struct { unsigned a:4, psychic:4, c:4, d:4; } D_16B0[];/*talents*/
-extern int16 D_16D4;/*DreamStage*/
-#define DreamStage D_16D4
+extern int16 DreamStage;
 extern unsigned char D_6EC6[];/*TalkFlags*/
 #define TalkFlags D_6EC6
 extern int16 D_EBC0;/*GiveObj: when set, refuse instead of dropping what does not fit*/
@@ -2257,7 +2220,7 @@ extern int16 D_EBC0;/*GiveObj: when set, refuse instead of dropping what does no
 
 /*show tile + frame at view cell (x, y) together with the left/upper parts
   of double-width/double-height tiles (x, y may be 11 for those)*/
-/*C_1B09_3D47*/static OBJ_ShowMultiTile(int16 tile, int16 frame, register int16 x, register int16 y) {
+/*C_1B09_3D47*/OBJ_ShowMultiTile(int16 tile, int16 frame, register int16 x, register int16 y) {
 	int16 flags;
 
 	if(x < 11 && y < 11)

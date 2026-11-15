@@ -7,18 +7,24 @@ compare the result with the original executable byte for byte.
 <SRC>/modules.txt gives the modules in link order (their sources: .c compiled with the
 flags of their first line or the target's, .asm assembled with MASM 3.0 /Mx and their
 fixups put in TASM's order, tools/md/tasmorder.py). The link is
-    TLINK /m /i C0M <modules> BSS, <EXE>, <MAP>, <libraries>
+    TLINK /m /i [<link_first>] C0M <modules> BSS, <EXE>, <MAP>, <libraries>
 with C0M.OBJ and the libraries of Turbo C++ 1.00 (tools/md/setup.py): EMU MATHM CM for
 MARTIAN.EXE, OVERLAY CM for GAME.EXE, whose overlaid modules (those whose frame in
-modules.txt is an overlay stub) are linked between /o and /o-, compiled with -Y. BSS.ASM, when there is
-one, lays out the uninitialised data of all the modules. /i ("initialise all segments")
-is Origin's: the .EXE holds the uninitialised data and the stack as zeros.
+modules.txt is an overlay stub) are linked between /o and /o-, compiled with -Y; an
+overlaid module's `/* stub order: */` comment puts its publics in the order that gives the
+original's stub entries (tools/md/stuborder.py). BSS.ASM, when there is one, lays out the
+uninitialised data of all the modules; the target's link_first modules (GAME.EXE:
+SEGORDER.ASM) come before C0M. /i ("initialise all segments")
+is Origin's: the .EXE holds the uninitialised data and the stack as zeros. An overlaid
+program also keeps, in its overlay data, the name the link wrote (the target's link_name:
+GAME.EXE was linked as ULTIMA.EXE) and the date of the link (link_date: DOS's date is set
+to it first).
 """
 import argparse, hashlib, os, shutil, struct, sys, tempfile
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
-import dos, target, tcc, tasmorder, mdcheck, mdsym  # noqa: E402
+import dos, target, tcc, tasmorder, stuborder, mdcheck, mdsym  # noqa: E402
 
 
 def main():
@@ -42,6 +48,9 @@ def main():
         files.append('BSS.ASM')
 
     exe = t['exe']
+    # the name the link writes (an overlaid program keeps it in its overlay data: GAME.EXE
+    # was linked as ULTIMA.EXE)
+    out = t.get('link_name', exe.split('.')[0])
     with tempfile.TemporaryDirectory() as tmp:
         c = os.path.join(tmp, 'c')
         os.makedirs(c)
@@ -86,6 +95,8 @@ def main():
         for f, base, ext in names:
             if (ext == '.ASM' or tcc.has_inline_asm(os.path.join(src, f))) and os.path.exists(os.path.join(s, base + '.OBJ')):
                 tasmorder.fix(os.path.join(src, f), os.path.join(s, base + '.OBJ'))
+            elif ext == '.C' and os.path.exists(os.path.join(s, base + '.OBJ')):
+                stuborder.fix(os.path.join(src, f), os.path.join(s, base + '.OBJ'))
         stubs = {o['stub'] for o in target.overlays(t['exe_path'])}
         ovl_files = {m[3] for m in mods if m[0] != '-' and int(m[0], 16) in stubs}
         objs, inov = [], False
@@ -105,10 +116,18 @@ def main():
                 line = ''
             line += ' ' + o
         rsp.append(line)
-        rsp.append('%s,%s,%s' % (exe.split('.')[0], exe.split('.')[0],
+        rsp.append('%s,%s,%s' % (out, out,
                                  ' '.join('\\TC\\LIB\\' + lb for lb in t['libs'])))
         open(os.path.join(s, 'LINK.RSP'), 'w', newline='').write('\r\n'.join(rsp) + '\r\n')
-        dos.run(c, ['set PATH=\\TC', 'cd \\S', 'TLINK /m /i @LINK.RSP >> \\BUILD.LOG'])
+        pre = []
+        if t.get('link_date'):
+            # TLINK /o writes the date of the link into the overlay data: set DOS's date first
+            # (a 15-byte program: int 21h function 2Bh, then exit)
+            y, mo, dy = t['link_date']
+            open(os.path.join(c, 'SETDATE.COM'), 'wb').write(
+                bytes([0xB4, 0x2B, 0xB9, y & 0xFF, y >> 8, 0xBA, dy, mo, 0xCD, 0x21, 0xB8, 0x00, 0x4C, 0xCD, 0x21]))
+            pre = ['\\SETDATE']
+        dos.run(c, pre + ['set PATH=\\TC', 'cd \\S', 'TLINK /m /i @LINK.RSP >> \\BUILD.LOG'])
         log = open(os.path.join(c, 'BUILD.LOG'), encoding='latin-1').read() if os.path.exists(os.path.join(c, 'BUILD.LOG')) else ''
         if a.log:
             print(log)
@@ -118,7 +137,7 @@ def main():
         if a.keep:
             shutil.copytree(s, a.keep, dirs_exist_ok=True)
             open(os.path.join(a.keep, 'NAMES.TXT'), 'w').write('\n'.join('%s %s' % (b, f) for f, b, e in names) + '\n')
-        built = os.path.join(s, exe)
+        built = os.path.join(s, out + '.EXE')
         if not os.path.exists(built):
             sys.exit('no %s was built' % exe)
         new = open(built, 'rb').read()
@@ -135,7 +154,7 @@ def main():
     ni, oi = new[hn:], old[ho:]
     diffs = [i for i in range(min(len(ni), len(oi))) if ni[i] != oi[i]]
     print('image: %d vs %d bytes, %d bytes differ' % (len(ni), len(oi), len(diffs)))
-    starts = [(int(m[0], 16) * 16 + int(m[1], 16), m[3]) for m in mods if m[0] != '-']
+    starts = sorted((int(m[0], 16) * 16 + int(m[1], 16), m[3]) for m in mods if m[0] != '-')
     shown, last = 0, -100
     for i in diffs:
         if i - last > 16 and shown < 12:

@@ -1,4 +1,5 @@
 /* flags: -d -mm -p -c -Z -O -y */
+/* stub order: 0000 0386 0237 */
 /*
  * Martian Dreams - GAME.EXE overlay 2F58: the drawbridges over the canals,
  * new code with no Savage Empire counterpart.
@@ -16,18 +17,18 @@
 
 /*other modules*/
 extern void cdecl TimerDelay(int32);/*wait (2383 per millisecond)*/
-extern C_120E_0221();/*DisplayTick*/
-extern int16 C_1B09_032A();/*next object of C_1B09_07D8's search*/
-extern int16 C_1B09_07D8(int16, int16, int16);/*first object at (x, y, z)?*/
-extern int16 C_1B09_0DD7(void);/*NextArea*/
-extern int16 C_1B09_0EDE(int16, int16, int16, int16);/*SearchArea(x1, y1, x2, y2)*/
-extern int16 C_1B09_116E(int16, int16, int16, int16, int16, int16);/*AddMapObj*/
-extern C_1B09_1872(int16);/*DeleteObj*/
-extern C_1B09_3E18();/*ShowObjects*/
-extern C_1FA9_0919(int16);/*play a sound effect?*/
+extern DisplayTick();
+extern int16 NextLoc();/*next object of FindLoc's search*/
+extern int16 FindLoc(int16, int16, int16);/*first object at (x, y, z)?*/
+extern int16 NextArea(void);
+extern int16 SearchArea(int16, int16, int16, int16);/*SearchArea(x1, y1, x2, y2)*/
+extern int16 AddMapObj(int16, int16, int16, int16, int16, int16);
+extern DeleteObj(int16);
+extern ShowObjects();
+extern MUS_PlaySfx(int16);/*play a sound effect?*/
 extern cdecl CON_printf(char far *, ...);
 
-extern int16 D_1680;/*MapZ*/
+extern int16 MapZ;
 extern unsigned char D_3266[];/*ObjStatus*/
 extern int16 D_54BA[];/*Amount: quantity (low byte), quality (high byte)*/
 extern unsigned char D_6EC6[];/*TalkFlags (per NPC)*/
@@ -39,7 +40,6 @@ extern int16 D_EC52;/*BridgeLen*/
 extern int16 D_EC54, D_EC56;/*BridgeX2, BridgeY2*/
 extern int16 D_EC58;/*BridgeNS: 0x80 when the bridge runs north-south*/
 
-#define MapZ D_1680
 #define ObjStatus D_3266
 #define Amount D_54BA
 #define TalkFlags D_6EC6
@@ -53,12 +53,6 @@ extern int16 D_EC58;/*BridgeNS: 0x80 when the bridge runs north-south*/
 #define BridgeY2 D_EC56
 #define BridgeNS D_EC58
 
-#define DisplayTick C_120E_0221
-#define NextArea C_1B09_0DD7
-#define SearchArea C_1B09_0EDE
-#define AddMapObj C_1B09_116E
-#define DeleteObj C_1B09_1872
-#define ShowObjects C_1B09_3E18
 
 #define GetType(i) (ObjShapeType[i] & 0x3ff)
 #define GetFrame(i) (ObjShapeType[i] >> 10)
@@ -74,7 +68,7 @@ extern int16 D_EC58;/*BridgeNS: 0x80 when the bridge runs north-south*/
 
 	if(!(TalkFlags[0x73] & 0x10)) {
 		CON_printf("There doesn't seem to be any power for the machinery.\n");
-		C_1FA9_0919(5);
+		MUS_PlaySfx(5);
 		return;
 	}
 	BridgeNum = GetQuan(objNum);
@@ -121,13 +115,13 @@ extern int16 D_EC58;/*BridgeNS: 0x80 when the bridge runs north-south*/
 			extended = 1;
 		} else {
 			CON_printf("The bridge doesn't move.\n");
-			C_1FA9_0919(5);
+			MUS_PlaySfx(5);
 			return;
 		}
 	}
 	for(j = 0; j < numLevers; j++)
 		ObjShapeType[levers[j]] = GetType(levers[j]) + ((1 - extended) << 10);
-	C_1FA9_0919(0x12);
+	MUS_PlaySfx(0x12);
 	if(extended)
 		BridgeRetract();
 	else
@@ -173,7 +167,7 @@ extern int16 D_EC58;/*BridgeNS: 0x80 when the bridge runs north-south*/
 
 	if(BridgeNS) {
 		for(x = BridgeX1; x <= BridgeX2; x++) {
-			for(objNum = C_1B09_07D8(x, BridgeY1, MapZ); objNum >= 0; objNum = C_1B09_032A()) {
+			for(objNum = FindLoc(x, BridgeY1, MapZ); objNum >= 0; objNum = NextLoc()) {
 				if(GetType(objNum) == 0xc3 && GetFrame(objNum) != 0)
 					DeleteObj(objNum);
 			}
@@ -183,7 +177,7 @@ extern int16 D_EC58;/*BridgeNS: 0x80 when the bridge runs north-south*/
 			DisplayTick();
 			TimerDelay(0x249f0L);
 			for(x = BridgeX1; x <= BridgeX2; x++) {
-				for(objNum = C_1B09_07D8(x, y, MapZ); objNum >= 0; objNum = C_1B09_032A()) {
+				for(objNum = FindLoc(x, y, MapZ); objNum >= 0; objNum = NextLoc()) {
 					if(GetType(objNum) == 0xc3 && GetFrame(objNum) != 0)
 						DeleteObj(objNum);
 				}
@@ -191,7 +185,7 @@ extern int16 D_EC58;/*BridgeNS: 0x80 when the bridge runs north-south*/
 		}
 	} else {
 		for(y = BridgeY1; y <= BridgeY2; y++) {
-			for(objNum = C_1B09_07D8(BridgeX1, y, MapZ); objNum >= 0; objNum = C_1B09_032A()) {
+			for(objNum = FindLoc(BridgeX1, y, MapZ); objNum >= 0; objNum = NextLoc()) {
 				if(GetType(objNum) == 0xc3 && GetFrame(objNum) != 0)
 					DeleteObj(objNum);
 			}
@@ -201,7 +195,7 @@ extern int16 D_EC58;/*BridgeNS: 0x80 when the bridge runs north-south*/
 			DisplayTick();
 			TimerDelay(0x249f0L);
 			for(y = BridgeY1; y <= BridgeY2; y++) {
-				for(objNum = C_1B09_07D8(x, y, MapZ); objNum >= 0; objNum = C_1B09_032A()) {
+				for(objNum = FindLoc(x, y, MapZ); objNum >= 0; objNum = NextLoc()) {
 					if(GetType(objNum) == 0xc3 && GetFrame(objNum) != 0)
 						DeleteObj(objNum);
 				}

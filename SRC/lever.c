@@ -1,4 +1,5 @@
 /* flags: -d -mm -p -c -Z -O -y */
+/* stub order: 0076 034B 0556 0000 */
 /*
  * Martian Dreams - GAME.EXE overlay 2F6E: using a lever (type 0xc4 and
  * others), new code with no Savage Empire counterpart.
@@ -19,24 +20,24 @@
 
 /*other modules*/
 extern BargePumps(int16);
-extern C_1B09_3E18();/*ShowObjects*/
-extern C_1FA9_0919(int16);/*MUS_PlaySfx*/
+extern ShowObjects();
+extern MUS_PlaySfx(int16);
 extern C_1FA9_0AFD();/*five beeps (machinery)*/
-extern C_2F52_0473();/*BeltStart*/
+extern BeltStart();
 extern Drawbridge(int16);
-extern C_2F5F_0000(int16, int16);
-extern C_2F5F_02CE();
-extern C_2F5F_0477();
+extern DreamSleep(int16, int16);
+extern DreamEnter();
+extern DreamWakeUp();
 extern C_2F5F_0AC1(int16);
-extern C_2F72_0000();/*MachineryOn*/
-extern C_2F72_0210();/*MachineryOff*/
+extern MachineryOn();
+extern MachineryOff();
 extern C_2F72_039E();
 extern C_2F75_042D();
 extern C_2F75_0532();
 extern C_2F75_07FA();
 extern C_2F75_0951();
 extern C_2F75_0A64();
-extern C_2F83_0167(int16, int16, int16);/*TALK_talkTo*/
+extern TALK_talkTo(int16, int16, int16);
 extern cdecl CON_printf(char far *, ...);
 extern char far C_2BB4_0C5F[];
 extern char far C_2BB4_0F21[];
@@ -44,19 +45,17 @@ extern char far C_2BB4_111C[];
 extern char far C_2BB4_12C8[];
 extern char far C_2BB4_12E9[];
 
-extern unsigned char D_167A;/*Active*/
-extern int16 D_1680;/*MapZ*/
+extern unsigned char Active;
+extern int16 MapZ;
 extern int32 D_16AA;/*flags (0x10: the dream)*/
 extern int16 D_16AE;/*rotation of the map view (eighths of a turn)?*/
-extern int16 D_16D4;
+extern int16 DreamStage;
 extern unsigned char D_4EA4[];/*Party*/
 extern int16 D_54BA[];/*Amount: quantity (low byte), quality (high byte)*/
 extern unsigned char D_6EC6[];/*TalkFlags (per NPC)*/
 extern struct coord D_78AE[];/*ObjPos*/
 extern uint16 D_9CC4[];/*ObjShapeType*/
 
-#define Active D_167A
-#define MapZ D_1680
 #define IN_DREAM (D_16AA & 0x10)
 #define Party D_4EA4
 #define Amount D_54BA
@@ -64,12 +63,6 @@ extern uint16 D_9CC4[];/*ObjShapeType*/
 #define ObjPos D_78AE
 #define ObjShapeType D_9CC4
 
-#define ShowObjects C_1B09_3E18
-#define MUS_PlaySfx C_1FA9_0919
-#define BeltStart C_2F52_0473
-#define MachineryOn C_2F72_0000
-#define MachineryOff C_2F72_0210
-#define TALK_talkTo C_2F83_0167
 
 #define GetType(i) (ObjShapeType[i] & 0x3ff)
 #define GetFrame(i) (ObjShapeType[i] >> 10)
@@ -156,14 +149,14 @@ extern uint16 D_9CC4[];/*ObjShapeType*/
 		} else {
 			ObjShapeType[found] = GetType(found) + (((frame & 2) + 1) << 10);
 			state = 0;
-			if(IN_DREAM && D_16D4 == 0x44) {
+			if(IN_DREAM && DreamStage == 0x44) {
 				for(i = 0xc0; i < 0x100; i ++) {
 					if(GetType(i) == 0x18e) {
 						if(!(TalkFlags[0x54] & 0x40) && GetZ(i) == MapZ && GetX(i) >= 0x37 && GetY(i) <= 0x37) {
 							C_2F5F_0AC1(0x54);
 							TalkFlags[0x54] |= 2;
 							TALK_talkTo(0, 0x54, 0);
-							C_2F5F_0477();
+							DreamWakeUp();
 							return;
 						}
 						break;
@@ -295,10 +288,10 @@ extern uint16 D_9CC4[];/*ObjShapeType*/
 			}
 			break;
 		case 2:
-			C_2F5F_0000(Party[Active], 0);
+			DreamSleep(Party[Active], 0);
 			return;
 		case 3:
-			C_2F5F_02CE();
+			DreamEnter();
 			return;
 		default:
 			CON_printf("Strangely, the lever does nothing at all!\n");

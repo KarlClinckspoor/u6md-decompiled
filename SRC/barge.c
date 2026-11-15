@@ -24,11 +24,11 @@ extern int32 DOS_write(int16, int32, int32, void far *);
 
 /*other modules*/
 extern char DirIncrX[8], DirIncrY[8];
-extern int16 D_1431;/*VisibilityDirty*/
-extern int16 D_14F2;
-extern unsigned char D_167A;/*Active*/
-extern int16 D_167C, D_167E;/*MapX, MapY*/
-extern char D_16A5;/*SoloMember*/
+extern int16 VisibilityDirty;
+extern int16 LocPartOffset;
+extern unsigned char Active;
+extern int16 MapX, MapY;
+extern char SoloMember;
 extern int32 D_16AA;/*flags (0x10: the dream)*/
 extern unsigned char D_4EA4[];/*Party*/
 extern int16 D_54BA[];/*Amount: quantity (low byte), quality (high byte)*/
@@ -53,28 +53,23 @@ extern int16 D_B976;/*barge_num*/
 extern int16 D_B978[9];/*CurrentBarge*/
 extern int16 D_B98A[0x20];/*barge_pieces*/
 
-extern C_120E_0009();
-extern C_120E_0221();/*DisplayTick*/
-extern C_1534_056F();/*MAP_LoadAround*/
-extern unsigned char C_1534_1072(int16, int16, int16);/*GetTileAtXYZ*/
+extern AnimateTiles();
+extern DisplayTick();
+extern MAP_LoadAround();
+extern unsigned char GetTileAtXYZ(int16, int16, int16);
 extern int16 C_170D_0002(int16);
 extern int16 C_170D_007E(int16, int16, int16);
-extern int16 C_1B09_032A();/*next object of C_1B09_07D8's search*/
-extern int16 C_1B09_07D8(int16, int16, int16);/*first object at (x, y, z)?*/
-extern int16 C_1B09_09C7(int16, int16, int16);/*OBJ_FindTypeAt(type, x, y)*/
-extern int16 C_1B09_0DD7(void);/*NextArea*/
-extern int16 C_1B09_0EDE(int16, int16, int16, int16);/*SearchArea(x1, y1, x2, y2)*/
-extern C_1B09_1F52(int16, int16, int16, int16);/*MoveObj*/
-extern C_1B09_3E18();/*ShowObjects*/
-extern C_1FA9_0919(int16);/*play a sound effect?*/
-extern int16 C_222C_0008(int16);/*InRange_10_17_C0_C3: water tiles*/
+extern int16 NextLoc();/*next object of FindLoc's search*/
+extern int16 FindLoc(int16, int16, int16);/*first object at (x, y, z)?*/
+extern int16 OBJ_FindTypeAt(int16, int16, int16);/*OBJ_FindTypeAt(type, x, y)*/
+extern int16 NextArea(void);
+extern int16 SearchArea(int16, int16, int16, int16);/*SearchArea(x1, y1, x2, y2)*/
+extern MoveObj(int16, int16, int16, int16);
+extern ShowObjects();
+extern MUS_PlaySfx(int16);/*play a sound effect?*/
+extern int16 InRange_10_17_C0_C3(int16);/*InRange_10_17_C0_C3: water tiles*/
 extern cdecl CON_printf(char far *, ...);
 
-#define VisibilityDirty D_1431
-#define Active D_167A
-#define MapX D_167C
-#define MapY D_167E
-#define SoloMember D_16A5
 #define IN_DREAM (D_16AA & 0x10)
 #define Party D_4EA4
 #define Amount D_54BA
@@ -99,15 +94,6 @@ extern cdecl CON_printf(char far *, ...);
 #define CurrentBarge D_B978
 #define barge_pieces D_B98A
 
-#define DisplayTick C_120E_0221
-#define MAP_LoadAround C_1534_056F
-#define GetTileAtXYZ C_1534_1072
-#define OBJ_FindTypeAt C_1B09_09C7
-#define NextArea C_1B09_0DD7
-#define SearchArea C_1B09_0EDE
-#define MoveObj C_1B09_1F52
-#define ShowObjects C_1B09_3E18
-#define InRange_10_17_C0_C3 C_222C_0008
 
 #define GetType(i) (ObjShapeType[i] & 0x3ff)
 #define GetFrame(i) (ObjShapeType[i] >> 10)
@@ -213,7 +199,7 @@ extern cdecl CON_printf(char far *, ...);
 	while(numbarges --) {
 		if(GetType(controllers[numbarges]) != 0x1a2) {
 			CON_printf("The barge creaks.");
-			C_1FA9_0919(0xc);
+			MUS_PlaySfx(0xc);
 			continue;
 		}
 		barge_num = bargeids[numbarges];
@@ -277,7 +263,7 @@ extern cdecl CON_printf(char far *, ...);
 		x = GetX(barge_pieces[i]);
 		y = GetY(barge_pieces[i]);
 		z = GetZ(barge_pieces[i]);
-		for(objNum = C_1B09_07D8(x, y, z); objNum >= 0; objNum = C_1B09_032A()) {
+		for(objNum = FindLoc(x, y, z); objNum >= 0; objNum = NextLoc()) {
 			if(objNum < 0x100 && objNum >= 0 && (NPCStatus[objNum] & 0x80))
 				npcs ++;
 		}
@@ -291,8 +277,8 @@ extern cdecl CON_printf(char far *, ...);
 		}
 		sameBarge = 0;
 		blocked = 0;
-		for(objNum = C_1B09_07D8(x, y, z); objNum >= 0; objNum = C_1B09_032A()) {
-			if(D_14F2)
+		for(objNum = FindLoc(x, y, z); objNum >= 0; objNum = NextLoc()) {
+			if(LocPartOffset)
 				break;
 			type = GetType(objNum);
 			if(type == 0x1a1 || type == 0x1a2) {
@@ -324,11 +310,11 @@ extern cdecl CON_printf(char far *, ...);
 	barge_scrap_count = 0;
 	for(i = 0; i < barge_piece_count; i++) {
 		for(
-			objNum = C_1B09_07D8(GetX(barge_pieces[i]), GetY(barge_pieces[i]), GetZ(barge_pieces[i]));
+			objNum = FindLoc(GetX(barge_pieces[i]), GetY(barge_pieces[i]), GetZ(barge_pieces[i]));
 			objNum >= 0;
-			objNum = C_1B09_032A()
+			objNum = NextLoc()
 		) {
-			tile = BaseTile[GetType(objNum)] + GetFrame(objNum) - D_14F2;
+			tile = BaseTile[GetType(objNum)] + GetFrame(objNum) - LocPartOffset;
 			if(barge_scrap_count < 0x200 && !(TileFlag2[tile] & 4) && !(TileFlag[tile] & 0x10) && GetType(objNum) < 0x1cd) {
 				barge_scrap[barge_scrap_count] = objNum;
 				barge_scrap_count ++;
@@ -354,13 +340,13 @@ extern cdecl CON_printf(char far *, ...);
 			MoveObj(barge_pieces[i], (GetX(barge_pieces[i]) + dx) & 0x3ff, (GetY(barge_pieces[i]) + dy) & 0x3ff, GetZ(barge_pieces[i]));
 		} else {
 			CON_printf("The barge groans!\n");
-			C_1FA9_0919(0xc);
+			MUS_PlaySfx(0xc);
 		}
 	}
 	for(i = barge_scrap_count - 1; i >= 0; i--) {
 		if(GetType(barge_scrap[i]) == 0x1a1 || GetType(barge_scrap[i]) == 0x1a2) {
 			CON_printf("The barge shudders!\n");
-			C_1FA9_0919(0xc);
+			MUS_PlaySfx(0xc);
 		} else {
 			MoveObj(barge_scrap[i], (GetX(barge_scrap[i]) + dx) & 0x3ff, (GetY(barge_scrap[i]) + dy) & 0x3ff, GetZ(barge_scrap[i]));
 		}
@@ -406,6 +392,6 @@ extern cdecl CON_printf(char far *, ...);
 			}
 		}
 	}
-	C_120E_0009();
+	AnimateTiles();
 	return (TalkFlags[0x76] & 0x20) && (TalkFlags[0x76] & 0x40);
 }

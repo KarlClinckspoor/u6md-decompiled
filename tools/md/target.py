@@ -21,8 +21,12 @@ TARGETS = {
     'martian': dict(exe='MARTIAN.EXE', src='SRC_M', dgroup=0x172A, syms='martian_syms.txt', bss=0x2366, bss_end=0x465C,
                     lib='CM.LIB', libs=['EMU', 'MATHM', 'CM'], flags='-mm -c -O -Z -d'),
     # GAME.EXE: the game (pascal, overlaid)
-    'game': dict(exe='GAME.EXE', src='SRC', dgroup=0x2FAB, syms='game_syms.txt', bss=None,
-                 lib='CM.LIB', libs=['OVERLAY', 'CM'], overlay=True, flags='-mm -p -c -O -Z -d'),
+    # bss-bss_end: Origin's uninitialised data (SRC/BSS.ASM); SEGORDER.ASM, linked before C0M,
+    # puts C0M's _BSSEND before _BSS, as in Savage Empire's GAME.EXE; link_name and link_date:
+    # the name and date TLINK /o wrote into the overlay data ("ultima.exe", 23 May 1991)
+    'game': dict(exe='GAME.EXE', src='SRC', dgroup=0x2FAB, syms='game_syms.txt', bss=0x3232, bss_end=0xF24E,
+                 lib='CM.LIB', libs=['OVERLAY', 'CM'], overlay=True, flags='-mm -p -c -O -Z -d',
+                 link_first=['SEGORDER.ASM'], link_name='ULTIMA', link_date=(1991, 5, 23)),
 }
 
 

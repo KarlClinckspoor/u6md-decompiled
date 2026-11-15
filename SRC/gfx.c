@@ -109,21 +109,21 @@ extern char DirIncrX[8], DirIncrY[8];
 extern int16 GrDriverOption;
 extern unsigned char MouseOn;
 /*other game modules*/
-extern C_120E_0009();
-extern C_120E_0084(int16);/*DrawMapWindow*/
-extern C_120E_0221();/*DisplayTick*/
+extern AnimateTiles();
+extern DrawMapWindow(int16);
+extern DisplayTick();
 extern MAP_BuildArea();
 extern unsigned char GetTileAtXYZ(int16, int16, int16);
 extern int16 WrapDelta(int16);
 extern int16 MapDistance(int16, int16);
 extern VIS_FloodFill(int16, int16, int16, int16);
 extern VIS_UpdateView();
-extern int16 C_1B09_032A();/*NextLoc*/
-extern int16 C_1B09_07D8(int16, int16, int16);/*FindLoc(x, y, z)*/
-extern int16 C_1B09_0DD7(void);/*NextArea*/
-extern int16 C_1B09_0EDE(int16, int16, int16, int16);/*SearchArea(x1, y1, x2, y2)*/
+extern int16 NextLoc();
+extern int16 FindLoc(int16, int16, int16);/*FindLoc(x, y, z)*/
+extern int16 NextArea(void);
+extern int16 SearchArea(int16, int16, int16, int16);/*SearchArea(x1, y1, x2, y2)*/
 extern int16 C_100B_038E(int16);
-extern int16 C_07D1_0BE1(int16, int16, int16);/*COMBAT_GetTargetAt(shooter, x, y)*/
+extern int16 COMBAT_GetTargetAt(int16, int16, int16);/*COMBAT_GetTargetAt(shooter, x, y)*/
 extern MUS_PlaySfx(int16);
 extern int16 CON_mouseOffAt(int16, int16, int16, int16);
 extern CON_mouseOn(int16);
@@ -131,13 +131,6 @@ extern CON_WaitKeyOrClick();
 extern cdecl CON_printf(char far *, ...);
 extern char far C_2BB4_22F1[];
 
-#define DrawMapWindow C_120E_0084
-#define DisplayTick C_120E_0221
-#define FindLoc C_1B09_07D8
-#define NextLoc C_1B09_032A
-#define SearchArea C_1B09_0EDE
-#define NextArea C_1B09_0DD7
-#define COMBAT_GetTargetAt C_07D1_0BE1
 
 /*library*/
 extern int16 cdecl osiError;
@@ -150,18 +143,18 @@ extern void cdecl ShutdownSound(void);
 extern void cdecl TimerDelay(int32);
 
 extern int16 D_0F18;/*MapAnimEnabled*/
-extern int16 D_1431;/*VisibilityDirty*/
-extern int16 D_14F2;/*LocPartOffset*/
-extern unsigned char D_1674;/*Time_M*/
-extern unsigned char D_1675;/*Time_H*/
-extern int16 D_167C;/*MapX*/
-extern int16 D_167E;/*MapY*/
-extern int16 D_1680;/*MapZ*/
-extern char D_16A4;/*InCombat*/
+extern int16 VisibilityDirty;
+extern int16 LocPartOffset;
+extern unsigned char Time_M;
+extern unsigned char Time_H;
+extern int16 MapX;
+extern int16 MapY;
+extern int16 MapZ;
+extern char InCombat;
 extern unsigned char D_16A8;/*the player is a woman*/
 extern int32 D_16AA;/*flags (0x10: the dream)*/
-extern int16 D_06BC;/*MissileShooter*/
-extern unsigned char D_06C0[8][8];/*RangeTable*/
+extern int16 MissileShooter;
+extern unsigned char RangeTable[8][8];
 extern int16 ViewX, ViewY;
 extern unsigned char AnimateAtPrompt;
 
@@ -202,14 +195,6 @@ extern int16 D_C4AA[11][11];/*Tile_11x11*/
 extern int16 D_B9CA;/*MissileHitObj*/
 extern int16 D_B9D2[2];/*MissileEnd*/
 
-#define MissileShooter D_06BC
-#define RangeTable D_06C0
-#define MapX D_167C
-#define MapY D_167E
-#define MapZ D_1680
-#define Time_M D_1674
-#define Time_H D_1675
-#define InCombat D_16A4
 #define ObjStatus D_3266
 #define Amount D_54BA
 #define TileFlag D_6DBA
@@ -219,7 +204,6 @@ extern int16 D_B9D2[2];/*MissileEnd*/
 #define ObjShapeType D_9CC4
 #define TerrainType D_B4C4
 #define MissileHitList D_B9D6
-#define LocPartOffset D_14F2
 #define GetType(i) (ObjShapeType[i] & 0x3ff)
 #define GetFrame(i) (ObjShapeType[i] >> 10)
 #define GetQuan(i) (((unsigned char *)(Amount + (i)))[0])
@@ -841,7 +825,7 @@ int16 far /*C_0E1A_1003*/*C_0E1A_1003(int16 x, int16 y, int16 x2, int16 y2, int1
   (tile map and visible tiles/objects) without displaying it*/
 /*C_0E1A_11D2*/ResetMapView() {
 	ClearMapView();
-	D_1431 = 0;
+	VisibilityDirty = 0;
 	ScreenFade = 1;
 	DrawMapWindow(1);
 	MAP_BuildArea();
@@ -877,7 +861,7 @@ int16 far /*C_0E1A_1003*/*C_0E1A_1003(int16 x, int16 y, int16 x2, int16 y2, int1
 		if(D_B4C8[i] == BaseTile[0x62])
 			D_770E[i] = Time_H % 12 + 0x1a0;
 	}
-	C_120E_0009();
+	AnimateTiles();
 }
 
 /*0AF4*/unsigned char PortraitBgs[] = {

@@ -1,4 +1,5 @@
 /* flags: -d -mm -p -c -Z -O -y */
+/* stub order: 0A1B 017E 06C9 17D4 0F95 0562 1CB6 18F3 18C6 0000 1338 1BBC 11E0 00F7 1DAE 1B00 1B18 041A 1953 0C42 14D8 048E 1A5C 1C2E */
 /*
  * Martian Dreams - GAME.EXE overlay 2FA1: actions of the "use" command (the
  * third of three overlays of them, with 2F8D and 2F98). New code.
@@ -69,20 +70,20 @@ extern int16 OSI_rand(int16, int16);
 
 extern signed char DirIncrX[8], DirIncrY[8];
 extern char *DirNames[];
-extern int16 D_080E;/*ScreenFade*/
-extern int16 D_0EA4;/*XRayView*/
+extern int16 ScreenFade;
+extern int16 XRayView;
 extern unsigned char D_0F12;/*StatusDirty*/
-extern int16 D_1431;/*VisibilityDirty*/
+extern int16 VisibilityDirty;
 extern unsigned char Time_H;
-extern unsigned char D_1676, D_1677;/*Date_D, Date_M*/
-extern unsigned char D_167A;/*Active*/
-extern char D_167B;/*AmbientLight*/
-extern int16 D_167C, D_167E, D_1680;/*MapX, MapY, MapZ*/
-extern unsigned char D_1686;/*DrunkCounter*/
-extern char D_16A4;/*InCombat*/
+extern unsigned char Date_D, Date_M;
+extern unsigned char Active;
+extern char AmbientLight;
+extern int16 MapX, MapY, MapZ;
+extern unsigned char DrunkCounter;
+extern char InCombat;
 extern int32 D_16AA;/*flags (0x10: the dream)*/
 extern struct { unsigned a:4, psychic:4, c:4, d:4; } D_16B0[];/*talents*/
-extern unsigned char D_1A8A;/*PartyListTop*/
+extern unsigned char PartyListTop;
 extern int16 StatusMember;
 extern int16 MouseMode;
 extern int16 StatusDisplay;
@@ -101,19 +102,6 @@ extern int16 D_EB72;/*AdvanceDir*/
 extern int16 D_EBCE;/*Selection.obj*/
 extern int16 D_EBF6, D_EBF8;/*Selection.x, Selection.y*/
 
-#define ScreenFade D_080E
-#define XRayView D_0EA4
-#define VisibilityDirty D_1431
-#define Date_D D_1676
-#define Date_M D_1677
-#define Active D_167A
-#define AmbientLight D_167B
-#define MapX D_167C
-#define MapY D_167E
-#define MapZ D_1680
-#define DrunkCounter D_1686
-#define InCombat D_16A4
-#define PartyListTop D_1A8A
 #define ObjStatus D_3266
 #define Party D_4EA4
 #define Level D_4EB6

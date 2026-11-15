@@ -1,4 +1,5 @@
 /* flags: -d -mm -p -c -Z -O -y */
+/* stub order: 1429 157A 1607 1657 0000 16A8 02E1 042D 0532 0757 07AA 07FA 0951 0A64 0B90 032D */
 /*
  * Martian Dreams - GAME.EXE overlay 2F75: the cut scenes. New code (Savage
  * Empire has nothing like it).
@@ -42,21 +43,21 @@ extern cdecl UnhookAll(void);
 extern void far *LZC_loadType(char far *name, int16 index, void far *out, int16 memflags, char far *work);
 
 /*other game modules*/
-extern C_047A_024B(int16);/*ShowPortrait*/
-extern C_07D1_15F0(int16);
-extern C_0E1A_1E2B(int16);/*ClearMapWindow*/
+extern ShowPortrait(int16);
+extern COMBAT_Kill(int16);
+extern ClearMapWindow(int16);
 extern VIS_UpdateView();
-extern C_120E_0084(int16);/*DrawMapWindow*/
-extern C_120E_18B4();/*RefreshStatus*/
+extern DrawMapWindow(int16);
+extern RefreshStatus();
 extern MAP_LoadAround();
-extern C_1B09_0DD7();/*NextArea: next object of SearchArea*/
-extern int16 C_1B09_0EDE(int16, int16, int16, int16);/*SearchArea(x1, y1, x2, y2)*/
-extern int16 C_1B09_116E(int16, int16, int16, int16, int16, int16);/*AddMapObj(shape, status, amount, x, y, z)*/
-extern C_1B09_1872(int16);/*DeleteObj*/
-extern C_1B09_1F52(int16, int16, int16, int16);/*MoveObj(obj, x, y, z)*/
-extern C_1B09_2CD2();/*OBJ_DeleteTmpBlocks*/
-extern C_1FA9_01B4(int16);/*MUS_PlaySong*/
-extern C_1FA9_02B5();/*MUS_PlayAreaSong*/
+extern NextArea();/*NextArea: next object of SearchArea*/
+extern int16 SearchArea(int16, int16, int16, int16);/*SearchArea(x1, y1, x2, y2)*/
+extern int16 AddMapObj(int16, int16, int16, int16, int16, int16);/*AddMapObj(shape, status, amount, x, y, z)*/
+extern DeleteObj(int16);
+extern MoveObj(int16, int16, int16, int16);/*MoveObj(obj, x, y, z)*/
+extern OBJ_DeleteTmpBlocks();
+extern MUS_PlaySong(int16);
+extern MUS_PlayAreaSong();
 extern CON_setClip(struct tClipInfo *);
 extern CON_gotoxy(int16, int16);
 extern int16 CON_getch();
@@ -65,21 +66,21 @@ extern cdecl CON_printf(char far *, ...);
 extern char far C_2BB4_22F1[];/*failure message*/
 
 extern unsigned char MouseOn;
-extern int16 D_080E;/*ScreenFade*/
-extern int16 D_081C;/*ColorPaper*/
-extern int16 D_081E;/*ColorText*/
+extern int16 ScreenFade;
+extern int16 ColorPaper;
+extern int16 ColorText;
 extern int16 D_0826;
 extern char D_0F12;/*StatusDirty*/
 extern char D_0F13;/*PromptFlag*/
 extern int16 D_0F18;/*MapAnimEnabled*/
-extern int16 D_167C, D_167E, D_1680;/*MapX, MapY, MapZ*/
+extern int16 MapX, MapY, MapZ;
 extern unsigned char D_16A8;/*the player is a woman*/
 extern char SelectMode;
-extern char D_1B8D;/*AnimateAtPrompt*/
-extern int16 D_1B90;/*EndPagingAtPrompt*/
+extern char AnimateAtPrompt;
+extern int16 EndPagingAtPrompt;
 extern int16 StatusDisplay;
 extern struct tClipInfo *CurClip;
-extern unsigned char D_2805;/*IsInConversation*/
+extern unsigned char IsInConversation;
 extern char D_3232;/*a drawing surface (main.c)*/
 extern unsigned char far *D_3262;/*talk flags 8-15*/
 extern unsigned char D_3266[];/*ObjStatus*/
@@ -99,18 +100,9 @@ extern int16 D_C0FA, D_C0FC;/*AreaX, AreaY*/
 extern struct tClipInfo D_EBD0[4];/*TextWindows*/
 extern int16 D_EC42;/*LinesBeforeMore*/
 
-#define ScreenFade D_080E
-#define ColorPaper D_081C
-#define ColorText D_081E
 #define StatusDirty D_0F12
 #define PromptFlag D_0F13
 #define MapAnimEnabled D_0F18
-#define MapX D_167C
-#define MapY D_167E
-#define MapZ D_1680
-#define AnimateAtPrompt D_1B8D
-#define EndPagingAtPrompt D_1B90
-#define IsInConversation D_2805
 #define ObjStatus D_3266
 #define NPCMode D_46D0
 #define Schedule D_4EBA
@@ -127,18 +119,6 @@ extern int16 D_EC42;/*LinesBeforeMore*/
 #define TextWindows D_EBD0
 #define LinesBeforeMore D_EC42
 
-#define ShowPortrait C_047A_024B
-#define ClearMapWindow C_0E1A_1E2B
-#define DrawMapWindow C_120E_0084
-#define RefreshStatus C_120E_18B4
-#define NextArea C_1B09_0DD7
-#define SearchArea C_1B09_0EDE
-#define AddMapObj C_1B09_116E
-#define DeleteObj C_1B09_1872
-#define MoveObj C_1B09_1F52
-#define OBJ_DeleteTmpBlocks C_1B09_2CD2
-#define MUS_PlaySong C_1FA9_01B4
-#define MUS_PlayAreaSong C_1FA9_02B5
 
 #define GR_SET_COLOR(c)              (GrDriver.iii.ofs = 0x06, (*GrDriver.f)(c))
 #define GR_FILL_RECT(x0,y0,x1,y1)    (GrDriver.iii.ofs = 0x12, (*GrDriver.f)(x0,y0,x1,y1))
@@ -462,7 +442,7 @@ extern int16 D_EC42;/*LinesBeforeMore*/
 	MUS_PlayAreaSong();
 }
 
-/*cut scene 8 (LeverMachinery 6): C_07D1_15F0 on NPCs 0x41, 0x43-0x45;
+/*cut scene 8 (LeverMachinery 6): COMBAT_Kill on NPCs 0x41, 0x43-0x45;
   NPCs 0x42 to (0x394, 0x284, 0), 0x46 to (0x393, 0x282, 0), 0x40 removed*/
 /*C_2F75_0A64*/C_2F75_0A64() {
 	char portraits[3];
@@ -477,10 +457,10 @@ extern int16 D_EC42;/*LinesBeforeMore*/
 	MapY = 0x280;
 	MapZ = 0;
 	MAP_LoadAround();
-	C_07D1_15F0(0x41);
-	C_07D1_15F0(0x43);
-	C_07D1_15F0(0x44);
-	C_07D1_15F0(0x45);
+	COMBAT_Kill(0x41);
+	COMBAT_Kill(0x43);
+	COMBAT_Kill(0x44);
+	COMBAT_Kill(0x45);
 	D_3262[0x42] |= 0x80;
 	NPCMode[0x42] = 0;
 	MoveObj(0x42, 0x394, 0x284, 0);

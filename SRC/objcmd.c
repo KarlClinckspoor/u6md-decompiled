@@ -19,8 +19,8 @@
  * (sums & 0x3ff, MapDistance); SE's cut scenes, type lists and tests
  * (IsContainerType ... IsUsableType, now objtype.c's) and everything after
  * CmdMove (use) are elsewhere; the commands reach as far as the actor's
- * first talent allows (REACH, C_07D1_35A8, the thrown object's path
- * C_07D1_0CFC), play a sound when refused (MUS_PlaySfx(5)) and print most
+ * first talent allows (REACH, COMBAT_range, the thrown object's path
+ * COMBAT_Missile), play a sound when refused (MUS_PlaySfx(5)) and print most
  * messages from the far message segment 2BB4; the hot objects 0x1c0/0x1c1
  * burn the hands; objects dropped or pushed into a running canal splash.
  */
@@ -36,8 +36,8 @@ struct tClipInfo/*size:9*/ {
 
 /*OSI*/
 extern int16 OSI_rand(int16, int16);/*OSI_rand(lo, hi)*/
-extern int16 cdecl MOUSE_SHOW(void);/*MOUSE_SHOW*/
-extern int16 cdecl MOUSE_HIDE(void);/*MOUSE_HIDE*/
+extern int16 cdecl MOUSE_SHOW(void);
+extern int16 cdecl MOUSE_HIDE(void);
 /*gameloop*/
 extern DisplayTick(void);
 extern PassTime(int16);
@@ -56,7 +56,7 @@ extern CON_gotoxy(int16, int16);
 extern cdecl CON_printf(char far *, ...);
 /*map*/
 extern unsigned char GetTileAtXYZ(int16, int16, int16);
-extern int16 MapDistance(int16, int16);/*C_1534_1129 (wrapping)*/
+extern int16 MapDistance(int16, int16);/*MapDistance (wrapping)*/
 /*visible*/
 extern VIS_UpdateView(void);
 /*object*/
@@ -75,7 +75,7 @@ extern char *GetObjectString(int16);
 extern char *GetTileString(int16);
 extern ShowObjects(void);
 extern int16 LocCursor[4];/*LocCursor: FindLoc's cursors*/
-extern int16 LocPartOffset;/*LocPartOffset*/
+extern int16 LocPartOffset;
 /*objtype*/
 extern int16 IsContainerType(int16);
 extern int16 C_100B_01AD(int16);/*breakable type*/
@@ -109,11 +109,11 @@ extern int16 CanMoveTo(int16, int16, int16);
 extern C_170D_083F(int16, int16);/*turns an NPC towards dir*/
 extern SubMov(int16, int16);
 /*combat*/
-extern int16 C_07D1_0521(int16);/*GetStr*/
-extern int16 C_07D1_0CFC(int16, int16 *, int16 *, int16, int16);/*the flight of a thrown object (actor, &x, &y, range, tile): 0 when blocked, x/y where it stops*/
-extern C_07D1_126D(int16);/*COMBAT_showHit*/
-extern C_07D1_1D64(int16, int16, int16);/*hurt (objNum, damage, kind)*/
-extern int16 C_07D1_35A8(int16, int16, int16, int16);/*distance of (x1, y1) and (x2, y2)*/
+extern int16 GetStr(int16);
+extern int16 COMBAT_Missile(int16, int16 *, int16 *, int16, int16);/*the flight of a thrown object (actor, &x, &y, range, tile): 0 when blocked, x/y where it stops*/
+extern COMBAT_showHit(int16);
+extern LoseHP(int16, int16, int16);/*hurt (objNum, damage, kind)*/
+extern int16 COMBAT_range(int16, int16, int16, int16);/*distance of (x1, y1) and (x2, y2)*/
 /*sound*/
 extern MUS_PlaySfx(int16);
 extern C_1FA9_0A8A(void);/*splash*/
@@ -196,28 +196,28 @@ extern char far C_2BB4_1EF7[];/*"\n\nYou can't do that!\n"*/
 extern char far C_2BB4_1F0D[];/*"That container is full.\n"*/
 extern char far C_2BB4_22F1[];/*"Aargh!\n"*/
 
-extern char DirIncrX[];/*DirIncrX*/
-extern char DirIncrY[];/*DirIncrY*/
-extern char *DirNames[];/*DirNames*/
-extern char MouseOn;/*MouseOn*/
-extern int16 EndPagingAtPrompt;/*EndPagingAtPrompt*/
-extern int16 StatusDisplay;/*StatusDisplay*/
-extern int16 GetsAborted;/*GetsAborted*/
-extern struct tClipInfo *CurClip;/*CurClip*/
-extern char SelectMode;/*SelectMode*/
-extern char SelectRange;/*SelectRange*/
-extern char AimX, AimY;/*AimX, AimY*/
-extern int16 LastNumberPlural;/*LastNumberPlural*/
-extern char DirOriginX, DirOriginY;/*DirOriginX, DirOriginY*/
-extern int16 AdvanceBlocked;/*AdvanceBlocked*/
+extern char DirIncrX[];
+extern char DirIncrY[];
+extern char *DirNames[];
+extern char MouseOn;
+extern int16 EndPagingAtPrompt;
+extern int16 StatusDisplay;
+extern int16 GetsAborted;
+extern struct tClipInfo *CurClip;
+extern char SelectMode;
+extern char SelectRange;
+extern char AimX, AimY;
+extern int16 LastNumberPlural;
+extern char DirOriginX, DirOriginY;
+extern int16 AdvanceBlocked;
 extern unsigned char D_0F12;/*StatusDirty*/
-extern int16 StatusMember;/*StatusMember*/
-extern int16 MouseMode;/*MouseMode*/
-extern unsigned char IsInConversation;/*IsInConversation*/
-extern int16 ColorPaper;/*ColorPaper*/
-extern unsigned char Time_M, Time_H;/*Time_M, Time_H*/
-extern unsigned char Active;/*Active*/
-extern int16 MapX, MapY, MapZ;/*MapX, MapY, MapZ*/
+extern int16 StatusMember;
+extern int16 MouseMode;
+extern unsigned char IsInConversation;
+extern int16 ColorPaper;
+extern unsigned char Time_M, Time_H;
+extern unsigned char Active;
+extern int16 MapX, MapY, MapZ;
 extern unsigned char D_16A8;/*the player is a woman*/
 extern int32 D_16AA;/*flags (0x10: the dream)*/
 extern struct { unsigned a:4, b:4, c:4, d:4; } D_16B0[];/*talents*/
@@ -248,7 +248,6 @@ extern struct tClipInfo D_EBD0[4];/*TextWindows*/
 extern int16 D_EBF6, D_EBF8;/*Selection.x, Selection.y*/
 extern int16 D_EC44;/*SelectionIsDark*/
 
-#define GetStr C_07D1_0521
 #define StatusDirty D_0F12
 #define ObjStatus D_3266
 #define Party D_4EA4
@@ -945,7 +944,7 @@ extern int16 D_EC44;/*SelectionIsDark*/
 	objFrm = GetFrame(obj);
 	if((objTyp == 0x1c1 || objTyp == 0x1c0) && !REACH && actor != 6 &&
 		GetType(Equipment[2]) != 0x88 && GetType(Equipment[5]) != 0x88) {
-		C_07D1_126D(Party[Active]);
+		COMBAT_showHit(Party[Active]);
 		NPCStatus[Party[Active]] |= 8;
 		CON_printf(C_2BB4_0D50);
 	}
@@ -971,18 +970,18 @@ extern int16 D_EC44;/*SelectionIsDark*/
 		CON_putch('\n');
 		destX = SelectionX;
 		destY = SelectionY;
-		dist = C_07D1_35A8(destX, destY, GetX(actor), GetY(actor));
+		dist = COMBAT_range(destX, destY, GetX(actor), GetY(actor));
 		if(OBJ_FindNPCAt(1, destX, destY) != -1) {
 			CON_printf(C_2BB4_034D);
 			MUS_PlaySfx(5);
 			return;
 		}
 		target = FindLoc(destX, destY, MapZ);
-		if(C_07D1_0CFC(actor, &destX, &destY, 8, 0)) {
+		if(COMBAT_Missile(actor, &destX, &destY, 8, 0)) {
 			if(C_047A_13C5(destX, destY) && objTyp != 0x18b) {
 				/*into the water: lost*/
 				if(obj >= 0x100 || obj < 0) {
-					C_07D1_0CFC(actor, &destX, &destY, 8, TILE_FRAME(obj));
+					COMBAT_Missile(actor, &destX, &destY, 8, TILE_FRAME(obj));
 					if(quanType && GetQuan(obj) > count) {
 						SubQuan(obj, count);
 					} else {
@@ -1032,7 +1031,7 @@ extern int16 D_EC44;/*SelectionIsDark*/
 		}
 		SubMov(actor, 3);
 		/*animate the throw; destX/destY = where it lands*/
-		C_07D1_0CFC(actor, &destX, &destY, 8, TILE_FRAME(obj));
+		COMBAT_Missile(actor, &destX, &destY, 8, TILE_FRAME(obj));
 		if(dist > 1 && REACH < dist && C_100B_01AD(objTyp)) {
 			if(quanType) {
 				qtyCode = QualQuan(GetQual(obj), count);
@@ -1044,7 +1043,7 @@ extern int16 D_EC44;/*SelectionIsDark*/
 				}
 			} else if(objTyp == 0x133) {
 				MoveObj(obj, destX, destY, MapZ);
-				C_07D1_1D64(obj, 1, 0);
+				LoseHP(obj, 1, 0);
 				STAT_RefreshInventory(InvenOwner);
 				StatusDirty = 0;
 				if(StatusDisplay == 0x92)
@@ -1052,7 +1051,7 @@ extern int16 D_EC44;/*SelectionIsDark*/
 				return;
 			} else if(C_100B_038E(objTyp) && GetQuan(obj)) {
 				MoveObj(obj, destX, destY, MapZ);
-				C_07D1_1D64(obj, GetQuan(obj), 0);
+				LoseHP(obj, GetQuan(obj), 0);
 			} else {
 				if(IsContainerType(objTyp))
 					MoveObj(obj, destX, destY, MapZ);
@@ -1144,8 +1143,8 @@ extern int16 D_EC44;/*SelectionIsDark*/
 		MUS_PlaySfx(5);
 		return;
 	} else {
-		dist = C_07D1_35A8(actorX, actorY, SelectionX, SelectionY);
-		if(!C_07D1_0CFC(SelectionObj, &actorX, &actorY, 8, 0)) {
+		dist = COMBAT_range(actorX, actorY, SelectionX, SelectionY);
+		if(!COMBAT_Missile(SelectionObj, &actorX, &actorY, 8, 0)) {
 			CON_printf(C_2BB4_0230);
 			MUS_PlaySfx(5);
 			return;
@@ -1172,12 +1171,12 @@ extern int16 D_EC44;/*SelectionIsDark*/
 	} else {
 		if(dist > 1) {
 			MUS_PlaySfx(0x32);
-			C_07D1_0CFC(SelectionObj, &actorX, &actorY, 8, TILE_FRAME(SelectionObj));
+			COMBAT_Missile(SelectionObj, &actorX, &actorY, 8, TILE_FRAME(SelectionObj));
 		}
 		SubMov(actor, 3);
 		if((objTyp == 0x1c1 || objTyp == 0x1c0) && !REACH && actor != 6 &&
 			GetType(Equipment[2]) != 0x88 && GetType(Equipment[5]) != 0x88) {
-			C_07D1_126D(Party[Active]);
+			COMBAT_showHit(Party[Active]);
 			NPCStatus[Party[Active]] |= 8;
 			CON_printf(C_2BB4_0D50);
 		}
@@ -1401,14 +1400,14 @@ extern int16 D_EC44;/*SelectionIsDark*/
 	actorX = GetX(Party[Active]);
 	actorY = GetY(Party[Active]);
 	if(GetCoordUse(SelectionObj) == LOCXYZ) {
-		dist = C_07D1_35A8(actorX, actorY, SelectionX, SelectionY);
+		dist = COMBAT_range(actorX, actorY, SelectionX, SelectionY);
 		if(REACH + 1 < dist) {
 			CON_printf(C_2BB4_03A6);
 			return;
 		}
 		if((objTyp == 0x1c1 || objTyp == 0x1c0) && !REACH && Party[Active] != 6 &&
 			GetType(Equipment[2]) != 0x88 && GetType(Equipment[5]) != 0x88) {
-			C_07D1_126D(Party[Active]);
+			COMBAT_showHit(Party[Active]);
 			NPCStatus[Party[Active]] |= 8;
 			CON_printf(C_2BB4_0D50);
 		}
@@ -1516,7 +1515,7 @@ extern int16 D_EC44;/*SelectionIsDark*/
 		/*inventory object of the displayed member StatusMember*/
 		if((objTyp == 0x1c1 || objTyp == 0x1c0) && !REACH && Party[Active] != 6 &&
 			GetType(Equipment[2]) != 0x88 && GetType(Equipment[5]) != 0x88) {
-			C_07D1_126D(Party[Active]);
+			COMBAT_showHit(Party[Active]);
 			NPCStatus[Party[Active]] |= 8;
 			CON_printf(C_2BB4_0D50);
 		}
@@ -1549,7 +1548,7 @@ extern int16 D_EC44;/*SelectionIsDark*/
 			return;
 		}
 		if(GetCoordUse(SelectionObj) == LOCXYZ) {
-			dist = C_07D1_35A8(SelectionX, SelectionY, actorX, actorY);
+			dist = COMBAT_range(SelectionX, SelectionY, actorX, actorY);
 			if((SelectionObj < 0x100 && SelectionObj >= 0 && !IsNpcOnScreen(SelectionObj)) ||
 				((SelectionObj >= 0x100 || SelectionObj < 0) && REACH + 1 < dist &&
 				MapDistance(SelectionX, actorX) > 1 && MapDistance(SelectionY, actorY) > 1)) {

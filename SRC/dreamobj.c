@@ -1,4 +1,5 @@
 /* flags: -d -mm -p -c -Z -O -y */
+/* stub order: 083C 062F 0086 0ACF 0000 0C0C 0A13 0043 */
 /*
  * Martian Dreams - GAME.EXE overlay 2F63: more of the dream (with dream.c,
  * overlay 2F5F, and dreamstg.c, overlay 2F68). New code (Savage Empire has
@@ -28,42 +29,42 @@ extern int16 OSI_rand(int16, int16);/*OSI_rand(lo, hi)*/
 extern void cdecl TimerDelay(int32);
 
 /*other game modules*/
-extern C_07D1_02C4();/*COMBAT_breakOff*/
-extern C_07D1_06C1(int16);/*SetTypeUnconscious*/
-extern int16 C_07D1_1D64(int16, int16, int16);/*hurt (objNum, damage, ?)*/
-extern int16 C_07D1_35A8(int16, int16, int16, int16);/*distance of (x1, y1) and (x2, y2)*/
-extern C_0E1A_11D2();/*ResetMapView*/
+extern COMBAT_breakOff();
+extern SetTypeUnconscious(int16);
+extern int16 LoseHP(int16, int16, int16);/*hurt (objNum, damage, ?)*/
+extern int16 COMBAT_range(int16, int16, int16, int16);/*distance of (x1, y1) and (x2, y2)*/
+extern ResetMapView();
 extern int16 C_100B_0247(int16);
-extern int16 C_100B_02C0(int16);/*STAT_GetEquipSlot*/
+extern int16 STAT_GetEquipSlot(int16);
 extern int16 NPC_TryStep(int16, int16, int16);
-extern C_1157_0312();/*VIS_UpdateView*/
-extern C_120E_0009();
-extern C_120E_0221();/*DisplayTick*/
-extern unsigned char C_1534_1072(int16, int16, int16);/*GetTileAtXYZ*/
-extern C_1534_056F();/*MAP_LoadAround*/
-extern int16 C_1534_1129(int16, int16);/*MapDistance*/
-extern int16 C_1649_000A(int16);/*GetMonsterClass(type): < 0 if none*/
-extern C_170D_0868(int16, int16);/*SubMov(npc, points)*/
-extern C_170D_2231(int16, int16, int16);/*TryStraightMove*/
-extern int16 C_1B09_032A();/*NextLoc*/
-extern int16 C_1B09_07D8(int16, int16, int16);/*FindLoc(x, y, z)*/
-extern int16 C_1B09_09C7(int16, int16, int16);/*OBJ_FindTypeAt(type, x, y)*/
-extern int16 C_1B09_0B1D(int16);/*FindInv: first object of an inventory*/
-extern int16 C_1B09_0B76(void);/*NextInv*/
-extern int16 C_1B09_0DD7(void);/*NextArea: next object of SearchArea*/
-extern int16 C_1B09_0EDE(int16, int16, int16, int16);/*SearchArea(x1, y1, x2, y2)*/
-extern int16 C_1B09_116E(int16, int16, int16, int16, int16, int16);/*AddMapObj(type, status, amount, x, y, z)*/
-extern int16 C_1B09_12EE(int16, int16, int16, int16);/*AddInvObj(shape, position, quantity, owner)*/
-extern C_1B09_1872(int16);/*DeleteObj*/
-extern C_1B09_1F52(int16, int16, int16, int16);/*MoveObj(obj, x, y, z)*/
-extern C_1B09_3E18();/*ShowObjects*/
-extern C_1B09_4963(int16);
-extern char *C_1B09_4759(int16);/*GetObjectString*/
+extern VIS_UpdateView();
+extern AnimateTiles();
+extern DisplayTick();
+extern unsigned char GetTileAtXYZ(int16, int16, int16);
+extern MAP_LoadAround();
+extern int16 MapDistance(int16, int16);
+extern int16 GetMonsterClass(int16);/*GetMonsterClass(type): < 0 if none*/
+extern SubMov(int16, int16);/*SubMov(npc, points)*/
+extern TryStraightMove(int16, int16, int16);
+extern int16 NextLoc();
+extern int16 FindLoc(int16, int16, int16);/*FindLoc(x, y, z)*/
+extern int16 OBJ_FindTypeAt(int16, int16, int16);/*OBJ_FindTypeAt(type, x, y)*/
+extern int16 FindInv(int16);/*FindInv: first object of an inventory*/
+extern int16 NextInv(void);
+extern int16 NextArea(void);/*NextArea: next object of SearchArea*/
+extern int16 SearchArea(int16, int16, int16, int16);/*SearchArea(x1, y1, x2, y2)*/
+extern int16 AddMapObj(int16, int16, int16, int16, int16, int16);/*AddMapObj(type, status, amount, x, y, z)*/
+extern int16 AddInvObj(int16, int16, int16, int16);/*AddInvObj(shape, position, quantity, owner)*/
+extern DeleteObj(int16);
+extern MoveObj(int16, int16, int16, int16);/*MoveObj(obj, x, y, z)*/
+extern ShowObjects();
+extern OBJ_DeleteContents(int16);
+extern char *GetObjectString(int16);
 extern C_1FA9_02CE(int16);/*the morning song*/
-extern C_1FA9_0919(int16);/*MUS_PlaySfx*/
-extern C_2077_1179(int16);/*STAT_RefreshInventory*/
+extern MUS_PlaySfx(int16);
+extern STAT_RefreshInventory(int16);
 extern STAT_ShowInventory(int16);
-extern C_2F83_0167(int16, int16, int16);/*TALK_talkTo*/
+extern TALK_talkTo(int16, int16, int16);
 extern int16 CON_mouseOffAt(int16, int16, int16, int16);
 extern CON_mouseOn(int16);
 extern CON_setClip(struct tClipInfo *);
@@ -74,15 +75,15 @@ extern char far C_2BB4_22F1[];/*failure message*/
 extern int16 far C_2DE5_01C6[];/*MonsterFlags (by GetMonsterClass)*/
 
 extern int16 MusicAdapter;/*1: AdLib or Roland, 0: none*/
-extern int16 D_081C;/*ColorPaper*/
+extern int16 ColorPaper;
 extern int16 D_082E;/*default paper color*/
 extern char D_0F13;/*PromptFlag*/
-extern int16 D_1431;/*VisibilityDirty*/
-extern int16 D_1435;/*TerrainType 8 blocks*/
-extern unsigned char D_167A;/*Active*/
-extern int16 D_167C, D_167E, D_1680;/*MapX, MapY, MapZ*/
-extern char D_16A4;/*InCombat*/
-extern int16 D_16D4;/*DreamStage*/
+extern int16 VisibilityDirty;
+extern int16 AvoidHazards;/*TerrainType 8 blocks*/
+extern unsigned char Active;
+extern int16 MapX, MapY, MapZ;
+extern char InCombat;
+extern int16 DreamStage;
 extern int16 StatusDisplay;/*0x90 a member, 0x91 the party, 0x92 the equipment*/
 extern unsigned char AnimateAtPrompt;
 extern int16 D_1E48;/*dream.c's: the AnimTile entry of tile 0x6f (-1: not looked up)*/
@@ -103,15 +104,7 @@ extern union tHandler D_BA6A;/*GrDriver*/
 extern struct tClipInfo D_EBD0[4];/*TextWindows*/
 extern char DirIncrX[8], DirIncrY[8];
 
-#define ColorPaper D_081C
 #define PromptFlag D_0F13
-#define VisibilityDirty D_1431
-#define Active D_167A
-#define MapX D_167C
-#define MapY D_167E
-#define MapZ D_1680
-#define InCombat D_16A4
-#define DreamStage D_16D4
 #define ObjStatus D_3266
 #define Party D_4EA4
 #define Amount D_54BA
@@ -125,34 +118,6 @@ extern char DirIncrX[8], DirIncrY[8];
 #define TextWindows D_EBD0
 #define MonsterFlags C_2DE5_01C6
 
-#define COMBAT_breakOff C_07D1_02C4
-#define SetTypeUnconscious C_07D1_06C1
-#define ResetMapView C_0E1A_11D2
-#define STAT_GetEquipSlot C_100B_02C0
-#define VIS_UpdateView C_1157_0312
-#define DisplayTick C_120E_0221
-#define GetTileAtXYZ C_1534_1072
-#define MAP_LoadAround C_1534_056F
-#define MapDistance C_1534_1129
-#define GetMonsterClass C_1649_000A
-#define SubMov C_170D_0868
-#define TryStraightMove C_170D_2231
-#define NextLoc C_1B09_032A
-#define FindLoc C_1B09_07D8
-#define OBJ_FindTypeAt C_1B09_09C7
-#define FindInv C_1B09_0B1D
-#define NextInv C_1B09_0B76
-#define NextArea C_1B09_0DD7
-#define SearchArea C_1B09_0EDE
-#define AddMapObj C_1B09_116E
-#define AddInvObj C_1B09_12EE
-#define DeleteObj C_1B09_1872
-#define MoveObj C_1B09_1F52
-#define ShowObjects C_1B09_3E18
-#define GetObjectString C_1B09_4759
-#define MUS_PlaySfx C_1FA9_0919
-#define STAT_RefreshInventory C_2077_1179
-#define TALK_talkTo C_2F83_0167
 
 #define GR_SET_COLOR(c)              (GrDriver.iii.ofs = 0x06, (*GrDriver.f)(c))
 #define GR_FILL_RECT(x0,y0,x1,y1)    (GrDriver.iii.ofs = 0x12, (*GrDriver.f)(x0,y0,x1,y1))
@@ -332,7 +297,7 @@ extern char DirIncrX[8], DirIncrY[8];
 		if((obj = OBJ_FindTypeAt(0x1d2, 0x6d, 0x16)) < 0)
 			CON_printf(C_2BB4_22F1);
 		else {
-			C_1B09_4963(obj);
+			OBJ_DeleteContents(obj);
 			DeleteObj(obj);
 		}
 		if((obj = OBJ_FindTypeAt(0x1cd, 0x70, 0x17)) < 0) {
@@ -347,7 +312,7 @@ extern char DirIncrX[8], DirIncrY[8];
 		if((obj = OBJ_FindTypeAt(0x1d2, 0x73, 0xec)) < 0)
 			CON_printf(C_2BB4_22F1);
 		else {
-			C_1B09_4963(obj);
+			OBJ_DeleteContents(obj);
 			DeleteObj(obj);
 		}
 		TalkFlags[0x66] |= 0x12;
@@ -358,16 +323,16 @@ extern char DirIncrX[8], DirIncrY[8];
 /*how good a step of npc to (x, y) is when going to (x2, y2): 200 - 15 *
   distance (+50 next to it), -50 or -100 when it cannot step there, -5
   for each object 0x9d around (-1000 if one is open), -1 for each 0x9e*/
-/*C_2F63_0726*/C_2F63_0726(int16 npc, int16 x, int16 y, int16 x2, int16 y2) {
+/*C_2F63_0726*/static C_2F63_0726(int16 npc, int16 x, int16 y, int16 x2, int16 y2) {
 	int16 dist, type, saved, terrain;
 	register int16 score, obj;
 
-	saved = D_1435;
-	dist = C_07D1_35A8(x, y, x2, y2);
+	saved = AvoidHazards;
+	dist = COMBAT_range(x, y, x2, y2);
 	score = 200 - dist * 15 + (dist <= 1) * 50;
-	D_1435 = 1;
+	AvoidHazards = 1;
 	if(!NPC_TryStep(npc, x, y)) {
-		D_1435 = 0;
+		AvoidHazards = 0;
 		if(NPC_TryStep(npc, x, y))
 			score -= 50;
 		else {
@@ -380,7 +345,7 @@ extern char DirIncrX[8], DirIncrY[8];
 				score -= 50;
 		}
 	}
-	D_1435 = saved;
+	AvoidHazards = saved;
 	for(obj = SearchArea(x - 1, y - 1, x + 1, y + 1); obj >= 0; obj = NextArea()) {
 		if((type = GetType(obj)) == 0x9d) {
 			if(GetFrame(obj) > 0)
@@ -457,7 +422,7 @@ extern char DirIncrX[8], DirIncrY[8];
 			C_2F63_0C0C(x, y, newObj, 1);
 		}
 	} else {
-		C_07D1_1D64(0, OSI_rand(1, 10), 3);
+		LoseHP(0, OSI_rand(1, 10), 3);
 		DeleteObj(obj);
 	}
 }
@@ -476,7 +441,7 @@ extern char DirIncrX[8], DirIncrY[8];
 			if((cls = GetMonsterClass(type)) == 0)
 				continue;
 			if((MonsterFlags[cls] & 0x80) || (MonsterFlags[cls] & 0x4000))
-				C_07D1_1D64(o, OSI_rand(1, 10), 3);
+				LoseHP(o, OSI_rand(1, 10), 3);
 		} else if(C_100B_0247(type)) {
 			DeleteObj(o);
 			if(type == 0x84) {
@@ -488,7 +453,7 @@ extern char DirIncrX[8], DirIncrY[8];
 		}
 	}
 	DeleteObj(obj);
-	C_120E_0009();
+	AnimateTiles();
 	TimerDelay(0x1d16eL);
 }
 

@@ -16,7 +16,9 @@ fixup is checked against what the original holds there instead:
   - an offset of an external variable: its DS offset in usyms.txt (learned likewise);
   - a segment base: DGROUP (the target's), the module's own segment is --seg.
 The module's initialised data (_DATA) is compared with the original data segment at the
-base found (or given), fixups inside it checked the same way.
+base found (or given), fixups inside it checked the same way. A C module's own far
+variables (Turbo C gives each one a paragraph-aligned segment, class FAR_DATA) are
+located by their /*C_SSSS_0000*/ comments, in the order of definition, and compared too.
 
 An overlaid module (GAME.EXE) is given by its stub segment (--seg 2F88 --at 0): its code
 is compared with the overlay's (target.load_image()), far calls to overlaid code through
@@ -166,6 +168,7 @@ def main():
     a = ap.parse_args()
 
     path = a.obj
+    src_text = ''
     if path.lower().endswith(('.c', '.asm')):
         import tcc
         masm = path.lower().endswith('.asm')
@@ -173,6 +176,8 @@ def main():
         res = tcc.compile_files([path], flags, out=tempfile.mkdtemp(), includes=a.include, masm=masm,
                                 per_file=a.flags is None)
         obj, msgs = res[path]
+        if not masm:
+            src_text = open(path, encoding='latin-1').read()
         for m in msgs:
             print(m)
         if not obj:
@@ -201,7 +206,9 @@ def main():
     dsyms = AddrNames(dsyms, r'_?D_([0-9A-F]{4})', lambda mm: dmap.get(int(mm.group(1), 16), int(mm.group(1), 16)))
     m = omf.parse_obj(path)
     cseg = [s for s in m.segs[1:] if s.cls == 'CODE' and (not a.cseg or s.name.upper() == a.cseg.upper())]
-    if len(cseg) > 1 and not a.cseg:  # several: the one named after the frame compared
+    if len(cseg) > 1 and not a.cseg:  # several: not an empty one (OSI_FILE.ASM's), the one named after the frame
+        cseg = [s for s in cseg if s.length] or cseg
+    if len(cseg) > 1 and not a.cseg:
         cseg = [s for s in cseg if re.fullmatch(r'SEG_%04X(_TEXT)?' % int(a.seg, 16), s.name, re.I)] or cseg
     if not [x for x in cseg if x.length]:
         # a data-only huge-model module (msgs.c): its own far data segment, compared as code
@@ -225,6 +232,11 @@ def main():
         bases['_BSS'] = int(a.bss, 16)
     learned = []
     problems = []
+    # the module's own far variables: {segment name: paragraph}, from their address comments
+    farparas = [int(x, 16) for x in re.findall(
+        r'/\*C_([0-9A-F]{4})_0000\*/(?:(?!extern)[^;=(])*?\bfar\b[^;=(]*[\[=]', src_text)]
+    farsegs = dict(zip([x.name for x in m.segs[1:] if x.cls == 'FAR_DATA' and x.name.upper().endswith('_FAR')],
+                       farparas))
     obs = []  # (segment name, offset, external name, 'C' (seg, off) / 'D' DS offset)
 
     def ds_word(addr):
@@ -290,6 +302,9 @@ def main():
                 elif f.tkind == 'seg' and f.target == cs.name:
                     if sg != segp or off != f.disp + at:
                         problems.append((where, 'far ptr to own code +%x: original %04x:%04x' % (f.disp, sg, off)))
+                elif f.tkind == 'seg' and f.target in farsegs:
+                    if (sg, off) != (farsegs[f.target], f.disp):
+                        problems.append((where, 'far ptr to %s+%x: original %04x:%04x' % (f.target, f.disp, sg, off)))
                 elif f.tkind == 'seg' and named_seg(f.target):
                     fr, a0 = named_seg(f.target)
                     if (sg, off) != (fr, (a0 + f.disp) & 0xFFFF):
@@ -336,6 +351,9 @@ def main():
                     elif (want + f.disp) & 0xFFFF != v:
                         problems.append((where, 'offset %s+%x: original %04x, %s is at %04x' % (
                             f.target, f.disp, v, f.target, want)))
+                elif f.tkind == 'seg' and f.target in farsegs:
+                    if f.disp != v:
+                        problems.append((where, 'offset in %s+%x: original %04x' % (f.target, f.disp, v)))
                 elif f.tkind == 'seg' and named_seg(f.target):
                     if (named_seg(f.target)[1] + f.disp) & 0xFFFF != v:
                         problems.append((where, 'offset in %s+%x: original %04x' % (f.target, f.disp, v)))
@@ -346,6 +364,8 @@ def main():
                 if f.tkind == 'ext':
                     obs.append((seg.name, f.offset, f.target, 'CS', v))
                 want = DGROUP if f.target in ('DGROUP', '_DATA', '_BSS') else (segp if f.target == cs.name else None)
+                if want is None and f.tkind == 'seg' and f.target in farsegs:
+                    want = farsegs[f.target]
                 if want is None and f.tkind == 'seg' and named_seg(f.target):
                     want = named_seg(f.target)[0]
                 if f.tkind == 'ext':
@@ -416,6 +436,21 @@ def main():
                     dfirst = i
                     break
             check_fixups(ds, dbase)
+
+    # ---- the module's own far variables ----
+    for fs in m.segs[1:]:
+        if fs.name in farsegs and fs is not cs:
+            fbase = farsegs[fs.name] * 16
+            fmask = bytearray(fs.length)
+            for f in fs.fixups:
+                for k in range(f.size):
+                    if f.offset + k < fs.length:
+                        fmask[f.offset + k] = 1
+            for i in range(fs.length):
+                if fs.mask[i] and not fmask[i] and img[fbase + i] != fs.data[i]:
+                    problems.append(((fs.name, i), 'far data differs: %02x, original %02x' % (fs.data[i], img[fbase + i])))
+                    break
+            check_fixups(fs, fbase)
 
     if a.learn:
         save_learned(learned)

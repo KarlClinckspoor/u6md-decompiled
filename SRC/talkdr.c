@@ -1,4 +1,5 @@
 /* flags: -d -mm -p -c -Z -O -y */
+/* stub order: 110A 1756 0000 00A5 1932 1812 1063 007A */
 /*
  * Martian Dreams - GAME.EXE overlay 2F88: the conversation engine
  * (Ultima VI's talkdr.c, by way of Savage Empire's: SE GAME.EXE 0F8D).
@@ -29,7 +30,7 @@
  * Martian Dreams' changes: SE's TALK_GetNpcName .. FindPartyMemberWithObj and
  * TALK_Event are in overlay 2F83 (another module); mk_npcnum turns NPC 1
  * into 0 when D_16AA & 0x10; the strength of OP_CANCARRY comes from
- * C_07D1_0521; OP_GIVEOBJ's #T is inverted; the dead body is type 0x155;
+ * GetStr; OP_GIVEOBJ's #T is inverted; the dead body is type 0x155;
  * TalkDriver has no "Talking to yourself?" or IsArmageddon test, says
  * "You sense " for ObjStatus & 1, stops the map animation (MapAnimEnabled)
  * while it waits for input, redraws the command mark (GR_DRAW_BITMAP) at the
@@ -160,95 +161,64 @@ struct tClipInfo/*size:9*/ {
 
 /*other modules*/
 extern int16 MkDirection(int16, int16);/*MkDirection(x, y): direction of the screen point from the party, or -1*/
-extern int16 CON_getch();/*CON_getch*/
+extern int16 CON_getch();
 extern CON_gets(char *, int16);/*CON_gets(buffer, max length)*/
-extern CON_setClip(struct tClipInfo *);/*CON_setClip*/
-extern CON_gotoxy(int16, int16);/*CON_gotoxy*/
-extern CON_putch(int16);/*CON_putch*/
-extern cdecl CON_printf(char far *, ...);/*CON_printf*/
-extern C_120E_0084(int16);/*DrawMapWindow: redraws the map window (U6: DrawMapWindow?)*/
-extern C_120E_0221();/*DisplayTick: one animation frame*/
-extern C_1157_0312();/*VIS_UpdateView*/
-extern int16 C_1B09_0B1D(int16);/*FindInv: first object of an inventory*/
-extern int16 C_1B09_0B76();/*NextInv*/
-extern int16 C_1B09_1026(int16, int16, int16);/*FindInvType(npc, type, quality)*/
-extern C_1B09_239C(int16, int16, int16);/*InsertObj(obj, owner, how)*/
-extern int16 C_1B09_2837(int16, int16, int16);/*GiveObj(npc, type, quality/quantity): -1 on failure*/
-extern C_1B09_29AE(int16, int16, int16);/*TakeObj(npc, type, quality/quantity)*/
-extern int16 C_1B09_2B0C(int16, int16);/*TestObj(npc, type)*/
-extern int16 C_100B_026E(int16);/*IsWeightPer10Type*/
-extern C_2077_08C4(int16);/*STAT_ComputeEquipment: STAT_ComputeWeights*/
-extern int16 C_1B09_0002(int16, int16, int16);/*OBJ_FindInContainer(npc, type, quality)*/
-extern int16 C_2F55_0000(int16);/*SPELL_ReviveNPC(dead body): the NPC, or < 0*/
+extern CON_setClip(struct tClipInfo *);
+extern CON_gotoxy(int16, int16);
+extern CON_putch(int16);
+extern cdecl CON_printf(char far *, ...);
+extern DrawMapWindow(int16);/*DrawMapWindow: redraws the map window (U6: DrawMapWindow?)*/
+extern DisplayTick();/*DisplayTick: one animation frame*/
+extern VIS_UpdateView();
+extern int16 FindInv(int16);/*FindInv: first object of an inventory*/
+extern int16 NextInv();
+extern int16 FindInvType(int16, int16, int16);/*FindInvType(npc, type, quality)*/
+extern InsertObj(int16, int16, int16);/*InsertObj(obj, owner, how)*/
+extern int16 GiveObj(int16, int16, int16);/*GiveObj(npc, type, quality/quantity): -1 on failure*/
+extern TakeObj(int16, int16, int16);/*TakeObj(npc, type, quality/quantity)*/
+extern int16 TestObj(int16, int16);/*TestObj(npc, type)*/
+extern int16 IsWeightPer10Type(int16);
+extern STAT_ComputeEquipment(int16);/*STAT_ComputeEquipment: STAT_ComputeWeights*/
+extern int16 OBJ_FindInContainer(int16, int16, int16);/*OBJ_FindInContainer(npc, type, quality)*/
+extern int16 SPELL_ReviveNPC(int16);/*SPELL_ReviveNPC(dead body): the NPC, or < 0*/
 extern C_170D_083F(int16, int16);/*UpdateMoveFrame(npc, direction)*/
-extern int16 C_07D1_0521(int16);/*strength of an NPC (with modifiers?)*/
-extern int16 C_07D1_064E(int16);/*MaxHP*/
-extern C_07D1_06C1(int16);/*SetTypeUnconscious: an NPC falls asleep (shape)*/
-extern int16 C_047A_016F(char *, int16);/*ParseNumberInput*/
-extern C_047A_024B(int16);/*ShowPortraitAndInventory*/
-extern C_0E1A_16F2(int16, unsigned char far *);/*LoadConversation(npc, buffer)*/
-extern int16 C_0E1A_175B(int16);/*HasConversation: has the npc a conversation script?*/
-extern C_0E1A_1E2B(int16);/*ClearMapWindow*/
+extern int16 GetStr(int16);/*strength of an NPC (with modifiers?)*/
+extern int16 MaxHP(int16);
+extern SetTypeUnconscious(int16);/*SetTypeUnconscious: an NPC falls asleep (shape)*/
+extern int16 ParseNumberInput(char *, int16);
+extern ShowPortrait(int16);/*ShowPortraitAndInventory*/
+extern LoadConversation(int16, unsigned char far *);/*LoadConversation(npc, buffer)*/
+extern int16 HasConversation(int16);/*HasConversation: has the npc a conversation script?*/
+extern ClearMapWindow(int16);
 extern int16 OSI_rand(int16, int16);/*OSI_rand(lo, hi)*/
-#define DrawMapWindow C_120E_0084
-#define DisplayTick C_120E_0221
-#define VIS_UpdateView C_1157_0312
-#define FindInv C_1B09_0B1D
-#define NextInv C_1B09_0B76
-#define FindInvType C_1B09_1026
-#define InsertObj C_1B09_239C
-#define GiveObj C_1B09_2837
-#define TakeObj C_1B09_29AE
-#define TestObj C_1B09_2B0C
-#define IsWeightPer10Type C_100B_026E
-#define STAT_ComputeEquipment C_2077_08C4
-#define OBJ_FindInContainer C_1B09_0002
-#define SPELL_ReviveNPC C_2F55_0000
 #define UpdateMoveFrame C_170D_083F
-#define MaxHP C_07D1_064E
-#define SetTypeUnconscious C_07D1_06C1
-#define ParseNumberInput C_047A_016F
-#define ShowPortrait C_047A_024B
-#define LoadConversation C_0E1A_16F2
-#define HasConversation C_0E1A_175B
-#define ClearMapWindow C_0E1A_1E2B
 #define StatusDirty D_0F12
-#define ScreenFade D_080E
-#define Active D_167A
-#define InCombat D_16A4
-#define SoloMember D_16A5
 /*overlay 2F83 (talk.c's code in Savage Empire's talkdr.c)*/
-extern char *C_2F83_0952(int16);/*TALK_GetCharName*/
-extern int16 C_2F83_098F(int16);/*IsNpcOnScreen*/
-extern int16 C_2F83_0A85(int16);/*JoinParty*/
-extern int16 C_2F83_0B82(int16);/*LeaveParty*/
-extern int16 C_2F83_0CC0(int16, int16);/*FindPartyMemberWithObj*/
-extern C_2F83_0D2A(int16);/*TALK_Event: scripted events (OP_EVENT)*/
-#define TALK_GetCharName C_2F83_0952
-#define IsNpcOnScreen C_2F83_098F
-#define JoinParty C_2F83_0A85
-#define LeaveParty C_2F83_0B82
-#define FindPartyMemberWithObj C_2F83_0CC0
-#define TALK_Event C_2F83_0D2A
+extern char *TALK_GetCharName(int16);
+extern int16 IsNpcOnScreen(int16);
+extern int16 JoinParty(int16);
+extern int16 LeaveParty(int16);
+extern int16 FindPartyMemberWithObj(int16, int16);
+extern TALK_Event(int16);/*TALK_Event: scripted events (OP_EVENT)*/
 extern char far C_2BB4_0315[];/*NotInSoloMsg (far messages)*/
 extern char far C_2BB4_02B7[];/*NoResponseMsg (far messages)*/
 #define NotInSoloMsg C_2BB4_0315
 #define NoResponseMsg C_2BB4_02B7
 
 extern unsigned char D_0F12;/*StatusDirty*/
-extern char AnimateAtPrompt;/*AnimateAtPrompt*/
+extern char AnimateAtPrompt;
 extern int16 EndPagingAtPrompt;
-extern int16 StatusMember;/*StatusMember*/
-extern int16 StatusDisplay;/*StatusDisplay*/
-extern int16 PromptCh;/*PromptCh*/
-extern struct tClipInfo *CurClip;/*CurClip*/
-extern int16 D_080E;/*ScreenFade*/
+extern int16 StatusMember;
+extern int16 StatusDisplay;
+extern int16 PromptCh;
+extern struct tClipInfo *CurClip;
+extern int16 ScreenFade;
 extern int32 D_16AA;/*flags (0x10: ?)*/
-extern int16 D_081E;/*ColorText*/
+extern int16 ColorText;
 extern int16 D_0826;/*color of the player's input*/
-extern unsigned char D_167A;/*Active*/
-extern unsigned char D_16A4;/*InCombat*/
-extern char D_16A5;/*SoloMember*/
+extern unsigned char Active;
+extern unsigned char InCombat;
+extern char SoloMember;
 
 extern unsigned char far *D_3262;/*NPC flags: 0x80 ?, bits 0-7: talk flags 8-15*/
 extern unsigned char D_3266[];/*ObjStatus*/
@@ -306,10 +276,6 @@ extern void far *D_BA7E;/*mdscreen.lzc entry 2: default command mark*/
 #define TalkInput D_ECA8
 #define TalkKeyword D_EC8E
 #define TalkAnswered D_ECDA
-#define CurClip CurClip
-#define StatusMember StatusMember
-#define StatusDisplay StatusDisplay
-#define PromptCh PromptCh
 
 #define IN_VEHICLE (Active == PartySize)
 #define IsParalyzed(i)   (NPCStatus[i] & 0x02)
@@ -350,7 +316,7 @@ extern void far *D_BA7E;/*mdscreen.lzc entry 2: default command mark*/
 /*keyword match: returns 1 if the first <len> chars of <pattern> match
 (case insensitive, '?' is a wildcard) the start of any space separated
 word of <input>*/
-/*C_2F88_0000*/static str_i_compare(unsigned char *pattern, unsigned char *input, int16 len) {
+/*C_2F88_0000*/str_i_compare(unsigned char *pattern, unsigned char *input, int16 len) {
 	unsigned char *word;
 	int16 i;
 	unsigned char buf[100];
@@ -368,7 +334,7 @@ word of <input>*/
 }
 
 /*translate the OP_NPC pseudo-number into the current npc's number*/
-/*C_2F88_007A*/static unsigned char mk_npcnum(int16 npc) {
+/*C_2F88_007A*/unsigned char mk_npcnum(int16 npc) {
 	if(npc == OP_NPC)
 		return TalkNpcs[0];
 	if((D_16AA & 0x10) && npc == 1)
@@ -380,7 +346,7 @@ word of <input>*/
 including) OP_END_OF_FACTOR/OP_LET_VALUE; returns its value.
 Constants are pushed; an operator pops its operands from the top of
 lstack and leaves its result in the lowest operand's slot.*/
-/*C_2F88_00A5*/static parse_factor() {
+/*C_2F88_00A5*/parse_factor() {
 	register int16 sidx;/*stack index*/
 	int32 lstack[10];/*local "stack"*/
 	int32 arrayAddr;
@@ -454,7 +420,7 @@ lstack and leaves its result in the lowest operand's slot.*/
 				case OP_CANCARRY:/*(npc): remaining capacity (STR * 20 stones)*/
 					iparam0 = mk_npcnum(lstack[sidx - 1]);
 					STAT_ComputeEquipment(iparam0);
-					iparam1 = C_07D1_0521(iparam0) * 200;
+					iparam1 = GetStr(iparam0) * 200;
 					iparam2 = (D_EB16 + D_EB1A) * 10;
 					if(iparam1 > iparam2)
 						lstack[sidx - 1] = iparam1 - iparam2;
@@ -778,7 +744,7 @@ array (isStringArray: skip <index> NUL-terminated strings; else skip
 <index> 16bit words).
 Leaves Talk_PC on the data and returns the PC where the caller must
 resume afterwards*/
-/*C_2F88_1063*/static uint32 TALK_ResolveAddress(int16 isStringArray) {
+/*C_2F88_1063*/uint32 TALK_ResolveAddress(int16 isStringArray) {
 	register int16 index;
 	uint32 resumePC, address;
 
@@ -807,7 +773,7 @@ resume afterwards*/
 /*execute one opcode (already read) of a statement;
 objNum is the npc being talked to.
 returns 0:ok, 1:syntax error, -1:unknown opcode*/
-/*C_2F88_110A*/static execute_op(unsigned char opcode, int16 objNum) {
+/*C_2F88_110A*/execute_op(unsigned char opcode, int16 objNum) {
 	register int16 tmp;
 	uint32 gotoAddr;
 	int16 ch, varIdx, varType;
@@ -1026,11 +992,11 @@ returns 0:ok, 1:syntax error, -1:unknown opcode*/
 	return 0;
 }
 
-static TALK_MatchKeywords(int16 objNum);
+TALK_MatchKeywords(int16 objNum);
 
 /*execute statements (printing text bytes) until an input/section
 opcode, 0, OP_ENDRES or OP_LEAVE; Talk_PC is left on the stop opcode*/
-/*C_2F88_1756*/static parse_statement(int16 objNum) {
+/*C_2F88_1756*/parse_statement(int16 objNum) {
 	unsigned char opcode;
 
 	opcode = PARSE_U8;
@@ -1069,7 +1035,7 @@ opcode, 0, OP_ENDRES or OP_LEAVE; Talk_PC is left on the stop opcode*/
 keyword (TalkKeyword) with the player's input (TalkInput; "*" matches anything);
 on a match, runs the answer after OP_RES (and sets TalkAnswered), otherwise
 skips to the next OP_KEY/OP_ENDRES/OP_SCRIPT_MARK*/
-/*C_2F88_1812*/static TALK_MatchKeywords(int16 objNum) {
+/*C_2F88_1812*/TALK_MatchKeywords(int16 objNum) {
 	register int16 len;
 	register int16 op;
 	int16 moreKeys;
@@ -1202,7 +1168,7 @@ until OP_LEAVE/OP_SCRIPT_MARK*/
 			MapAnimEnabled = 1;
 			CON_printf("\n");
 			TalkAnswered = 0;
-			CurClip->fgColor = D_081E;
+			CurClip->fgColor = ColorText;
 		} else if(opcode == OP_GETSTR) {/*<index> OP_VARSTR*/
 			CurClip->fgColor = D_0826;
 			MapAnimEnabled = 0;
@@ -1213,7 +1179,7 @@ until OP_LEAVE/OP_SCRIPT_MARK*/
 				break;
 			strcpy(VarStr[idx], TalkInput);
 			CON_printf("\n\n");
-			CurClip->fgColor = D_081E;
+			CurClip->fgColor = ColorText;
 			TalkAnswered = 0;
 		} else if(opcode == OP_GETINT) {/*<index> OP_VARINT*/
 			CurClip->fgColor = D_0826;
@@ -1226,7 +1192,7 @@ until OP_LEAVE/OP_SCRIPT_MARK*/
 			number = ParseNumberInput(TalkInput, 0);
 			VarInt[idx] = (number == -1 || number == -2)?0:number;
 			CON_printf("\n\n");
-			CurClip->fgColor = D_081E;
+			CurClip->fgColor = ColorText;
 			TalkAnswered = 0;
 		} else if(opcode == OP_GETDIGIT) {/*<index> OP_VARINT*/
 			CurClip->fgColor = D_0826;
@@ -1244,7 +1210,7 @@ until OP_LEAVE/OP_SCRIPT_MARK*/
 				break;
 			VarInt[idx] = number;
 			CON_printf("%d\n\n", number);
-			CurClip->fgColor = D_081E;
+			CurClip->fgColor = ColorText;
 			TalkAnswered = 0;
 		} else if(opcode == OP_GETCHR) {
 			CurClip->fgColor = D_0826;
@@ -1253,7 +1219,7 @@ until OP_LEAVE/OP_SCRIPT_MARK*/
 			MapAnimEnabled = 1;
 			TalkInput[1] = 0;
 			CON_printf("%s\n\n", TalkInput);
-			CurClip->fgColor = D_081E;
+			CurClip->fgColor = ColorText;
 			TalkAnswered = 0;
 		} else if(opcode == OP_WAIT) {
 			MapAnimEnabled = 0;
@@ -1277,7 +1243,7 @@ until OP_LEAVE/OP_SCRIPT_MARK*/
 			TalkInput[0] = opcode;
 			TalkInput[1] = 0;
 			CON_printf("\n");
-			CurClip->fgColor = D_081E;
+			CurClip->fgColor = ColorText;
 			TalkAnswered = 0;
 		} else if(opcode == OP_KEY) {
 			CON_printf("\nCommand for input key expected.");

@@ -18,8 +18,8 @@
  *
  * Differences from Savage Empire's: no DISK_confirm; MAP_BuildArea records
  * where the area crosses the map's edge (D_BCCE/D_C0F2, D_BCD0/D_C0F4) and
- * offsets are wrapped by WrapDelta (C_1534_1101, new, like MapDistance
- * C_1534_1129); a party whose Active is PartySize (alone?) moves as one
+ * offsets are wrapped by WrapDelta (WrapDelta, new, like MapDistance
+ * MapDistance); a party whose Active is PartySize (alone?) moves as one
  * object; PartyEnter's mode 2 shows an object 0x13c with a sound;
  * the entrances (C_1534_096C) are one table of (x, y, z) by quality, with
  * object 0xc5 (a talk flag needed) and the objects moved along by
@@ -40,26 +40,26 @@ extern int16 OSI_rand(int16, int16);/*OSI_rand(lo, hi)*/
 extern void cdecl TimerDelay(int32);/*wait (2383 per millisecond)*/
 
 /*other game modules*/
-extern int16 D_06BE;/*CombatOutcome*/
-extern int16 D_080E;/*ScreenFade*/
-extern int16 D_0EA0, D_0EA2;/*ViewX, ViewY*/
+extern int16 CombatOutcome;
+extern int16 ScreenFade;
+extern int16 ViewX, ViewY;
 extern char D_0F12;/*StatusDirty*/
-extern int16 D_13F0;/*ForceHatching*/
-extern int16 D_1431;/*VisibilityDirty*/
-extern int16 D_14F2;
-extern int16 D_1580;/*MoveAppliesTerrain*/
-extern unsigned char D_1674;/*Time_M*/
-extern unsigned char D_1675;/*Time_H*/
-extern unsigned char D_1676;/*Date_D*/
-extern unsigned char D_1677;/*Date_M*/
-extern int16 D_1678;/*Date_Y*/
-extern unsigned char D_167A;/*Active*/
-extern int16 D_167C, D_167E, D_1680;/*MapX, MapY, MapZ*/
+extern int16 ForceHatching;
+extern int16 VisibilityDirty;
+extern int16 LocPartOffset;
+extern int16 MoveAppliesTerrain;
+extern unsigned char Time_M;
+extern unsigned char Time_H;
+extern unsigned char Date_D;
+extern unsigned char Date_M;
+extern int16 Date_Y;
+extern unsigned char Active;
+extern int16 MapX, MapY, MapZ;
 extern unsigned char D_16A3;
-extern char D_16A4;/*InCombat*/
-extern char D_16A5;/*SoloMember*/
-extern char D_16A6;/*SavedNPCMode*/
-extern int16 D_1BAC;/*StatusDisplay*/
+extern char InCombat;
+extern char SoloMember;
+extern char SavedNPCMode;
+extern int16 StatusDisplay;
 extern unsigned char D_3266[];/*ObjStatus*/
 extern char D_44C4[];/*MovePts*/
 extern unsigned char far *D_45CC;/*NPCFlag*/
@@ -88,64 +88,44 @@ extern int16 D_C59C[];/*Link*/
 extern int16 D_DDB2[AREA_H][AREA_W];/*MapObjPtr*/
 extern int16 D_EBCE;/*Selection.obj*/
 
-extern C_0E1A_11FA();/*DrawSkyBar*/
-extern int16 C_07D1_00FB(int16, int16, int16);/*COMBAT_TileDistance(objNum, x, y)*/
-extern C_07D1_02C4();/*COMBAT_breakOff*/
-extern int16 C_07D1_064E(int16);/*MaxHP*/
-extern int16 C_07D1_0576(int16);/*an NPC's dexterity*/
-extern C_1157_0312();/*VIS_UpdateView*/
-extern C_120E_0221();/*DisplayTick*/
-extern C_120E_0A47(int16);/*PassTime*/
-extern C_120E_19DA();/*SetPartyMode*/
-extern C_1649_081E();/*EGG_hatchArea*/
-extern C_170D_0976(int16, int16);/*MoveFollowers*/
-extern C_170D_2231(int16, int16, int16);/*TryStraightMove*/
-extern int16 C_170D_25D5(int16, int16, int16);/*TryMoveTo*/
-extern int16 C_1B09_032A();/*next object of C_1B09_07D8's search*/
-extern int16 C_1B09_07D8(int16, int16, int16);/*first object at (x, y, z)?*/
-extern int16 C_1B09_116E(int16, int16, int16, int16, int16, int16);/*AddMapObj*/
-extern C_1B09_1872(int16);/*DeleteObj*/
-extern C_1B09_1A1D(int16, int16, int16);/*OBJ_PurgeFarLocals*/
-extern C_1B09_1DF5(int16);/*OBJ_ReviveFromBody*/
-extern C_1B09_1F52(int16, int16, int16, int16);/*MoveObj*/
-extern C_1B09_35A0();/*OBJ_RebuildMapObjPtr*/
-extern C_1B09_3851(int16, int16, int16);/*LoadNewRegions*/
-extern C_1B09_3E18();/*ShowObjects*/
-extern C_1FA9_01B4(int16);/*MUS_PlaySong*/
-extern C_1FA9_02B5();/*MUS_PlayAreaSong*/
-extern C_1FA9_0919(int16);/*play a sound effect?*/
+extern DrawSkyBar();
+extern int16 COMBAT_TileDistance(int16, int16, int16);/*COMBAT_TileDistance(objNum, x, y)*/
+extern COMBAT_breakOff();
+extern int16 MaxHP(int16);
+extern int16 GetDex(int16);/*an NPC's dexterity*/
+extern VIS_UpdateView();
+extern DisplayTick();
+extern PassTime(int16);
+extern SetPartyMode();
+extern EGG_hatchArea();
+extern MoveFollowers(int16, int16);
+extern TryStraightMove(int16, int16, int16);
+extern int16 TryMoveTo(int16, int16, int16);
+extern int16 NextLoc();/*next object of FindLoc's search*/
+extern int16 FindLoc(int16, int16, int16);/*first object at (x, y, z)?*/
+extern int16 AddMapObj(int16, int16, int16, int16, int16, int16);
+extern DeleteObj(int16);
+extern OBJ_PurgeFarLocals(int16, int16, int16);
+extern OBJ_ReviveFromBody(int16);
+extern MoveObj(int16, int16, int16, int16);
+extern OBJ_RebuildMapObjPtr();
+extern LoadNewRegions(int16, int16, int16);
+extern ShowObjects();
+extern MUS_PlaySong(int16);
+extern MUS_PlayAreaSong();
+extern MUS_PlaySfx(int16);/*play a sound effect?*/
 extern C_1FA9_0CD2();
-extern C_2077_009D(int16);/*STAT_ShowParty*/
-extern int16 C_2238_0000(int16, int16, int16, int16);/*CON_mouseOffAt*/
-extern C_2238_0049(int16);/*CON_mouseOn*/
+extern STAT_ShowParty(int16);
+extern int16 CON_mouseOffAt(int16, int16, int16, int16);
+extern CON_mouseOn(int16);
 extern cdecl CON_printf(char far *, ...);
-extern C_2F55_0000(int16);/*SPELL_ReviveNPC*/
-extern C_2F83_0167(int16, int16, int16);/*TALK_talkTo*/
+extern SPELL_ReviveNPC(int16);
+extern TALK_talkTo(int16, int16, int16);
 extern char far C_2BB4_219B[];/*far messages*/
 extern char far C_2BB4_21CD[];
 extern char far C_2BB4_22F1[];
 
-#define CombatOutcome D_06BE
-#define ScreenFade D_080E
-#define ViewX D_0EA0
-#define ViewY D_0EA2
 #define StatusDirty D_0F12
-#define ForceHatching D_13F0
-#define VisibilityDirty D_1431
-#define MoveAppliesTerrain D_1580
-#define Time_M D_1674
-#define Time_H D_1675
-#define Date_D D_1676
-#define Date_M D_1677
-#define Date_Y D_1678
-#define Active D_167A
-#define MapX D_167C
-#define MapY D_167E
-#define MapZ D_1680
-#define InCombat D_16A4
-#define SoloMember D_16A5
-#define SavedNPCMode D_16A6
-#define StatusDisplay D_1BAC
 #define ObjStatus D_3266
 #define MovePts D_44C4
 #define NPCFlag D_45CC
@@ -172,33 +152,6 @@ extern char far C_2BB4_22F1[];
 #define MapObjPtr D_DDB2
 #define Selection D_EBCE
 
-#define DrawSkyBar C_0E1A_11FA
-#define COMBAT_TileDistance C_07D1_00FB
-#define COMBAT_breakOff C_07D1_02C4
-#define MaxHP C_07D1_064E
-#define VIS_UpdateView C_1157_0312
-#define DisplayTick C_120E_0221
-#define PassTime C_120E_0A47
-#define SetPartyMode C_120E_19DA
-#define EGG_hatchArea C_1649_081E
-#define MoveFollowers C_170D_0976
-#define TryStraightMove C_170D_2231
-#define TryMoveTo C_170D_25D5
-#define AddMapObj C_1B09_116E
-#define DeleteObj C_1B09_1872
-#define OBJ_PurgeFarLocals C_1B09_1A1D
-#define OBJ_ReviveFromBody C_1B09_1DF5
-#define MoveObj C_1B09_1F52
-#define OBJ_RebuildMapObjPtr C_1B09_35A0
-#define LoadNewRegions C_1B09_3851
-#define ShowObjects C_1B09_3E18
-#define MUS_PlaySong C_1FA9_01B4
-#define MUS_PlayAreaSong C_1FA9_02B5
-#define STAT_ShowParty C_2077_009D
-#define CON_mouseOffAt C_2238_0000
-#define CON_mouseOn C_2238_0049
-#define SPELL_ReviveNPC C_2F55_0000
-#define TALK_talkTo C_2F83_0167
 
 #define GetType(i) (ObjShapeType[i] & 0x3ff)
 #define GetFrame(i) (ObjShapeType[i] >> 10)
@@ -466,7 +419,7 @@ static /*C_1534_0000*/cacheChunk(int16 chunkIdx) {
 							fx = AddMapObj(0x13c, 0, 0, MapX, MapY, MapZ);
 							ShowObjects();
 							DisplayTick();
-							C_1FA9_0919(0x22);
+							MUS_PlaySfx(0x22);
 							TimerDelay(0x91726L);
 							DeleteObj(fx);
 						} else {
@@ -484,7 +437,7 @@ static /*C_1534_0000*/cacheChunk(int16 chunkIdx) {
 						allArrived = 0;
 					}
 				}
-				MovePts[objNum] = C_07D1_0576(objNum);
+				MovePts[objNum] = GetDex(objNum);
 			}
 			ShowObjects();
 			DisplayTick();
@@ -543,7 +496,7 @@ static /*C_1534_0000*/cacheChunk(int16 chunkIdx) {
 			}
 		}
 		for(i = 0; i < PartySize; i ++)
-			MovePts[Party[i]] = C_07D1_0576(Party[i]);
+			MovePts[Party[i]] = GetDex(Party[i]);
 	}
 }
 
@@ -551,7 +504,7 @@ static /*C_1534_0000*/cacheChunk(int16 chunkIdx) {
 /*C_1534_0906*/PartyTeleport(int16 x, int16 y, int16 z, register int16 withAnimation) {
 	PartyEnter(withAnimation);
 	if(withAnimation == 1)
-		C_1FA9_0919(0x33);
+		MUS_PlaySfx(0x33);
 
 	MapX = x;
 	MapY = y;
@@ -607,20 +560,20 @@ static /*C_1534_0000*/cacheChunk(int16 chunkIdx) {
 	MapX = GetX(objNum);
 	MapY = GetY(objNum);
 	MAP_LoadAround();
-	C_1FA9_01B4(-1);
+	MUS_PlaySong(-1);
 	PartyEnter((type == 0xa3)?0:((type == 0xc5)?2:1));
 	C_1FA9_0CD2();
 	if(type == 0xaf || type == 0xd2) {
-		for(obj = C_1B09_07D8(MapX, (MapY - 1) & 0x3ff, MapZ); obj >= 0; obj = C_1B09_032A()) {
-			if(D_14F2)
+		for(obj = FindLoc(MapX, (MapY - 1) & 0x3ff, MapZ); obj >= 0; obj = NextLoc()) {
+			if(LocPartOffset)
 				break;
 			MoveObj(obj, x, (y - 1) & 0x3ff, z);
 			if(GetType(obj) == 0x1b9)
 				D_9CC4[obj] = GetType(obj) + 0xc00;
 		}
 	} else if(type == 0xa3) {
-		for(obj = C_1B09_07D8(MapX, (MapY + 1) & 0x3ff, MapZ); obj >= 0; obj = C_1B09_032A()) {
-			if(D_14F2)
+		for(obj = FindLoc(MapX, (MapY + 1) & 0x3ff, MapZ); obj >= 0; obj = NextLoc()) {
+			if(LocPartOffset)
 				break;
 			MoveObj(obj, x, (y + 2) & 0x3ff, z);
 		}
@@ -631,7 +584,7 @@ static /*C_1534_0000*/cacheChunk(int16 chunkIdx) {
 		z = MapZ;
 	}
 	if(MapZ == 3 && qual == 3 && !(TalkFlags[0x66] & 0x10)) {
-		C_1B09_1A1D(-1, -1, -1);
+		OBJ_PurgeFarLocals(-1, -1, -1);
 		D_16A3 = 6;
 		ForceHatching = 1;
 	}
@@ -699,7 +652,7 @@ static /*C_1534_0000*/cacheChunk(int16 chunkIdx) {
 		NPCStatus[memberObj] &= ~0x1e;
 		HitPoints[memberObj] = MaxHP(memberObj);
 		ExpPoints[memberObj] = ExpPoints[memberObj] * 3 / 4;
-		MovePts[memberObj] = C_07D1_0576(memberObj);
+		MovePts[memberObj] = GetDex(memberObj);
 	}
 	for(i = 0; i < 0x40; i ++)
 		MissileHitList[i] = -1;

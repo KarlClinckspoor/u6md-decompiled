@@ -1,4 +1,5 @@
 /* flags: -d -mm -p -c -Z -O -y */
+/* stub order: 0000 0A85 098F 0CC0 0167 0D2A 0952 0B82 08BD */
 /*
  * Martian Dreams - GAME.EXE overlay 2F83: conversation entry points and
  * the scripted events (Ultima VI's talk.c, by way of Savage Empire's:
@@ -18,75 +19,59 @@
 #include "se.h"
 
 /*other modules*/
-extern int16 CON_mouseOffAt(int16, int16, int16, int16);/*CON_mouseOffAt*/
-extern CON_mouseOn(int16);/*CON_mouseOn*/
-extern cdecl CON_printf(char far *, ...);/*CON_printf*/
+extern int16 CON_mouseOffAt(int16, int16, int16, int16);
+extern CON_mouseOn(int16);
+extern cdecl CON_printf(char far *, ...);
 extern CON_itoa(uint16, char far *, int16, int16);/*CON_itoa(number, str, max length, base)*/
 extern TalkDriver(int16, int16);/*TalkDriver(talker, npc): overlay 2F88*/
-extern OSI_resetVideo();/*OSI_resetVideo*/
+extern OSI_resetVideo();
 extern cdecl MEM_shutdown(int16);
 extern void cdecl TimerDelay(int32);/*wait (2383 per millisecond)*/
 extern void cdecl exit(int16);
-extern int16 C_07D1_0416(int16, int16);/*(npc, ?): 0 makes TALK_Event delete the new NPC*/
-extern int16 C_07D1_0521(int16);/*strength of an NPC (with modifiers?)*/
-extern int16 C_07D1_0576(int16);/*an NPC attribute (#A)*/
-extern int16 C_07D1_05C0(int16);/*an NPC attribute (#I)*/
-extern int16 C_07D1_064E(int16);/*MaxHP*/
-extern C_07D1_06C1(int16);/*SetTypeUnconscious*/
-extern C_07D1_01BB();/*called when not InCombat (COMBAT_begin?)*/
-extern C_07D1_0CFC(int16, int16 *, int16 *, int16, int16);
-extern C_07D1_15F0(int16);
-extern int16 C_0E1A_175B(int16);/*HasConversation*/
-extern C_0E1A_16F2(int16, unsigned char far *);/*LoadConversation(npc, buffer)*/
-extern C_120E_0221();/*DisplayTick*/
-extern C_1157_0312();/*VIS_UpdateView*/
-extern C_1534_056F();
-extern C_1534_0906(int16, int16, int16, int16);
-extern int16 C_1534_1101(int16);/*wraps a map distance*/
-extern int16 C_1534_1129(int16, int16);/*distance of two map coordinates (wrapping)*/
-extern int16 C_1649_009C(int16, int16, int16, int16);/*EGG_generate(type, x, y, z)*/
+extern int16 COMBAT_TryTeleport(int16, int16);/*(npc, ?): 0 makes TALK_Event delete the new NPC*/
+extern int16 GetStr(int16);/*strength of an NPC (with modifiers?)*/
+extern int16 GetDex(int16);/*an NPC attribute (#A)*/
+extern int16 GetInt(int16);/*an NPC attribute (#I)*/
+extern int16 MaxHP(int16);
+extern SetTypeUnconscious(int16);
+extern COMBAT_begin();/*called when not InCombat (COMBAT_begin?)*/
+extern COMBAT_Missile(int16, int16 *, int16 *, int16, int16);
+extern COMBAT_Kill(int16);
+extern int16 HasConversation(int16);
+extern LoadConversation(int16, unsigned char far *);/*LoadConversation(npc, buffer)*/
+extern DisplayTick();
+extern VIS_UpdateView();
+extern MAP_LoadAround();
+extern PartyTeleport(int16, int16, int16, int16);
+extern int16 WrapDelta(int16);/*wraps a map distance*/
+extern int16 MapDistance(int16, int16);/*distance of two map coordinates (wrapping)*/
+extern int16 EGG_generate(int16, int16, int16, int16);/*EGG_generate(type, x, y, z)*/
 extern C_1FA9_04ED();
-extern C_1FA9_0919(int16);
-extern int16 C_1B09_0002(int16, int16, int16);/*OBJ_FindInContainer(npc, type, quality)*/
+extern MUS_PlaySfx(int16);
+extern int16 OBJ_FindInContainer(int16, int16, int16);/*OBJ_FindInContainer(npc, type, quality)*/
 extern int16 C_1B09_090B(int16);
-extern int16 C_1B09_09C7(int16, int16, int16);/*OBJ_FindTypeAt(type, x, y)*/
-extern int16 C_1B09_0B1D(int16);/*FindInv*/
-extern int16 C_1B09_0B76();/*NextInv*/
-extern int16 C_1B09_0BEE(int16, int16);/*first object of a type in an inventory*/
-extern int16 C_1B09_0CA4();/*next one*/
-extern int16 C_1B09_0DD7();/*next object of an area search*/
-extern int16 C_1B09_0EDE(int16, int16, int16, int16);/*first object of an area search*/
-extern int16 C_1B09_1081(int16, int16, int16);
-extern int16 C_1B09_116E(int16, int16, int16, int16, int16, int16);/*AddMapObj*/
-extern int16 C_1B09_12EE(int16, int16, int16, int16);
-extern C_1B09_1872(int16);/*DeleteObj?*/
-extern C_1B09_1A1D(int16, int16, int16);
-extern C_1B09_1DF5(int16);
-extern C_1B09_1F52(int16, int16, int16, int16);/*MoveObj(obj, x, y, z)*/
-extern C_1B09_2CD2();/*OBJ_DeleteTmpBlocks*/
-extern C_1B09_3E18();
-extern char *C_1B09_4759(int16);/*GetObjectString*/
-extern C_1B09_4963(int16);
-extern C_2F5F_0477();
+extern int16 OBJ_FindTypeAt(int16, int16, int16);/*OBJ_FindTypeAt(type, x, y)*/
+extern int16 FindInv(int16);
+extern int16 NextInv();
+extern int16 FindInvOfType(int16, int16);/*first object of a type in an inventory*/
+extern int16 NextInvOfType();/*next one*/
+extern int16 NextArea();/*next object of an area search*/
+extern int16 SearchArea(int16, int16, int16, int16);/*first object of an area search*/
+extern int16 OBJ_FindNPCAt(int16, int16, int16);
+extern int16 AddMapObj(int16, int16, int16, int16, int16, int16);
+extern int16 AddInvObj(int16, int16, int16, int16);
+extern DeleteObj(int16);/*DeleteObj?*/
+extern OBJ_PurgeFarLocals(int16, int16, int16);
+extern OBJ_ReviveFromBody(int16);
+extern MoveObj(int16, int16, int16, int16);/*MoveObj(obj, x, y, z)*/
+extern OBJ_DeleteTmpBlocks();
+extern ShowObjects();
+extern char *GetObjectString(int16);
+extern OBJ_DeleteContents(int16);
+extern DreamWakeUp();
 extern C_2F5F_0AC1(int16);
 extern C_2F75_1429();
 extern C_2F75_16A8();
-#define MaxHP C_07D1_064E
-#define SetTypeUnconscious C_07D1_06C1
-#define HasConversation C_0E1A_175B
-#define LoadConversation C_0E1A_16F2
-#define DisplayTick C_120E_0221
-#define VIS_UpdateView C_1157_0312
-#define EGG_generate C_1649_009C
-#define OBJ_FindInContainer C_1B09_0002
-#define OBJ_FindTypeAt C_1B09_09C7
-#define FindInv C_1B09_0B1D
-#define NextInv C_1B09_0B76
-#define AddMapObj C_1B09_116E
-#define DeleteObj C_1B09_1872
-#define MoveObj C_1B09_1F52
-#define OBJ_DeleteTmpBlocks C_1B09_2CD2
-#define GetObjectString C_1B09_4759
 extern char far C_2BB4_0000[];
 extern char far C_2BB4_000B[];
 extern char far C_2BB4_0022[];
@@ -97,22 +82,22 @@ extern char far C_2BB4_22F1[];
 #define NotInSoloMsg C_2BB4_0315
 
 extern int16 D_0F18;/*MapAnimEnabled*/
-extern int16 D_13F0;
-extern int16 D_1431;
-extern unsigned char D_1675;/*Time_H*/
-extern unsigned char D_1676;/*Date_D*/
-extern unsigned char D_1677;/*Date_M*/
-extern unsigned char D_167A;/*Active*/
-extern int16 D_167C, D_167E, D_1680;/*MapX, MapY, MapZ*/
+extern int16 ForceHatching;
+extern int16 VisibilityDirty;
+extern unsigned char Time_H;
+extern unsigned char Date_D;
+extern unsigned char Date_M;
+extern unsigned char Active;
+extern int16 MapX, MapY, MapZ;
 extern unsigned char D_1684, D_1685;
-extern unsigned char D_1686;
+extern unsigned char DrunkCounter;
 extern unsigned char D_16A3;
-extern char D_16A4;/*InCombat*/
-extern char D_16A5;/*SoloMember*/
+extern char InCombat;
+extern char SoloMember;
 extern unsigned char D_16A8;/*the player is a woman*/
 extern int32 D_16AA;/*flags (0x10: ?)*/
 extern struct { unsigned a:4, psychic:4, b:8; } D_16B0[];/*talents? (psychic: can read objects)*/
-extern int16 D_16D4;
+extern int16 DreamStage;
 extern unsigned char far *D_3262;/*NPC flags: 0x80 ?, bits 0-7: talk flags 8-15*/
 extern unsigned char D_3266[];/*ObjStatus*/
 extern unsigned char far *D_46D0;/*NPCMode*/
@@ -137,15 +122,6 @@ extern unsigned char D_EC5C[];/*TalkNpcName*/
 extern char D_ECE2[10][100];/*TalkStrBuf: storage of the string variables $0-$9*/
 
 #define MapAnimEnabled D_0F18
-#define Time_H D_1675
-#define Date_D D_1676
-#define Date_M D_1677
-#define Active D_167A
-#define MapX D_167C
-#define MapY D_167E
-#define MapZ D_1680
-#define InCombat D_16A4
-#define SoloMember D_16A5
 #define ObjStatus D_3266
 #define NPCMode D_46D0
 #define Party D_4EA4
@@ -193,16 +169,16 @@ char *TALK_GetCharName(int16);
 	int16 handle;
 
 	/*set variables #*/
-	VarInt['A' - 0x37] = C_07D1_0576(1);
+	VarInt['A' - 0x37] = GetDex(1);
 	VarInt['D' - 0x37] = Date_D;/*[d]ay*/
 	VarInt['E' - 0x37] = ExpPoints[1];/*[e]xperience*/
 	VarInt['H' - 0x37] = Time_H;/*[h]our*/
-	VarInt['I' - 0x37] = C_07D1_05C0(1);
+	VarInt['I' - 0x37] = GetInt(1);
 	VarInt['M' - 0x37] = Date_M;/*[m]onth*/
 	VarInt['N' - 0x37] = PartySize;
 	VarInt['P' - 0x37] = HitPoints[1];
 	VarInt['W' - 0x37] = NPCMode[objNum];/*NPC's [w]ork type*/
-	VarInt['S' - 0x37] = C_07D1_0521(1);/*[s]trength*/
+	VarInt['S' - 0x37] = GetStr(1);/*[s]trength*/
 	VarInt['T' - 0x37] = 0;
 	VarInt['W' - 0x37] = NPCMode[objNum];
 	VarInt['X' - 0x37] = MapX;
@@ -305,7 +281,7 @@ char *TALK_GetCharName(int16);
 			if(D_16AA & 0x10) {
 				CON_printf("You try to wake yourself up.\n");
 				if(MapZ != 3)
-					C_2F5F_0477();
+					DreamWakeUp();
 			} else if(SoloMember >= 0) {
 				CON_printf(NotInSoloMsg);
 			} else {
@@ -338,7 +314,7 @@ char *TALK_GetCharName(int16);
 							break;
 						C_2F5F_0AC1(0x55);
 					case 0x34: case 0x36:
-						C_2F5F_0477();
+						DreamWakeUp();
 					break;
 					case 0x65:
 						k = AddMapObj(0xd24, 0, 0xe00, 0x34, 0x20, MapZ);
@@ -348,13 +324,13 @@ char *TALK_GetCharName(int16);
 							return;
 						}
 						ObjStatus[obj2] = 0xc1;
-						if((k = C_1B09_1081(0, 0x34, 0x20)) == 0) {
+						if((k = OBJ_FindNPCAt(0, 0x34, 0x20)) == 0) {
 							MoveObj(0, 0x34, 0x22, MapZ);
 							MapX = 0x34;
 							MapY = 0x22;
-							C_1534_056F();
+							MAP_LoadAround();
 						}
-						D_1431 = 1;
+						VisibilityDirty = 1;
 					break;
 					case 0x66:
 						k = AddMapObj(0xd24, 0, 0xf00, 0x12, 0x22, MapZ);
@@ -364,13 +340,13 @@ char *TALK_GetCharName(int16);
 							return;
 						}
 						ObjStatus[obj2] = 0xc5;
-						if((k = C_1B09_1081(0, 0x12, 0x22)) == 0) {
+						if((k = OBJ_FindNPCAt(0, 0x12, 0x22)) == 0) {
 							MoveObj(0, 0x13, 0x23, MapZ);
 							MapX = 0x13;
 							MapY = 0x23;
-							C_1534_056F();
+							MAP_LoadAround();
 						}
-						D_1431 = 1;
+						VisibilityDirty = 1;
 						TalkFlags[0x68] &= 1;
 						if((k = OBJ_FindTypeAt(0x155, 0x14, 0xb)) >= 0)
 							ObjShapeType[k] = 0x189;
@@ -404,7 +380,7 @@ char *TALK_GetCharName(int16);
 							y = 0xb;
 							k = 4;
 						}
-						C_1FA9_0919(2);
+						MUS_PlaySfx(2);
 						CON_printf("`%s ", GetObjectString(0x68));
 						if(!(TalkFlags[0x68] & 8)) {
 							CON_printf(C_2BB4_000B);
@@ -412,19 +388,19 @@ char *TALK_GetCharName(int16);
 						} else {
 							CON_printf(C_2BB4_0000);
 						}
-						C_1FA9_0919(10);
-						C_07D1_0CFC(0x68, &x, &y, 9, 0x16a);
-						C_1FA9_0919(1);
+						MUS_PlaySfx(10);
+						COMBAT_Missile(0x68, &x, &y, 9, 0x16a);
+						MUS_PlaySfx(1);
 						CON_printf(C_2BB4_0045, GetObjectString(k));
 						if(k == 1) {
 							SetTypeUnconscious(0);
 							SetTypeUnconscious(0x68);
-							D_1431 = 1;
+							VisibilityDirty = 1;
 							DisplayTick();
 							TimerDelay(0x122e4cL);
 							ObjShapeType[0] = OrigShapeType[1];
 							ObjShapeType[0x68] = OrigShapeType[0x68];
-							C_1534_0906(D_1684, D_1685, MapZ, 0);
+							PartyTeleport(D_1684, D_1685, MapZ, 0);
 						} else {
 							if((obj2 = OBJ_FindTypeAt(0x189, x, y)) >= 0)
 								ObjShapeType[obj2] = 0x155 | ((GetType(k) - 0x156) << 10);
@@ -444,17 +420,17 @@ char *TALK_GetCharName(int16);
 							return;
 						}
 						ObjStatus[obj2] = 0xe0;
-						if((k = C_1B09_1081(0, 0x6a, 0x2a)) == 0) {
+						if((k = OBJ_FindNPCAt(0, 0x6a, 0x2a)) == 0) {
 							MoveObj(0, 0x6b, 0x2b, MapZ);
 							MapX = 0x6b;
 							MapY = 0x2b;
-							C_1534_056F();
+							MAP_LoadAround();
 						}
-						D_1431 = 1;
+						VisibilityDirty = 1;
 						TalkFlags[0x69] |= 1;
 					break;
 					case 0x69:
-						C_1B09_3E18();
+						ShowObjects();
 				}
 				TalkEvent = -1;
 			}
@@ -514,9 +490,9 @@ and not on a hidden/dark tile)*/
 	register int16 y;
 	int16 tile;
 
-	if(C_1534_1129(GetX(objNum), MapX) < 5 && C_1534_1129(GetY(objNum), MapY) < 5) {
-		x = C_1534_1101(GetX(objNum) - (MapX - 5));
-		y = C_1534_1101(GetY(objNum) - (MapY - 5));
+	if(MapDistance(GetX(objNum), MapX) < 5 && MapDistance(GetY(objNum), MapY) < 5) {
+		x = WrapDelta(GetX(objNum) - (MapX - 5));
+		y = WrapDelta(GetY(objNum) - (MapY - 5));
 		/*objects displayed there, or an object tile*/
 		if(D_C130[y][x] || D_C4AA[y][x] >= 0x200)
 			return 1;
@@ -622,9 +598,9 @@ returns 0:ok, 1:party is in a vehicle, 2:not in party*/
 		case 1:
 			count = 0;
 			for(k = 0; k < PartySize; k ++) {
-				for(npc = C_1B09_0BEE(Party[k], 0x1ca); npc >= 0; npc = C_1B09_0CA4()) {
+				for(npc = FindInvOfType(Party[k], 0x1ca); npc >= 0; npc = NextInvOfType()) {
 					count ++;
-					C_1FA9_0919(4);
+					MUS_PlaySfx(4);
 					GetQual(npc) &= 0xfd;
 					GetQuan(npc) = 4;
 				}
@@ -635,7 +611,7 @@ returns 0:ok, 1:party is in a vehicle, 2:not in party*/
 				TalkFlags[0x39] &= ~8;
 		break;
 		case 2:
-			C_07D1_15F0(0x3c);
+			COMBAT_Kill(0x3c);
 		break;
 		case 3:
 		break;
@@ -667,7 +643,7 @@ returns 0:ok, 1:party is in a vehicle, 2:not in party*/
 				ObjShapeType[k] = GetType(k) + 0x1c00;
 		break;
 		case 8:
-			for(k = C_1B09_0EDE(0x9a, 0xbb, 0xaa, 0xcb); k >= 0; k = C_1B09_0DD7()) {
+			for(k = SearchArea(0x9a, 0xbb, 0xaa, 0xcb); k >= 0; k = NextArea()) {
 				if(GetType(k) == 0x19a && (ObjShapeType[k] >> 10) > 3 && GetQual(k) == 3) {
 					TalkFlags[0x3a] |= 4;
 					break;
@@ -703,7 +679,7 @@ returns 0:ok, 1:party is in a vehicle, 2:not in party*/
 			D_16A3 = 0;
 			for(k = 0; k < 6; k ++) {
 				if((npc = EGG_generate(0x91, MapX, MapY, MapZ)) >= 0) {
-					if(C_07D1_0416(npc, 0)) {
+					if(COMBAT_TryTeleport(npc, 0)) {
 						NPCComMode[npc] = NPCMode[npc] = 8;
 						D_16A3 ++;
 					} else {
@@ -720,16 +696,16 @@ returns 0:ok, 1:party is in a vehicle, 2:not in party*/
 		break;
 		case 0x37:
 			MoveObj(0x56, 0x56, 0x56, 6);
-			C_1B09_1A1D(-1, -1, -1);
-			if((k = C_1B09_12EE(0x9e, 0x10, 4, 0)) < 0) {
+			OBJ_PurgeFarLocals(-1, -1, -1);
+			if((k = AddInvObj(0x9e, 0x10, 4, 0)) < 0) {
 				CON_printf(C_2BB4_22F1);
 				break;
 			}
-			if((k = C_1B09_12EE(0xf2, 0x10, 0, 0)) < 0) {
+			if((k = AddInvObj(0xf2, 0x10, 0, 0)) < 0) {
 				CON_printf(C_2BB4_22F1);
 				break;
 			}
-			if((k = C_1B09_12EE(0x4a0, 0x10, 0, 0)) < 0) {
+			if((k = AddInvObj(0x4a0, 0x10, 0, 0)) < 0) {
 				CON_printf(C_2BB4_22F1);
 				break;
 			}
@@ -741,14 +717,14 @@ returns 0:ok, 1:party is in a vehicle, 2:not in party*/
 				CON_printf(C_2BB4_22F1);
 				break;
 			}
-			if((npc = C_1B09_12EE(0xfc, 8, 0, k)) < 0) {
+			if((npc = AddInvObj(0xfc, 8, 0, k)) < 0) {
 				CON_printf(C_2BB4_22F1);
 				break;
 			}
 			for(k = 0; k < 4; k ++) {
 				if((npc = EGG_generate(0x56e, 0xa, 0x6f, MapZ)) >= 0) {
 					NPCComMode[npc] = NPCMode[npc] = 0x18;
-					if(!C_07D1_0416(npc, 1))
+					if(!COMBAT_TryTeleport(npc, 1))
 						DeleteObj(npc);
 				} else {
 					CON_printf(C_2BB4_22F1);
@@ -757,7 +733,7 @@ returns 0:ok, 1:party is in a vehicle, 2:not in party*/
 			for(k = 0; k < 4; k ++) {
 				if((npc = EGG_generate(0x56e, 0x19, 0x60, MapZ)) >= 0) {
 					NPCComMode[npc] = NPCMode[npc] = 0x18;
-					if(!C_07D1_0416(npc, 1))
+					if(!COMBAT_TryTeleport(npc, 1))
 						DeleteObj(npc);
 				} else {
 					CON_printf(C_2BB4_22F1);
@@ -766,7 +742,7 @@ returns 0:ok, 1:party is in a vehicle, 2:not in party*/
 			for(k = 0; k < 4; k ++) {
 				if((npc = EGG_generate(0x56e, 0x28, 0x6f, MapZ)) >= 0) {
 					NPCComMode[npc] = NPCMode[npc] = 0x18;
-					if(!C_07D1_0416(npc, 1))
+					if(!COMBAT_TryTeleport(npc, 1))
 						DeleteObj(npc);
 				} else {
 					CON_printf(C_2BB4_22F1);
@@ -781,7 +757,7 @@ returns 0:ok, 1:party is in a vehicle, 2:not in party*/
 			TalkFlags[0x55] &= 0xfb;
 			count = 0;
 			found = 0;
-			for(obj = C_1B09_0EDE(0x49, 0x30, 0x57, 0x51); obj >= 0; obj = C_1B09_0DD7()) {
+			for(obj = SearchArea(0x49, 0x30, 0x57, 0x51); obj >= 0; obj = NextArea()) {
 				switch(GetType(obj)) {
 					case 0x84:
 						count ++;
@@ -816,7 +792,7 @@ returns 0:ok, 1:party is in a vehicle, 2:not in party*/
 			TalkEvent = 0x38;
 		break;
 		case 0x39:
-			for(k = C_1B09_0EDE(8, 0x18, 0x16, 0x39); k >= 0; k = C_1B09_0DD7()) {
+			for(k = SearchArea(8, 0x18, 0x16, 0x39); k >= 0; k = NextArea()) {
 				if(GetType(k) == 0x155 && GetQual(k) == 0x5b)
 					break;
 			}
@@ -824,7 +800,7 @@ returns 0:ok, 1:party is in a vehicle, 2:not in party*/
 				CON_printf(C_2BB4_22F1);
 				break;
 			}
-			C_1B09_1DF5(k);
+			OBJ_ReviveFromBody(k);
 			NPCStatus[0x5b] &= 0xef;
 			HitPoints[0x5b] = MaxHP(0x5b);
 			NPCStatus[0x5b] &= 0xf7;
@@ -848,7 +824,7 @@ returns 0:ok, 1:party is in a vehicle, 2:not in party*/
 			TalkEvent = 0x68;
 		break;
 		case 0x69:
-			C_1FA9_0919(0x32);
+			MUS_PlaySfx(0x32);
 			if(GetX(0x67) == 0x2c) {
 				if((k = OBJ_FindTypeAt(0xdb, 0x3b, 0xc)) < 0) {
 					CON_printf(C_2BB4_22F1);
@@ -866,25 +842,25 @@ returns 0:ok, 1:party is in a vehicle, 2:not in party*/
 			TalkEvent = 0x69;
 		break;
 		case 0x6a:
-			C_1534_0906(D_1684, D_1685, MapZ, 0);
+			PartyTeleport(D_1684, D_1685, MapZ, 0);
 		break;
 		case 0x6b:
-			C_1FA9_0919(4);
-			C_1B09_1A1D(-1, -1, -1);
-			C_1534_0906(0x6a, 0x2c, MapZ, 0);
-			C_1B09_4963(0);
+			MUS_PlaySfx(4);
+			OBJ_PurgeFarLocals(-1, -1, -1);
+			PartyTeleport(0x6a, 0x2c, MapZ, 0);
+			OBJ_DeleteContents(0);
 			D_1684 = 0x6a;
 			D_1685 = 0x2c;
-			D_16D4 = 0xe4;
+			DreamStage = 0xe4;
 		break;
 		case 0x6c:
 			if(!InCombat)
-				C_07D1_01BB();
+				COMBAT_begin();
 			D_16A3 = 6;
-			C_1B09_1A1D(-1, -1, -1);
-			D_13F0 = 1;
-			C_1534_0906(0x6e, 0x17, MapZ, 0);
-			D_13F0 = 0;
+			OBJ_PurgeFarLocals(-1, -1, -1);
+			ForceHatching = 1;
+			PartyTeleport(0x6e, 0x17, MapZ, 0);
+			ForceHatching = 0;
 			if((k = OBJ_FindTypeAt(0xe0, 0x75, 0x17)) >= 0)
 				break;
 			if((k = AddMapObj(0xce0, 0, 0, 0x75, 0x17, MapZ)) < 0)
@@ -894,12 +870,12 @@ returns 0:ok, 1:party is in a vehicle, 2:not in party*/
 		break;
 		case 0x6d:
 			if(!InCombat)
-				C_07D1_01BB();
+				COMBAT_begin();
 			D_16A3 = 6;
-			D_13F0 = 1;
-			C_1B09_1A1D(-1, -1, -1);
-			C_1534_0906(0x7a, 0xd, MapZ, 0);
-			D_13F0 = 0;
+			ForceHatching = 1;
+			OBJ_PurgeFarLocals(-1, -1, -1);
+			PartyTeleport(0x7a, 0xd, MapZ, 0);
+			ForceHatching = 0;
 			if((k = OBJ_FindTypeAt(0xe0, 0x7a, 0x12)) >= 0)
 				break;
 			if((k = AddMapObj(0x1ce0, 0, 0, 0x7a, 0x12, MapZ)) < 0)
@@ -909,17 +885,17 @@ returns 0:ok, 1:party is in a vehicle, 2:not in party*/
 		break;
 		case 0x6e:
 			if(!InCombat)
-				C_07D1_01BB();
-			D_13F0 = 1;
-			C_1B09_1A1D(-1, -1, -1);
-			C_1534_0906(0x82, 0x18, MapZ, 0);
-			D_13F0 = 0;
+				COMBAT_begin();
+			ForceHatching = 1;
+			OBJ_PurgeFarLocals(-1, -1, -1);
+			PartyTeleport(0x82, 0x18, MapZ, 0);
+			ForceHatching = 0;
 		break;
 		case 0x6f:
 			HitPoints[0] = MaxHP(1);
 		break;
 		case 0xfe:
-			D_1686 ++;
+			DrunkCounter ++;
 		break;
 		case 0xff:/*end of the game: back to DOS*/
 			OBJ_DeleteTmpBlocks();

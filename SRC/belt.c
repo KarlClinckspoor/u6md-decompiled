@@ -16,28 +16,28 @@
 #include "se.h"
 
 /*other modules*/
-extern C_120E_0221();/*DisplayTick*/
-extern C_1534_056F();/*MAP_LoadAround*/
-extern int16 C_1534_1101(int16);/*WrapDelta*/
-extern int16 C_1B09_032A();/*next object of C_1B09_07D8's search*/
-extern int16 C_1B09_07D8(int16, int16, int16);/*first object at (x, y, z)?*/
-extern int16 C_1B09_09C7(int16, int16, int16);/*OBJ_FindTypeAt(type, x, y)*/
-extern int16 C_1B09_0DD7(void);/*NextArea*/
-extern int16 C_1B09_0EDE(int16, int16, int16, int16);/*SearchArea(x1, y1, x2, y2)*/
-extern int16 C_1B09_116E(int16, int16, int16, int16, int16, int16);/*AddMapObj*/
-extern C_1B09_1872(int16);/*DeleteObj*/
-extern C_1B09_1F52(int16, int16, int16, int16);/*MoveObj*/
-extern C_2F72_0000();/*MachineryOn*/
-extern C_2F72_0210();/*MachineryOff*/
+extern DisplayTick();
+extern MAP_LoadAround();
+extern int16 WrapDelta(int16);
+extern int16 NextLoc();/*next object of FindLoc's search*/
+extern int16 FindLoc(int16, int16, int16);/*first object at (x, y, z)?*/
+extern int16 OBJ_FindTypeAt(int16, int16, int16);/*OBJ_FindTypeAt(type, x, y)*/
+extern int16 NextArea(void);
+extern int16 SearchArea(int16, int16, int16, int16);/*SearchArea(x1, y1, x2, y2)*/
+extern int16 AddMapObj(int16, int16, int16, int16, int16, int16);
+extern DeleteObj(int16);
+extern MoveObj(int16, int16, int16, int16);
+extern MachineryOn();
+extern MachineryOff();
 extern int16 OSI_rand(int16, int16);/*OSI_rand(lo, hi)*/
 extern cdecl CON_printf(char far *, ...);
 extern char far C_2BB4_2203[];/*"The coal begins moving down the belt.\n"*/
 extern char far C_2BB4_222A[];/*"The conveyor belt stops.\n"*/
 extern char far C_2BB4_22F1[];/*"Aargh!\n"*/
 
-extern int16 D_1431;/*VisibilityDirty*/
-extern unsigned char D_167A;/*Active*/
-extern int16 D_167C, D_167E, D_1680;/*MapX, MapY, MapZ*/
+extern int16 VisibilityDirty;
+extern unsigned char Active;
+extern int16 MapX, MapY, MapZ;
 extern unsigned char D_3266[];/*ObjStatus*/
 extern unsigned char D_4EA4[];/*Party*/
 extern int16 D_54BA[];/*Amount: quantity (low byte), quality (high byte)*/
@@ -49,11 +49,6 @@ extern int16 D_B530;/*barge_scrap_count (barge.c)*/
 extern int16 D_B576[0x200];/*barge_scrap (barge.c)*/
 extern int16 D_C0FA, D_C0FC;/*AreaX, AreaY*/
 
-#define VisibilityDirty D_1431
-#define Active D_167A
-#define MapX D_167C
-#define MapY D_167E
-#define MapZ D_1680
 #define ObjStatus D_3266
 #define Party D_4EA4
 #define Amount D_54BA
@@ -66,17 +61,6 @@ extern int16 D_C0FA, D_C0FC;/*AreaX, AreaY*/
 #define AreaX D_C0FA
 #define AreaY D_C0FC
 
-#define DisplayTick C_120E_0221
-#define MAP_LoadAround C_1534_056F
-#define WrapDelta C_1534_1101
-#define OBJ_FindTypeAt C_1B09_09C7
-#define NextArea C_1B09_0DD7
-#define SearchArea C_1B09_0EDE
-#define AddMapObj C_1B09_116E
-#define DeleteObj C_1B09_1872
-#define MoveObj C_1B09_1F52
-#define MachineryOn C_2F72_0000
-#define MachineryOff C_2F72_0210
 
 #define GetType(i) (ObjShapeType[i] & 0x3ff)
 #define GetFrame(i) (ObjShapeType[i] >> 10)
@@ -118,7 +102,7 @@ extern int16 D_C0FA, D_C0FC;/*AreaX, AreaY*/
 			if((objNum = OBJ_FindTypeAt(0xbd, x, y)) >= 0)
 				MoveObj(objNum, (x - 1) & 0x3ff, y, MapZ);
 			npc = -1;
-			for(objNum = C_1B09_07D8(x, y, MapZ); objNum >= 0; objNum = C_1B09_032A()) {
+			for(objNum = FindLoc(x, y, MapZ); objNum >= 0; objNum = NextLoc()) {
 				type = GetType(objNum);
 				if((objNum < 0x100 && objNum >= 0) || type == 0x1bf || TypeWeight[type] > 0) {
 					MoveObj(objNum, (x - 1) & 0x3ff, y, MapZ);
@@ -163,7 +147,7 @@ extern int16 D_C0FA, D_C0FC;/*AreaX, AreaY*/
 		if((objNum = OBJ_FindTypeAt(0xbd, x, y)) >= 0)
 			MoveObj(objNum, (x + 1) & 0x3ff, y, MapZ);
 		npc = -1;
-		for(objNum = C_1B09_07D8(x, y, MapZ); objNum >= 0; objNum = C_1B09_032A()) {
+		for(objNum = FindLoc(x, y, MapZ); objNum >= 0; objNum = NextLoc()) {
 			type = GetType(objNum);
 			if((objNum < 0x100 && objNum >= 0) || type == 0x1bf || TypeWeight[type] > 0) {
 				MoveObj(objNum, (x + 1) & 0x3ff, y, MapZ);

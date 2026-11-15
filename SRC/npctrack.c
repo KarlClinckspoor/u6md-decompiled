@@ -5,7 +5,7 @@
  * from Ultima VI's) reworked:
  *
  * - the passability test went to canmove.c (SE's CanMoveTo is MD's
- *   NPC_TryStep, C_104E_056F), and with it MoveFromX/Y/Set; SE's type
+ *   NPC_TryStep, NPC_TryStep), and with it MoveFromX/Y/Set; SE's type
  *   tests (C_130F_0002-01C6), Board/Unboard, FindAdjacentPlate and the
  *   big creatures made of several objects are gone;
  * - new: C_170D_0002/007E (is an object/a square outside the 40x40 area
@@ -63,36 +63,36 @@ extern int16 MapDistance(int16, int16);
 extern C_1534_096C(int16);/*goes through an entrance*/
 extern PartyTeleport(int16, int16, int16, int16);
 /*objects*/
-extern int16 C_1B09_032A();/*NextLoc*/
-extern int16 C_1B09_07D8(int16, int16, int16);/*FindLoc(x, y, z)*/
-extern int16 C_1B09_09C7(int16, int16, int16);/*OBJ_FindTypeAt(type, x, y)*/
+extern int16 NextLoc();
+extern int16 FindLoc(int16, int16, int16);/*FindLoc(x, y, z)*/
+extern int16 OBJ_FindTypeAt(int16, int16, int16);/*OBJ_FindTypeAt(type, x, y)*/
 extern int16 C_1B09_0A5D(int16);/*the next object of the same type there*/
 extern int16 C_1B09_090B(int16);
-extern int16 C_1B09_0DD7();/*NextArea*/
-extern int16 C_1B09_0EDE(int16, int16, int16, int16);/*SearchArea(x1, y1, x2, y2)*/
-extern int16 C_1B09_116E(int16, int16, int16, int16, int16, int16);/*AddMapObj(shape, status, amount, x, y, z)*/
-extern C_1B09_1872(int16);/*DeleteObj*/
-extern C_1B09_1A1D(int16, int16, int16);/*OBJ_PurgeFarLocals*/
-extern int16 C_1B09_1F52(int16, int16, int16, int16);/*MoveObj(objNum, x, y, z)*/
-extern C_1B09_3D47(int16, int16, int16, int16);
-extern C_1B09_3E18();/*ShowObjects*/
+extern int16 NextArea();
+extern int16 SearchArea(int16, int16, int16, int16);/*SearchArea(x1, y1, x2, y2)*/
+extern int16 AddMapObj(int16, int16, int16, int16, int16, int16);/*AddMapObj(shape, status, amount, x, y, z)*/
+extern DeleteObj(int16);
+extern OBJ_PurgeFarLocals(int16, int16, int16);
+extern int16 MoveObj(int16, int16, int16, int16);/*MoveObj(objNum, x, y, z)*/
+extern OBJ_ShowMultiTile(int16, int16, int16, int16);
+extern ShowObjects();
 extern int16 C_100B_03B5(int16);
 /*combat*/
-extern C_07D1_014C(int16);/*COMBAT_stopCharm*/
-extern int16 C_07D1_00FB(int16, int16, int16);/*COMBAT_TileDistance(objNum, x, y)*/
-extern int16 C_07D1_0576(int16);/*an NPC's dexterity*/
-extern C_07D1_06C1(int16);/*SetTypeUnconscious: an NPC falls asleep (shape)*/
-extern int16 C_07D1_0B2A(int16, int16);/*COMBAT_canSee(objNum, target)*/
-extern C_07D1_126D(int16);/*COMBAT_showHit*/
-extern int16 C_07D1_35A8(int16, int16, int16, int16);/*distance of (x1, y1) and (x2, y2)*/
-extern int16 C_07D1_398D(int16);/*COMBAT_pickOpponent*/
-extern C_07D1_3C26(int16);/*COMBAT_AI_Assault*/
-extern C_07D1_3E77(int16);/*COMBAT_AI_Range*/
-extern C_07D1_40A5(int16);/*COMBAT_AI_Berserk*/
-extern C_07D1_4352(int16);/*COMBAT_AI_Retreat*/
-extern C_07D1_44D8(int16);/*COMBAT_AI_Like*/
-extern C_07D1_4612(int16);/*COMBAT_AI_Unfriendly*/
-extern C_07D1_47D8(int16);/*COMBAT_AI_Immobile*/
+extern COMBAT_stopCharm(int16);
+extern int16 COMBAT_TileDistance(int16, int16, int16);/*COMBAT_TileDistance(objNum, x, y)*/
+extern int16 GetDex(int16);/*an NPC's dexterity*/
+extern SetTypeUnconscious(int16);/*SetTypeUnconscious: an NPC falls asleep (shape)*/
+extern int16 COMBAT_canSee(int16, int16);/*COMBAT_canSee(objNum, target)*/
+extern COMBAT_showHit(int16);
+extern int16 COMBAT_range(int16, int16, int16, int16);/*distance of (x1, y1) and (x2, y2)*/
+extern int16 COMBAT_pickOpponent(int16);
+extern COMBAT_AI_Assault(int16);
+extern COMBAT_AI_Range(int16);
+extern COMBAT_AI_Berserk(int16);
+extern COMBAT_AI_Retreat(int16);
+extern COMBAT_AI_Like(int16);
+extern COMBAT_AI_Unfriendly(int16);
+extern COMBAT_AI_Immobile(int16);
 extern C_07D1_4912(int16);/*A.I. of mode 0x13*/
 extern C_07D1_4A00(int16);/*A.I. of mode 0x16*/
 extern C_07D1_4C0A(int16);/*A.I. of mode 0x12*/
@@ -107,7 +107,7 @@ extern C_2F63_083C(int16);/*A.I. of mode 0x18*/
 extern int16 OSI_rand(int16, int16);
 extern void cdecl TimerDelay(int32);/*wait (2383 per millisecond)*/
 extern int16 NPC_TryStep(int16, int16, int16);/*SE: CanMoveTo*/
-extern C_120E_0221();/*DisplayTick*/
+extern DisplayTick();
 extern FlushViewIfDirty();
 extern SetActive(int16);
 extern SetPartyMode();
@@ -118,10 +118,10 @@ extern DrawSkyBar();
 extern MUS_PlaySfx(int16);
 extern C_1FA9_0603();/*the party is knocked out*/
 extern BeltUpdate(int16);
-extern C_2F52_0473();/*BeltStart*/
+extern BeltStart();
 extern BargeFindLeader(int16);
-extern C_2F72_0000();/*MachineryOn*/
-extern C_2F72_0210();/*MachineryOff*/
+extern MachineryOn();
+extern MachineryOff();
 extern C_2F75_042D();/*a cut scene*/
 extern C_2F63_0043();
 extern DreamTrigger(int16);
@@ -140,18 +140,18 @@ extern int16 MoveFromX, MoveFromY, MoveFromSet;/*canmove.c*/
 extern int16 LeaderOnBelt, MemberOnBelt;/*canmove.c*/
 extern char LeaderOnBarge;/*barge.c*/
 extern char D_0F13;/*PromptFlag*/
-extern int16 D_14F2;/*LocPartOffset*/
-extern int16 D_1580;/*MoveAppliesTerrain*/
-extern unsigned char D_1675;/*Time_H*/
-extern unsigned char D_1676;/*Date_D*/
-extern unsigned char D_167A;/*Active*/
-extern int16 D_167C, D_167E, D_1680;/*MapX, MapY, MapZ*/
-extern unsigned char D_1686;/*DrunkCounter*/
-extern unsigned char D_168B[8];/*PathObject: NPC following each path slot (0 = free)*/
-extern unsigned char D_1693[8];/*PathCounter: current entry of each path*/
-extern unsigned char D_169B[8];/*PathTries: steps done in the current entry*/
-extern char D_16A4;/*InCombat*/
-extern char D_16A5;/*SoloMember*/
+extern int16 LocPartOffset;
+extern int16 MoveAppliesTerrain;
+extern unsigned char Time_H;
+extern unsigned char Date_D;
+extern unsigned char Active;
+extern int16 MapX, MapY, MapZ;
+extern unsigned char DrunkCounter;
+extern unsigned char PathObject[8];/*PathObject: NPC following each path slot (0 = free)*/
+extern unsigned char PathCounter[8];/*PathCounter: current entry of each path*/
+extern unsigned char PathTries[8];/*PathTries: steps done in the current entry*/
+extern char InCombat;
+extern char SoloMember;
 extern unsigned char D_16A8;/*the player is a woman*/
 extern int32 D_16AA;/*flags (0x10: the dream)*/
 extern int16 D_16AE;/*rotation of the map view*/
@@ -193,50 +193,8 @@ extern int16 D_C11E;/*PTH_object: object type seeked, -1 if none*/
 extern int16 D_C120;/*PTH_direct: area edge to reach (0 N, 1 E, 2 S, 3 W), -1 if none*/
 extern int16 D_C122;/*PTH_Found*/
 
-#define NextLoc C_1B09_032A
-#define FindLoc C_1B09_07D8
-#define OBJ_FindTypeAt C_1B09_09C7
-#define NextArea C_1B09_0DD7
-#define SearchArea C_1B09_0EDE
-#define AddMapObj C_1B09_116E
-#define DeleteObj C_1B09_1872
-#define OBJ_PurgeFarLocals C_1B09_1A1D
-#define MoveObj C_1B09_1F52
-#define ShowObjects C_1B09_3E18
-#define COMBAT_stopCharm C_07D1_014C
-#define COMBAT_TileDistance C_07D1_00FB
-#define GetDex C_07D1_0576
-#define SetTypeUnconscious C_07D1_06C1
-#define COMBAT_canSee C_07D1_0B2A
-#define COMBAT_showHit C_07D1_126D
-#define COMBAT_pickOpponent C_07D1_398D
-#define COMBAT_AI_Assault C_07D1_3C26
-#define COMBAT_AI_Range C_07D1_3E77
-#define COMBAT_AI_Berserk C_07D1_40A5
-#define COMBAT_AI_Retreat C_07D1_4352
-#define COMBAT_AI_Like C_07D1_44D8
-#define COMBAT_AI_Unfriendly C_07D1_4612
-#define COMBAT_AI_Immobile C_07D1_47D8
-#define DisplayTick C_120E_0221
-#define BeltStart C_2F52_0473
-#define MachineryOn C_2F72_0000
-#define MachineryOff C_2F72_0210
 
 #define PromptFlag D_0F13
-#define LocPartOffset D_14F2
-#define MoveAppliesTerrain D_1580
-#define Time_H D_1675
-#define Date_D D_1676
-#define Active D_167A
-#define MapX D_167C
-#define MapY D_167E
-#define MapZ D_1680
-#define DrunkCounter D_1686
-#define PathObject D_168B
-#define PathCounter D_1693
-#define PathTries D_169B
-#define InCombat D_16A4
-#define SoloMember D_16A5
 #define ObjStatus D_3266
 #define MovePts D_44C4
 #define SchedIndex D_45C4
@@ -779,7 +737,7 @@ extern int16 D_C122;/*PTH_Found*/
 			if(obj >= 0) {
 				DisplayTick();
 				ShowObjects();
-				C_1B09_3D47(TILE_FRAME(obj), 0x1000, 5, 4);
+				OBJ_ShowMultiTile(TILE_FRAME(obj), 0x1000, 5, 4);
 				DisplayTick();
 				TimerDelay(238300L);
 			}
@@ -1549,7 +1507,7 @@ extern int16 D_C122;/*PTH_Found*/
 		if(ObjShapeType[member] && IsDead(member) == 0 && COMBAT_canSee(objNum, member)) {
 			x_dest = GetX(member);
 			y_dest = GetY(member);
-			dist = C_07D1_35A8(x_dest, y_dest, x, y);
+			dist = COMBAT_range(x_dest, y_dest, x, y);
 			if(
 				(dist < dist_min) ||
 				(dist == dist_min && OSI_rand(0, 1))
@@ -2151,7 +2109,7 @@ extern int16 D_C122;/*PTH_Found*/
 /*mode 0x95: talks to NPC 1 when he comes within 2 squares*/
 /*C_170D_3F3E*/C_170D_3F3E(int16 objNum) {
 	if(!C_170D_0002(objNum) && GetZ(objNum) == MapZ) {
-		if(C_07D1_35A8(GetX(objNum), GetY(objNum), GetX(1), GetY(1)) > 2)
+		if(COMBAT_range(GetX(objNum), GetY(objNum), GetX(1), GetY(1)) > 2)
 			SubMov(objNum, 5);
 		else
 			TalkToParty(objNum, 1);

@@ -22,7 +22,7 @@
  *   0x80 visible from the party
  *
  * Differences from Savage Empire's: map coordinates wrap (& 0x3ff, distances
- * by MapDistance C_1534_1129); no VIS_IsInViewSquare; a square keeps the
+ * by MapDistance MapDistance); no VIS_IsInViewSquare; a square keeps the
  * brightest light reaching it instead of the sum, and a light source of
  * level n spreads n + 1 squares; XRayView, or the active member's third
  * talent (D_16B0 bits 8-11), shows the whole view lit and unhidden; objects
@@ -40,10 +40,10 @@
 #define AREA_H 40
 
 /*other modules*/
-extern char D_167B;/*AmbientLight: sun light level 0..7*/
-extern unsigned char D_167A;/*Active*/
-extern int16 D_167C;/*MapX*/
-extern int16 D_167E;/*MapY*/
+extern char AmbientLight;/*AmbientLight: sun light level 0..7*/
+extern unsigned char Active;
+extern int16 MapX;
+extern int16 MapY;
 extern struct { unsigned a:4, psychic:4, c:4, d:4; } D_16B0[];/*talents*/
 extern unsigned char D_3E84[AREA_H][AREA_W];/*AreaFlags*/
 extern unsigned char D_46D4[AREA_H][AREA_W];/*AreaTiles: the ground tiles of the area*/
@@ -61,17 +61,13 @@ extern unsigned char D_BA84[256];/*flood fill ring-buffer queue, x*/
 extern unsigned char D_BB84[256];/*flood fill ring-buffer queue, y*/
 extern int16 D_C4AA[11][11];/*Tile_11x11: the tiles of the map window*/
 
-extern int16 C_1534_1129(int16, int16);/*MapDistance: distance of two map coordinates (wrapping)*/
-extern C_1FA9_0919(int16);/*play a sound effect?*/
-extern int16 C_1B09_0EDE(int16, int16, int16, int16);/*SearchArea(x1, y1, x2, y2): first object in the rectangle*/
-extern int16 C_1B09_0DD7(void);/*NextArea: next object of SearchArea*/
-extern C_1B09_3E18(void);/*ShowObjects: draw the map window*/
+extern int16 MapDistance(int16, int16);/*MapDistance: distance of two map coordinates (wrapping)*/
+extern MUS_PlaySfx(int16);/*play a sound effect?*/
+extern int16 SearchArea(int16, int16, int16, int16);/*SearchArea(x1, y1, x2, y2): first object in the rectangle*/
+extern int16 NextArea(void);/*NextArea: next object of SearchArea*/
+extern ShowObjects(void);/*ShowObjects: draw the map window*/
 extern int16 OSI_rand(int16, int16);/*OSI_rand(lo, hi)*/
 
-#define AmbientLight D_167B
-#define Active D_167A
-#define MapX D_167C
-#define MapY D_167E
 #define Party D_4EA4
 #define Amount D_54BA
 #define AreaOffset D_BA82
@@ -82,10 +78,6 @@ extern int16 OSI_rand(int16, int16);/*OSI_rand(lo, hi)*/
 #define TileFlag2 D_760A
 #define TerrainType D_B4C4
 #define ObjShapeType D_9CC4
-#define MapDistance C_1534_1129
-#define SearchArea C_1B09_0EDE
-#define NextArea C_1B09_0DD7
-#define ShowObjects C_1B09_3E18
 #define GetType(i) (D_9CC4[i] & 0x3ff)
 #define GetFrame(i) (D_9CC4[i] >> 10)
 #define GetQual(i) (((unsigned char *)(Amount + (i)))[1])
@@ -251,7 +243,7 @@ static /*C_1157_00A6*/VIS_Enqueue(int16 x, int16 y) {
 		if(GetType(objNum) == 0x184) {\
 			if(MapDistance(GetX(objNum), MapX) <= 1 && MapDistance(GetY(objNum), MapY) <= 1) {\
 				if(GetFrame(objNum))\
-					C_1FA9_0919(0x22);\
+					MUS_PlaySfx(0x22);\
 				ObjShapeType[objNum] = GetType(objNum);\
 				GetQual(objNum) = OSI_rand(6, 10);\
 			} else if(GetFrame(objNum) == 0) {\

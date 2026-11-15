@@ -2,11 +2,13 @@
 # FRAME AT LEN SOURCE [DS-RANGE]   FRAME: the module code segment (paragraph; an overlaid
 # module: its stub segment); AT: its first byte in the frame (overlay: in the overlay);
 # LEN: bytes up to the next module (hex); SOURCE: the file ("-" while not decompiled).
+# "- - 0": data only. Overlaid modules sit in the link after use.c, where their data are
+# (their stubs come after all the code anyway).
 02CD D 1009 main.c 00A8-028C
-0000 242 421 OSILIB/OSI_FILE.ASM 07FA-0804  # linked after main.c: its code joins C0M's _TEXT, its data follow main's
 03CE 6 AC8 barge.c 028C-042A
 047A E 356F objcmd.c 042A-06BA
 07D1 D 6456 combat.c 06BA-07FA
+0000 242 421 OSILIB/OSI_FILE.ASM 07FA-0804  # linked after combat.c (its relocations follow combat.c's): its code joins C0M's _TEXT, its data follow combat's
 0E17 4 38 LIB/PTRNORM.ASM
 0E1A C 1EAF gfx.c 0804-0BB2
 1005 C 62 OSILIB/KBD.ASM
@@ -15,6 +17,8 @@
 1157 A B6F visible.c 0EA0-0F10
 120E 9 3257 gameloop.c 0F10-132E
 1534 0 1159 map.c 132E-13F0
+- - 0 MSGS.ASM  # far data only (segment 2BB4, the far messages), its empty code segment at 1649:A
+- - 0 MONSDATA.ASM  # far data only (segment 2DE5, the monster tables), its empty code segment at 1649:A
 1649 A 8DF egg.c 13F0-1412
 16D7 A 358 OSILIB/MOUSE.ASM 1412-1420
 170D 2 3FC0 npctrack.c 1420-14F0
@@ -25,11 +29,27 @@
 222C 8 B8 typetest.c
 2238 0 35F2 console.c 1B84-1CBA
 2597 2 A6C use.c 1CBA-1CD6
+2F52 0 4AD belt.c  # overlay
+2F55 0 232 revive.c  # overlay
+2F58 0 552 bridge.c 1CD6-1DA4  # overlay
+2F5B 0 8F disk.c 1DA4-1E48  # overlay
+2F5F 0 C13 dream.c 1E48-1E88  # overlay
+2F63 0 D00 dreamobj.c 1E88-1F02  # overlay
+2F68 0 1A87 dreamstg.c 1F02-1F28  # overlay
+2F6E 0 60F lever.c 1F28-20F4  # overlay
+2F72 0 402 power.c  # overlay
+2F75 0 16F2 cutscene.c 20F4-213E  # overlay
+2F7C 0 B3D rest.c 213E-2408  # overlay
+2F80 0 268 jet.c 2408-247A  # overlay
+2F83 0 1700 talk.c 247A-2802  # overlay
+2F88 0 1F6B talkdr.c 2802-28F0  # overlay
+2F8D 0 200B useact1.c 28F0-2990  # overlay
+2F98 0 201A useact2.c 2990-29A2  # overlay
+2FA1 0 1E99 useact3.c 29A2-29F4  # overlay
 - - 0 OSILIB/drvnames.c 29F4-2A28
 263D E C1 OSILIB/DRVLOAD.ASM 2A28-2A6C
 264A 0 1DF OSILIB/CLIP.ASM 2A6C-2A7A
 2668 0 1A OSILIB/VIDRESET.ASM 2A7A-2A7C
-2669 A A8 LIB/OSIWRITE.ASM
 2674 2 530 OSILIB/LOW.ASM 2A7C-2B12
 26C7 2 78 OSILIB/DELAY.ASM 2B12-2B1A
 26CE A 52 OSILIB/RAND.ASM 2B1A-2B1E
@@ -51,6 +71,7 @@
 2A56 C 4C LIB/OSIOPEN.ASM 2EA2-2EA8
 2A5B 8 2B LIB/OSICREAT.ASM
 2A5E 4 F0 LIB/OSIREAD.ASM 2EA8-2EAC
+2669 A A8 LIB/OSIWRITE.ASM  # linked after OSIREAD; its code sits after VIDRESET's, which names its segment first
 2A6D 4 38 LIB/OSISEEK.ASM
 2A70 C 31D LIB/LZC.C 2EAC-2EB8
 2AA2 9 84 LIB/LIBSIZE.C
@@ -60,20 +81,3 @@
 2AE7 D A7 LIB/LIBREAD.C
 2AF2 4 E8 LIB/LIBSEEK.C
 2B00 C 212 LIB/EMSALLOC.ASM
-2F52 0 4AD belt.c  # overlay
-2F55 0 232 revive.c  # overlay
-2F58 0 552 bridge.c 1CD6-1DA4  # overlay
-2F5B 0 8F disk.c 1DA4-1E48  # overlay
-2F5F 0 C13 dream.c 1E48-1E88  # overlay
-2F63 0 D00 dreamobj.c 1E88-1F02  # overlay
-2F68 0 1A87 dreamstg.c 1F02-1F28  # overlay
-2F6E 0 60F lever.c 1F28-20F4  # overlay
-2F72 0 402 power.c  # overlay
-2F75 0 16F2 cutscene.c 20F4-213E  # overlay
-2F7C 0 B3D rest.c 213E-2408  # overlay
-2F80 0 268 jet.c 2408-247A  # overlay
-2F83 0 1700 talk.c 247A-2802  # overlay
-2F88 0 1F6B talkdr.c 2802-28F0  # overlay
-2F8D 0 200B useact1.c 28F0-2990  # overlay
-2F98 0 201A useact2.c 2990-29A2  # overlay
-2FA1 0 1E99 useact3.c 29A2-29F4  # overlay

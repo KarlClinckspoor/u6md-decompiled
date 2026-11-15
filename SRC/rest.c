@@ -1,4 +1,5 @@
 /* flags: -d -mm -p -c -Z -O -y */
+/* stub order: 0087 0131 0000 0397 */
 /*
  * Martian Dreams - GAME.EXE overlay 2F7C: the "Rest" command.
  * From Savage Empire's rest.c (Ultima VI's), reworked.
@@ -36,7 +37,7 @@ struct tClipInfo/*size:9*/ {
 
 /*OSI routines (asm)*/
 extern int16 OSI_rand(int16, int16);/*OSI_rand(lo, hi)*/
-extern cdecl MOUSE_SERVE();/*MOUSE_SERVE*/
+extern cdecl MOUSE_SERVE();
 
 /*library*/
 extern void cdecl TimerDelay(int32);/*wait (2383 per millisecond)*/
@@ -44,27 +45,27 @@ extern int16 cdecl soundCard;
 
 /*other game modules*/
 extern PaletteAnimation();
-extern C_047A_024B(int16);/*ShowPortrait*/
-extern int16 C_07D1_064E(int16);/*MaxHP*/
-extern int16 C_07D1_0B2A(int16, int16);/*COMBAT_canSee*/
-extern C_0E1A_1E2B(int16);/*ClearMapWindow*/
-extern C_120E_0084(int16);/*DrawMapWindow*/
-extern C_120E_0221();/*DisplayTick*/
-extern C_120E_0A47(int16);/*PassTime(minutes)*/
+extern ShowPortrait(int16);
+extern int16 MaxHP(int16);
+extern int16 COMBAT_canSee(int16, int16);
+extern ClearMapWindow(int16);
+extern DrawMapWindow(int16);
+extern DisplayTick();
+extern PassTime(int16);/*PassTime(minutes)*/
 extern VIS_UpdateView();
 extern MAP_LoadAround();
 extern PartyEnter(int16);
 extern PartyExit(int16, int16, int16, int16);
-extern int16 C_1534_1129(int16, int16);/*MapDistance (wrapping)*/
+extern int16 MapDistance(int16, int16);/*MapDistance (wrapping)*/
 extern int16 C_170D_2BB4(int16);/*true for a man (the dream's pronoun)*/
-extern int16 C_1B09_0DD7(void);/*NextArea*/
-extern int16 C_1B09_0EDE(int16, int16, int16, int16);/*SearchArea(x1, y1, x2, y2)*/
-extern int16 C_1B09_116E(int16, int16, int16, int16, int16, int16);/*AddMapObj(type, status, quantity, x, y, z)*/
-extern C_1B09_1872(int16);/*DeleteObj*/
-extern C_1B09_3E18();/*ShowObjects*/
-extern char *C_1B09_4759(int16);/*GetObjectString*/
+extern int16 NextArea(void);
+extern int16 SearchArea(int16, int16, int16, int16);/*SearchArea(x1, y1, x2, y2)*/
+extern int16 AddMapObj(int16, int16, int16, int16, int16, int16);/*AddMapObj(type, status, quantity, x, y, z)*/
+extern DeleteObj(int16);
+extern ShowObjects();
+extern char *GetObjectString(int16);
 extern C_1FA9_02CE(int16);/*the morning song*/
-extern C_1FA9_0919(int16);/*MUS_PlaySfx*/
+extern MUS_PlaySfx(int16);
 extern int16 CON_mouseOffAt(int16, int16, int16, int16);
 extern CON_mouseOn(int16);
 extern int16 CON_getch();
@@ -77,18 +78,18 @@ extern char far C_2BB4_02FA[];/*NotInCombatMsg*/
 extern char far C_2BB4_0315[];/*NotInSoloMsg*/
 
 extern unsigned char MouseOn;
-extern int16 D_080E;/*ScreenFade*/
-extern int16 D_081E;/*ColorText*/
+extern int16 ScreenFade;
+extern int16 ColorText;
 extern int16 D_0826;/*text color of the dream's question*/
 extern char D_0F12;/*StatusDirty*/
 extern int16 D_0F16;/*IdleAnimTick*/
-extern unsigned char D_1673;/*NextSleep*/
-extern unsigned char D_1675;/*Time_H*/
-extern unsigned char D_167A;/*Active*/
-extern int16 D_167C, D_167E, D_1680;/*MapX, MapY, MapZ*/
-extern int16 D_1687;/*SoundFlag*/
-extern char D_16A4;/*InCombat*/
-extern char D_16A5;/*SoloMember*/
+extern unsigned char NextSleep;
+extern unsigned char Time_H;
+extern unsigned char Active;
+extern int16 MapX, MapY, MapZ;
+extern int16 SoundFlag;
+extern char InCombat;
+extern char SoloMember;
 extern struct { unsigned a:4, b:4, c:4, d:4; } D_16B0[];/*talents*/
 extern char SelectMode;
 extern char AnimateAtPrompt;
@@ -112,19 +113,8 @@ extern uint16 D_9CC4[];/*ObjShapeType*/
 extern struct tClipInfo D_EBD0[4];/*TextWindows*/
 extern int16 D_EC42;/*LinesBeforeMore*/
 
-#define ScreenFade D_080E
-#define ColorText D_081E
 #define StatusDirty D_0F12
 #define IdleAnimTick D_0F16
-#define NextSleep D_1673
-#define Time_H D_1675
-#define Active D_167A
-#define MapX D_167C
-#define MapY D_167E
-#define MapZ D_1680
-#define SoundFlag D_1687
-#define InCombat D_16A4
-#define SoloMember D_16A5
 #define DEXTE D_45D0
 #define Party D_4EA4
 #define Level D_4EB6
@@ -140,21 +130,6 @@ extern int16 D_EC42;/*LinesBeforeMore*/
 #define TextWindows D_EBD0
 #define LinesBeforeMore D_EC42
 
-#define ShowPortrait C_047A_024B
-#define MaxHP C_07D1_064E
-#define COMBAT_canSee C_07D1_0B2A
-#define ClearMapWindow C_0E1A_1E2B
-#define DrawMapWindow C_120E_0084
-#define DisplayTick C_120E_0221
-#define PassTime C_120E_0A47
-#define MapDistance C_1534_1129
-#define NextArea C_1B09_0DD7
-#define SearchArea C_1B09_0EDE
-#define AddMapObj C_1B09_116E
-#define DeleteObj C_1B09_1872
-#define ShowObjects C_1B09_3E18
-#define GetObjectString C_1B09_4759
-#define MUS_PlaySfx C_1FA9_0919
 #define NotInCombatMsg C_2BB4_02FA
 #define NotInSoloMsg C_2BB4_0315
 
@@ -173,7 +148,7 @@ extern int16 D_EC42;/*LinesBeforeMore*/
 /*check foes near:
   returns 1 if a hostile NPC (NPCStatus 0x20) is on this level within
   39 tiles of the party*/
-/*C_2F7C_0000*/static REST_FoesNear() {
+/*C_2F7C_0000*/REST_FoesNear() {
 	int16 objNum;
 
 	for(objNum = 0x10; objNum < 0x100; objNum ++) {
@@ -190,7 +165,7 @@ extern int16 D_EC42;/*LinesBeforeMore*/
 
 /*check others near: returns the first NPC (NPCStatus without 0x10, 0x04,
   0x80) within 5 tiles on this level that COMBAT_canSee, else 0*/
-/*C_2F7C_0087*/static REST_OthersNear() {
+/*C_2F7C_0087*/REST_OthersNear() {
 	int16 objNum;
 
 	for(objNum = 1; objNum < 0x100; objNum ++) {

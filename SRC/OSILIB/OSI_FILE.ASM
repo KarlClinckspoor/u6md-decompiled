@@ -490,4 +490,9 @@ OSI_memory	ENDP
 
 _TEXT	ENDS
 
+;an empty code segment, as Origin's macros gave every module: WORD aligned, GAME.EXE's
+;segment table lists it at 0E17:4, after combat.c (one byte of padding before PTRNORM)
+CSegStart	OSI_FILE_TEXT
+CSegEnd	OSI_FILE_TEXT
+
 END

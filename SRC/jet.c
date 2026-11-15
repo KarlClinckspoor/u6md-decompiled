@@ -1,11 +1,12 @@
 /* flags: -d -mm -p -c -Z -O -y */
+/* stub order: 0000 01C2 */
 /*
  * Martian Dreams - GAME.EXE overlay 2F80: "jetters" (object type 0x1d0,
  * jets of steam or gas?), new code with no Savage Empire counterpart.
  *
  * A jetter's quality: bits 0-3 its delay, bits 4-7 the length of the jet;
  * its quantity: bits 0-3 the countdown, bits 5-7 the direction (as
- * DirIncrX/DirIncrY). TriggerJet shows the jet (C_0E1A_02B3) along the
+ * DirIncrX/DirIncrY). TriggerJet shows the jet (Missiles) along the
  * tiles in front of it and hurts what is hit (MissileHitList): NPCs and
  * C_100B_038E types. UpdateJet counts a jetter down (or, with no delay,
  * triggers it at random) while talk flag TalkFlags[0x73] & 4 is set.
@@ -13,11 +14,11 @@
 #include "se.h"
 
 /*other modules*/
-extern int16 C_07D1_1D64(int16, int16, int16);/*hurt (objNum, damage, ?)*/
-extern int16 C_0E1A_02B3(int16, int16, int16, int16 *, int16 *, int16, int16, int16);/*show a missile/jet (x, y, length, xs, ys, ?, tile?, ?)*/
+extern int16 LoseHP(int16, int16, int16);/*hurt (objNum, damage, ?)*/
+extern int16 Missiles(int16, int16, int16, int16 *, int16 *, int16, int16, int16);/*show a missile/jet (x, y, length, xs, ys, ?, tile?, ?)*/
 extern int16 C_100B_038E(int16);
-extern C_120E_0280();
-extern C_1FA9_0919(int16);/*play a sound effect?*/
+extern FlushViewIfDirty();
+extern MUS_PlaySfx(int16);/*play a sound effect?*/
 extern cdecl CON_printf(char far *, ...);
 extern int16 OSI_rand(int16, int16);/*OSI_rand(lo, hi)*/
 
@@ -76,12 +77,12 @@ extern int16 D_B9D6[0x40];/*MissileHitList: what the last missile hit (-1 ends)*
 		y = (y + DirIncrY[dir]) & 0x3ff;
 		ys[i] = y;
 	}
-	C_120E_0280();
-	C_1FA9_0919(0x19);
-	C_0E1A_02B3(GetX(objNum), GetY(objNum), len, xs, ys, 8, 0x104, 6);
+	FlushViewIfDirty();
+	MUS_PlaySfx(0x19);
+	Missiles(GetX(objNum), GetY(objNum), len, xs, ys, 8, 0x104, 6);
 	for(p = MissileHitList; *p >= 0; p ++) {
 		if((*p < 0x100 && *p >= 0) || C_100B_038E(GetType(*p)))
-			C_07D1_1D64(*p, OSI_rand(10, 50), 0);
+			LoseHP(*p, OSI_rand(10, 50), 0);
 	}
 }
 

@@ -5,33 +5,26 @@
  *
  * MD's changes: the coordinates tried around the body wrap (& 0x3ff),
  * OrigShapeType is a far pointer, and a revived party member also calls
- * C_170D_0976(1, 0).
+ * MoveFollowers(1, 0).
  */
 #include "se.h"
 
 /*other modules*/
-extern int16 C_07D1_064E(int16);/*MaxHP*/
-extern int16 C_104E_0007(int16, int16, int16);/*CanMoveTo(npc, x, y)*/
-extern int16 C_170D_0976(int16, int16);
-extern int16 C_1B09_1872(int16);/*DeleteObj?*/
-extern int16 C_1B09_1DF5(int16);/*OBJ_ReviveFromBody: the NPC*/
-extern C_1B09_1F52(int16, int16, int16, int16);/*MoveObj(obj, x, y, z)*/
-extern int16 C_2F83_0A85(int16);/*JoinParty*/
-#define MaxHP C_07D1_064E
-#define CanMoveTo C_104E_0007
-#define DeleteObj C_1B09_1872
-#define OBJ_ReviveFromBody C_1B09_1DF5
-#define MoveObj C_1B09_1F52
-#define JoinParty C_2F83_0A85
+extern int16 MaxHP(int16);
+extern int16 CanMoveTo(int16, int16, int16);/*CanMoveTo(npc, x, y)*/
+extern int16 MoveFollowers(int16, int16);
+extern int16 DeleteObj(int16);/*DeleteObj?*/
+extern int16 OBJ_ReviveFromBody(int16);/*OBJ_ReviveFromBody: the NPC*/
+extern MoveObj(int16, int16, int16, int16);/*MoveObj(obj, x, y, z)*/
+extern int16 JoinParty(int16);
 
-extern int16 D_1680;/*MapZ*/
+extern int16 MapZ;
 extern int16 D_54BA[];/*Amount: quantity (low byte), quality (high byte)*/
 extern unsigned char D_6CBA[];/*NPCStatus*/
 extern unsigned char D_6DBE[];/*HitPoints*/
 extern struct coord D_78AE[];/*ObjPos*/
 extern uint16 D_9CC4[];/*ObjShapeType*/
 extern int16 far *D_B508;/*OrigShapeType*/
-#define MapZ D_1680
 #define Amount D_54BA
 #define NPCStatus D_6CBA
 #define HitPoints D_6DBE
@@ -100,7 +93,7 @@ extern int16 far *D_B508;/*OrigShapeType*/
 		MoveObj(npc, GetX(npc), GetY(npc), MapZ);
 	if(NPCStatus[npc] & 0x80) {
 		JoinParty(npc);
-		C_170D_0976(1, 0);
+		MoveFollowers(1, 0);
 	}
 	return npc;
 }

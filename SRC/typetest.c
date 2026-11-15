@@ -2,7 +2,7 @@
 /*
  * Martian Dreams - GAME.EXE segment 222C: four small tests of a number
  * (a tile or an object type) against fixed lists. New in MD (no Savage
- * Empire counterpart). C_222C_0008 is used by console.c on the animated
+ * Empire counterpart). InRange_10_17_C0_C3 is used by console.c on the animated
  * tiles (D_B4C8).
  */
 #include "se.h"

@@ -6,6 +6,9 @@ gave them.
     python3 tools/md/mdsym.py [--target martian|game] list    the table (address, name, defined in)
     python3 tools/md/mdsym.py [--target martian|game] apply   rewrite the sources (C and assembly)
 
+apply warns when a module uses by address what another module defines static: Turbo C
+gives a static no public name, so the link cannot find it (Origin's was not static).
+
 Where the names come from:
   - C:        /*C_SSSS_OOOO*/ before a function definition; /*XXXX*/ before a variable.
   - assembly: `FProc NAME ;SSSS:OOOO`, `NAME PROC ... ;SSSS:OOOO`, and data
@@ -181,9 +184,14 @@ def main():
         tok = re.compile(r'\b(C_[0-9A-F]{4}_[0-9A-F]{4}|D_[0-9A-F]{4})\b')
         # in assembly also the C link name of an address: _C_SSSS_OOOO, _D_XXXX
         atok = re.compile(r'(?<![\w@$?])_?(C_[0-9A-F]{4}_[0-9A-F]{4}|D_[0-9A-F]{4})\b')
+        statics = {('C_%04X_%04X' % k[1:] if k[0] == 'C' else 'D_%04X' % k[1]): v for k, v in t.items() if v[3]}
         for p in files():
             s = read(p)
             o = s
+            # a static of another module referenced by address: the link will not find it
+            for addr in sorted(set(tok.findall(re.sub(r'/\*\s*\w+\s*\*/', ' ', s))) & set(statics)):
+                if os.path.normcase(statics[addr][1]) != os.path.normcase(os.path.relpath(p, SRC)):
+                    print('warning: %s uses %s, static in %s' % (os.path.relpath(p, SRC), addr, statics[addr][1]))
             if p.lower().endswith(('.c', '.h')):
                 # not the address comments /*C_SSSS_OOOO*/ themselves
                 s = re.sub(r'(/\*)?\b(C_[0-9A-F]{4}_[0-9A-F]{4}|D_[0-9A-F]{4})\b(\*/)?',

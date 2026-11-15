@@ -11,7 +11,7 @@ INCLUDE OSI.INC
 
 EXTRN OSI_DELAY_CLEAN:FAR
 
-EXTRN D_00AC:BYTE	;the compressed files' names (SE: CompressedFileList, main.c)
+EXTRN CompressedFileList:BYTE	;the compressed files' names (SE: CompressedFileList, main.c)
 
 DSegStart
 
@@ -675,7 +675,7 @@ C_049C	PROC NEAR
 	PUSH	SI
 	PUSH	DI
 	;--
-	MOV	BX,OFFSET DGROUP:D_00AC
+	MOV	BX,OFFSET DGROUP:CompressedFileList
 C_04A2:	;--
 	MOV	SI,[BX]
 	CMP	BYTE PTR [SI],0

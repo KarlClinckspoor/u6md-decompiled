@@ -68,9 +68,9 @@ extern int16 cdecl MOUSE_IN_AREA(struct tSurface *);
 extern int16 far C_2DE5_01C6[];/*MonsterFlags (by GetMonsterClass)*/
 
 /*other modules*/
-extern int16 C_07D1_0075(int16);
-extern int16 C_07D1_064E(int16);
-extern C_07D1_1D64(int16, int16, int16);/*(npc, damage, kind)*/
+extern int16 IsInvulnerable(int16);
+extern int16 MaxHP(int16);
+extern LoseHP(int16, int16, int16);/*(npc, damage, kind)*/
 extern Missiles(int16, int16, int16, int16 *, int16 *, int16, int16, int16);
 extern Explosion(int16, int16, int16);
 extern VIS_UpdateView();
@@ -78,9 +78,9 @@ extern DrawSlotCursor(int16);
 extern cdecl CON_printf(char far *, ...);
 extern unsigned char GetTileAtXYZ(int16, int16, int16);
 extern int16 GetMonsterClass(int16);
-extern int16 C_1B09_032A();/*NextLoc*/
-extern int16 C_1B09_07D8(int16, int16, int16);/*FindLoc(x, y, z)*/
-extern C_1B09_3E18();/*ShowObjects*/
+extern int16 NextLoc();
+extern int16 FindLoc(int16, int16, int16);/*FindLoc(x, y, z)*/
+extern ShowObjects();
 extern MUS_PlaySfx(int16);
 extern ShakeScreen(int16, int16);
 extern BargeClear();
@@ -95,39 +95,39 @@ extern STAT_ShowParty(int16);
 extern STAT_ShowPortrait(int16);
 extern STAT_ShowInventory(int16);
 extern char *TALK_GetCharName(int16);
-extern C_047A_024B(int16);/*ShowPortrait*/
-extern C_047A_0416(int16);/*shows a tile in the text window*/
-extern C_07D1_014C(int16);/*COMBAT_stopCharm*/
-extern int16 C_07D1_0521(int16);/*an NPC's strength*/
-extern int16 C_07D1_05C0(int16);/*an NPC's intelligence*/
+extern ShowPortrait(int16);
+extern PrintTileArticle(int16);/*shows a tile in the text window*/
+extern COMBAT_stopCharm(int16);
+extern int16 GetStr(int16);/*an NPC's strength*/
+extern int16 GetInt(int16);/*an NPC's intelligence*/
 extern int16 C_100B_015C(int16);/*warmth of a worn type*/
 extern int16 C_100B_01FB(int16);/*a burning light?*/
 extern int16 C_170D_0002(int16);
-extern C_170D_3D9D();/*UpdateSchedules*/
-extern int16 C_1B09_005C(int16, int16, int16);/*OBJ_IsLocLoaded(x, y, z)*/
-extern int16 C_1B09_0B1D(int16);/*FindInv*/
-extern int16 C_1B09_0B76();/*NextInv*/
-extern int16 C_1B09_0BEE(int16, int16);/*first object of a type in an inventory*/
-extern int16 C_1B09_0CA4();/*next one*/
-extern char *C_1B09_4759(int16);/*GetObjectString*/
+extern UpdateSchedules();
+extern int16 OBJ_IsLocLoaded(int16, int16, int16);/*OBJ_IsLocLoaded(x, y, z)*/
+extern int16 FindInv(int16);
+extern int16 NextInv();
+extern int16 FindInvOfType(int16, int16);/*first object of a type in an inventory*/
+extern int16 NextInvOfType();/*next one*/
+extern char *GetObjectString(int16);
 extern char far C_2BB4_21E9[];
 extern char far C_2BB4_1737[];
 extern char far C_2BB4_136D[];
-extern int16 C_1534_1101(int16);/*WrapDelta*/
-extern int16 C_1534_1129(int16, int16);/*MapDistance (wrapping)*/
-extern C_170D_3D71();/*InitNPCTracker*/
-extern C_170D_1097(int16);/*PartyAdvance*/
-extern C_170D_0976(int16, int16);/*MoveFollowers*/
-extern C_170D_3685();/*PTH_SearchPaths*/
-extern C_170D_3A6D();/*RunNPCTurns*/
-extern C_07D1_01BB();/*COMBAT_begin*/
-extern C_07D1_02C4();/*COMBAT_breakOff*/
-extern C_07D1_3480();/*COMBAT_attack*/
-extern int16 C_07D1_0CFC(int16, int16 *, int16 *, int16, int16);
-extern C_047A_0734();/*CmdLook*/
-extern C_047A_145E();/*CmdDrop*/
-extern C_047A_1C0E();/*CmdGet*/
-extern C_047A_26A5();/*CmdMove*/
+extern int16 WrapDelta(int16);
+extern int16 MapDistance(int16, int16);/*MapDistance (wrapping)*/
+extern InitNPCTracker();
+extern PartyAdvance(int16);
+extern MoveFollowers(int16, int16);
+extern PTH_SearchPaths();
+extern RunNPCTurns();
+extern COMBAT_begin();
+extern COMBAT_breakOff();
+extern COMBAT_attack();
+extern int16 COMBAT_Missile(int16, int16 *, int16 *, int16, int16);
+extern CmdLook();
+extern CmdDrop();
+extern CmdGet();
+extern CmdMove();
 extern CmdUse();
 extern TALK_talkTo(int16, int16, int16);
 extern CON_mouseOffAt(int16, int16, int16, int16);
@@ -149,9 +149,9 @@ extern C_1FA9_09A5(int16);
 extern C_1FA9_0A8A();
 extern C_1FA9_0AFD();
 extern C_1FA9_0BE4();
-extern int16 C_100B_0295(int16);/*QuanType*/
-extern int16 C_1B09_116E(int16, int16, int16, int16, int16, int16);/*AddMapObj(shape, status, amount, x, y, z)*/
-extern int16 C_1B09_12EE(int16, int16, int16, int16);/*AddInvObj(shape, status, amount, owner)*/
+extern int16 QuanType(int16);
+extern int16 AddMapObj(int16, int16, int16, int16, int16, int16);/*AddMapObj(shape, status, amount, x, y, z)*/
+extern int16 AddInvObj(int16, int16, int16, int16);/*AddInvObj(shape, status, amount, owner)*/
 extern C_2F75_02E1();
 extern C_2F75_042D();
 extern C_2F75_0532();
@@ -182,9 +182,9 @@ extern char far C_2BB4_174D[];
 extern char far C_2BB4_178B[];
 extern char far C_2BB4_215E[];/*no EMS for the music*/
 extern char far C_2BB4_22F9[];/*version*/
-extern int16 C_1B09_09C7(int16, int16, int16);/*OBJ_FindTypeAt(type, x, y)*/
-extern int16 C_1B09_1026(int16, int16, int16);/*FindInvType(owner, type, quality)*/
-extern C_1B09_1872(int16);/*DeleteObj*/
+extern int16 OBJ_FindTypeAt(int16, int16, int16);/*OBJ_FindTypeAt(type, x, y)*/
+extern int16 FindInvType(int16, int16, int16);/*FindInvType(owner, type, quality)*/
+extern DeleteObj(int16);
 extern char far C_2BB4_22F1[];/*failure message*/
 
 /*variables of the other modules*/
@@ -201,15 +201,15 @@ extern int16 HelpOn;
 extern int16 PendingCommand;
 extern int16 DiskFullChoice;
 extern int16 cdecl soundCard;
-extern int16 D_00D6;/*MusicAdapter*/
-extern char D_028C;
-extern int16 D_06BE;/*CombatOutcome*/
-extern int16 D_13F2;/*HatchingDisabled*/
-extern int16 D_1422;/*AllowNPCTeleport*/
-extern int16 D_1687;/*SoundFlag*/
+extern int16 MusicAdapter;
+extern char LeaderOnBarge;
+extern int16 CombatOutcome;
+extern int16 HatchingDisabled;
+extern int16 AllowNPCTeleport;
+extern int16 SoundFlag;
 extern int16 D_1689;/*the avatar is not solid (debug)*/
-extern unsigned char D_16A7;/*DefaultCommand*/
-extern int16 D_2E5C;/*emsInUse*/
+extern unsigned char DefaultCommand;
+extern int16 cdecl emsInUse;/*EMSINIT.ASM*/
 extern int16 D_3260;/*free memory for the tiles, in KB*/
 extern unsigned char far *D_3262;/*talk flags 8-15*/
 extern char D_44C4[];/*MovePts*/
@@ -218,24 +218,24 @@ extern void far *D_BA7E;/*mdscreen.lzc entry 2: default command mark*/
 extern int16 D_EB72;/*AdvanceDir*/
 extern int16 D_EBCE;/*Selection.obj*/
 extern int16 D_EBF6, D_EBF8;/*Selection.x, Selection.y*/
-extern int16 D_080E;/*ScreenFade*/
-extern int16 D_1431;/*VisibilityDirty*/
-extern unsigned char D_1673;/*NextSleep*/
-extern unsigned char D_1674;/*Time_M*/
-extern unsigned char D_1675;/*Time_H*/
-extern unsigned char D_1676;/*Date_D*/
-extern unsigned char D_1677;/*Date_M*/
-extern int16 D_1678;/*Date_Y*/
-extern unsigned char D_167A;/*Active*/
-extern char D_167B;/*AmbientLight*/
-extern unsigned char D_1686;/*DrunkCounter*/
-extern char D_16A4;/*InCombat*/
-extern char D_16A5;/*SoloMember*/
-extern unsigned char D_16A6;/*SavedNPCMode*/
+extern int16 ScreenFade;
+extern int16 VisibilityDirty;
+extern unsigned char NextSleep;
+extern unsigned char Time_M;
+extern unsigned char Time_H;
+extern unsigned char Date_D;
+extern unsigned char Date_M;
+extern int16 Date_Y;
+extern unsigned char Active;
+extern char AmbientLight;
+extern unsigned char DrunkCounter;
+extern char InCombat;
+extern char SoloMember;
+extern unsigned char SavedNPCMode;
 extern struct { unsigned a:4, b:4, c:4, d:4; } D_16B0[];/*talents*/
 extern int16 StatusMember;
 extern int16 StatusDisplay;
-extern unsigned char D_213E;/*IsResting*/
+extern unsigned char IsResting;
 extern unsigned char D_3266[];/*ObjStatus*/
 extern unsigned char far *D_46D0;/*NPCMode*/
 extern unsigned char D_4EA4[];/*Party*/
@@ -248,7 +248,7 @@ extern int16 D_EC4A;
 extern unsigned char D_BC84[5];/*HexInputBuf*/
 extern unsigned char D_BC89[6];/*DecInputBuf*/
 extern int32 D_16AA;/*flags (0x10: the dream)*/
-extern int16 D_167C, D_167E, D_1680;/*MapX, MapY, MapZ*/
+extern int16 MapX, MapY, MapZ;
 extern struct tSurface D_3232;/*Screen*/
 extern unsigned char D_3240[0x20];/*AnimFrameMask*/
 extern struct tMouse D_3E66;/*Mouse*/
@@ -274,37 +274,12 @@ extern unsigned char D_C3AA[];/*CellObjNext*/
 extern int16 D_C4AA[11][11];/*Tile_11x11*/
 extern struct tSurface D_EB78;/*MouseArea*/
 
-#define ScreenFade D_080E
-#define MusicAdapter D_00D6
-#define CombatOutcome D_06BE
-#define HatchingDisabled D_13F2
-#define AllowNPCTeleport D_1422
-#define SoundFlag D_1687
-#define DefaultCommand D_16A7
-#define emsInUse D_2E5C
 #define MovePts D_44C4
 #define Level D_4EB6
 #define AdvanceDir D_EB72
 #define Selection_obj D_EBCE
 #define Selection_x D_EBF6
 #define Selection_y D_EBF8
-#define WrapDelta C_1534_1101
-#define MapDistance C_1534_1129
-#define InitNPCTracker C_170D_3D71
-#define PartyAdvance C_170D_1097
-#define MoveFollowers C_170D_0976
-#define PTH_SearchPaths C_170D_3685
-#define RunNPCTurns C_170D_3A6D
-#define COMBAT_begin C_07D1_01BB
-#define COMBAT_breakOff C_07D1_02C4
-#define COMBAT_attack C_07D1_3480
-#define CmdLook C_047A_0734
-#define CmdDrop C_047A_145E
-#define CmdGet C_047A_1C0E
-#define CmdMove C_047A_26A5
-#define QuanType C_100B_0295
-#define AddMapObj C_1B09_116E
-#define AddInvObj C_1B09_12EE
 #define PassMsg C_2BB4_0130
 #define CombatMsg C_2BB4_0137
 #define BreakOffMsg C_2BB4_0146
@@ -326,22 +301,8 @@ extern struct tSurface D_EB78;/*MouseArea*/
 #define VersionMsg C_2BB4_22F9
 #define IN_VEHICLE (Active == PartySize)
 #define GR_DRAW_BITMAP(s,x,y,p,m)    (D_BA6A.iii.ofs = 0x30, (*D_BA6A.f)(s,x,y,p,m))
-#define VisibilityDirty D_1431
-#define NextSleep D_1673
-#define Time_M D_1674
-#define Time_H D_1675
-#define Date_D D_1676
-#define Date_M D_1677
-#define Date_Y D_1678
-#define Active D_167A
-#define AmbientLight D_167B
-#define DrunkCounter D_1686
-#define InCombat D_16A4
-#define SoloMember D_16A5
-#define SavedNPCMode D_16A6
 #define HexInputBuf D_BC84
 #define DecInputBuf D_BC89
-#define IsResting D_213E
 #define ObjStatus D_3266
 #define NPCMode D_46D0
 #define Party D_4EA4
@@ -350,9 +311,6 @@ extern struct tSurface D_EB78;/*MouseArea*/
 #define TalkFlags D_6EC6
 #define PartySize D_9CC0
 #define OrigShapeType D_B508
-#define MapX D_167C
-#define MapY D_167E
-#define MapZ D_1680
 #define Screen D_3232
 #define AnimFrameMask D_3240
 #define Mouse D_3E66
@@ -376,23 +334,6 @@ extern struct tSurface D_EB78;/*MouseArea*/
 #define Tile_11x11 D_C4AA
 #define MouseArea D_EB78
 #define MonsterFlags C_2DE5_01C6
-#define NextLoc C_1B09_032A
-#define FindLoc C_1B09_07D8
-#define ShowObjects C_1B09_3E18
-#define OBJ_FindTypeAt C_1B09_09C7
-#define FindInvType C_1B09_1026
-#define DeleteObj C_1B09_1872
-#define COMBAT_stopCharm C_07D1_014C
-#define GetStr C_07D1_0521
-#define GetInt C_07D1_05C0
-#define UpdateSchedules C_170D_3D9D
-#define OBJ_IsLocLoaded C_1B09_005C
-#define FindInv C_1B09_0B1D
-#define NextInv C_1B09_0B76
-#define FindInvOfType C_1B09_0BEE
-#define NextInvOfType C_1B09_0CA4
-#define GetObjectString C_1B09_4759
-#define ShowPortrait C_047A_024B
 #define GetOwner(i) (*(int16 *)&(ObjPos[i].raw[0]))
 
 #define GetType(i) (ObjShapeType[i] & 0x3ff)
@@ -546,7 +487,7 @@ window*/
 	dmg = 0;
 	kind = 0;
 	NPCFlag[npc] |= 8;/*terrain handled for this turn*/
-	if(C_07D1_0075(npc))
+	if(IsInvulnerable(npc))
 		return;
 	if(!(NPCStatus[npc] & 0x10)) {/*not dead*/
 	objCls = GetMonsterClass(GetType(npc));
@@ -554,7 +495,7 @@ window*/
 		case 0xd1:
 			kind = 3;
 			if(npc != 6)
-				dmg = OSI_rand(D_6DBE[npc] / 2, C_07D1_064E(npc) / 2);
+				dmg = OSI_rand(D_6DBE[npc] / 2, MaxHP(npc) / 2);
 			else
 				dmg = 0;
 		break;
@@ -636,7 +577,7 @@ window*/
 		break;
 	}
 	if(dmg)
-		C_07D1_1D64(npc, dmg, kind);
+		LoseHP(npc, dmg, kind);
 	}
 }
 
@@ -827,7 +768,7 @@ time-dependent state) and process everything that depends on it*/
 							CON_printf("The %s is out of fuel.\n", GetObjectString(inv));
 							PromptFlag = 1;
 						} else {
-							C_047A_0416(TILE_FRAME(inv));
+							PrintTileArticle(TILE_FRAME(inv));
 							CON_printf("%s went out.\n", GetObjectString(inv));
 							PromptFlag = 1;
 							DeleteObj(inv);
@@ -865,13 +806,13 @@ time-dependent state) and process everything that depends on it*/
 							if(OSI_rand(0, 1)) {
 								CON_printf("%s is freezing!\n", GetObjectString(i));
 								PromptFlag = 1;
-								C_07D1_1D64(i, OSI_rand(1, 2), 1);
+								LoseHP(i, OSI_rand(1, 2), 1);
 								if(cold > 1)
-									C_07D1_1D64(i, OSI_rand(1, 2), 1);
+									LoseHP(i, OSI_rand(1, 2), 1);
 							} else if(cold > 1) {
 								CON_printf("%s is freezing!\n", GetObjectString(i));
 								PromptFlag = 1;
-								C_07D1_1D64(i, OSI_rand(1, 2), 1);
+								LoseHP(i, OSI_rand(1, 2), 1);
 							}
 						}
 					}
@@ -924,7 +865,7 @@ time-dependent state) and process everything that depends on it*/
 				ObjShapeType[i] = OrigShapeType[i];
 			}
 			if((NPCStatus[i] & 8) && i != 6 && OSI_rand(0, 7) == 0)
-				C_07D1_1D64(i, 1, 0);
+				LoseHP(i, 1, 0);
 			if(i > 7)
 				continue;
 			/*-- talents wear off --*/
@@ -1656,7 +1597,7 @@ Exits on <ALT+X>/<CTRL+Q>/<CTRL+E> confirmed (ch == 0x12D).*/
 							CON_printf("from (%03x,%03x) to (%03x,%03x):", GetX(num), GetY(num), num2, num3);
 							MUS_PlaySfx(0x32);
 							MUS_PlaySfx(6);
-							if(C_07D1_0CFC(num, &num2, &num3, 8, 0x101)) {
+							if(COMBAT_Missile(num, &num2, &num3, 8, 0x101)) {
 								CON_printf("successful! (%03x,%03x)\n", num2, num3);
 								MUS_PlaySfx(4);
 							} else {
@@ -1800,7 +1741,7 @@ Exits on <ALT+X>/<CTRL+Q>/<CTRL+E> confirmed (ch == 0x12D).*/
 						break;
 						case 0xf6:/*the barges*/
 							BargeDump();
-							CON_printf("LB: %d\n", D_028C);
+							CON_printf("LB: %d\n", LeaderOnBarge);
 						break;
 						case 0xf9:/*analyze an object*/
 							CON_printf("Analyze what? ");
@@ -1889,10 +1830,10 @@ Exits on <ALT+X>/<CTRL+Q>/<CTRL+E> confirmed (ch == 0x12D).*/
 
 							CON_printf("Healing party\n\n");
 							if(IN_VEHICLE) {
-								D_6DBE[0] = C_07D1_064E(1);
+								D_6DBE[0] = MaxHP(1);
 							} else {
 								for(num = 0; num < PartySize; num++)
-									D_6DBE[Party[num]] = C_07D1_064E(Party[num]);
+									D_6DBE[Party[num]] = MaxHP(Party[num]);
 							}
 							StatusDirty = 1;
 						}

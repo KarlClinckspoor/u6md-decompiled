@@ -13,14 +13,14 @@
  * "Ready" / "Unready".
  *
  * Equipment slots: 0 head, 1 neck, 2 right hand, 3 right finger, 4 chest,
- * 5 left hand, 6 left finger, 7 feet; STAT_GetEquipSlot (C_100B_02C0) also
+ * 5 left hand, 6 left finger, 7 feet; STAT_GetEquipSlot (STAT_GetEquipSlot) also
  * returns 8 for a two-handed weapon.
  * Object positions (ObjStatus & 0x18): 0x00 on the map, 0x08 contained,
  * 0x10 in an inventory, 0x18 equipped.
  *
  * Differences from Savage Empire's: the hit points' color has more cases
  * (STAT_PrintHP), the strength/dexterity/intelligence shown are computed
- * (C_07D1_0521/0576/05C0) and colored, the talents (D_16B0) are shown as
+ * (GetStr/0576/05C0) and colored, the talents (D_16B0) are shown as
  * icons, the empty slot tiles follow the panel color, in the dream
  * (D_16AA & 0x10) only one inventory is shown, readying some objects has
  * side effects, unreadying may be refused, no "modern weapons" rule.
@@ -47,65 +47,49 @@ extern CON_setClip(struct tClipInfo *);
 extern CON_gotoxy(int16, int16);
 extern cdecl CON_printf(char far *, ...);
 /*object*/
-extern int16 C_1B09_00C3(int16, int16);/*OBJ_MakeDirFrame(type, direction)*/
-extern int16 C_1B09_0B1D(int16);/*FindInv*/
-extern int16 C_1B09_0B76(void);/*NextInv*/
-extern int16 C_1B09_116E(int16, int16, int16, int16, int16, int16);/*AddMapObj*/
-extern int16 C_1B09_12EE(int16, int16, int16, int16);/*AddInvObj(shape, position, quantity, owner)*/
-extern C_1B09_1872(int16);/*DeleteObj*/
-extern int16 C_1B09_1ECF(int16, int16);/*OBJ_IsInside(objNum, container)*/
-extern int16 C_1B09_239C(int16, int16, int16);/*InsertObj(objNum, owner, position)*/
-extern char *C_1B09_4759(int16);/*GetObjectString*/
+extern int16 OBJ_MakeDirFrame(int16, int16);/*OBJ_MakeDirFrame(type, direction)*/
+extern int16 FindInv(int16);
+extern int16 NextInv(void);
+extern int16 AddMapObj(int16, int16, int16, int16, int16, int16);
+extern int16 AddInvObj(int16, int16, int16, int16);/*AddInvObj(shape, position, quantity, owner)*/
+extern DeleteObj(int16);
+extern int16 OBJ_IsInside(int16, int16);/*OBJ_IsInside(objNum, container)*/
+extern int16 InsertObj(int16, int16, int16);/*InsertObj(objNum, owner, position)*/
+extern char *GetObjectString(int16);
 /*other modules*/
-extern int16 C_07D1_0521(int16);/*an NPC's strength*/
-extern int16 C_07D1_0576(int16);/*an NPC's dexterity*/
-extern int16 C_07D1_05C0(int16);/*an NPC's intelligence*/
-extern int16 C_07D1_064E(int16);/*MaxHP*/
-extern int16 C_100B_0186(int16);/*IsContainerType*/
+extern int16 GetStr(int16);/*an NPC's strength*/
+extern int16 GetDex(int16);/*an NPC's dexterity*/
+extern int16 GetInt(int16);/*an NPC's intelligence*/
+extern int16 MaxHP(int16);
+extern int16 IsContainerType(int16);
 extern int16 C_100B_01FB(int16);
-extern int16 C_100B_026E(int16);/*IsWeightPer10Type*/
-extern int16 C_100B_0295(int16);/*QuanType: 4 quantity on 16 bits, 2 on 8 bits, else 0*/
-extern int16 C_100B_02C0(int16);/*STAT_GetEquipSlot*/
-extern C_0E1A_13A8(int16, int16, int16);/*DrawPortrait(npcNum, x, y)*/
-extern C_0E1A_186B(int16, int16, int16);/*DrawPaperDoll(x, y, npcNum)*/
+extern int16 IsWeightPer10Type(int16);
+extern int16 QuanType(int16);/*QuanType: 4 quantity on 16 bits, 2 on 8 bits, else 0*/
+extern int16 STAT_GetEquipSlot(int16);
+extern DrawPortrait(int16, int16, int16);/*DrawPortrait(npcNum, x, y)*/
+extern DrawPaperDoll(int16, int16, int16);/*DrawPaperDoll(x, y, npcNum)*/
 extern C_2FA1_0000(int16, int16, int16);
 extern char far C_2BB4_0D8D[];
 extern char far C_2BB4_137F[];/*BurnOutMsg*/
 extern char far C_2BB4_22F1[];
 
-#define OBJ_MakeDirFrame C_1B09_00C3
-#define FindInv C_1B09_0B1D
-#define NextInv C_1B09_0B76
-#define AddMapObj C_1B09_116E
-#define AddInvObj C_1B09_12EE
-#define DeleteObj C_1B09_1872
-#define OBJ_IsInside C_1B09_1ECF
-#define InsertObj C_1B09_239C
-#define GetObjectString C_1B09_4759
-#define MaxHP C_07D1_064E
-#define IsContainerType C_100B_0186
-#define IsWeightPer10Type C_100B_026E
-#define QuanType C_100B_0295
-#define STAT_GetEquipSlot C_100B_02C0
-#define DrawPortrait C_0E1A_13A8
-#define DrawPaperDoll C_0E1A_186B
 #define BurnOutMsg C_2BB4_137F
 
 extern int16 LastNumberPlural;
 extern int16 StatusMember;/*party index shown in the portrait/equipment view*/
 extern int16 StatusDisplay;/*0x92 when the equipment view is shown*/
 extern struct tClipInfo *CurClip;/*current text window*/
-extern int16 D_0810;/*ColorRed*/
-extern int16 D_0814;
-extern int16 D_0816;
-extern int16 D_081A;/*color set before drawing a portrait*/
-extern int16 D_081C;/*ColorPaper*/
-extern int16 D_081E;/*ColorText*/
+extern int16 ColorRed;
+extern int16 ColorBlue;
+extern int16 ColorMagenta;
+extern int16 ColorBlack;/*color set before drawing a portrait*/
+extern int16 ColorPaper;
+extern int16 ColorText;
 extern int16 D_0826;
 extern int16 D_082A;
 extern int16 D_082C;
 extern char D_0F13;/*PromptFlag?*/
-extern int16 D_1680;/*MapZ*/
+extern int16 MapZ;
 extern int32 D_16AA;/*flags (0x10: the dream)*/
 extern struct { unsigned a:4, psychic:4, c:4, d:4; } D_16B0[];/*talents (shown as tiles 0x120, 0x121, 0x122)*/
 extern unsigned char D_3266[];/*ObjStatus*/
@@ -138,15 +122,9 @@ extern int16 D_EB74, D_EB76;/*PointerX, PointerY*/
 extern int16 D_EBCE;/*Selection.obj*/
 extern struct tClipInfo D_EBD0[4];/*TextWindows*/
 extern int16 D_EBF6, D_EBF8;/*Selection.x, Selection.y*/
-extern int16 D_167C, D_167E;/*MapX, MapY*/
+extern int16 MapX, MapY;
 
-#define ColorRed D_0810
-#define ColorPaper D_081C
-#define ColorText D_081E
 #define PromptFlag D_0F13
-#define MapX D_167C
-#define MapY D_167E
-#define MapZ D_1680
 #define ObjStatus D_3266
 #define Party D_4EA4
 #define Level D_4EB6
@@ -218,7 +196,7 @@ extern int16 D_167C, D_167E;/*MapX, MapY*/
 /*print an NPC's hit points at the cursor, colored by its state*/
 /*C_2077_0003*/STAT_PrintHP(register int16 objNum) {
 	if(NPCStatus[objNum] & 2)
-		CurClip->fgColor = D_0816;
+		CurClip->fgColor = ColorMagenta;
 	if(NPCStatus[objNum] & 8)
 		CurClip->fgColor = ColorRed;
 	else if(NPCStatus[objNum] & 1)
@@ -226,7 +204,7 @@ extern int16 D_167C, D_167E;/*MapX, MapY*/
 	else if(HitPoints[objNum] < 10)
 		CurClip->fgColor = D_082C;
 	else if(ObjStatus[objNum] & 0x40)
-		CurClip->fgColor = D_0814;
+		CurClip->fgColor = ColorBlue;
 	else if((ObjStatus[objNum] & 0x80) && objNum != 1)
 		CurClip->fgColor = D_0826;
 	else
@@ -314,31 +292,31 @@ extern int16 D_167C, D_167E;/*MapX, MapY*/
 	CON_gotoxy((17 - strlen(Names[partyIdx])) / 2, 0);
 	CON_printf(/*1AB9*/"%s\n", Names[partyIdx]);
 	objNum = Party[partyIdx];
-	GR_SET_COLOR(D_081A);
+	GR_SET_COLOR(ColorBlack);
 	DrawPortrait(objNum, 185, 16);
 	CON_gotoxy(10, 1); CON_printf(/*1AC0*/"STR:");
 	CON_gotoxy(10, 2); CON_printf(/*1AC5*/"DEX:");
 	CON_gotoxy(10, 3); CON_printf(/*1ACA*/"INT:");
 	CON_gotoxy(14, 1);
 	if(ObjStatus[objNum] & 0x40)
-		CurClip->fgColor = D_0814;
+		CurClip->fgColor = ColorBlue;
 	if(objNum <= 15 && D_16B0[objNum].a)
-		CurClip->fgColor = D_0816;
+		CurClip->fgColor = ColorMagenta;
 	else if(ObjStatus[objNum] & 0x80)
 		CurClip->fgColor = D_0826;
-	CON_printf(/*1ACF*/"%d\n", C_07D1_0521(objNum));
+	CON_printf(/*1ACF*/"%d\n", GetStr(objNum));
 	CON_gotoxy(14, 2);
 	if(ObjStatus[objNum] & 0x40)
-		CurClip->fgColor = D_0814;
+		CurClip->fgColor = ColorBlue;
 	else if(ObjStatus[objNum] & 0x80)
 		CurClip->fgColor = D_0826;
 	else
 		CurClip->fgColor = ColorText;
-	CON_printf(/*1ACF*/"%d\n", C_07D1_0576(objNum));
+	CON_printf(/*1ACF*/"%d\n", GetDex(objNum));
 	CON_gotoxy(14, 3);
 	if(objNum == 1 && !(ObjStatus[objNum] & 0x40) && (ObjStatus[objNum] & 0x80))
 		CurClip->fgColor = ColorText;
-	CON_printf(/*1ACF*/"%d\n", C_07D1_05C0(objNum));
+	CON_printf(/*1ACF*/"%d\n", GetInt(objNum));
 	CurClip->fgColor = ColorText;
 	CON_gotoxy(10, 4); CON_printf(/*1AD3*/"HP:");
 	STAT_PrintHP(objNum);
@@ -588,12 +566,12 @@ extern int16 D_167C, D_167E;/*MapX, MapY*/
 	CON_gotoxy(2, 9);
 	CON_printf(/*1AF3*/"      ");
 	CON_gotoxy(2, 9);
-	CON_printf(/*1AFA*/"%d%/%ds", WeightToStones(WeightEquip), C_07D1_0521(owner));
+	CON_printf(/*1AFA*/"%d%/%ds", WeightToStones(WeightEquip), GetStr(owner));
 	/*display inventory weight (total, capacity: 2 x strength)*/
 	CON_gotoxy(2, 10);
 	CON_printf(/*1AF3*/"      ");
 	CON_gotoxy(2, 10);
-	CON_printf(/*1AFA*/"%d%/%ds", WeightToStones(WeightInven + WeightEquip), C_07D1_0521(owner) << 1);
+	CON_printf(/*1AFA*/"%d%/%ds", WeightToStones(WeightInven + WeightEquip), GetStr(owner) << 1);
 	/* */
 	CON_setClip(savedClip);
 	CON_mouseOn(mouseState);
@@ -758,7 +736,7 @@ extern int16 D_167C, D_167E;/*MapX, MapY*/
 
 	npcNum = Party[StatusMember];
 	objTyp = GetShape(SelectionObj);
-	strength = C_07D1_0521(npcNum);
+	strength = GetStr(npcNum);
 	LastNumberPlural = 0;
 	PromptFlag = 1;
 	CON_printf(/*1B08*/"Ready-");

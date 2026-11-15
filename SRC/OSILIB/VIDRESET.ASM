@@ -28,4 +28,11 @@ ProcEnd	OSI_resetVideo
 
 CSegEnd	SEG_2668_TEXT
 
+;OSIWRITE.ASM's code segment, named here first: TLINK puts a segment where the link
+;first names it, so OSIWRITE's code, linked after OSIREAD.ASM (its relocation follows
+;OSIREAD's in the .EXE's table), comes right after this module's, at 2669:A. How
+;Origin's link got it here is not known.
+OSIWRITE_TEXT	SEGMENT WORD PUBLIC 'CODE'
+OSIWRITE_TEXT	ENDS
+
 END

@@ -40,10 +40,10 @@ extern char far C_2BB4_134E[];/*HearSomethingMsg: "You hear something to the %s!
 
 extern char *DirNames[];
 extern char D_0F13;/*PromptFlag*/
-extern int16 D_1437;/*EnemyWarningGiven*/
-extern unsigned char D_1675;/*Time_H*/
-extern int16 D_1680;/*MapZ*/
-extern int16 D_167C, D_167E;/*MapX, MapY*/
+extern int16 EnemyWarningGiven;
+extern unsigned char Time_H;
+extern int16 MapZ;
+extern int16 MapX, MapY;
 extern unsigned char D_16A3;/*creatures that could not be placed (counted down)?*/
 extern int32 D_16AA;/*flags (0x10: the dream)*/
 extern unsigned char DirOriginX, DirOriginY;/*screen position of the party*/
@@ -68,27 +68,27 @@ extern int16 far *D_B508;/*OrigShapeType*/
 extern int16 D_C0FA, D_C0FC;/*AreaX, AreaY*/
 extern int16 D_C0FE;/*GetMonsterClass: last type looked up*/
 extern int16 D_C100;/*GetMonsterClass: its class*/
-extern int16 D_13F2;/*HatchingDisabled*/
+extern int16 HatchingDisabled;
 
 extern int16 C_047A_13C5(int16, int16);
-extern int16 C_07D1_0416(int16, int16);/*COMBAT_TryTeleport*/
+extern int16 COMBAT_TryTeleport(int16, int16);
 extern C_07D1_5520(int16);
 extern int16 C_100B_038E(int16);
-extern int16 C_104E_0007(int16, int16, int16);/*CanMoveTo(npc, x, y)*/
-extern int16 C_1B09_09C7(int16, int16, int16);/*OBJ_FindTypeAt(type, x, y)*/
-extern int16 C_1B09_0B1D(int16);/*FindInv*/
-extern int16 C_1B09_0B76(void);/*NextInv*/
-extern int16 C_1B09_0DD7(void);/*NextArea*/
-extern int16 C_1B09_0EDE(int16, int16, int16, int16);/*SearchArea*/
-extern int16 C_1B09_116E(int16, int16, int16, int16, int16, int16);/*AddMapObj*/
-extern int16 C_1B09_15C7(int16, int16, int16, int16);/*AddMonster*/
-extern C_1B09_1872(int16);/*DeleteObj*/
-extern int16 C_100B_0295(int16);/*QuanType*/
+extern int16 CanMoveTo(int16, int16, int16);/*CanMoveTo(npc, x, y)*/
+extern int16 OBJ_FindTypeAt(int16, int16, int16);/*OBJ_FindTypeAt(type, x, y)*/
+extern int16 FindInv(int16);
+extern int16 NextInv(void);
+extern int16 NextArea(void);
+extern int16 SearchArea(int16, int16, int16, int16);
+extern int16 AddMapObj(int16, int16, int16, int16, int16, int16);
+extern int16 AddMonster(int16, int16, int16, int16);
+extern DeleteObj(int16);
+extern int16 QuanType(int16);
 extern C_1FA9_04ED();
-extern int16 C_2238_0062(int16, int16);/*MkDirection*/
+extern int16 MkDirection(int16, int16);
 extern cdecl CON_printf(char far *, ...);
-extern unsigned char C_1534_1072(int16, int16, int16);/*GetTileAtXYZ*/
-extern int16 C_1534_1129(int16, int16);/*MapDistance*/
+extern unsigned char GetTileAtXYZ(int16, int16, int16);
+extern int16 MapDistance(int16, int16);
 extern int16 OSI_rand(int16, int16);/*OSI_rand(lo, hi)*/
 
 #define MonsterTypes C_2DE5_0000
@@ -99,11 +99,6 @@ extern int16 OSI_rand(int16, int16);/*OSI_rand(lo, hi)*/
 #define MonsterAlignment C_2DE5_0192
 #define HearSomethingMsg C_2BB4_134E
 #define PromptFlag D_0F13
-#define EnemyWarningGiven D_1437
-#define Time_H D_1675
-#define MapX D_167C
-#define MapY D_167E
-#define MapZ D_1680
 #define ObjStatus D_3266
 #define MovePts D_44C4
 #define DEXTE D_45D0
@@ -124,20 +119,6 @@ extern int16 OSI_rand(int16, int16);/*OSI_rand(lo, hi)*/
 #define AreaX D_C0FA
 #define AreaY D_C0FC
 
-#define COMBAT_TryTeleport C_07D1_0416
-#define CanMoveTo C_104E_0007
-#define OBJ_FindTypeAt C_1B09_09C7
-#define FindInv C_1B09_0B1D
-#define NextInv C_1B09_0B76
-#define NextArea C_1B09_0DD7
-#define SearchArea C_1B09_0EDE
-#define AddMapObj C_1B09_116E
-#define AddMonster C_1B09_15C7
-#define DeleteObj C_1B09_1872
-#define QuanType C_100B_0295
-#define MkDirection C_2238_0062
-#define GetTileAtXYZ C_1534_1072
-#define MapDistance C_1534_1129
 
 #define GetType(i) (ObjShapeType[i] & 0x3ff)
 #define GetFrame(i) (ObjShapeType[i] >> 10)

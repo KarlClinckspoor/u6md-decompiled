@@ -15,8 +15,7 @@
  */
 #include "se.h"
 
-extern int16 C_1649_000A(int16);/*GetMonsterClass(type): < 0 if none*/
-#define GetMonsterClass C_1649_000A
+extern int16 GetMonsterClass(int16);/*GetMonsterClass(type): < 0 if none*/
 
 extern unsigned char far C_2DE5_012E[];/*MonsterDamage (by GetMonsterClass)*/
 #define MonsterDamage C_2DE5_012E

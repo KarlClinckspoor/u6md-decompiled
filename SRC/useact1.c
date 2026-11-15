@@ -1,4 +1,5 @@
 /* flags: -d -mm -p -c -Z -O -y */
+/* stub order: 0476 06C1 05DE 09C9 0B57 0849 1983 1145 133F 0DFE 1929 04E4 0895 1621 0A67 1B29 1545 0CFC 1F92 14BC 0B9D 1C20 0000 01C1 0EDB 0F1C */
 /*
  * Martian Dreams - GAME.EXE overlay 2F8D: actions of the "use" command (the
  * first of three overlays of them, with 2F98 and 2FA1). New code: Savage
@@ -153,17 +154,17 @@ extern char far C_2BB4_2244[];/*"The berries are not edible.\n"*/
 extern char far C_2BB4_22D3[];/*"You don't know how it works.\n"*/
 extern char far C_2BB4_22F1[];/*"Aargh!\n"*/
 extern signed char DirIncrX[8], DirIncrY[8];
-extern int16 D_080E;/*ScreenFade*/
+extern int16 ScreenFade;
 extern unsigned char D_0F12;/*StatusDirty*/
 extern int16 D_0F18;/*MapAnimEnabled*/
-extern unsigned char D_167A;/*Active*/
-extern int16 D_167C, D_167E, D_1680;/*MapX, MapY, MapZ*/
-extern char D_16A5;/*SoloMember*/
+extern unsigned char Active;
+extern int16 MapX, MapY, MapZ;
+extern char SoloMember;
 extern int32 D_16AA;/*flags (0x10: the dream)*/
 extern struct { unsigned a:4, psychic:4, c:4, d:4; } D_16B0[];/*talents*/
 extern char SelectMode;
-extern char D_1B8D;/*AnimateAtPrompt*/
-extern int16 D_1B90;/*EndPagingAtPrompt*/
+extern char AnimateAtPrompt;
+extern int16 EndPagingAtPrompt;
 extern int16 MouseMode;
 extern int16 StatusDisplay;
 extern int16 PromptCh;
@@ -193,15 +194,7 @@ extern int16 D_EC42;/*LinesBeforeMore*/
 extern int16 D_EC46;/*distance of the last target (use.c)*/
 extern int16 D_F0CA;/*set when a dirt action failed (the load is not used up)*/
 
-#define ScreenFade D_080E
 #define MapAnimEnabled D_0F18
-#define Active D_167A
-#define MapX D_167C
-#define MapY D_167E
-#define MapZ D_1680
-#define SoloMember D_16A5
-#define AnimateAtPrompt D_1B8D
-#define EndPagingAtPrompt D_1B90
 #define ObjStatus D_3266
 #define Party D_4EA4
 #define Names D_50CE
@@ -374,7 +367,7 @@ extern int16 D_F0CA;/*set when a dirt action failed (the load is not used up)*/
 /*
  * the load kind of a dirt type (0x102: 1, 0x1ba: 2, 0x1bb: 3, 0x1bc: 4)
  */
-/*C_2F8D_03FC*/unsigned char C_2F8D_03FC(int16 type) {
+/*C_2F8D_03FC*/static unsigned char C_2F8D_03FC(int16 type) {
 	switch(type) {
 	case 0x102:
 		return 1;
@@ -392,7 +385,7 @@ extern int16 D_F0CA;/*set when a dirt action failed (the load is not used up)*/
 /*
  * the dirt type of a load kind (the reverse of C_2F8D_03FC)
  */
-/*C_2F8D_043F*/C_2F8D_043F(unsigned char n) {
+/*C_2F8D_043F*/static C_2F8D_043F(unsigned char n) {
 	switch(n) {
 	case 1:
 		return 0x102;

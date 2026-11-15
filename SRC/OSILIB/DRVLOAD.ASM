@@ -7,7 +7,7 @@
 ;----------------------------------------
 INCLUDE OSI.INC
 
-EXTRN D_29F4:WORD	;the drivers' file names (near pointers) by driver type (data-only module)
+EXTRN _drvName:WORD	;the drivers' file names (near pointers) by driver type (data-only module)
 EXTRN D_2A84:WORD,DriveErrorCallback:DWORD	;LOW.ASM
 EXTRN my_alloc:FAR,C_2674_04D9:FAR	;LOW.ASM: allocate BX paragraphs; load a file whole
 
@@ -101,7 +101,7 @@ C_0097:
 	MOV	BX,2
 C_00A5:
 	SHL	BX,1
-	MOV	DX,D_29F4[BX]
+	MOV	DX,_drvName[BX]
 	CALL	C_2674_04D9	;load the driver
 	JB	C_00B8
 	MOV	D_2A2A,BX

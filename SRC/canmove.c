@@ -18,12 +18,12 @@
 extern int16 far C_2DE5_01C6[];/*MonsterFlags (by GetMonsterClass)*/
 
 extern char DirIncrX[8], DirIncrY[8];
-extern int16 D_142A;/*the mover stands on a tile of TerrainType 8*/
-extern int16 D_1433;/*party members may swap places?*/
-extern int16 D_1435;/*TerrainType 8 blocks*/
-extern int16 D_14F2;/*tile offset of the objects (animation)*/
-extern unsigned char D_167A;/*Active*/
-extern int16 D_1680;/*MapZ*/
+extern int16 HazardFound;/*the mover stands on a tile of TerrainType 8*/
+extern int16 PassThroughParty;/*party members may swap places?*/
+extern int16 AvoidHazards;/*TerrainType 8 blocks*/
+extern int16 LocPartOffset;/*tile offset of the objects (animation)*/
+extern unsigned char Active;
+extern int16 MapZ;
 extern int16 D_1689;
 extern unsigned char D_3266[];/*ObjStatus*/
 extern unsigned char far *D_45CC;/*NPCFlag*/
@@ -38,26 +38,24 @@ extern uint16 D_9CC4[];/*ObjShapeType*/
 extern unsigned char far *D_B4C4;/*TerrainType*/
 extern char far C_2BB4_0210[];
 
-extern int16 C_047A_234C(int16, int16, int16, int16);/*push obj from (x, y) in dir: 0 moved, 2 message*/
+extern int16 PushObj(int16, int16, int16, int16);/*push obj from (x, y) in dir: 0 moved, 2 message*/
 extern int16 C_100B_0222(int16);/*pushable type*/
-extern int16 C_1534_1101(int16);/*WrapDelta*/
-extern unsigned char C_1534_1072(int16, int16, int16);/*GetTileAtXYZ*/
-extern int16 C_1649_000A(int16);/*GetMonsterClass(type): < 0 if none*/
-extern C_1FA9_0919(int16);/*MUS_PlaySfx*/
-extern int16 C_1B09_032A();/*next object of C_1B09_07D8's search*/
-extern int16 C_1B09_07D8(int16, int16, int16);/*first object at (x, y, z)?*/
-extern int16 C_1B09_08BC(int16, int16);
-extern int16 C_1B09_09C7(int16, int16, int16);/*OBJ_FindTypeAt(type, x, y)*/
-extern C_1B09_1F52(int16, int16, int16, int16);/*MoveObj(obj, x, y, z)*/
-extern C_1B09_3E18();/*ShowObjects*/
-extern int16 C_222C_0008(int16);/*InRange_10_17_C0_C3: water tiles*/
-extern int16 C_222C_005F(int16);/*InRange_20_3F_7C_7F*/
+extern int16 WrapDelta(int16);
+extern unsigned char GetTileAtXYZ(int16, int16, int16);
+extern int16 GetMonsterClass(int16);/*GetMonsterClass(type): < 0 if none*/
+extern MUS_PlaySfx(int16);
+extern int16 NextLoc();/*next object of FindLoc's search*/
+extern int16 FindLoc(int16, int16, int16);/*first object at (x, y, z)?*/
+extern int16 OBJ_MapObjAt(int16, int16);
+extern int16 OBJ_FindTypeAt(int16, int16, int16);/*OBJ_FindTypeAt(type, x, y)*/
+extern MoveObj(int16, int16, int16, int16);/*MoveObj(obj, x, y, z)*/
+extern ShowObjects();
+extern int16 InRange_10_17_C0_C3(int16);/*InRange_10_17_C0_C3: water tiles*/
+extern int16 Class_20_3F_7C_7F(int16);/*InRange_20_3F_7C_7F*/
 extern cdecl CON_printf(char far *, ...);
 extern void cdecl TimerDelay(int32);
 
 #define MonsterFlags C_2DE5_01C6
-#define Active D_167A
-#define MapZ D_1680
 #define ObjStatus D_3266
 #define NPCFlag D_45CC
 #define Party D_4EA4
@@ -70,16 +68,8 @@ extern void cdecl TimerDelay(int32);
 #define ObjShapeType D_9CC4
 #define TerrainType D_B4C4
 
-#define PushObj C_047A_234C
-#define WrapDelta C_1534_1101
-#define GetTileAtXYZ C_1534_1072
-#define GetMonsterClass C_1649_000A
-#define MUS_PlaySfx C_1FA9_0919
-#define OBJ_FindTypeAt C_1B09_09C7
-#define MoveObj C_1B09_1F52
-#define ShowObjects C_1B09_3E18
-#define IsWaterTile C_222C_0008
-#define InRange_20_3F_7C_7F C_222C_005F
+#define IsWaterTile InRange_10_17_C0_C3
+#define InRange_20_3F_7C_7F Class_20_3F_7C_7F
 
 #define GetType(i) (ObjShapeType[i] & 0x3ff)
 #define GetFrame(i) (ObjShapeType[i] >> 10)
@@ -176,13 +166,13 @@ CanStandAt(int16, int16, int16);
 			if(npc < 0x100 && npc >= 0 && (MonsterFlags[class] & 0x8000) && !InRange_20_3F_7C_7F(tile))
 				ok = 0;
 		}
-		for(obj = C_1B09_07D8(x, y, MapZ); obj >= 0; obj = C_1B09_032A()) {
+		for(obj = FindLoc(x, y, MapZ); obj >= 0; obj = NextLoc()) {
 			if(obj == npc)
 				continue;
 			objType = GetType(obj);
 			if((type == 0x1b9 || type == 0x10c) && objType == 0xaf)
 				continue;
-			tile = BaseTile[GetType(obj)] + GetFrame(obj) - D_14F2;
+			tile = BaseTile[GetType(obj)] + GetFrame(obj) - LocPartOffset;
 			if((TileFlag2[tile] & 0x10) && !(TerrainType[tile] & 2) && !(TileFlag2[tile] & 4))
 				continue;
 			objTerrain = TerrainType[tile];
@@ -311,19 +301,19 @@ CanStandAt(int16, int16, int16);
 		}
 	}
 	if((terrain & 8) && !anywhere && !flies) {
-		D_142A = 1;
-		if(D_1435)
+		HazardFound = 1;
+		if(AvoidHazards)
 			okTo = 0;
 	} else {
-		D_142A = 0;
+		HazardFound = 0;
 	}
 	if(walks) {
-		for(obj = C_1B09_07D8(MoveFromX, MoveFromY, MapZ); obj >= 0; obj = C_1B09_032A()) {
+		for(obj = FindLoc(MoveFromX, MoveFromY, MapZ); obj >= 0; obj = NextLoc()) {
 			if(obj == npc)
 				continue;
 			if(GetType(obj) == 0xaf)
 				onRail = 2;
-			dtile = BaseTile[GetType(obj)] + GetFrame(obj) - D_14F2;
+			dtile = BaseTile[GetType(obj)] + GetFrame(obj) - LocPartOffset;
 			if((TileFlag2[dtile] & 0x10) && !(TerrainType[dtile] & 2) && !(TileFlag2[dtile] & 4))
 				continue;
 			objTerrain = TerrainType[dtile];
@@ -340,13 +330,13 @@ CanStandAt(int16, int16, int16);
 		}
 	}
 	if(okFrom) {
-		for(obj = C_1B09_07D8(x, y, MapZ); obj >= 0; obj = C_1B09_032A()) {
+		for(obj = FindLoc(x, y, MapZ); obj >= 0; obj = NextLoc()) {
 			if(obj == npc)
 				continue;
 			objType = GetType(obj);
 			if(objType == 0xbc)
 				onBelt = 1;
-			dtile = BaseTile[GetType(obj)] + GetFrame(obj) - D_14F2;
+			dtile = BaseTile[GetType(obj)] + GetFrame(obj) - LocPartOffset;
 			if((TileFlag2[dtile] & 0x10) && !(TerrainType[dtile] & 2) && !(TileFlag2[dtile] & 4))
 				continue;
 			objTerrain = TerrainType[dtile];
@@ -394,7 +384,7 @@ CanStandAt(int16, int16, int16);
 				nx = (x + DirIncrX[dir]) & 0x3ff;
 				ny = (y + DirIncrY[dir]) & 0x3ff;
 				if(!(pushResult = PushObj(obj, x, y, dir)) ||
-					((water = IsWaterTile(GetTileAtXYZ(nx, ny, MapZ))) == 1 && GetType(obj) == 0x19a && (objAt = C_1B09_08BC(nx, ny)) == -1)
+					((water = IsWaterTile(GetTileAtXYZ(nx, ny, MapZ))) == 1 && GetType(obj) == 0x19a && (objAt = OBJ_MapObjAt(nx, ny)) == -1)
 				) {
 					pushed = obj;
 					okTo = 1;
@@ -413,7 +403,7 @@ CanStandAt(int16, int16, int16);
 							okTo = 0;
 					}
 					if(okTo == 1)
-						D_142A = 0;
+						HazardFound = 0;
 					if(!(TileFlag2[dtile] & 0x10))
 						break;
 				} else if(swims) {
@@ -426,15 +416,15 @@ CanStandAt(int16, int16, int16);
 				(flies && obj < 0x100 && obj >= 0)
 			) {
 				if(NPCStatus[npc] & 0x80) {
-					if(Party[Active] == obj || !D_1433 || obj >= 0x100 || obj < 0 || !(NPCStatus[obj] & 0x80) || (NPCStatus[obj] & 0x16) || (NPCFlag[obj] & 0x10))
+					if(Party[Active] == obj || !PassThroughParty || obj >= 0x100 || obj < 0 || !(NPCStatus[obj] & 0x80) || (NPCStatus[obj] & 0x16) || (NPCFlag[obj] & 0x10))
 						okTo = 0;
 				} else {
 					okTo = 0;
 				}
 			} else if((objTerrain & 8) && !anywhere && !flies) {
-				if(D_1435)
+				if(AvoidHazards)
 					okTo = 0;
-				D_142A = 1;
+				HazardFound = 1;
 			}
 		}
 	}

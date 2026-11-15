@@ -1,4 +1,5 @@
 /* flags: -d -mm -p -c -Z -O -y */
+/* stub order: 0000 0AC1 0477 0688 02CE */
 /*
  * Martian Dreams - GAME.EXE overlay 2F5F: the dream. New code (Savage
  * Empire has no dream).
@@ -25,30 +26,30 @@ struct tClipInfo/*size:9*/ {
 
 /*OSI routines (asm)*/
 extern int16 OSI_rand(int16, int16);/*OSI_rand(lo, hi)*/
-extern cdecl MOUSE_SERVE();/*MOUSE_SERVE*/
+extern cdecl MOUSE_SERVE();
 
 /*other game modules*/
 extern PaletteAnimation();
-extern C_07D1_02C4();/*COMBAT_breakOff*/
-extern int16 C_07D1_064E(int16);/*MaxHP*/
-extern C_07D1_11BB(int16, int16);
-extern C_0E1A_11FA();/*DrawSkyBar*/
-extern C_120E_0221();/*DisplayTick*/
-extern C_120E_0A47(int16);/*PassTime(minutes)*/
-extern C_120E_19DA();/*SetPartyMode*/
+extern COMBAT_breakOff();
+extern int16 MaxHP(int16);
+extern CloneObject(int16, int16);
+extern DrawSkyBar();
+extern DisplayTick();
+extern PassTime(int16);/*PassTime(minutes)*/
+extern SetPartyMode();
 extern VIS_UpdateView();
 extern MAP_LoadAround();
 extern PartyTeleport(int16, int16, int16, int16);
-extern int16 C_1B09_09C7(int16, int16, int16);/*OBJ_FindTypeAt(type, x, y)*/
-extern C_1B09_1872(int16);/*DeleteObj*/
-extern C_1B09_1A1D(int16, int16, int16);/*OBJ_PurgeFarLocals*/
-extern C_1B09_1F52(int16, int16, int16, int16);/*MoveObj(obj, x, y, z)*/
-extern C_1B09_3E18();/*ShowObjects*/
-extern char *C_1B09_4759(int16);/*GetObjectString*/
-extern C_1B09_4963(int16);
+extern int16 OBJ_FindTypeAt(int16, int16, int16);/*OBJ_FindTypeAt(type, x, y)*/
+extern DeleteObj(int16);
+extern OBJ_PurgeFarLocals(int16, int16, int16);
+extern MoveObj(int16, int16, int16, int16);/*MoveObj(obj, x, y, z)*/
+extern ShowObjects();
+extern char *GetObjectString(int16);
+extern OBJ_DeleteContents(int16);
 extern C_1FA9_02CE(int16);/*the morning song*/
-extern C_1FA9_02B5();/*MUS_PlayAreaSong*/
-extern C_2077_009D(int16);/*STAT_ShowParty*/
+extern MUS_PlayAreaSong();
+extern STAT_ShowParty(int16);
 extern int16 CON_mouseOffAt(int16, int16, int16, int16);
 extern CON_mouseOn(int16);
 extern CON_setClip(struct tClipInfo *);
@@ -70,34 +71,34 @@ extern C_2F75_157A();
 extern char far C_2BB4_22F1[];/*failure message*/
 
 extern unsigned char MouseOn;
-extern int16 D_080E;/*ScreenFade*/
-extern int16 D_081C;/*ColorPaper*/
+extern int16 ScreenFade;
+extern int16 ColorPaper;
 extern int16 D_082E;/*default paper color*/
 extern char D_0F12;/*StatusDirty*/
 extern char D_0F13;/*PromptFlag*/
 extern int16 D_0F18;/*MapAnimEnabled*/
-extern int16 D_1431;/*VisibilityDirty*/
-extern unsigned char D_1674;/*Time_M*/
-extern unsigned char D_1675;/*Time_H*/
-extern unsigned char D_1676;/*Date_D*/
-extern unsigned char D_1677;/*Date_M*/
-extern int16 D_1678;/*Date_Y*/
-extern unsigned char D_167A;/*Active*/
-extern char D_167B;/*AmbientLight*/
-extern int16 D_167C, D_167E, D_1680;/*MapX, MapY, MapZ*/
+extern int16 VisibilityDirty;
+extern unsigned char Time_M;
+extern unsigned char Time_H;
+extern unsigned char Date_D;
+extern unsigned char Date_M;
+extern int16 Date_Y;
+extern unsigned char Active;
+extern char AmbientLight;
+extern int16 MapX, MapY, MapZ;
 extern unsigned char D_1684, D_1685;/*where the dreamer wakes up (x, y)*/
-extern unsigned char D_1686;/*DrunkCounter*/
+extern unsigned char DrunkCounter;
 extern unsigned char D_16A3;
-extern char D_16A4;/*InCombat*/
-extern char D_16A5;/*SoloMember*/
-extern char D_16A6;/*SavedNPCMode*/
+extern char InCombat;
+extern char SoloMember;
+extern char SavedNPCMode;
 extern unsigned char D_16A8;/*the player is a woman*/
 extern int32 D_16AA;/*flags (0x10: the dream)*/
 extern int16 D_16AE;/*rotation of the map view*/
 extern struct { unsigned a:4, b:4, c:4, d:4; } D_16B0[];/*talents*/
 extern unsigned char D_16D0, D_16D1;/*the day and month to wake up*/
 extern int16 D_16D2;/*the year to wake up*/
-extern int16 D_16D4;/*DreamStage: the kind of the last dream trigger*/
+extern int16 DreamStage;/*DreamStage: the kind of the last dream trigger*/
 extern int16 StatusMember;
 extern int16 StatusDisplay;/*0x90 a member, 0x91 the party, 0x92 the equipment*/
 extern struct tClipInfo *CurClip;
@@ -121,30 +122,12 @@ extern uint16 D_9CC4[];/*ObjShapeType*/
 extern union tHandler D_BA6A;/*GrDriver*/
 extern struct tClipInfo D_EBD0[4];/*TextWindows*/
 
-#define ScreenFade D_080E
-#define ColorPaper D_081C
 #define StatusDirty D_0F12
 #define PromptFlag D_0F13
 #define MapAnimEnabled D_0F18
-#define VisibilityDirty D_1431
-#define Time_M D_1674
-#define Time_H D_1675
-#define Date_D D_1676
-#define Date_M D_1677
-#define Date_Y D_1678
-#define Active D_167A
-#define AmbientLight D_167B
-#define MapX D_167C
-#define MapY D_167E
-#define MapZ D_1680
-#define DrunkCounter D_1686
-#define InCombat D_16A4
-#define SoloMember D_16A5
-#define SavedNPCMode D_16A6
 #define WakeDay D_16D0
 #define WakeMonth D_16D1
 #define WakeYear D_16D2
-#define DreamStage D_16D4
 #define ObjStatus D_3266
 #define MovePts D_44C4
 #define DEXTE D_45D0
@@ -163,20 +146,6 @@ extern struct tClipInfo D_EBD0[4];/*TextWindows*/
 #define GrDriver D_BA6A
 #define TextWindows D_EBD0
 
-#define COMBAT_breakOff C_07D1_02C4
-#define MaxHP C_07D1_064E
-#define DrawSkyBar C_0E1A_11FA
-#define DisplayTick C_120E_0221
-#define PassTime C_120E_0A47
-#define SetPartyMode C_120E_19DA
-#define OBJ_FindTypeAt C_1B09_09C7
-#define DeleteObj C_1B09_1872
-#define OBJ_PurgeFarLocals C_1B09_1A1D
-#define MoveObj C_1B09_1F52
-#define ShowObjects C_1B09_3E18
-#define GetObjectString C_1B09_4759
-#define MUS_PlayAreaSong C_1FA9_02B5
-#define STAT_ShowParty C_2077_009D
 
 #define GR_SET_COLOR(c)              (GrDriver.iii.ofs = 0x06, (*GrDriver.f)(c))
 #define GR_FILL_RECT(x0,y0,x1,y1)    (GrDriver.iii.ofs = 0x12, (*GrDriver.f)(x0,y0,x1,y1))
@@ -218,7 +187,7 @@ DreamTrigger(int16);
 		C_2F75_0757();
 		if(SoloMember >= 0)
 			SetPartyMode();
-		C_07D1_11BB(1, 0);
+		CloneObject(1, 0);
 		ObjShapeType[0] = GetType(0) + 0x400;
 		HitPoints[0] = MaxHP(1);
 		ObjStatus[0] &= 0x18;
@@ -244,7 +213,7 @@ DreamTrigger(int16);
 		MapY = GetY(0);
 		MapZ = GetZ(0);
 		MAP_LoadAround();
-		C_1B09_4963(0);
+		OBJ_DeleteContents(0);
 		MapAnimEnabled = 1;
 		PromptFlag = 1;
 		ColorPaper = 7;
@@ -295,7 +264,7 @@ DreamTrigger(int16);
 	C_2F75_157A();
 	if(SoloMember >= 0)
 		SetPartyMode();
-	C_07D1_11BB(1, 0);
+	CloneObject(1, 0);
 	HitPoints[0] = MaxHP(1);
 	ObjShapeType[0] = GetType(0) + 0x400;
 	ObjStatus[0] &= 0x18;
@@ -307,7 +276,7 @@ DreamTrigger(int16);
 	ObjShapeType[0] = (ObjShapeType[0] & 0xfc00) + (D_16A8 ? 0x158 : 0x157);
 	NPCMode[0] = 2;
 	*(int16 *)D_16B0 = 0;
-	C_1B09_4963(0);
+	OBJ_DeleteContents(0);
 	Party[Active = PartySize] = 0;
 	for(i = 0; i < 14; i ++)
 		Names[Active][i] = Names[0][i];
@@ -348,7 +317,7 @@ DreamTrigger(int16);
 	DreamTrigger(0);
 	Active = 0;
 	NPCStatus[0] &= 0x7f;
-	C_1B09_4963(0);
+	OBJ_DeleteContents(0);
 	D_16AE = 0;
 	D_16A3 = 0;
 	Time_H = 8;
@@ -422,7 +391,7 @@ DreamTrigger(int16);
 	if(DreamStage && kind != 0xa5 && kind != 0xe5) {
 		switch(DreamStage) {
 		case 5: C_2F68_0F20(); break;
-		case 0x20: C_1B09_4963(0); break;
+		case 0x20: OBJ_DeleteContents(0); break;
 		case 0x40: ObjShapeType[0] = GetType(1) | 0x2400; break;
 		case 0x44: C_2F68_0785(); break;
 		case 0xa0: C_2F68_02A9(); break;
@@ -472,7 +441,7 @@ DreamTrigger(int16);
 			}
 			break;
 		case 0xc4:
-			C_1B09_4963(0);
+			OBJ_DeleteContents(0);
 			break;
 		case 0xc5:
 			TalkFlags[0x6a] |= 4;
@@ -489,7 +458,7 @@ DreamTrigger(int16);
 		case 0xc0:
 			HitPoints[0] = MaxHP(1);
 			StatusDirty = 1;
-			C_1B09_4963(0);
+			OBJ_DeleteContents(0);
 			break;
 		}
 	}
@@ -531,7 +500,7 @@ DreamTrigger(int16);
 			HitPoints[0] = MaxHP(1);
 			D_1684 = x;
 			D_1685 = y;
-			C_1B09_4963(0);
+			OBJ_DeleteContents(0);
 			break;
 		case 0xe5:
 			if(!(TalkFlags[0x66] & 8))

@@ -1,4 +1,5 @@
 /* flags: -d -mm -p -c -Z -O -y */
+/* stub order: 0210 039E 0000 */
 /*
  * Martian Dreams - GAME.EXE overlay 2F72: the machinery's power going on
  * and off, and the lamps lit at night; new code with no Savage Empire
@@ -14,14 +15,14 @@
 #include "se.h"
 
 /*other modules*/
-extern C_120E_0009();
-extern int16 C_1B09_09C7(int16, int16, int16);/*OBJ_FindTypeAt(type, x, y)*/
-extern int16 C_1B09_116E(int16, int16, int16, int16, int16, int16);/*AddMapObj*/
-extern C_1B09_1872(int16);/*DeleteObj*/
+extern AnimateTiles();
+extern int16 OBJ_FindTypeAt(int16, int16, int16);/*OBJ_FindTypeAt(type, x, y)*/
+extern int16 AddMapObj(int16, int16, int16, int16, int16, int16);
+extern DeleteObj(int16);
 
-extern int16 D_1431;/*VisibilityDirty*/
-extern unsigned char D_1675;/*Time_H*/
-extern int16 D_1680;/*MapZ*/
+extern int16 VisibilityDirty;
+extern unsigned char Time_H;
+extern int16 MapZ;
 extern unsigned char D_3266[];/*ObjStatus*/
 extern int16 far *D_6EBE;/*BaseTile*/
 extern struct coord D_78AE[];/*ObjPos*/
@@ -30,9 +31,6 @@ extern uint16 D_9CC4[];/*ObjShapeType*/
 extern int16 D_B4C8[];/*AnimTiles: the animated tiles*/
 extern unsigned char D_BC8E[];/*StateAnimData*/
 
-#define VisibilityDirty D_1431
-#define Time_H D_1675
-#define MapZ D_1680
 #define ObjStatus D_3266
 #define BaseTile D_6EBE
 #define ObjPos D_78AE
@@ -40,9 +38,6 @@ extern unsigned char D_BC8E[];/*StateAnimData*/
 #define ObjShapeType D_9CC4
 #define AnimTiles D_B4C8
 #define StateAnimData D_BC8E
-#define OBJ_FindTypeAt C_1B09_09C7
-#define AddMapObj C_1B09_116E
-#define DeleteObj C_1B09_1872
 
 #define GetType(i) (ObjShapeType[i] & 0x3ff)
 #define GetFrame(i) (ObjShapeType[i] >> 10)
@@ -123,13 +118,13 @@ extern unsigned char D_BC8E[];/*StateAnimData*/
 	VisibilityDirty = 1;
 }
 
-/*after C_120E_0009: the lamps (type 0xe4) go to frame 7 at night
+/*after AnimateTiles: the lamps (type 0xe4) go to frame 7 at night
   (Time_H < 6 or > 17)*/
 /*C_2F72_039E*/C_2F72_039E() {
 	int16 night;
 	register int16 type, i;
 
-	C_120E_0009();
+	AnimateTiles();
 	night = Time_H < 6 || Time_H > 17;
 	for(i = 0x101; i < 0xc00; i ++) {
 		if((type = GetType(i)) == 0xe4 && night)

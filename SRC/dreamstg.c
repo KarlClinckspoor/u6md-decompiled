@@ -1,4 +1,5 @@
 /* flags: -d -mm -p -c -Z -O -y */
+/* stub order: 03ED 0000 0494 0CA9 165C 07E6 02A9 1393 037E 0785 0F20 0FE1 */
 /*
  * Martian Dreams - GAME.EXE overlay 2F68: the dream's stages, called by
  * dream.c's DreamTrigger (overlay 2F5F) when the dreamer reaches a stage
@@ -24,21 +25,21 @@ struct tClipInfo/*size:9*/ {
 extern int16 OSI_rand(int16, int16);/*OSI_rand(lo, hi)*/
 
 /*other game modules*/
-extern C_07D1_01BB();/*called when not InCombat (COMBAT_begin?)*/
-extern int16 C_07D1_064E(int16);/*MaxHP*/
-extern C_120E_0009();
-extern int16 C_1649_009C(int16, int16, int16, int16);/*EGG_generate(type, x, y, z)*/
-extern int16 C_1B09_09C7(int16, int16, int16);/*OBJ_FindTypeAt(type, x, y)*/
-extern int16 C_1B09_0B1D(int16);/*FindInv: first object of an inventory*/
-extern int16 C_1B09_0B76(void);/*NextInv*/
-extern int16 C_1B09_0DD7(void);/*NextArea: next object of SearchArea*/
-extern int16 C_1B09_0EDE(int16, int16, int16, int16);/*SearchArea(x1, y1, x2, y2)*/
-extern int16 C_1B09_12EE(int16, int16, int16, int16);/*AddInvObj(shape, position, quantity, owner)*/
-extern C_1B09_1872(int16);/*DeleteObj*/
-extern C_1B09_1F52(int16, int16, int16, int16);/*MoveObj(obj, x, y, z)*/
-extern C_1B09_3E18();/*ShowObjects*/
-extern C_1B09_4963(int16);
-extern C_1FA9_02B5();/*MUS_PlayAreaSong*/
+extern COMBAT_begin();/*called when not InCombat (COMBAT_begin?)*/
+extern int16 MaxHP(int16);
+extern AnimateTiles();
+extern int16 EGG_generate(int16, int16, int16, int16);/*EGG_generate(type, x, y, z)*/
+extern int16 OBJ_FindTypeAt(int16, int16, int16);/*OBJ_FindTypeAt(type, x, y)*/
+extern int16 FindInv(int16);/*FindInv: first object of an inventory*/
+extern int16 NextInv(void);
+extern int16 NextArea(void);/*NextArea: next object of SearchArea*/
+extern int16 SearchArea(int16, int16, int16, int16);/*SearchArea(x1, y1, x2, y2)*/
+extern int16 AddInvObj(int16, int16, int16, int16);/*AddInvObj(shape, position, quantity, owner)*/
+extern DeleteObj(int16);
+extern MoveObj(int16, int16, int16, int16);/*MoveObj(obj, x, y, z)*/
+extern ShowObjects();
+extern OBJ_DeleteContents(int16);
+extern MUS_PlayAreaSong();
 extern STAT_ShowInventory(int16);
 extern int16 CON_mouseOffAt(int16, int16, int16, int16);
 extern CON_mouseOn(int16);
@@ -48,11 +49,11 @@ extern int16 C_2F63_0000(int16, int16, int16, int16, int16, int16);/*(shape, sta
 extern C_2F63_0043();
 extern char far C_2BB4_22F1[];/*failure message*/
 
-extern int16 D_081C;/*ColorPaper*/
+extern int16 ColorPaper;
 extern char D_0F12;/*StatusDirty*/
 extern char D_0F13;/*PromptFlag*/
 extern int16 D_0F18;/*MapAnimEnabled*/
-extern int16 D_167C, D_167E, D_1680;/*MapX, MapY, MapZ*/
+extern int16 MapX, MapY, MapZ;
 extern unsigned char D_16A3;
 extern unsigned char D_16A8;/*the player is a woman*/
 extern struct { unsigned a:4, b:4, c:4, d:4; } D_16B0[];/*talents*/
@@ -78,13 +79,9 @@ extern union tHandler D_BA6A;/*GrDriver*/
 extern struct tClipInfo D_EBD0[4];/*TextWindows*/
 extern char DirIncrX[8], DirIncrY[8];
 
-#define ColorPaper D_081C
 #define StatusDirty D_0F12
 #define PromptFlag D_0F13
 #define MapAnimEnabled D_0F18
-#define MapX D_167C
-#define MapY D_167E
-#define MapZ D_1680
 #define ObjStatus D_3266
 #define NPCMode D_46D0
 #define NPCComMode D_53AE
@@ -101,18 +98,6 @@ extern char DirIncrX[8], DirIncrY[8];
 #define GrDriver D_BA6A
 #define TextWindows D_EBD0
 
-#define MaxHP C_07D1_064E
-#define EGG_generate C_1649_009C
-#define OBJ_FindTypeAt C_1B09_09C7
-#define FindInv C_1B09_0B1D
-#define NextInv C_1B09_0B76
-#define NextArea C_1B09_0DD7
-#define SearchArea C_1B09_0EDE
-#define AddInvObj C_1B09_12EE
-#define DeleteObj C_1B09_1872
-#define MoveObj C_1B09_1F52
-#define ShowObjects C_1B09_3E18
-#define MUS_PlayAreaSong C_1FA9_02B5
 
 #define GR_SET_COLOR(c)              (GrDriver.iii.ofs = 0x06, (*GrDriver.f)(c))
 #define GR_FILL_RECT(x0,y0,x1,y1)    (GrDriver.iii.ofs = 0x12, (*GrDriver.f)(x0,y0,x1,y1))
@@ -195,7 +180,7 @@ extern char DirIncrX[8], DirIncrY[8];
 	D_16A3 = i;
 	while(i-- > 0)
 		EGG_generate(0x16c, x + DirIncrX[i * 2], y + DirIncrY[i * 2], MapZ);
-	C_07D1_01BB();
+	COMBAT_begin();
 }
 
 /*end of stage 0xa0: the panel gray again, the dreamer's inventory
@@ -258,7 +243,7 @@ extern char DirIncrX[8], DirIncrY[8];
 	}
 	CON_printf("You fall off the cliff!\n");
 	ObjShapeType[0] = D_16A8 ? 0x127 : 0x126;
-	C_120E_0009();
+	AnimateTiles();
 	ShowObjects();
 	for(i = SearchArea(MapX - 1, MapY - 8, MapX + 1, MapY - 4); i >= 0; i = NextArea()) {
 		if(GetType(i) == 0x187) {
@@ -522,7 +507,7 @@ extern char DirIncrX[8], DirIncrY[8];
 				ObjStatus[i] |= 2;
 				break;
 			case 0x14b:
-				C_1B09_4963(i);
+				OBJ_DeleteContents(i);
 			case 1: case 3: case 7: case 0x2c: case 0x4b: case 0x58: case 0x65: case 0x7a:
 			case 0xb8: case 0x100: case 0x116: case 0x12d: case 0x181: case 0x1a1: case 0x1a2:
 				DeleteObj(i);
@@ -612,7 +597,7 @@ extern char DirIncrX[8], DirIncrY[8];
 	register int16 i;
 
 	if(first) {
-		C_1B09_4963(0);
+		OBJ_DeleteContents(0);
 		TalkFlags[0x51] = 0;
 		MoveObj(0x51, 0x39, 0x65, 2);
 		MoveObj(0xa, 0x3d, 0x66, 2);
@@ -651,7 +636,7 @@ extern char DirIncrX[8], DirIncrY[8];
 		NPCStatus[0xf] &= 0x9f;
 		for(i = 0x101; i < 0xc00; i ++) {
 			if(InRect(i, 0x30, 0x50, 0x3f, 0x67) && (GetType(i) == 0x14b || GetType(i) == 0xeb)) {
-				C_1B09_4963(i);
+				OBJ_DeleteContents(i);
 				DeleteObj(i);
 			}
 		}

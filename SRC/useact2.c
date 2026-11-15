@@ -1,4 +1,5 @@
 /* flags: -d -mm -p -c -Z -O -y */
+/* stub order: 03AA 1E83 1BB6 0000 1EC7 0F88 0777 17B5 1A75 1334 19BD 166A 0CF3 0E53 1E08 0503 1237 1449 1088 1988 0267 1568 */
 /*
  * Martian Dreams - GAME.EXE overlay 2F98: actions of the "use" command (the
  * second of three overlays of them, with 2F8D and 2FA1). New code.
@@ -90,7 +91,7 @@ extern int16 COMBAT_range(int16, int16, int16, int16);
 extern int16 COMBAT_TryTeleport(int16, int16);
 extern int16 CanMoveTo(int16, int16, int16);
 extern int16 EGG_generate(int16, int16, int16, int16);/*EGG_generate(type, x, y, z)*/
-extern int16 C_2F55_0000(int16);/*SPELL_ReviveNPC*/
+extern int16 SPELL_ReviveNPC(int16);
 extern C_2F8D_0476(int16, int16, int16);/*take and ready (useact1.c)*/
 extern void PrintTileArticle(int16);
 extern PrintObjCountOrArticle(int16);
@@ -100,9 +101,9 @@ extern far CON_UpdateMousePointer();
 extern signed char DirIncrX[8], DirIncrY[8];
 extern unsigned char D_0F12;/*StatusDirty*/
 extern int16 D_0F18;/*MapAnimEnabled*/
-extern unsigned char D_167A;/*Active*/
-extern int16 D_167C, D_167E, D_1680;/*MapX, MapY, MapZ*/
-extern char D_16A5;/*SoloMember*/
+extern unsigned char Active;
+extern int16 MapX, MapY, MapZ;
+extern char SoloMember;
 extern int32 D_16AA;/*flags (0x10: the dream)*/
 extern int16 StatusMember;
 extern int16 StatusDisplay;
@@ -110,7 +111,7 @@ extern unsigned char far *D_3262;/*NPC flags: 0x80 ?, bits 0-7: talk flags 8-15*
 extern unsigned char far *D_46D0;/*NPCMode*/
 extern unsigned char far *D_53AE;/*NPCComMode*/
 extern int16 far *D_B508;/*OrigShapeType*/
-extern int16 D_081E;/*ColorText*/
+extern int16 ColorText;
 extern int16 D_0826;/*color of the player's input*/
 extern unsigned char Time_M, Time_H;
 extern int16 MouseMode;
@@ -123,7 +124,7 @@ extern struct { unsigned a:4, psychic:4, c:4, d:4; } D_16B0[];/*talents*/
 extern char SelectMode;
 extern char AimX, AimY;
 extern int16 D_EBF6, D_EBF8;/*Selection.x, Selection.y*/
-extern unsigned char D_213E;/*IsResting*/
+extern unsigned char IsResting;
 extern struct tClipInfo *CurClip;
 extern unsigned char D_3266[];/*ObjStatus*/
 extern unsigned char D_4EA4[];/*Party*/
@@ -136,14 +137,7 @@ extern unsigned char D_9CC0;/*PartySize*/
 extern uint16 D_9CC4[];/*ObjShapeType*/
 
 #define MapAnimEnabled D_0F18
-#define Active D_167A
-#define MapX D_167C
-#define MapY D_167E
-#define MapZ D_1680
-#define SoloMember D_16A5
 #define ObjStatus D_3266
-#define ColorText D_081E
-#define IsResting D_213E
 #define OrigShapeType D_B508
 #define NPCMode D_46D0
 #define NPCComMode D_53AE
@@ -1146,7 +1140,7 @@ extern char far C_2BB4_22F1[];/*"Aargh!\n"*/
 	}
 	if(t == 0x155) {
 		if(n < 0x10) {
-			if((n = C_2F55_0000(on)) < 0) {
+			if((n = SPELL_ReviveNPC(on)) < 0) {
 				CON_printf(C_2BB4_22AF, GetObjectString(on));
 				MUS_PlaySfx(5);
 			} else {

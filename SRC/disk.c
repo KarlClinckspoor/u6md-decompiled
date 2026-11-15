@@ -14,8 +14,8 @@
 extern void (*DriveErrorCallback)();/*DriveErrorCallback (LOW.ASM): called by OSI_selectDrive when selection fails*/
 
 /*console*/
-extern int16 CON_getch();/*CON_getch*/
-extern cdecl CON_printf(char far *, ...);/*CON_printf*/
+extern int16 CON_getch();
+extern cdecl CON_printf(char far *, ...);
 
 extern int16 D_0F18;/*MapAnimEnabled*/
 extern unsigned char D_EC5A, D_EC5B;/*DosVerMajor, DosVerMinor*/

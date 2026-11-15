@@ -20,7 +20,7 @@
  * the party wakes in the Olympus mine or the space capsule, unless the
  * capsule door is not open yet (TalkFlags[0x10] & 0x10), which ends the
  * game with a message on the text screen.
- * The game state block (SE's gamestat.c, MD's D_1672-16D9) is a data-only
+ * The game state block (SE's gamestat.c, MD's IsOnQuest-16D9) is a data-only
  * module just before this one (its empty code segment is at 1FA9:2).
  */
 #include "se.h"
@@ -50,44 +50,44 @@ struct tSfxStep {
 
 /*other game modules*/
 extern int16 MusicAdapter;/*1: AdLib or Roland, 0: none*/
-extern int16 D_06BE;/*CombatOutcome*/
+extern int16 CombatOutcome;
 extern char D_0F12;/*StatusDirty*/
 extern int16 D_0F18;/*MapAnimEnabled*/
-extern unsigned char D_1675;/*Time_H*/
-extern unsigned char D_167A;/*Active*/
-extern int16 D_167C, D_167E, D_1680;/*MapX, MapY, MapZ*/
+extern unsigned char Time_H;
+extern unsigned char Active;
+extern int16 MapX, MapY, MapZ;
 extern unsigned char D_1684, D_1685;/*where the dreamer wakes up (x, y)*/
-extern int16 D_1687;/*SoundFlag*/
+extern int16 SoundFlag;
 extern char D_16A3;
-extern char D_16A4;/*InCombat*/
+extern char InCombat;
 extern int32 D_16AA;/*flags (0x10: the dream)*/
-extern int16 D_16D4;
-extern char D_1B8D;/*AnimateAtPrompt*/
-extern int16 D_1B90;/*EndPagingAtPrompt*/
-extern struct tClipInfo *D_1BDB;/*CurClip*/
+extern int16 DreamStage;
+extern char AnimateAtPrompt;
+extern int16 EndPagingAtPrompt;
+extern struct tClipInfo *CurClip;
 extern unsigned char D_3266[];/*ObjStatus*/
 extern unsigned char far *D_46D0;/*NPCMode*/
 extern unsigned char D_6CBA[];/*NPCStatus*/
 extern unsigned char D_6DBE[];/*HitPoints*/
 extern unsigned char D_6EC6[];/*TalkFlags (per NPC)*/
 extern uint16 D_9CC4[];/*ObjShapeType*/
-extern C_07D1_02C4();
-extern int16 C_07D1_064E(int16);/*MaxHP*/
-extern C_0E1A_11D2();/*ResetMapView*/
-extern C_120E_18B4();/*RefreshStatus*/
+extern COMBAT_breakOff();
+extern int16 MaxHP(int16);
+extern ResetMapView();
+extern RefreshStatus();
 extern MAP_LoadAround();
 extern C_1534_0C51();/*the party wakes up after its death*/
-extern int16 C_1B09_09C7(int16, int16, int16);/*OBJ_FindTypeAt(type, x, y)*/
-extern int16 C_1B09_1081(int16, int16, int16);/*next object from (start, ?, ?)*/
-extern int16 C_1B09_116E(int16, int16, int16, int16, int16, int16);/*AddMapObj*/
-extern C_1B09_1F52(int16, int16, int16, int16);/*MoveObj(obj, x, y, z)*/
-extern C_1B09_2CD2();/*OBJ_DeleteTmpBlocks*/
+extern int16 OBJ_FindTypeAt(int16, int16, int16);/*OBJ_FindTypeAt(type, x, y)*/
+extern int16 OBJ_FindNPCAt(int16, int16, int16);/*next object from (start, ?, ?)*/
+extern int16 AddMapObj(int16, int16, int16, int16, int16, int16);
+extern MoveObj(int16, int16, int16, int16);/*MoveObj(obj, x, y, z)*/
+extern OBJ_DeleteTmpBlocks();
 extern int16 CON_mouseOffAt(int16, int16, int16, int16);
 extern CON_mouseOn(int16);
 extern CON_putch0(int16);
 extern cdecl CON_printf(char far *, ...);
-extern C_2F5F_0477();
-extern C_2F83_0167(int16, int16, int16);/*TALK_talkTo*/
+extern DreamWakeUp();
+extern TALK_talkTo(int16, int16, int16);
 extern char far C_2BB4_006E[];/*UnconsciousMsg*/
 extern char far C_2BB4_00A4[];/*"... wake up in %s"*/
 extern char far C_2BB4_215E[];/*no EMS, no music*/
@@ -122,20 +122,9 @@ extern void far *D_BA7E;/*mdscreen.lzc entry 2*/
 extern void far *D_EA76;/*LoopVoice: the looping sound effect's voice*/
 extern void far *D_EA90[16];/*Songs: the songs of music.lzc*/
 
-#define CombatOutcome D_06BE
 #define StatusDirty D_0F12
 #define MapAnimEnabled D_0F18
-#define Time_H D_1675
-#define Active D_167A
-#define MapX D_167C
-#define MapY D_167E
-#define MapZ D_1680
-#define SoundFlag D_1687
-#define InCombat D_16A4
 #define IN_DREAM (D_16AA & 0x10)
-#define AnimateAtPrompt D_1B8D
-#define EndPagingAtPrompt D_1B90
-#define CurClip D_1BDB
 #define ObjStatus D_3266
 #define NPCMode D_46D0
 #define NPCStatus D_6CBA
@@ -145,14 +134,6 @@ extern void far *D_EA90[16];/*Songs: the songs of music.lzc*/
 #define LoopVoice D_EA76
 #define Songs D_EA90
 
-#define MaxHP C_07D1_064E
-#define ResetMapView C_0E1A_11D2
-#define RefreshStatus C_120E_18B4
-#define OBJ_FindTypeAt C_1B09_09C7
-#define AddMapObj C_1B09_116E
-#define MoveObj C_1B09_1F52
-#define OBJ_DeleteTmpBlocks C_1B09_2CD2
-#define TALK_talkTo C_2F83_0167
 #define UnconsciousMsg C_2BB4_006E
 
 #define GetType(i) (ObjShapeType[i] & 0x3ff)
@@ -500,11 +481,11 @@ extern int16 MUS_LoadSongs();
 			MapX = D_1684;
 			MapY = D_1685;
 			MAP_LoadAround();
-			C_07D1_02C4();
+			COMBAT_breakOff();
 			CON_printf("You feel your dream consciousness returning.\n");
-			if(D_16D4 == 0xc0) {
+			if(DreamStage == 0xc0) {
 				if((TalkFlags[0x66] & 0x3c) == 0x18) {
-					for(obj = C_1B09_1081(0xc0, 0x87, 0x17); obj >= 0; obj = C_1B09_1081(obj + 1, 0x87, 0x17)) {
+					for(obj = OBJ_FindNPCAt(0xc0, 0x87, 0x17); obj >= 0; obj = OBJ_FindNPCAt(obj + 1, 0x87, 0x17)) {
 						if(GetType(obj) == 0x175 && NPCMode[obj] == 0x12) {
 							NPCStatus[obj] |= 0x10;
 							ObjShapeType[obj] = 0;
@@ -532,7 +513,7 @@ extern int16 MUS_LoadSongs();
 		InCombat = 0;
 		CurClip->attrFlags |= 0x10;
 		CON_printf("You shake yourself awake from the nightmare.\n");
-		C_2F5F_0477();
+		DreamWakeUp();
 		MapAnimEnabled = 1;
 		StatusDirty = 1;
 		RefreshStatus();
