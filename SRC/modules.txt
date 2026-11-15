@@ -74,6 +74,6 @@
 2F80 0 268 jet.c 2408-247A  # overlay
 2F83 0 1700 talk.c 247A-2802  # overlay
 2F88 0 1F6B talkdr.c 2802-28F0  # overlay
-2F8D 0 200B -  # overlay
+2F8D 0 200B useact1.c 28F0-2990  # overlay
 2F98 0 201A -  # overlay
 2FA1 0 1E99 -  # overlay
