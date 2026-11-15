@@ -105,19 +105,19 @@ extern struct tClipInfo *CurClip;
 extern char IsResting;
 extern unsigned char far *D_3262;/*talk flags 8-15*/
 extern unsigned char ObjStatus[];
-extern char D_44C4[];/*MovePts*/
+extern char MovePts[];
 extern unsigned char DEXTE[];
-extern unsigned char far *D_46D0;/*NPCMode*/
-extern unsigned char D_4EA4[];/*Party*/
-extern char far *D_4EBA;/*Schedule (5 bytes each)*/
-extern int16 D_4EBE[0x101];/*SchedPointer*/
+extern unsigned char far *NPCMode;
+extern unsigned char Party[];
+extern char far *Schedule;/*5 bytes each*/
+extern int16 SchedPointer[0x101];
 extern char D_50CE[][14];/*Names*/
 extern int16 Amount[];/*quantity (low byte), quality (high byte)*/
-extern unsigned char D_6CBA[];/*NPCStatus*/
+extern unsigned char NPCStatus[];
 extern unsigned char HitPoints[];
 extern unsigned char D_6EC6[];/*TalkFlags*/
 extern struct coord ObjPos[];
-extern unsigned char D_9CC0;/*PartySize*/
+extern unsigned char PartySize;
 extern uint16 ObjShapeType[];
 extern union tHandler D_BA6A;/*GrDriver*/
 extern struct tClipInfo D_EBD0[4];/*TextWindows*/
@@ -125,15 +125,8 @@ extern struct tClipInfo D_EBD0[4];/*TextWindows*/
 #define StatusDirty D_0F12
 #define PromptFlag D_0F13
 #define MapAnimEnabled D_0F18
-#define MovePts D_44C4
-#define NPCMode D_46D0
-#define Party D_4EA4
-#define Schedule D_4EBA
-#define SchedPointer D_4EBE
 #define Names D_50CE
-#define NPCStatus D_6CBA
 #define TalkFlags D_6EC6
-#define PartySize D_9CC0
 #define GrDriver D_BA6A
 #define TextWindows D_EBD0
 

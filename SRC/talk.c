@@ -100,37 +100,31 @@ extern struct { unsigned a:4, psychic:4, b:8; } Talents[];/*talents? (psychic: c
 extern int16 DreamStage;
 extern unsigned char far *D_3262;/*NPC flags: 0x80 ?, bits 0-7: talk flags 8-15*/
 extern unsigned char ObjStatus[];
-extern unsigned char far *D_46D0;/*NPCMode*/
-extern unsigned char D_4EA4[];/*Party*/
+extern unsigned char far *NPCMode;
+extern unsigned char Party[];
 extern char D_50CE[][14];/*Names*/
 extern uint16 ExpPoints[];
-extern unsigned char far *D_53AE;/*NPCComMode*/
+extern unsigned char far *NPCComMode;
 extern unsigned char far *D_54B2;/*ScratchBuf*/
 extern int16 Amount[];/*quantity (low byte), quality (high byte)*/
-extern unsigned char D_6CBA[];/*NPCStatus*/
+extern unsigned char NPCStatus[];
 extern unsigned char HitPoints[];
 extern unsigned char D_6EC6[];/*TalkFlags*/
 extern struct coord ObjPos[];
-extern unsigned char D_9CC0;/*PartySize*/
+extern unsigned char PartySize;
 extern uint16 ObjShapeType[];
-extern int16 far *D_B508;/*OrigShapeType*/
+extern int16 far *OrigShapeType;
 extern unsigned char Obj_11x11[11][11];
-extern int16 D_C4AA[11][11];/*Tile_11x11*/
+extern int16 Tile_11x11[11][11];
 extern int16 D_EB86[10+26];/*VarInt*/
 extern char *D_EBFA[10+26];/*VarStr*/
 extern unsigned char D_EC5C[];/*TalkNpcName*/
 extern char D_ECE2[10][100];/*TalkStrBuf: storage of the string variables $0-$9*/
 
 #define MapAnimEnabled D_0F18
-#define NPCMode D_46D0
-#define Party D_4EA4
 #define Names D_50CE
-#define NPCComMode D_53AE
 #define ScratchBuf D_54B2
-#define NPCStatus D_6CBA
 #define TalkFlags D_6EC6
-#define PartySize D_9CC0
-#define OrigShapeType D_B508
 #define VarInt D_EB86
 #define VarStr D_EBFA
 #define TalkNpcName D_EC5C
@@ -489,9 +483,9 @@ and not on a hidden/dark tile)*/
 		x = WrapDelta(GetX(objNum) - (MapX - 5));
 		y = WrapDelta(GetY(objNum) - (MapY - 5));
 		/*objects displayed there, or an object tile*/
-		if(Obj_11x11[y][x] || D_C4AA[y][x] >= 0x200)
+		if(Obj_11x11[y][x] || Tile_11x11[y][x] >= 0x200)
 			return 1;
-		tile = D_C4AA[y][x];
+		tile = Tile_11x11[y][x];
 		return (tile != 0xff && tile != 0x10c);
 	}
 	return 0;

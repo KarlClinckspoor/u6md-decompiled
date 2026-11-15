@@ -119,30 +119,30 @@ extern int16 StatusMember;
 extern unsigned char IsInConversation;
 extern struct tSurface D_3232;/*Screen*/
 extern unsigned char ObjStatus[];
-extern char D_44C4[];/*MovePts*/
-extern unsigned char far *D_45C4;/*SchedIndex*/
-extern unsigned char far *D_45CC;/*NPCFlag*/
+extern char MovePts[];
+extern unsigned char far *SchedIndex;
+extern unsigned char far *NPCFlag;
 /*45D0*/extern unsigned char DEXTE[];
-extern unsigned char far *D_46D0;/*NPCMode*/
-extern unsigned char D_4EA4[];/*Party*/
+extern unsigned char far *NPCMode;
+extern unsigned char Party[];
 /*4EB6*/extern unsigned char far *Level;
-extern unsigned char far *D_50CA;/*Leader*/
+extern unsigned char far *Leader;
 extern char D_50CE[][14];/*Names*/
 /*51AE*/extern uint16 ExpPoints[];
-extern unsigned char far *D_53AE;/*NPCComMode*/
+extern unsigned char far *NPCComMode;
 /*53B2*/extern unsigned char STREN[];
 extern int16 Amount[];
-extern unsigned char D_6CBA[];/*NPCStatus*/
+extern unsigned char NPCStatus[];
 /*6DBE*/extern unsigned char HitPoints[];
 extern int16 far *D_6EBE;/*BaseTile*/
 extern unsigned char D_6EC6[];/*TalkFlags*/
 extern unsigned char far *D_760A;/*TileFlag2*/
 /*760E*/extern unsigned char INTEL[];
 extern struct coord ObjPos[];
-extern unsigned char D_9CC0;/*PartySize*/
+extern unsigned char PartySize;
 extern uint16 ObjShapeType[];
 extern unsigned char far *D_B4C4;/*TerrainType*/
-extern int16 far *D_B508;/*OrigShapeType*/
+extern int16 far *OrigShapeType;
 /*set by Missiles (gfx.c): the object hit where missile #0 stopped (with
   MissileShooter set), and where it stopped*/
 /*B9CA*/extern int16 MissileHitObj;
@@ -188,15 +188,15 @@ extern ShakeScreen(int16, int16);
 extern C_2F5F_0AC1(int16);
 extern DreamWakeUp();
 extern C_2F75_0B90();/*a cut scene*/
-extern int16 D_C0FA, D_C0FC;/*AreaX, AreaY*/
+extern int16 AreaX, AreaY;
 extern int16 LocPartOffset;
 extern int16 InsertObj(int16, int16, int16);
 extern int16 OBJ_FindNPCAt(int16, int16, int16);/*OBJ_FindNPCAt(startNum, x, y)*/
-extern int16 C_170D_0002(int16);
+extern int16 IsOutOfArea(int16);
 extern int16 OBJ_IsOnScreen(int16);
 extern int16 far *Explosion(int16, int16, int16);/*Explosion(x, y, missileTile): the objects hit, -1 terminated*/
-extern int16 C_170D_007E(int16, int16, int16);
-extern int16 C_170D_0853(int16, int16);
+extern int16 IsSquareOutOfArea(int16, int16, int16);
+extern int16 UpdateStepFrame(int16, int16);
 extern int16 NPC_TryStep(int16, int16, int16);
 extern int16 OBJ_NextOfTypeAt(int16);/*the next map object of the same type on the same square*/
 extern void cdecl TimerDelay(int32);/*wait (2383 per millisecond)*/
@@ -242,7 +242,7 @@ extern C_2F63_0086(void);/*the dreamer passes out*/
 extern C_2F63_062F(int16);
 extern char *GetTileString(int16);
 extern int16 MkDirection(int16, int16);
-extern C_170D_083F(int16, int16);/*UpdateMoveFrame(npc, direction)*/
+extern UpdateTurnFrame(int16, int16);/*turns an NPC towards dir*/
 extern far CON_UpdateMousePointer();
 extern int16 CON_getch();
 extern SubMov(int16, int16);/*SubMov(npc, points)*/
@@ -260,7 +260,6 @@ extern int16 D_EBF6, D_EBF8;/*Selection.x, Selection.y*/
 extern int16 D_EC44;/*SelectionIsDark*/
 extern unsigned char far *D_6DBA;/*TileFlag*/
 
-#define UpdateMoveFrame C_170D_083F
 #define MapAnimEnabled D_0F18
 #define PointerX D_EB74
 #define PointerY D_EB76
@@ -268,28 +267,16 @@ extern unsigned char far *D_6DBA;/*TileFlag*/
 #define SelectionY D_EBF8
 #define SelectionIsDark D_EC44
 #define TileFlag D_6DBA
-#define AreaX D_C0FA
-#define AreaY D_C0FC
 
 #define StatusDirty D_0F12
 #define PromptFlag D_0F13
 #define IsArmageddon D_0F15
 #define Screen D_3232
-#define MovePts D_44C4
-#define SchedIndex D_45C4
-#define NPCFlag D_45CC
-#define NPCMode D_46D0
-#define Party D_4EA4
-#define Leader D_50CA
 #define Names D_50CE
-#define NPCComMode D_53AE
-#define NPCStatus D_6CBA
 #define BaseTile D_6EBE
 #define TalkFlags D_6EC6
 #define TileFlag2 D_760A
-#define PartySize D_9CC0
 #define TerrainType D_B4C4
-#define OrigShapeType D_B508
 #define GrDriver D_BA6A
 #define Equipment D_EB04
 #define SelectionObj D_EBCE
@@ -1818,7 +1805,7 @@ extern int16 COMBAT_FireM60(int16, int16, int16, int16);
 				CON_printf("%s.\n", GetObjectString(SelectionObj));
 				dir = MkDirection(PointerX, PointerY);
 				if(dir != -1) {
-					UpdateMoveFrame(Party[Active], dir);
+					UpdateTurnFrame(Party[Active], dir);
 					VIS_UpdateView();
 				}
 			}
@@ -2728,7 +2715,7 @@ extern int16 COMBAT_FireM60(int16, int16, int16, int16);
 		}
 		return -1;
 	}
-	if(C_170D_0002(tail))
+	if(IsOutOfArea(tail))
 		return -1;
 	tailFrame = ObjShapeType[tail] >> 10;
 	frame = ObjShapeType[objNum] >> 10;
@@ -2773,10 +2760,10 @@ extern int16 COMBAT_FireM60(int16, int16, int16, int16);
 	}
 	x = GetX(objNum);
 	y = GetY(objNum);
-	if(!C_170D_0002(objNum) || objTyp == 0x172) {
+	if(!IsOutOfArea(objNum) || objTyp == 0x172) {
 		if(
 			objTyp == 0x174 && other &&
-			(C_170D_0002(other) || MapDistance(x, GetX(other)) > 8 || MapDistance(y, GetY(other)) > 8)
+			(IsOutOfArea(other) || MapDistance(x, GetX(other)) > 8 || MapDistance(y, GetY(other)) > 8)
 		) {
 			if((r = COMBAT_WormBackUp(objNum, 0)) >= 0)
 				SetQuan(objNum, r + 1);
@@ -2853,7 +2840,7 @@ extern int16 COMBAT_FireM60(int16, int16, int16, int16);
 			}
 			if(
 				GetQuan(objNum) - 1 == dir || !NPC_TryStep(objNum, tx, ty) ||
-				C_170D_007E(tx, ty, MapZ) || !C_170D_0853(objNum, dir)
+				IsSquareOutOfArea(tx, ty, MapZ) || !UpdateStepFrame(objNum, dir)
 			) {
 				if(diag) {
 					diag = 0;

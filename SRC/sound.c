@@ -66,8 +66,8 @@ extern char AnimateAtPrompt;
 extern int16 EndPagingAtPrompt;
 extern struct tClipInfo *CurClip;
 extern unsigned char ObjStatus[];
-extern unsigned char far *D_46D0;/*NPCMode*/
-extern unsigned char D_6CBA[];/*NPCStatus*/
+extern unsigned char far *NPCMode;
+extern unsigned char NPCStatus[];
 extern unsigned char HitPoints[];
 extern unsigned char D_6EC6[];/*TalkFlags (per NPC)*/
 extern uint16 ObjShapeType[];
@@ -76,7 +76,7 @@ extern int16 MaxHP(int16);
 extern ResetMapView();
 extern RefreshStatus();
 extern MAP_LoadAround();
-extern C_1534_0C51();/*the party wakes up after its death*/
+extern ResurrectParty();/*the party wakes up after its death*/
 extern int16 OBJ_FindTypeAt(int16, int16, int16);/*OBJ_FindTypeAt(type, x, y)*/
 extern int16 OBJ_FindNPCAt(int16, int16, int16);/*next object from (start, ?, ?)*/
 extern int16 AddMapObj(int16, int16, int16, int16, int16, int16);
@@ -125,8 +125,6 @@ extern void far *D_EA90[16];/*Songs: the songs of music.lzc*/
 #define StatusDirty D_0F12
 #define MapAnimEnabled D_0F18
 #define IN_DREAM (GameFlags & 0x10)
-#define NPCMode D_46D0
-#define NPCStatus D_6CBA
 #define TalkFlags D_6EC6
 #define LoopVoice D_EA76
 #define Songs D_EA90
@@ -549,7 +547,7 @@ extern int16 MUS_LoadSongs();
 		exit(4);
 	}
 	CON_printf(C_2BB4_00A4, (TalkFlags[0x46] & 8)?"the Olympus mine":"the space capsule");
-	C_1534_0C51();
+	ResurrectParty();
 	EndPagingAtPrompt = 1;
 	AnimateAtPrompt = 1;
 }

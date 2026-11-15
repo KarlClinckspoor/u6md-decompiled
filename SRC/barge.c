@@ -30,35 +30,35 @@ extern unsigned char Active;
 extern int16 MapX, MapY;
 extern char SoloMember;
 extern int32 GameFlags;/*0x10: in a dream*/
-extern unsigned char D_4EA4[];/*Party*/
+extern unsigned char Party[];
 extern int16 Amount[];/*quantity (low byte), quality (high byte)*/
-extern unsigned char D_6CBA[];/*NPCStatus*/
+extern unsigned char NPCStatus[];
 extern unsigned char far *D_6DBA;/*TileFlag*/
 extern int16 far *D_6EBE;/*BaseTile*/
 extern unsigned char D_6EC6[];/*TalkFlags (per NPC)*/
 extern unsigned char far *D_760A;/*TileFlag2*/
 extern int16 D_770E[];/*AnimFirstFrame*/
 extern struct coord ObjPos[];
-extern unsigned char D_9CC0;/*PartySize*/
+extern unsigned char PartySize;
 extern int16 D_9CC2;/*NumAnimData*/
 extern uint16 ObjShapeType[];
 extern int16 D_B4C8[];/*AnimTile*/
-extern int16 D_B530;/*barge_scrap_count*/
-extern int16 D_B532;/*barge_piece_count*/
-extern int16 D_B534[0x10];/*controllers*/
-extern int16 D_B554[0x10];/*bargeids*/
-extern int16 D_B574;/*numbarges*/
-extern int16 D_B576[0x200];/*barge_scrap*/
-extern int16 D_B976;/*barge_num*/
-extern int16 D_B978[9];/*CurrentBarge*/
-extern int16 D_B98A[0x20];/*barge_pieces*/
+/*B530*/extern int16 barge_scrap_count;/*the names are the dump's (BargeDump)*/
+/*B532*/extern int16 barge_piece_count;
+/*B534*/extern int16 controllers[0x10];/*the controllers found this turn (BargeAddController)*/
+/*B554*/extern int16 bargeids[0x10];/*their barge numbers*/
+/*B574*/extern int16 numbarges;
+/*B576*/extern int16 barge_scrap[0x200];/*the objects standing on the barge (belt.c: the belt pieces)*/
+/*B976*/extern int16 barge_num;/*the barge being moved*/
+/*B978*/extern int16 CurrentBarge[9];/*the leader's barge: its pieces of quantity 1-9 (the party's places)*/
+/*B98A*/extern int16 barge_pieces[0x20];/*its controller, then its pieces*/
 
 extern AnimateTiles();
 extern DisplayTick();
 extern MAP_LoadAround();
 extern unsigned char GetTileAtXYZ(int16, int16, int16);
-extern int16 C_170D_0002(int16);
-extern int16 C_170D_007E(int16, int16, int16);
+extern int16 IsOutOfArea(int16);
+extern int16 IsSquareOutOfArea(int16, int16, int16);
 extern int16 NextLoc();/*next object of FindLoc's search*/
 extern int16 FindLoc(int16, int16, int16);/*first object at (x, y, z)?*/
 extern int16 OBJ_FindTypeAt(int16, int16, int16);/*OBJ_FindTypeAt(type, x, y)*/
@@ -71,25 +71,13 @@ extern int16 IsWaterTile(int16);
 extern cdecl CON_printf(char far *, ...);
 
 #define IN_DREAM (GameFlags & 0x10)
-#define Party D_4EA4
-#define NPCStatus D_6CBA
 #define TileFlag D_6DBA
 #define BaseTile D_6EBE
 #define TalkFlags D_6EC6
 #define TileFlag2 D_760A
 #define AnimFirstFrame D_770E
-#define PartySize D_9CC0
 #define NumAnimData D_9CC2
 #define AnimTile D_B4C8
-#define barge_scrap_count D_B530
-#define barge_piece_count D_B532
-#define controllers D_B534
-#define bargeids D_B554
-#define numbarges D_B574
-#define barge_scrap D_B576
-#define barge_num D_B976
-#define CurrentBarge D_B978
-#define barge_pieces D_B98A
 
 
 #define GetType(i) (ObjShapeType[i] & 0x3ff)
@@ -240,7 +228,7 @@ extern cdecl CON_printf(char far *, ...);
 		i != -1;
 		i = NextArea()
 	) {
-		if(!C_170D_0002(i) && GetType(i) == 0x1a1 && GetQual(i) == barge_num && barge_piece_count < 0x20) {
+		if(!IsOutOfArea(i) && GetType(i) == 0x1a1 && GetQual(i) == barge_num && barge_piece_count < 0x20) {
 			barge_pieces[barge_piece_count] = i;
 			barge_piece_count ++;
 		}
@@ -266,7 +254,7 @@ extern cdecl CON_printf(char far *, ...);
 		}
 		x = (x + dx) & 0x3ff;
 		y = (y + dy) & 0x3ff;
-		if(C_170D_007E(x, y, z))
+		if(IsSquareOutOfArea(x, y, z))
 			return 0;
 		if(!IsWaterTile(GetTileAtXYZ(x, y, z))) {
 			ObjShapeType[ctrl] = GetType(ctrl) + 0x1000;

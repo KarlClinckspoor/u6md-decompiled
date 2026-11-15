@@ -84,33 +84,33 @@ extern int16 MapX, MapY, MapZ;
 extern int16 DiskFullChoice;
 /*3266*/extern unsigned char ObjStatus[];
 extern char far *D_3E80;/*the .lzc loader's work area*/
-extern unsigned char D_3E84[AREA_H][AREA_W];/*AreaFlags*/
-extern unsigned char far *D_45CC;/*NPCFlag*/
-extern unsigned char far *D_46D0;/*NPCMode*/
-extern unsigned char D_4EA4[];/*Party*/
-extern unsigned char far *D_50C0;/*ScratchBuf*/
+extern unsigned char AreaFlags[AREA_H][AREA_W];
+extern unsigned char far *NPCFlag;
+extern unsigned char far *NPCMode;
+extern unsigned char Party[];
+extern unsigned char far *ScratchBuf;
 extern char D_50CE[][14];/*Names*/
 extern char far *D_54B2;/*ScratchBuf + 0x36b0*/
 /*54BA*/extern int16 Amount[];
-extern unsigned char D_6CBA[];/*NPCStatus*/
+extern unsigned char NPCStatus[];
 extern unsigned char far *D_6DBA;/*TileFlag*/
 extern int16 far *D_6EBE;/*BaseTile*/
-extern unsigned char D_6FC6[AREA_H][AREA_W];/*AreaLight*/
+extern unsigned char AreaLight[AREA_H][AREA_W];
 extern unsigned char far *D_760A;/*TileFlag2*/
 /*78AE*/extern struct coord ObjPos[];
-extern unsigned char D_9CC0;/*PartySize*/
+extern unsigned char PartySize;
 /*9CC4*/extern uint16 ObjShapeType[];
 extern unsigned char far *D_B4C4;/*TerrainType*/
-extern int16 far *D_B508;/*OrigShapeType*/
-extern int16 D_C0FA, D_C0FC;/*AreaX, AreaY*/
+extern int16 far *OrigShapeType;
+extern int16 AreaX, AreaY;
 /*the display stacks ShowObjects builds: the first display node of each
   view cell, the tile | frame of each node, the next node ([0]: free list)*/
 /*C130*/extern unsigned char Obj_11x11[11][11];
 /*C1AA*/extern int16 CellObjTile[];
 /*C3AA*/extern unsigned char CellObjNext[];
-extern int16 D_C4AA[11][11];/*Tile_11x11*/
+extern int16 Tile_11x11[11][11];
 /*C59C*/extern int16 Link[];
-extern int16 D_BCCE, D_BCD0, D_C0F2, D_C0F4;/*the loaded area's first and last column/row in map order (map.c)*/
+extern int16 AreaFirstCol, AreaFirstRow, AreaLastCol, AreaLastRow;/*the loaded area's first and last column/row in map order (map.c)*/
 /*the free lists of the monster slots (0xc0-0xff) and of the objects*/
 /*DD9C*/extern int16 FreeMonsterCount;
 /*DDA4*/extern int16 FreeMonsterHead;
@@ -149,23 +149,11 @@ extern int16 IsContainerType(int16);
 #define StatusDirty D_0F12
 #define MapAnimEnabled D_0F18
 #define Erupting D_0F1A
-#define AreaFlags D_3E84
-#define NPCFlag D_45CC
-#define NPCMode D_46D0
-#define Party D_4EA4
-#define ScratchBuf D_50C0
 #define Names D_50CE
-#define NPCStatus D_6CBA
 #define TileFlag D_6DBA
 #define BaseTile D_6EBE
-#define AreaLight D_6FC6
 #define TileFlag2 D_760A
-#define PartySize D_9CC0
 #define TerrainType D_B4C4
-#define OrigShapeType D_B508
-#define AreaX D_C0FA
-#define AreaY D_C0FC
-#define Tile_11x11 D_C4AA
 #define WeightEquip D_EB16
 #define WeightInven D_EB1A
 
@@ -384,8 +372,8 @@ extern unsigned char D_6EC6[];/*TalkFlags*/
 /*position in the object list for location (x, y): the first object at or
   after it (wantPrev = 0), or the object after which an object placed there
   is to be linked (wantPrev != 0). Inside the loaded 40x40 area MapObjPtr
-  is scanned in map order: the area may cross the map's edge, D_BCCE/D_C0F2
-  (D_BCD0/D_C0F4) are its first and last column (row) in map order.*/
+  is scanned in map order: the area may cross the map's edge, AreaFirstCol/AreaLastCol
+  (AreaFirstRow/AreaLastRow) are its first and last column (row) in map order.*/
 /*C_1B09_00FD*/static OBJ_FindListPos(int16 x, int16 y, int16 wantPrev) {
 	struct coord xyz;
 	int16 i, prev, cur, objY;
@@ -399,9 +387,9 @@ extern unsigned char D_6EC6[];/*TalkFlags*/
 		col = relX;
 		row = relY;
 		while((obj = MapObjPtr[row][col]) == -1) {
-			if(col == D_C0F2) {
-				col = D_BCCE;
-				if(row == D_C0F4) {
+			if(col == AreaLastCol) {
+				col = AreaFirstCol;
+				if(row == AreaLastRow) {
 					obj = -1;
 					break;
 				}
@@ -419,9 +407,9 @@ extern unsigned char D_6EC6[];/*TalkFlags*/
 			col = relX;
 			row = relY;
 			do {
-				if(col == D_BCCE) {
-					col = D_C0F2;
-					if(row == D_BCD0) {
+				if(col == AreaFirstCol) {
+					col = AreaLastCol;
+					if(row == AreaFirstRow) {
 						prev = 0x100;
 						break;
 					}

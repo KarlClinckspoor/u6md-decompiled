@@ -106,7 +106,7 @@ extern TALK_talkTo(int16, int16, int16);
 /*canmove*/
 extern int16 CanMoveTo(int16, int16, int16);
 /*npctrack*/
-extern C_170D_083F(int16, int16);/*turns an NPC towards dir*/
+extern UpdateTurnFrame(int16, int16);/*turns an NPC towards dir*/
 extern SubMov(int16, int16);
 /*combat*/
 extern int16 GetStr(int16);
@@ -222,16 +222,16 @@ extern unsigned char PlayerIsFemale;
 extern int32 GameFlags;/*0x10: in a dream*/
 extern struct { unsigned a:4, b:4, c:4, d:4; } Talents[];
 extern unsigned char ObjStatus[];
-extern unsigned char D_4EA4[];/*Party*/
+extern unsigned char Party[];
 extern unsigned char far *Level;
 extern int16 Amount[];
-extern unsigned char D_6CBA[];/*NPCStatus*/
+extern unsigned char NPCStatus[];
 extern int16 far *D_6EBE;/*BaseTile*/
 extern unsigned char D_6EC6[];/*TalkFlags*/
 extern unsigned char far *D_7606;/*TypeWeight*/
 extern unsigned char far *D_760A;/*TileFlag2*/
 extern struct coord ObjPos[];
-extern unsigned char D_9CC0;/*PartySize*/
+extern unsigned char PartySize;
 extern uint16 ObjShapeType[];
 extern unsigned char far *D_B4C4;/*TerrainType*/
 extern union tHandler D_BA6A;/*GrDriver*/
@@ -249,13 +249,10 @@ extern int16 D_EBF6, D_EBF8;/*Selection.x, Selection.y*/
 extern int16 D_EC44;/*SelectionIsDark*/
 
 #define StatusDirty D_0F12
-#define Party D_4EA4
-#define NPCStatus D_6CBA
 #define BaseTile D_6EBE
 #define TalkFlags D_6EC6
 #define TypeWeight D_7606
 #define TileFlag2 D_760A
-#define PartySize D_9CC0
 #define TerrainType D_B4C4
 #define GrDriver D_BA6A
 #define InvenSize D_EAF8
@@ -596,7 +593,7 @@ extern int16 D_EC44;/*SelectionIsDark*/
 	CON_printf(C_2BB4_1CB7);
 	dir = MkDirection(PointerX, PointerY);
 	if(dir != -1) {
-		C_170D_083F(Party[Active], dir);
+		UpdateTurnFrame(Party[Active], dir);
 		VIS_UpdateView();
 	}
 	if(SelectionIsDark) {
@@ -1123,7 +1120,7 @@ extern int16 D_EC44;/*SelectionIsDark*/
 	}
 	dir = MkDirection(PointerX, PointerY);
 	if(dir != -1) {
-		C_170D_083F(actor, dir);
+		UpdateTurnFrame(actor, dir);
 		VIS_UpdateView();
 	}
 	if(QuanType(GetType(SelectionObj)) && GetQuan(SelectionObj) == 0)
@@ -1415,7 +1412,7 @@ extern int16 D_EC44;/*SelectionIsDark*/
 		}
 		dir = MkDirection(PointerX, PointerY);
 		if(dir != -1) {
-			C_170D_083F(Party[Active], dir);
+			UpdateTurnFrame(Party[Active], dir);
 			VIS_UpdateView();
 		}
 		objX = GetX(SelectionObj);
@@ -1622,7 +1619,7 @@ extern int16 D_EC44;/*SelectionIsDark*/
 			}
 			dir = MkDirection(PointerX, PointerY);
 			if(dir != -1) {
-				C_170D_083F(Party[Active], dir);
+				UpdateTurnFrame(Party[Active], dir);
 				VIS_UpdateView();
 			}
 			SubMov(Party[Active], 5);

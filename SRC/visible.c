@@ -4,10 +4,10 @@
  * (Ultima VI's visible.c, by way of Savage Empire's: SE GAME.EXE 09DA).
  *
  * VIS_UpdateView builds the 11x11 ground tiles shown around the party
- * (D_C4AA): it marks in the area flags (D_3E84) what the objects of the
- * area do to sight and light, then runs a breadth-first flood fill
+ * (Tile_11x11): it marks in the area flags (AreaFlags) what the objects of
+ * the area do to sight and light, then runs a breadth-first flood fill
  * (VIS_FloodFill) from the party's square and from every visible light
- * source, keeping the brightest light in D_6FC6. Squares never reached are
+ * source, keeping the brightest light in AreaLight. Squares never reached are
  * drawn as tile 0xff (hidden), reached but unlit ones as tile 0x10c
  * (darkness), and wall tiles seen from one side only are replaced by a
  * variant showing only their visible faces.
@@ -22,7 +22,7 @@
  *   0x80 visible from the party
  *
  * Differences from Savage Empire's: map coordinates wrap (& 0x3ff, distances
- * by MapDistance MapDistance); no VIS_IsInViewSquare; a square keeps the
+ * by MapDistance); no VIS_IsInViewSquare; a square keeps the
  * brightest light reaching it instead of the sum, and a light source of
  * level n spreads n + 1 squares; XRayView, or the active member's third
  * talent (Talents bits 8-11), shows the whole view lit and unhidden; objects
@@ -45,21 +45,21 @@ extern unsigned char Active;
 extern int16 MapX;
 extern int16 MapY;
 extern struct { unsigned a:4, psychic:4, c:4, d:4; } Talents[];
-extern unsigned char D_3E84[AREA_H][AREA_W];/*AreaFlags*/
-extern unsigned char D_46D4[AREA_H][AREA_W];/*AreaTiles: the ground tiles of the area*/
-extern unsigned char D_4EA4[];/*Party*/
+/*3E84*/extern unsigned char AreaFlags[AREA_H][AREA_W];
+extern unsigned char AreaTiles[AREA_H][AREA_W];/*the ground tiles of the area*/
+extern unsigned char Party[];
 extern int16 Amount[];/*quantity (low byte), quality (high byte)*/
 extern unsigned char far *D_6DBA;/*TileFlag: 0x03 light, 0x04 opaque, 0x08 window, 0x40 double height, 0x80 double width*/
 extern int16 far *D_6EBE;/*BaseTile: first tile of each object type*/
-extern unsigned char D_6FC6[AREA_H][AREA_W];/*AreaLight*/
+/*6FC6*/extern unsigned char AreaLight[AREA_H][AREA_W];
 extern unsigned char far *D_760A;/*TileFlag2: 0x20 background*/
 extern struct coord ObjPos[];
 extern uint16 ObjShapeType[];
 extern unsigned char far *D_B4C4;/*TerrainType: 0x0f kind (0x04 wall), 0x10 W, 0x20 S, 0x40 E, 0x80 N*/
-extern int16 D_BA82;/*AreaOffset*/
-extern unsigned char D_BA84[256];/*flood fill ring-buffer queue, x*/
-extern unsigned char D_BB84[256];/*flood fill ring-buffer queue, y*/
-extern int16 D_C4AA[11][11];/*Tile_11x11: the tiles of the map window*/
+/*BA82*/extern int16 AreaOffset;
+/*BA84*/extern unsigned char VisQueueX[256];/*flood fill ring-buffer queue, x*/
+/*BB84*/extern unsigned char VisQueueY[256];/*flood fill ring-buffer queue, y*/
+/*C4AA*/extern int16 Tile_11x11[11][11];/*the tiles of the map window*/
 
 extern int16 MapDistance(int16, int16);/*distance of two map coordinates (wrapping)*/
 extern MUS_PlaySfx(int16);/*play a sound effect?*/
@@ -68,11 +68,6 @@ extern int16 NextArea(void);/*next object of SearchArea*/
 extern ShowObjects(void);/*draw the map window*/
 extern int16 OSI_rand(int16, int16);/*OSI_rand(lo, hi)*/
 
-#define Party D_4EA4
-#define AreaOffset D_BA82
-#define AreaFlags D_3E84
-#define AreaTiles D_46D4
-#define AreaLight D_6FC6
 #define TileFlag D_6DBA
 #define TileFlag2 D_760A
 #define TerrainType D_B4C4
@@ -99,7 +94,7 @@ extern int16 OSI_rand(int16, int16);/*OSI_rand(lo, hi)*/
 	{7,7,7,8,8,9,9,10}
 };
 
-/*flood fill queue (ring buffer of 256 in D_BA84/D_BB84)*/
+/*flood fill queue (ring buffer of 256 in VisQueueX/VisQueueY)*/
 /*0EE6*/static unsigned char visited_w = 0;
 /*0EE7*/static unsigned char visited_r = 0;
 
@@ -159,8 +154,8 @@ static /*C_1157_000A*/VIS_IsSeeThrough(int16 x, int16 y) {
   (the queue silently drops squares when full)*/
 static /*C_1157_00A6*/VIS_Enqueue(int16 x, int16 y) {
 	if(x >= 0 && x < AREA_W && y >= 0 && y < AREA_H) {
-		D_BA84[visited_w] = x;
-		D_BB84[visited_w] = y;
+		VisQueueX[visited_w] = x;
+		VisQueueY[visited_w] = y;
 		if(++visited_w == visited_r)
 			visited_w --;
 		else
@@ -196,8 +191,8 @@ static /*C_1157_00A6*/VIS_Enqueue(int16 x, int16 y) {
 			VIS_Enqueue(x, y + 1);
 	}
 	while(visited_w != visited_r) {
-		curX = D_BA84[visited_r];
-		curY = D_BB84[visited_r];
+		curX = VisQueueX[visited_r];
+		curY = VisQueueY[visited_r];
 		visited_r ++;
 		AreaOffset = curY << 3;
 		AreaOffset += AreaOffset << 2;
@@ -252,7 +247,7 @@ static /*C_1157_00A6*/VIS_Enqueue(int16 x, int16 y) {
 			}\
 		}
 
-/*compute the visible 11x11 tiles (D_C4AA) and the light of the
+/*compute the visible 11x11 tiles (Tile_11x11) and the light of the
   area around the party, then redraw the map window*/
 /*C_1157_0312*/VIS_UpdateView() {
 	unsigned char *pTiles,*pLight;
@@ -273,7 +268,7 @@ static /*C_1157_00A6*/VIS_Enqueue(int16 x, int16 y) {
 		}
 		for(cellY = 0; cellY < 11; cellY ++) {
 			for(cellX = 0; cellX < 11; cellX ++) {
-				D_C4AA[cellY][cellX] = AreaTiles[cellY + ViewY][cellX + ViewX];
+				Tile_11x11[cellY][cellX] = AreaTiles[cellY + ViewY][cellX + ViewX];
 				AreaFlags[cellY + ViewY][cellX + ViewX] |= 0x80;
 			}
 		}
@@ -368,7 +363,7 @@ static /*C_1157_00A6*/VIS_Enqueue(int16 x, int16 y) {
 		}
 
 		/*build the 11x11 view*/
-		pView = &(D_C4AA[0][0]);
+		pView = &(Tile_11x11[0][0]);
 		pLight = &(AreaLight[ViewY][ViewX]);
 		pFlags = &(AreaFlags[ViewY][ViewX]);
 		pTiles = &(AreaTiles[ViewY][ViewX]);

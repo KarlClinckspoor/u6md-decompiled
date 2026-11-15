@@ -35,7 +35,7 @@ extern PrintTileArticle(int16);/*show a tile in the text window?*/
 extern int16 COMBAT_getHead(int16);
 extern int16 COMBAT_range(int16, int16, int16, int16);/*distance of (x1, y1) and (x2, y2)*/
 extern DisplayTick();
-extern C_170D_083F(int16, int16);/*UpdateMoveFrame(npc, direction)*/
+extern UpdateTurnFrame(int16, int16);/*turns an NPC towards dir*/
 extern SubMov(int16, int16);/*SubMov(npc, points)*/
 extern char *GetTileString(int16);
 extern char *GetObjectString(int16);
@@ -66,7 +66,7 @@ extern int16 EndPagingAtPrompt;
 extern int16 MouseMode;
 extern struct { unsigned char originX, originY, cols, rows, curX, curY, fgColor, bgColor, attrFlags; } *CurClip;
 extern unsigned char ObjStatus[];
-extern unsigned char D_4EA4[];/*Party*/
+extern unsigned char Party[];
 extern unsigned char far *Level;
 extern int16 far *D_6EBE;/*BaseTile*/
 extern unsigned char far *D_760A;/*TileFlag2: 0x10 ignored*/
@@ -78,7 +78,6 @@ extern int16 D_EBF6, D_EBF8;/*Selection.x, Selection.y*/
 /*the distance of the last target (GetUseTarget)*/
 /*EC46*/extern int16 TargetDist;
 
-#define Party D_4EA4
 #define BaseTile D_6EBE
 #define TileFlag2 D_760A
 #define PointerX D_EB74
@@ -86,7 +85,6 @@ extern int16 D_EBF6, D_EBF8;/*Selection.x, Selection.y*/
 #define SelectionObj D_EBCE
 #define SelectionX D_EBF6
 #define SelectionY D_EBF8
-#define UpdateMoveFrame C_170D_083F
 #define OnMsg C_2BB4_01C0
 #define NoEffectMsg C_2BB4_02A4
 #define OutOfRangeMsg C_2BB4_03A6
@@ -648,7 +646,7 @@ extern void C_2F98_1EC7(int16, int16, int16);
 	if(GetCoordUse(SelectionObj) == 0) {
 		dir = MkDirection(PointerX, PointerY);
 		if(dir != -1) {
-			UpdateMoveFrame(Party[Active], dir);
+			UpdateTurnFrame(Party[Active], dir);
 			VIS_UpdateView();
 		}
 		x = GetX(Party[Active]);

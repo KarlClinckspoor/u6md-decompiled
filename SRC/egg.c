@@ -47,27 +47,27 @@ extern int16 MapX, MapY;
 extern unsigned char DreamFoesLeft;
 extern int32 GameFlags;/*0x10: in a dream*/
 extern unsigned char DirOriginX, DirOriginY;/*screen position of the party*/
-extern unsigned char far *D_3262;/*MAGIC?*/
+extern unsigned char far *D_3262;/*per NPC: talk flags 8-15 (0x80: waiting)*/
 extern unsigned char ObjStatus[];
-extern char D_44C4[];/*MovePts*/
+extern char MovePts[];
 extern unsigned char DEXTE[];
-extern unsigned char far *D_46D0;/*NPCMode*/
+extern unsigned char far *NPCMode;
 extern unsigned char far *Level;
 extern uint16 ExpPoints[];
-extern unsigned char far *D_53AE;/*NPCComMode*/
+extern unsigned char far *NPCComMode;
 extern unsigned char STREN[];
 extern int16 Amount[];/*quantity (low byte), quality (high byte)*/
-extern unsigned char D_6CBA[];/*NPCStatus*/
+extern unsigned char NPCStatus[];
 extern unsigned char HitPoints[];
 extern unsigned char D_6EC6[];/*TalkFlags*/
 extern unsigned char INTEL[];
 extern struct coord ObjPos[];
 extern uint16 ObjShapeType[];
 extern unsigned char far *D_B4C4;/*TerrainType*/
-extern int16 far *D_B508;/*OrigShapeType*/
-extern int16 D_C0FA, D_C0FC;/*AreaX, AreaY*/
-extern int16 D_C0FE;/*GetMonsterClass: last type looked up*/
-extern int16 D_C100;/*GetMonsterClass: its class*/
+extern int16 far *OrigShapeType;
+extern int16 AreaX, AreaY;
+/*C0FE*/extern int16 MonClassLastType;/*GetMonsterClass: last type looked up*/
+/*C100*/extern int16 MonClassLast;/*GetMonsterClass: its class*/
 extern int16 HatchingDisabled;
 
 extern int16 IsOpenWater(int16, int16);
@@ -93,15 +93,8 @@ extern int16 OSI_rand(int16, int16);/*OSI_rand(lo, hi)*/
 
 #define HearSomethingMsg C_2BB4_134E
 #define PromptFlag D_0F13
-#define MovePts D_44C4
-#define NPCMode D_46D0
-#define NPCComMode D_53AE
-#define NPCStatus D_6CBA
 #define TalkFlags D_6EC6
 #define TerrainType D_B4C4
-#define OrigShapeType D_B508
-#define AreaX D_C0FA
-#define AreaY D_C0FC
 
 
 #define GetType(i) (ObjShapeType[i] & 0x3ff)
@@ -120,16 +113,16 @@ extern int16 OSI_rand(int16, int16);/*OSI_rand(lo, hi)*/
 /*C_1649_000A*/GetMonsterClass(int16 objType) {
 	int16 far *p;
 
-	if(objType == D_C0FE)
-		return D_C100;
-	D_C0FE = objType;
-	D_C100 = 0;
+	if(objType == MonClassLastType)
+		return MonClassLast;
+	MonClassLastType = objType;
+	MonClassLast = 0;
 	for(p = MonsterTypes + 1; *p; p ++) {
 		if(*p == objType)
-			return D_C100;
-		D_C100 ++;
+			return MonClassLast;
+		MonClassLast ++;
 	}
-	return D_C100 = -1;
+	return MonClassLast = -1;
 }
 
 /*random value in [val - val/2, val + val/2] (triangular distribution)*/

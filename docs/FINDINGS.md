@@ -84,12 +84,12 @@ The layout of both programs is in `docs/MAP.md`.
   - Differences go through `WrapDelta` (C_1534_1101, a value in -0x200..0x200) or
     `MapDistance` (C_1534_1129), where SE subtracted or used `abs()`.
 - **The 40x40 area can cross the map's edge.**
-  - `MAP_BuildArea` records where it crosses: when AreaX > 0x3d8, D_BCCE = 0x400 - AreaX and
-    D_C0F2 = D_BCCE - 1. Y is handled the same way in D_BCD0/D_C0F4.
+  - `MAP_BuildArea` records where it crosses: when AreaX > 0x3d8, AreaFirstCol = 0x400 - AreaX
+    and AreaLastCol = AreaFirstCol - 1. Y is handled the same way in AreaFirstRow/AreaLastRow.
   - `OBJ_FindListPos` scans `MapObjPtr` in map order across the edge.
   - `SearchArea(x1, y1, x2, y2)` takes x1 > x2 (or y1 > y2) as a rectangle that crosses
     it (AreaWrapX/AreaWrapY D_EA4E/D_EA50).
-  - C_170D_0002/007E tell whether an object or a square is outside the area.
+  - IsOutOfArea/IsSquareOutOfArea tell whether an object or a square is outside the area.
   - The peer map lost SE's world-edge cases.
 - **Double tiles.**
   - `FindLoc` keeps four cursors (LocCursor[4] D_158E, LocTarget[4] D_159A): the square,
@@ -105,7 +105,7 @@ The layout of both programs is in `docs/MAP.md`.
   - Waking from the dream resets it.
 - **Entrances.** SE had destination tables by object type. MD has one table,
   Entrances[24] (DS 1344), of (x, y, z) by the entrance's quality 1-24.
-  - Object 0xc5 has its own four places (D_13D4) and needs TalkFlags[0x73] & 0x10.
+  - Object 0xc5 has its own four places (ChamberDests) and needs TalkFlags[0x73] & 0x10.
   - Objects of types 0xaf/0xd2 and 0xa3 are moved along with the party.
   - SE's type-0x44 travel objects are gone.
 - **Levels.**
@@ -115,7 +115,7 @@ The layout of both programs is in `docs/MAP.md`.
     there between dreams.
 - **Where the game starts and where the party wakes.** The game starts at 8:00 on day 6 of
   month 1, 1895, at (0x198, 0x270, 0) (gamestat.c).
-  - After the party's death (C_1534_0C51) it wakes at 7:00-7:59 at (0xa4, 0xc3, 4), the
+  - After the party's death (ResurrectParty) it wakes at 7:00-7:59 at (0xa4, 0xc3, 4), the
     "Olympus mine", once TalkFlags[0x46] & 8 is set. Otherwise it wakes at
     (0x19d, 0x278, 0), the "space capsule". Then conversation 0x12 runs.
   - In SE the party woke in Intanya's hut, seven days later.

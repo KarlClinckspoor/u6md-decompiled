@@ -171,17 +171,17 @@ extern int16 PromptCh;
 extern struct tClipInfo *CurClip;
 extern unsigned char ObjStatus[];
 extern char far *D_3E80;/*work area of the .lzc loader*/
-extern unsigned char D_4EA4[];/*Party*/
+extern unsigned char Party[];
 extern unsigned char far *Level;
 extern char D_50CE[][14];/*Names*/
 extern int16 Amount[];/*quantity (low byte), quality (high byte)*/
-extern unsigned char D_6CBA[];/*NPCStatus*/
+extern unsigned char NPCStatus[];
 extern int16 far *D_6EBE;/*BaseTile*/
 extern char far *D_6EC2;/*TalkBuf*/
 extern unsigned char D_6EC6[];/*TalkFlags*/
 extern unsigned char far *D_760A;/*TileFlag2*/
 extern struct coord ObjPos[];
-extern unsigned char D_9CC0;/*PartySize*/
+extern unsigned char PartySize;
 extern uint16 ObjShapeType[];
 extern unsigned char far *D_B4C4;/*TerrainType*/
 extern int16 Link[];
@@ -195,14 +195,11 @@ extern int16 TargetDist;/*distance of the last target (use.c)*/
 extern int16 D_F0CA;/*set when a dirt action failed (the load is not used up)*/
 
 #define MapAnimEnabled D_0F18
-#define Party D_4EA4
 #define Names D_50CE
-#define NPCStatus D_6CBA
 #define BaseTile D_6EBE
 #define TalkBuf D_6EC2
 #define TalkFlags D_6EC6
 #define TileFlag2 D_760A
-#define PartySize D_9CC0
 #define TerrainType D_B4C4
 #define Selection D_EBCE
 #define TextWindows D_EBD0

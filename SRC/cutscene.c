@@ -85,34 +85,27 @@ extern char D_3232;/*a drawing surface (main.c)*/
 extern unsigned char far *D_3262;/*talk flags 8-15*/
 extern unsigned char ObjStatus[];
 extern char far *D_3E80;/*work area of the .lzc loader*/
-extern unsigned char far *D_45C4;/*0x100 bytes*/
-extern unsigned char far *D_46D0;/*NPCMode*/
-extern char far *D_4EBA;/*Schedule (5 bytes each)*/
-extern int16 D_4EBE[0x101];/*SchedPointer*/
-extern char far *D_50C0;/*ScratchBuf*/
-extern unsigned char D_6CBA[];/*NPCStatus*/
+extern unsigned char far *SchedIndex;/*0x100 bytes*/
+extern unsigned char far *NPCMode;
+extern char far *Schedule;/*5 bytes each*/
+extern int16 SchedPointer[0x101];
+extern char far *ScratchBuf;
+extern unsigned char NPCStatus[];
 extern char far *D_6EC2;/*TalkBuf*/
 extern struct coord ObjPos[];
 extern uint16 ObjShapeType[];
 extern struct tGr far *D_BA66;/*GrInfo*/
 extern union tHandler D_BA6A;/*GrDriver*/
-extern int16 D_C0FA, D_C0FC;/*AreaX, AreaY*/
+extern int16 AreaX, AreaY;
 extern struct tClipInfo D_EBD0[4];/*TextWindows*/
 extern int16 D_EC42;/*LinesBeforeMore*/
 
 #define StatusDirty D_0F12
 #define PromptFlag D_0F13
 #define MapAnimEnabled D_0F18
-#define NPCMode D_46D0
-#define Schedule D_4EBA
-#define SchedPointer D_4EBE
-#define ScratchBuf D_50C0
-#define NPCStatus D_6CBA
 #define TalkBuf D_6EC2
 #define GrInfo D_BA66
 #define GrDriver D_BA6A
-#define AreaX D_C0FA
-#define AreaY D_C0FC
 #define TextWindows D_EBD0
 #define LinesBeforeMore D_EC42
 
@@ -577,7 +570,7 @@ extern int16 D_EC42;/*LinesBeforeMore*/
 	}
 	for(i = 0x2a; i <= 0x31; i ++) {
 		D_3262[i] &= ~0x80;
-		pos = *(struct coord far *)(Schedule + (D_45C4[i] + SchedPointer[i]) * 5 + 2);
+		pos = *(struct coord far *)(Schedule + (SchedIndex[i] + SchedPointer[i]) * 5 + 2);
 		MoveObj(i, (*(int16 *)&pos.raw[0]) & 0x3ff, ((*(int16 *)&pos.raw[1]) >> 2) & 0x3ff, pos.raw[2] >> 4);
 	}
 	MapX = 0x64;

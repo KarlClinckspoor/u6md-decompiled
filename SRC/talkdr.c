@@ -181,7 +181,7 @@ extern int16 IsWeightPer10Type(int16);
 extern STAT_ComputeEquipment(int16);/*SE: STAT_ComputeWeights*/
 extern int16 OBJ_FindInContainer(int16, int16, int16);/*OBJ_FindInContainer(npc, type, quality)*/
 extern int16 SPELL_ReviveNPC(int16);/*SPELL_ReviveNPC(dead body): the NPC, or < 0*/
-extern C_170D_083F(int16, int16);/*UpdateMoveFrame(npc, direction)*/
+extern UpdateTurnFrame(int16, int16);/*turns an NPC towards dir*/
 extern int16 GetStr(int16);/*strength of an NPC (with modifiers?)*/
 extern int16 MaxHP(int16);
 extern SetTypeUnconscious(int16);/*an NPC falls asleep (shape)*/
@@ -191,7 +191,6 @@ extern LoadConversation(int16, unsigned char far *);/*LoadConversation(npc, buff
 extern int16 HasConversation(int16);/*has the npc a conversation script?*/
 extern ClearMapWindow(int16);
 extern int16 OSI_rand(int16, int16);/*OSI_rand(lo, hi)*/
-#define UpdateMoveFrame C_170D_083F
 #define StatusDirty D_0F12
 /*overlay 2F83 (talk.c's code in Savage Empire's talkdr.c)*/
 extern char *TALK_GetCharName(int16);
@@ -223,19 +222,19 @@ extern char SoloMember;
 extern unsigned char far *D_3262;/*NPC flags: 0x80 ?, bits 0-7: talk flags 8-15*/
 extern unsigned char ObjStatus[];
 extern unsigned char DEXTE[];
-extern unsigned char far *D_46D0;/*NPCMode*/
-extern unsigned char D_4EA4[];/*Party*/
+extern unsigned char far *NPCMode;
+extern unsigned char Party[];
 extern unsigned char far *Level;
 extern uint16 ExpPoints[];
 extern unsigned char STREN[];
-extern unsigned char D_6CBA[];/*NPCStatus*/
+extern unsigned char NPCStatus[];
 extern unsigned char HitPoints[];
 extern unsigned char far *D_6EC2;/*TalkBuf*/
 extern unsigned char D_6EC6[];/*TalkFlags*/
 extern unsigned char far *D_7606;/*TypeWeight*/
 extern unsigned char INTEL[];
 extern struct coord ObjPos[];
-extern unsigned char D_9CC0;/*PartySize*/
+extern unsigned char PartySize;
 extern uint16 ObjShapeType[];
 extern int16 D_EB74, D_EB76;/*PointerX, PointerY*/
 extern int16 D_EB86[10+26];/*VarInt*/
@@ -260,10 +259,6 @@ extern void far *D_BA7E;/*mdscreen.lzc entry 2: default command mark*/
 #define GR_DRAW_BITMAP(s,x,y,p,m)    (D_BA6A.iii.ofs = 0x30, (*D_BA6A.f)(s,x,y,p,m))
 
 #define MapAnimEnabled D_0F18
-#define PartySize D_9CC0
-#define Party D_4EA4
-#define NPCStatus D_6CBA
-#define NPCMode D_46D0
 #define TalkBuf D_6EC2
 #define Talk_PC D_ECDC
 #define TalkBase D_ECA0
@@ -1104,7 +1099,7 @@ until OP_LEAVE/OP_SCRIPT_MARK*/
 	/*face the npc*/
 	dir = MkDirection(D_EB74, D_EB76);
 	if(dir != -1) {
-		UpdateMoveFrame(Party[Active], dir);
+		UpdateTurnFrame(Party[Active], dir);
 		VIS_UpdateView();
 	}
 

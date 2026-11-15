@@ -20,13 +20,11 @@ extern int16 JoinParty(int16);
 
 extern int16 MapZ;
 extern int16 Amount[];/*quantity (low byte), quality (high byte)*/
-extern unsigned char D_6CBA[];/*NPCStatus*/
+extern unsigned char NPCStatus[];
 extern unsigned char HitPoints[];
 extern struct coord ObjPos[];
 extern uint16 ObjShapeType[];
-extern int16 far *D_B508;/*OrigShapeType*/
-#define NPCStatus D_6CBA
-#define OrigShapeType D_B508
+extern int16 far *OrigShapeType;
 
 #define GetX(i) ((*(int16 *)&(ObjPos[i].raw[0]))&0x3ff)
 #define GetY(i) (((*(int16 *)&(ObjPos[i].raw[1]))>>2)&0x3ff)

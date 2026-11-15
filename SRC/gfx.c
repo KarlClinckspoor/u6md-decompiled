@@ -162,15 +162,15 @@ extern unsigned char AnimateAtPrompt;
 extern struct tSurface D_3232;/*Screen*/
 extern unsigned char ObjStatus[];
 extern char far *D_3E80;/*work area of the .lzc loader*/
-extern unsigned char D_3E84[AREA_H][AREA_W];/*AreaFlags*/
-extern unsigned char D_46D4[AREA_H][AREA_W];/*AreaTiles*/
+extern unsigned char AreaFlags[AREA_H][AREA_W];
+extern unsigned char AreaTiles[AREA_H][AREA_W];
 extern char far *D_54B2;/*ScratchBuf + 0x36b0*/
 extern int16 Amount[];/*quantity (low byte), quality (high byte)*/
-extern unsigned char D_6CBA[];/*NPCStatus*/
+extern unsigned char NPCStatus[];
 extern unsigned char far *D_6DBA;/*TileFlag*/
 extern int16 far *D_6EBE;/*BaseTile*/
 extern unsigned char D_6EC6[];/*TalkFlags*/
-extern unsigned char D_6FC6[AREA_H][AREA_W];/*AreaLight*/
+extern unsigned char AreaLight[AREA_H][AREA_W];
 extern int16 D_770E[];/*AnimFirstFrame*/
 extern struct coord ObjPos[];
 extern struct tSurface D_9CAE;/*MapSurface*/
@@ -186,12 +186,12 @@ extern int16 D_BA72;/*width - 1 of the shaken rectangle*/
 extern void far *D_BA78;/*the paper doll picture (mdinv.lzc)*/
 extern int16 D_BA7C;/*its entry, -1: none*/
 extern void far *D_BA7E;/*mdscreen.lzc entry 2: the sky*/
-extern int16 D_C0FA;/*AreaX*/
-extern int16 D_C0FC;/*AreaY*/
+extern int16 AreaX;
+extern int16 AreaY;
 extern unsigned char Obj_11x11[11][11];/*first entry of each cell's object tiles*/
 extern int16 CellObjTile[];
 extern unsigned char CellObjNext[];
-extern int16 D_C4AA[11][11];/*Tile_11x11*/
+extern int16 Tile_11x11[11][11];
 extern int16 MissileHitObj;
 extern int16 MissileEnd[2];
 
@@ -320,7 +320,7 @@ static DiskConfirm(int16);
 				if(tile && (TileFlag[tile & 0x7ff] & 0x10))
 					GR_PUT_TILE(tile & 0x7ff, TIL2SCR(tx), TIL2SCR(ty));
 			}
-			if(D_C4AA[ty][tx] == 0xff || D_C4AA[ty][tx] == 0x10c)
+			if(Tile_11x11[ty][tx] == 0xff || Tile_11x11[ty][tx] == 0x10c)
 				GR_PUT_TILE(0xff, TIL2SCR(tx), TIL2SCR(ty));
 		}
 	}
@@ -807,7 +807,7 @@ int16 far /*C_0E1A_1003*/*C_0E1A_1003(int16 x, int16 y, int16 x2, int16 y2, int1
 
 	for(i = 0; i < 11; i ++) {
 		for(j = 0; j < 11; j ++)
-			D_C4AA[i][j] = 0xff;
+			Tile_11x11[i][j] = 0xff;
 	}
 	for(i = 0; i < 0x100; i++)
 		CellObjNext[i] = i + 1;
@@ -1134,8 +1134,8 @@ int16 far /*C_0E1A_1003*/*C_0E1A_1003(int16 x, int16 y, int16 x2, int16 y2, int1
 	isUnderground = (MapZ > 0 && MapZ < 5);
 	for(row = 0; row < AREA_H; row ++) {
 		for(col = 0; col < AREA_W; col ++)
-			D_3E84[row][col] =
-			D_6FC6[row][col] = 0;
+			AreaFlags[row][col] =
+			AreaLight[row][col] = 0;
 	}
 	rowStart = colStart = 0;
 	rowEnd = colEnd = 40;
@@ -1148,19 +1148,19 @@ int16 far /*C_0E1A_1003*/*C_0E1A_1003(int16 x, int16 y, int16 x2, int16 y2, int1
 	/*terrain*/
 	for(row = rowStart; row < rowEnd; row ++) {
 		for(col = colStart; col < colEnd; col ++) {
-			tile = D_46D4[row][col];
-			if(isUnderground && !(D_3E84[row][col] & 0x80))
+			tile = AreaTiles[row][col];
+			if(isUnderground && !(AreaFlags[row][col] & 0x80))
 				tile = 0xff;
 			peer_tile(tile, (col << 2) + 8, (row << 2) + 8);
 		}
 	}
 	/*objects (NPC #0 only if under player control)*/
-	for(objNum = SearchArea(D_C0FA, D_C0FC, (D_C0FA + (AREA_W-1)) & 0x3ff, (D_C0FC + (AREA_H-1)) & 0x3ff); objNum >= 0; objNum = NextArea()) {
-		if(objNum == 0 && (D_6CBA[objNum] & 0x80) == 0)
+	for(objNum = SearchArea(AreaX, AreaY, (AreaX + (AREA_W-1)) & 0x3ff, (AreaY + (AREA_H-1)) & 0x3ff); objNum >= 0; objNum = NextArea()) {
+		if(objNum == 0 && (NPCStatus[objNum] & 0x80) == 0)
 			continue;
-		col = WrapDelta(GetX(objNum) - D_C0FA);
-		row = WrapDelta(GetY(objNum) - D_C0FC);
-		if(isUnderground && (D_3E84[row][col] & 0x80) == 0)
+		col = WrapDelta(GetX(objNum) - AreaX);
+		row = WrapDelta(GetY(objNum) - AreaY);
+		if(isUnderground && (AreaFlags[row][col] & 0x80) == 0)
 			continue;
 		if(objNum < 0x100 && objNum >= 0) {
 			peer_tile(-1, (col << 2) + 8, (row << 2) + 8);

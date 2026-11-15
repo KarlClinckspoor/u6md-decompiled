@@ -91,25 +91,22 @@ extern int16 D_1E4A;/*dream.c's: how fast it animates (0-4)*/
 extern struct tClipInfo *CurClip;
 extern unsigned char D_3240[0x20];/*AnimFrameMask*/
 extern unsigned char ObjStatus[];
-extern unsigned char D_4EA4[];/*Party*/
+extern unsigned char Party[];
 extern int16 Amount[];/*quantity (low byte), quality (high byte)*/
 extern unsigned char D_6EC6[];/*TalkFlags*/
 extern struct coord ObjPos[];
-extern unsigned char D_9CC0;/*PartySize*/
+extern unsigned char PartySize;
 extern uint16 ObjShapeType[];
 extern unsigned char far *D_B4C4;/*TerrainType*/
-extern int16 far *D_B508;/*OrigShapeType*/
+extern int16 far *OrigShapeType;
 extern unsigned char D_B50C[0x20];/*AnimFrameShift*/
 extern union tHandler D_BA6A;/*GrDriver*/
 extern struct tClipInfo D_EBD0[4];/*TextWindows*/
 extern char DirIncrX[8], DirIncrY[8];
 
 #define PromptFlag D_0F13
-#define Party D_4EA4
 #define TalkFlags D_6EC6
-#define PartySize D_9CC0
 #define TerrainType D_B4C4
-#define OrigShapeType D_B508
 #define GrDriver D_BA6A
 #define TextWindows D_EBD0
 

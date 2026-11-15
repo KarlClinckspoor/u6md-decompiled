@@ -26,9 +26,9 @@ extern unsigned char Active;
 extern int16 MapZ;
 extern int16 AvatarNotSolid;
 extern unsigned char ObjStatus[];
-extern unsigned char far *D_45CC;/*NPCFlag*/
-extern unsigned char D_4EA4[];/*Party*/
-extern unsigned char D_6CBA[];/*NPCStatus*/
+extern unsigned char far *NPCFlag;
+extern unsigned char Party[];
+extern unsigned char NPCStatus[];
 extern unsigned char far *D_6DBA;/*TileFlag*/
 extern unsigned char D_6EC6[];/*TalkFlags*/
 extern int16 far *D_6EBE;/*BaseTile*/
@@ -55,9 +55,6 @@ extern int16 GetDigClass(int16);
 extern cdecl CON_printf(char far *, ...);
 extern void cdecl TimerDelay(int32);
 
-#define NPCFlag D_45CC
-#define Party D_4EA4
-#define NPCStatus D_6CBA
 #define TileFlag D_6DBA
 #define TalkFlags D_6EC6
 #define BaseTile D_6EBE

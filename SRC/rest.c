@@ -57,7 +57,7 @@ extern MAP_LoadAround();
 extern PartyEnter(int16);
 extern PartyExit(int16, int16, int16, int16);
 extern int16 MapDistance(int16, int16);/*wrapping*/
-extern int16 C_170D_2BB4(int16);/*true for a man (the dream's pronoun)*/
+extern int16 IsMale(int16);/*true for a man (the dream's pronoun)*/
 extern int16 NextArea(void);
 extern int16 SearchArea(int16, int16, int16, int16);/*SearchArea(x1, y1, x2, y2)*/
 extern int16 AddMapObj(int16, int16, int16, int16, int16, int16);/*AddMapObj(type, status, quantity, x, y, z)*/
@@ -99,26 +99,23 @@ extern int16 StatusDisplay;/*0x90 a member, 0x91 the party, 0x92 the equipment*/
 extern struct tClipInfo *CurClip;
 extern char IsInConversation;
 extern unsigned char DEXTE[];
-extern unsigned char D_4EA4[];/*Party*/
+extern unsigned char Party[];
 extern unsigned char far *Level;
 extern char D_50CE[][14];/*Names*/
 extern uint16 ExpPoints[];
 extern unsigned char STREN[];
-extern unsigned char D_6CBA[];/*NPCStatus*/
+extern unsigned char NPCStatus[];
 extern unsigned char HitPoints[];
 extern unsigned char INTEL[];
 extern struct coord ObjPos[];
-extern unsigned char D_9CC0;/*PartySize*/
+extern unsigned char PartySize;
 extern uint16 ObjShapeType[];
 extern struct tClipInfo D_EBD0[4];/*TextWindows*/
 extern int16 D_EC42;/*LinesBeforeMore*/
 
 #define StatusDirty D_0F12
 #define IdleAnimTick D_0F16
-#define Party D_4EA4
 #define Names D_50CE
-#define NPCStatus D_6CBA
-#define PartySize D_9CC0
 #define TextWindows D_EBD0
 #define LinesBeforeMore D_EC42
 
@@ -193,7 +190,7 @@ extern int16 D_EC42;/*LinesBeforeMore*/
 		return;
 	Level[npc] ++;
 	name = TALK_GetCharName(npc);
-	if(C_170D_2BB4(npc)) {
+	if(IsMale(npc)) {
 		pronoun[2] = 0;
 		pronoun[1] = 'e';
 		pronoun[0] = 'H';

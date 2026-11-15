@@ -156,18 +156,18 @@ extern int16 D_3260;/*free memory for the driver, in KB*/
 extern char far *D_3262;/*0x100 bytes*/
 extern struct tMouse D_3E66;/*Mouse*/
 extern char far *D_3E80;/*work area of the .lzc loader (0x3500 bytes)*/
-extern char far *D_45C4;/*0x100 bytes*/
-extern char far *D_45C8;/*0x100 bytes*/
-extern char far *D_45CC;/*0x100 bytes*/
-extern char far *D_46D0;/*0x100 bytes*/
+extern char far *SchedIndex;/*0x100 bytes*/
+extern char far *PathData;/*0x100 bytes*/
+extern char far *NPCFlag;/*0x100 bytes*/
+extern char far *NPCMode;/*0x100 bytes*/
 extern uint16 D_4D14[200];/*ScreenScanlines*/
 extern char far *Level;/*0x100 bytes*/
-extern char far *D_4EBA;/*3000 bytes*/
-extern char far *D_50C0;/*ScratchBuf: 0x7900 bytes, also the map view back buffer*/
+extern char far *Schedule;/*3000 bytes*/
+extern char far *ScratchBuf;/*0x7900 bytes, also the map view back buffer*/
 extern uint16 D_50C4;/*GrMemorySeg*/
 extern char far *D_50C6;/*PointerShapes*/
-extern char far *D_50CA;/*0x100 bytes*/
-extern char far *D_53AE;/*0x100 bytes*/
+extern char far *Leader;/*0x100 bytes*/
+extern char far *NPCComMode;/*0x100 bytes*/
 extern char far *D_54B2;/*ScratchBuf + 0x36b0*/
 extern uint32 D_54B6;/*memory given to the graphic driver*/
 extern char far *D_6DBA;/*TileFlag*/
@@ -182,13 +182,13 @@ extern void huge *D_9CBC;/*GrMemory*/
 extern int16 D_9CC2;/*NumAnimData*/
 extern char far *D_B4C4;/*TerrainType*/
 extern int16 D_B4C8[0x20];/*AnimTile*/
-extern int16 far *D_B508;/*0x100 words*/
+extern int16 far *OrigShapeType;/*0x100 words*/
 extern unsigned char D_B50C[0x20];/*AnimFrameShift*/
 extern struct tRGB far *D_B52C;/*VGAPalette*/
 extern struct tGr far *D_BA66;/*GrInfo*/
 extern union tHandler D_BA6A;/*GrDriver*/
 extern void far *D_BA7E;/*mdscreen.lzc entry 2*/
-extern char far *D_C0F6;/*0x600 bytes*/
+extern char far *ChunkIndexBuf;/*0x600 bytes*/
 extern struct tClipInfo D_EBD0[4];/*TextWindows*/
 
 /*====---- ----====*/
@@ -651,39 +651,39 @@ extern struct tClipInfo D_EBD0[4];/*TextWindows*/
 	__MemAlloc(&D_6EBE, 0x800);
 	__MemAlloc(&D_7606, 0x400);
 	__MemAlloc(&D_760A, 0x800);
-	__MemAlloc(&D_4EBA, 3000);
-	__MemAlloc(&D_46D0, 0x100);
+	__MemAlloc(&Schedule, 3000);
+	__MemAlloc(&NPCMode, 0x100);
 	__MemAlloc(&D_3262, 0x100);
-	__MemAlloc(&D_53AE, 0x100);
-	__MemAlloc(&D_45C4, 0x100);
-	__MemAlloc(&D_50CA, 0x100);
-	__MemAlloc(&D_45CC, 0x100);
-	__MemAlloc(&D_B508, 0x100 * sizeof(int16));
+	__MemAlloc(&NPCComMode, 0x100);
+	__MemAlloc(&SchedIndex, 0x100);
+	__MemAlloc(&Leader, 0x100);
+	__MemAlloc(&NPCFlag, 0x100);
+	__MemAlloc(&OrigShapeType, 0x100 * sizeof(int16));
 	__MemAlloc(&Level, 0x100);
-	__MemAlloc(&D_45C8, 0x100);
-	__MemAlloc(&D_C0F6, 0x600);
+	__MemAlloc(&PathData, 0x100);
+	__MemAlloc(&ChunkIndexBuf, 0x600);
 
 	/*ScratchBuf is also the 176x176 (0x7900 bytes) map view back buffer:
 	  MapScanlines gives the offsets of its inner part (8 pixels border)*/
-	__MemAlloc(&D_50C0, 0x7900);
-	D_6EC2 = D_BA66->pWorkBuf = D_50C0;
-	linearAddr = PtrToLinear(D_50C0);
+	__MemAlloc(&ScratchBuf, 0x7900);
+	D_6EC2 = D_BA66->pWorkBuf = ScratchBuf;
+	linearAddr = PtrToLinear(ScratchBuf);
 	D_54B2 = LinearToPtr(linearAddr + 0x36b0);
 	if(GrAdapter == 0) {/*VGA*/
-		D_9CAE.segment = FP_SEG(D_50C0);
-		D_774E[0] = FP_OFF(D_50C0);
+		D_9CAE.segment = FP_SEG(ScratchBuf);
+		D_774E[0] = FP_OFF(ScratchBuf);
 		for(i = 1; i < 0xa0; i++)
 			D_774E[i] = D_774E[i - 1] + 0xb0;
 	} else
 	if(GrAdapter == 2) {/*TANDY*/
-		D_9CAE.segment = FP_SEG(D_50C0);
-		D_774E[0] = FP_OFF(D_50C0);
+		D_9CAE.segment = FP_SEG(ScratchBuf);
+		D_774E[0] = FP_OFF(ScratchBuf);
 		for(i = 1; i < 0xa0; i++)
 			D_774E[i] = D_774E[i - 1] + 0x80;
 	} else
 	if(GrAdapter == 3 || GrAdapter == 4) {/*CGA/HERCULES*/
-		D_9CAE.segment = FP_SEG(D_50C0);
-		D_774E[0] = FP_OFF(D_50C0);
+		D_9CAE.segment = FP_SEG(ScratchBuf);
+		D_774E[0] = FP_OFF(ScratchBuf);
 		for(i = 1; i < 0xa0; i++)
 			D_774E[i] = D_774E[i - 1] + 0x50;
 	}

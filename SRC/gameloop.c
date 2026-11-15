@@ -102,7 +102,7 @@ extern int16 GetStr(int16);/*an NPC's strength*/
 extern int16 GetInt(int16);/*an NPC's intelligence*/
 extern int16 GetWarmth(int16);/*of a worn type*/
 extern int16 IsLitLightType(int16);
-extern int16 C_170D_0002(int16);
+extern int16 IsOutOfArea(int16);
 extern UpdateSchedules();
 extern int16 OBJ_IsLocLoaded(int16, int16, int16);/*OBJ_IsLocLoaded(x, y, z)*/
 extern int16 FindInv(int16);
@@ -212,7 +212,7 @@ extern unsigned char DefaultCommand;
 extern int16 cdecl emsInUse;/*EMSINIT.ASM*/
 extern int16 D_3260;/*free memory for the tiles, in KB*/
 extern unsigned char far *D_3262;/*talk flags 8-15*/
-extern char D_44C4[];/*MovePts*/
+extern char MovePts[];
 extern unsigned char far *Level;
 extern void far *D_BA7E;/*mdscreen.lzc entry 2: default command mark*/
 extern int16 D_EB72;/*AdvanceDir*/
@@ -237,13 +237,13 @@ extern int16 StatusMember;
 extern int16 StatusDisplay;
 extern unsigned char IsResting;
 extern unsigned char ObjStatus[];
-extern unsigned char far *D_46D0;/*NPCMode*/
-extern unsigned char D_4EA4[];/*Party*/
+extern unsigned char far *NPCMode;
+extern unsigned char Party[];
 extern char D_50CE[][14];/*Names*/
 extern unsigned char far *D_6DBA;/*TileFlag*/
 extern unsigned char D_6EC6[];/*TalkFlags*/
-extern unsigned char D_9CC0;/*PartySize*/
-extern uint16 far *D_B508;/*OrigShapeType*/
+extern unsigned char PartySize;
+extern uint16 far *OrigShapeType;
 extern int16 D_EC4A;
 extern unsigned char D_BC84[5];/*HexInputBuf*/
 extern unsigned char D_BC89[6];/*DecInputBuf*/
@@ -252,9 +252,9 @@ extern int16 MapX, MapY, MapZ;
 extern struct tSurface D_3232;/*Screen*/
 extern unsigned char D_3240[0x20];/*AnimFrameMask*/
 extern struct tMouse D_3E66;/*Mouse*/
-extern unsigned char far *D_45CC;/*NPCFlag*/
+extern unsigned char far *NPCFlag;
 extern int16 Amount[];
-extern unsigned char D_6CBA[];/*NPCStatus*/
+extern unsigned char NPCStatus[];
 extern unsigned char HitPoints[];
 extern int16 far *D_6EBE;/*BaseTile*/
 extern unsigned char far *D_760A;/*TileFlag2*/
@@ -271,10 +271,9 @@ extern unsigned char D_BC8E[0x20];/*StateAnimData*/
 extern unsigned char Obj_11x11[11][11];
 extern int16 CellObjTile[];
 extern unsigned char CellObjNext[];
-extern int16 D_C4AA[11][11];/*Tile_11x11*/
+extern int16 Tile_11x11[11][11];
 extern struct tSurface D_EB78;/*MouseArea*/
 
-#define MovePts D_44C4
 #define AdvanceDir D_EB72
 #define Selection_obj D_EBCE
 #define Selection_x D_EBF6
@@ -302,18 +301,12 @@ extern struct tSurface D_EB78;/*MouseArea*/
 #define GR_DRAW_BITMAP(s,x,y,p,m)    (D_BA6A.iii.ofs = 0x30, (*D_BA6A.f)(s,x,y,p,m))
 #define HexInputBuf D_BC84
 #define DecInputBuf D_BC89
-#define NPCMode D_46D0
-#define Party D_4EA4
 #define Names D_50CE
 #define TileFlag D_6DBA
 #define TalkFlags D_6EC6
-#define PartySize D_9CC0
-#define OrigShapeType D_B508
 #define Screen D_3232
 #define AnimFrameMask D_3240
 #define Mouse D_3E66
-#define NPCFlag D_45CC
-#define NPCStatus D_6CBA
 #define BaseTile D_6EBE
 #define TileFlag2 D_760A
 #define AnimFirstFrame D_770E
@@ -323,7 +316,6 @@ extern struct tSurface D_EB78;/*MouseArea*/
 #define AnimTile D_B4C8
 #define AnimFrameShift D_B50C
 #define StateAnimData D_BC8E
-#define Tile_11x11 D_C4AA
 #define MouseArea D_EB78
 #define GetOwner(i) (*(int16 *)&(ObjPos[i].raw[0]))
 
@@ -697,7 +689,7 @@ time-dependent state) and process everything that depends on it*/
 	BargeClear();
 	if(minutes > 0) {
 		for(i = 0x101; i < 0xc00; i++) {
-			if(!C_170D_0002(i)) {
+			if(!IsOutOfArea(i)) {
 				switch(GetType(i)) {
 					case 0x1a2: BargeAddController(i); break;
 					case 0x1d0: UpdateJet(i); break;
@@ -727,7 +719,7 @@ time-dependent state) and process everything that depends on it*/
 			if(i == 0)
 				continue;
 			warmth = 0;
-			if(minutes && !(NPCStatus[i] & 4) && !C_170D_0002(i)) {
+			if(minutes && !(NPCStatus[i] & 4) && !IsOutOfArea(i)) {
 				if(i == 6 || !(TalkFlags[0x10] & 0x20) || FindInvOfType(i, 0x83) >= 0) {
 					if(ObjStatus[i] & 0x40) {
 						ObjStatus[i] &= ~0x40;

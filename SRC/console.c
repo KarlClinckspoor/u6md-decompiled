@@ -202,41 +202,41 @@ extern char D_3232;/*a drawing surface (main.c)*/
 extern char far *D_3262;/*0x100 bytes*/
 extern unsigned char ObjStatus[];
 extern struct tMouse D_3E66;/*Mouse*/
-extern char D_44C4[];/*MovePts*/
-extern char far *D_45C4;/*0x100 bytes*/
-extern char far *D_45C8;/*0x100 bytes*/
-extern char far *D_45CC;/*0x100 bytes*/
+extern char MovePts[];
+extern char far *SchedIndex;/*0x100 bytes*/
+extern char far *PathData;/*0x100 bytes*/
+extern char far *NPCFlag;/*0x100 bytes*/
 extern unsigned char DEXTE[];
-extern unsigned char far *D_46D0;/*NPCMode*/
-extern unsigned char D_4EA4[];/*Party*/
+extern unsigned char far *NPCMode;
+extern unsigned char Party[];
 extern unsigned char far *Level;
-extern char far *D_4EBA;/*Schedule (5 bytes each)*/
-extern int16 D_4EBE[0x101];/*SchedPointer*/
+extern char far *Schedule;/*5 bytes each*/
+extern int16 SchedPointer[0x101];
 extern void far *D_50C6;/*PointerShapes*/
-extern char far *D_50CA;/*0x100 bytes*/
+extern char far *Leader;/*0x100 bytes*/
 extern char D_50CE[][14];/*Names*/
 extern uint16 ExpPoints[];
-extern unsigned char far *D_53AE;/*NPCComMode*/
+extern unsigned char far *NPCComMode;
 extern unsigned char STREN[];
 extern int16 Amount[];
-extern unsigned char D_6CBA[];/*NPCStatus*/
+extern unsigned char NPCStatus[];
 extern unsigned char HitPoints[];
 extern int16 far *D_6EBE;/*BaseTile*/
 extern unsigned char D_6EC6[];/*TalkFlags*/
 extern unsigned char INTEL[];
 extern int16 D_770E[];
 extern struct coord ObjPos[];
-extern unsigned char D_9CC0;/*PartySize*/
+extern unsigned char PartySize;
 extern int16 D_9CC2;/*NumAnimData*/
 extern uint16 ObjShapeType[];
 extern int16 D_B4C8[];
-extern int16 far *D_B508;/*OrigShapeType*/
+extern int16 far *OrigShapeType;
 extern struct tGr far *D_BA66;/*GrInfo*/
 extern union tHandler D_BA6A;/*GrDriver*/
 extern void far *D_BA7E;/*mdscreen.lzc entry 2: default command mark*/
 extern unsigned char D_BC8E[];/*StateAnimData*/
 extern unsigned char Obj_11x11[11][11];/*objects shown in the map window*/
-extern int16 D_C4AA[11][11];/*Tile_11x11: the tiles of the map window*/
+extern int16 Tile_11x11[11][11];/*the tiles of the map window*/
 extern unsigned char D_EAF9[8];/*Party_2Handed*/
 extern int16 D_EB00;/*ShowNPCInven*/
 extern int16 D_EB02;/*NPC_2Handed*/
@@ -263,20 +263,13 @@ extern int16 D_EC44;/*SelectionIsDark*/
 #define IdleAnimTick D_0F16
 #define MapAnimEnabled D_0F18
 #define Mouse D_3E66
-#define NPCMode D_46D0
-#define Party D_4EA4
-#define SchedPointer D_4EBE
 #define PointerShapes D_50C6
-#define NPCComMode D_53AE
 #define BaseTile D_6EBE
 #define TalkFlags D_6EC6
-#define PartySize D_9CC0
 #define NumAnimData D_9CC2
-#define OrigShapeType D_B508
 #define GrInfo D_BA66
 #define GrDriver D_BA6A
 #define StateAnimData D_BC8E
-#define Tile_11x11 D_C4AA
 #define Party_2Handed D_EAF9
 #define ShowNPCInven D_EB00
 #define NPC_2Handed D_EB02
@@ -652,7 +645,7 @@ the game's flags, and the status panel colors*/
 
 	fd = OSI_open(/*1C81*/"schedule");
 	OSI_read(fd, 0, (0x100 + 1) * sizeof(int16), SchedPointer);
-	OSI_read(fd, -1, (int32)SchedPointer[0x100] * 5, D_4EBA);
+	OSI_read(fd, -1, (int32)SchedPointer[0x100] * 5, Schedule);
 	OSI_close(fd);
 
 	fd = OSI_open(/*1C8A*/"basetile");
@@ -664,7 +657,7 @@ the game's flags, and the status panel colors*/
 	OSI_read(fd, -1, 0x100 * sizeof(struct coord), ObjPos);
 	OSI_read(fd, -1, 0x200, ObjShapeType);
 	OSI_read(fd, -1, 0x200, Amount);
-	OSI_read(fd, -1, 0x100, D_6CBA);
+	OSI_read(fd, -1, 0x100, NPCStatus);
 	OSI_read(fd, -1, 0x100, STREN);
 	OSI_read(fd, -1, 0x100, DEXTE);
 	OSI_read(fd, -1, 0x100, INTEL);
@@ -674,17 +667,17 @@ the game's flags, and the status panel colors*/
 	OSI_read(fd, -1, 0x10, Party);
 	OSI_read(fd, -1, 1, &PartySize);
 	OSI_read(fd, -1, 0x100, Level);
-	OSI_read(fd, -1, 0x100, D_45C4);
+	OSI_read(fd, -1, 0x100, SchedIndex);
 	OSI_read(fd, -1, 0x100, NPCMode);
 	OSI_read(fd, -1, 0x100, D_3262);
 	OSI_read(fd, -1, 0x100, NPCComMode);
-	OSI_read(fd, -1, 0x100, D_44C4);
-	OSI_read(fd, -1, 0x100, D_44C4);
+	OSI_read(fd, -1, 0x100, MovePts);
+	OSI_read(fd, -1, 0x100, MovePts);
 	OSI_read(fd, -1, 0x100 * sizeof(int16), OrigShapeType);
 	OSI_read(fd, -1, 0x100, TalkFlags);
-	OSI_read(fd, -1, 0x100, D_50CA);
-	OSI_read(fd, -1, 0x100, D_45CC);
-	OSI_read(fd, -1, 0x100, D_45C8);
+	OSI_read(fd, -1, 0x100, Leader);
+	OSI_read(fd, -1, 0x100, NPCFlag);
+	OSI_read(fd, -1, 0x100, PathData);
 	OSI_read(fd, -1, (int32)((char *)&GameStateEnd - (char *)&IsOnQuest), &IsOnQuest);
 	OSI_close(fd);
 
@@ -810,7 +803,7 @@ the game's flags, and the status panel colors*/
 	OSI_write(fd, -1, 0x100 * sizeof(struct coord), ObjPos);
 	OSI_write(fd, -1, 0x200, ObjShapeType);
 	OSI_write(fd, -1, 0x200, Amount);
-	OSI_write(fd, -1, 0x100, D_6CBA);
+	OSI_write(fd, -1, 0x100, NPCStatus);
 	OSI_write(fd, -1, 0x100, STREN);
 	OSI_write(fd, -1, 0x100, DEXTE);
 	OSI_write(fd, -1, 0x100, INTEL);
@@ -820,17 +813,17 @@ the game's flags, and the status panel colors*/
 	OSI_write(fd, -1, 0x10, Party);
 	OSI_write(fd, -1, 1, &PartySize);
 	OSI_write(fd, -1, 0x100, Level);
-	OSI_write(fd, -1, 0x100, D_45C4);
+	OSI_write(fd, -1, 0x100, SchedIndex);
 	OSI_write(fd, -1, 0x100, NPCMode);
 	OSI_write(fd, -1, 0x100, D_3262);
 	OSI_write(fd, -1, 0x100, NPCComMode);
-	OSI_write(fd, -1, 0x100, D_44C4);
-	OSI_write(fd, -1, 0x100, D_44C4);
+	OSI_write(fd, -1, 0x100, MovePts);
+	OSI_write(fd, -1, 0x100, MovePts);
 	OSI_write(fd, -1, 0x100 * sizeof(int16), OrigShapeType);
 	OSI_write(fd, -1, 0x100, TalkFlags);
-	OSI_write(fd, -1, 0x100, D_50CA);
-	OSI_write(fd, -1, 0x100, D_45CC);
-	OSI_write(fd, -1, 0x100, D_45C8);
+	OSI_write(fd, -1, 0x100, Leader);
+	OSI_write(fd, -1, 0x100, NPCFlag);
+	OSI_write(fd, -1, 0x100, PathData);
 	OSI_write(fd, -1, (int32)((char *)&GameStateEnd - (char *)&IsOnQuest), &IsOnQuest);
 	OSI_close(fd);
 

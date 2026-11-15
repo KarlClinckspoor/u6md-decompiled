@@ -50,14 +50,13 @@ extern int16 MapZ;
 extern int32 GameFlags;/*0x10: in a dream*/
 extern int16 ViewRotation;/*rotation of the map view (eighths of a turn)?*/
 extern int16 DreamStage;
-extern unsigned char D_4EA4[];/*Party*/
+extern unsigned char Party[];
 extern int16 Amount[];/*quantity (low byte), quality (high byte)*/
 extern unsigned char D_6EC6[];/*TalkFlags (per NPC)*/
 extern struct coord ObjPos[];
 extern uint16 ObjShapeType[];
 
 #define IN_DREAM (GameFlags & 0x10)
-#define Party D_4EA4
 #define TalkFlags D_6EC6
 
 

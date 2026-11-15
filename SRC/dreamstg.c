@@ -63,18 +63,18 @@ extern struct tClipInfo *CurClip;
 extern unsigned char D_3240[0x20];/*AnimFrameMask*/
 extern unsigned char far *D_3262;/*talk flags 8-15*/
 extern unsigned char ObjStatus[];
-extern unsigned char far *D_46D0;/*NPCMode*/
-extern unsigned char far *D_53AE;/*NPCComMode*/
+extern unsigned char far *NPCMode;
+extern unsigned char far *NPCComMode;
 extern int16 Amount[];/*quantity (low byte), quality (high byte)*/
-extern unsigned char D_6CBA[];/*NPCStatus*/
+extern unsigned char NPCStatus[];
 extern unsigned char HitPoints[];
 extern unsigned char D_6EC6[];/*TalkFlags*/
 extern struct coord ObjPos[];
-extern unsigned char D_9CC0;/*PartySize*/
+extern unsigned char PartySize;
 extern int16 D_9CC2;/*NumAnimData*/
 extern uint16 ObjShapeType[];
 extern int16 D_B4C8[0x20];/*AnimTile*/
-extern uint16 far *D_B508;/*OrigShapeType*/
+extern uint16 far *OrigShapeType;
 extern union tHandler D_BA6A;/*GrDriver*/
 extern struct tClipInfo D_EBD0[4];/*TextWindows*/
 extern char DirIncrX[8], DirIncrY[8];
@@ -82,14 +82,9 @@ extern char DirIncrX[8], DirIncrY[8];
 #define StatusDirty D_0F12
 #define PromptFlag D_0F13
 #define MapAnimEnabled D_0F18
-#define NPCMode D_46D0
-#define NPCComMode D_53AE
-#define NPCStatus D_6CBA
 #define TalkFlags D_6EC6
-#define PartySize D_9CC0
 #define NumAnimData D_9CC2
 #define AnimTile D_B4C8
-#define OrigShapeType D_B508
 #define GrDriver D_BA6A
 #define TextWindows D_EBD0
 

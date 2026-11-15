@@ -108,9 +108,9 @@ extern int32 GameFlags;/*0x10: in a dream*/
 extern int16 StatusMember;
 extern int16 StatusDisplay;
 extern unsigned char far *D_3262;/*NPC flags: 0x80 ?, bits 0-7: talk flags 8-15*/
-extern unsigned char far *D_46D0;/*NPCMode*/
-extern unsigned char far *D_53AE;/*NPCComMode*/
-extern int16 far *D_B508;/*OrigShapeType*/
+extern unsigned char far *NPCMode;
+extern unsigned char far *NPCComMode;
+extern int16 far *OrigShapeType;
 extern int16 ColorText;
 extern int16 D_0826;/*color of the player's input*/
 extern unsigned char Time_M, Time_H;
@@ -127,24 +127,18 @@ extern int16 D_EBF6, D_EBF8;/*Selection.x, Selection.y*/
 extern unsigned char IsResting;
 extern struct tClipInfo *CurClip;
 extern unsigned char ObjStatus[];
-extern unsigned char D_4EA4[];/*Party*/
+extern unsigned char Party[];
 extern int16 Amount[];/*quantity (low byte), quality (high byte)*/
-extern unsigned char D_6CBA[];/*NPCStatus*/
+extern unsigned char NPCStatus[];
 extern int16 far *D_6EBE;/*BaseTile*/
 extern unsigned char D_6EC6[];/*TalkFlags*/
 extern struct coord ObjPos[];
-extern unsigned char D_9CC0;/*PartySize*/
+extern unsigned char PartySize;
 extern uint16 ObjShapeType[];
 
 #define MapAnimEnabled D_0F18
-#define OrigShapeType D_B508
-#define NPCMode D_46D0
-#define NPCComMode D_53AE
-#define Party D_4EA4
-#define NPCStatus D_6CBA
 #define BaseTile D_6EBE
 #define TalkFlags D_6EC6
-#define PartySize D_9CC0
 
 #define GetType(i) (ObjShapeType[i] & 0x3ff)
 #define GetFrame(i) (ObjShapeType[i] >> 10)

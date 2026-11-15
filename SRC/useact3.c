@@ -88,11 +88,11 @@ extern int16 StatusMember;
 extern int16 MouseMode;
 extern int16 StatusDisplay;
 extern unsigned char ObjStatus[];
-extern unsigned char D_4EA4[];/*Party*/
+extern unsigned char Party[];
 extern unsigned char far *Level;
 extern char D_50CE[][14];/*Names*/
 extern int16 Amount[];/*quantity (low byte), quality (high byte)*/
-extern unsigned char D_6CBA[];/*NPCStatus*/
+extern unsigned char NPCStatus[];
 extern unsigned char D_6EC6[];/*TalkFlags*/
 extern struct coord ObjPos[];
 extern uint16 ObjShapeType[];
@@ -102,9 +102,7 @@ extern int16 D_EB72;/*AdvanceDir*/
 extern int16 D_EBCE;/*Selection.obj*/
 extern int16 D_EBF6, D_EBF8;/*Selection.x, Selection.y*/
 
-#define Party D_4EA4
 #define Names D_50CE
-#define NPCStatus D_6CBA
 #define TalkFlags D_6EC6
 #define TerrainType D_B4C4
 #define Equipment D_EB04

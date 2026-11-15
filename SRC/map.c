@@ -8,23 +8,23 @@
  * - "map": the chunk indexes, packed 2 per 3 bytes (12 bits each).
  *   The surface (z=0, 1024x1024 tiles) is split in 8x8 "superchunks"
  *   of 16x16 chunks (0x180 bytes each); only a 2x2 window of superchunks
- *   is kept in the chunk index buffer (D_C0F6). The other levels are 32x32
- *   chunks (0x600 bytes) each and are loaded entirely.
- * The 40x40 tiles around the party (AreaTiles D_46D4, origin AreaX/AreaY
- * D_C0FA/D_C0FC) are rebuilt from a small LRU cache of 16 chunks (D_BCF2).
+ *   is kept in the chunk index buffer (ChunkIndexBuf). The other levels
+ *   are 32x32 chunks (0x600 bytes) each and are loaded entirely.
+ * The 40x40 tiles around the party (AreaTiles, origin AreaX/AreaY) are
+ * rebuilt from a small LRU cache of 16 chunks (ChunkCache).
  * This module also moves the whole party between places: gathering
  * (PartyEnter), spreading out (PartyExit), teleport, going in and out
  * of caves by their entrances, and coming back to life after the party died.
  *
  * Differences from Savage Empire's: no DISK_confirm; MAP_BuildArea records
- * where the area crosses the map's edge (D_BCCE/D_C0F2, D_BCD0/D_C0F4) and
- * offsets are wrapped by WrapDelta (WrapDelta, new, like MapDistance
+ * where the area crosses the map's edge (AreaFirstCol/AreaLastCol,
+ * AreaFirstRow/AreaLastRow) and offsets are wrapped by WrapDelta (new, like
  * MapDistance); a party whose Active is PartySize (alone?) moves as one
  * object; PartyEnter's mode 2 shows an object 0x13c with a sound;
- * the entrances (C_1534_096C) are one table of (x, y, z) by quality, with
- * object 0xc5 (a talk flag needed) and the objects moved along by
- * 0xaf/0xd2/0xa3; SE's object 0x44 teleporters (C_08CB_0B8B) are gone;
- * after the party's death (C_1534_0C51) the party wakes up at 7 o'clock at
+ * the entrances (GoThroughEntrance) are one table of (x, y, z) by quality,
+ * with the alien device chamber 0xc5 (ChamberDests, a talk flag needed)
+ * and the objects moved along by 0xaf/0xd2/0xa3; SE's object 0x44 teleporters (C_08CB_0B8B) are gone;
+ * after the party's death (ResurrectParty) the party wakes up at 7 o'clock at
  * one of two places and the event conversation 0x12 runs.
  */
 #include "se.h"
@@ -61,29 +61,32 @@ extern char SoloMember;
 extern char SavedNPCMode;
 extern int16 StatusDisplay;
 extern unsigned char ObjStatus[];
-extern char D_44C4[];/*MovePts*/
-extern unsigned char far *D_45CC;/*NPCFlag*/
-extern unsigned char far *D_46D0;/*NPCMode*/
-extern unsigned char D_46D4[AREA_H][AREA_W];/*AreaTiles*/
-extern unsigned char D_4EA4[];/*Party*/
-extern unsigned char far *D_50CA;
+extern char MovePts[];
+extern unsigned char far *NPCFlag;
+extern unsigned char far *NPCMode;
+/*46D4*/extern unsigned char AreaTiles[AREA_H][AREA_W];/*the ground tiles of the area*/
+extern unsigned char Party[];
+extern unsigned char far *Leader;
 extern uint16 ExpPoints[];
 extern int16 Amount[];/*quantity (low byte), quality (high byte)*/
-extern unsigned char D_6CBA[];/*NPCStatus*/
+extern unsigned char NPCStatus[];
 extern unsigned char HitPoints[];
 extern unsigned char D_6EC6[];/*TalkFlags (per NPC)*/
 extern struct coord ObjPos[];
-extern unsigned char D_9CC0;/*PartySize*/
+extern unsigned char PartySize;
 extern uint16 ObjShapeType[];
 extern int16 D_B9D6[0x40];/*MissileHitList*/
-extern int16 far *D_B508;/*OrigShapeType*/
-extern int16 D_BCAE[16];/*ChunkCacheAge*/
-extern int16 D_BCCE, D_BCD0;
-extern int16 D_BCD2[16];/*ChunkCacheIdx*/
-extern unsigned char D_BCF2[16][8][8];/*ChunkCache*/
-extern int16 D_C0F2, D_C0F4;
-extern unsigned char far *D_C0F6;/*ChunkIndexBuf*/
-extern int16 D_C0FA, D_C0FC;/*AreaX, AreaY*/
+extern int16 far *OrigShapeType;
+/*BCAE*/extern int16 ChunkCacheAge[16];
+/*BCCE*/extern int16 AreaFirstCol;/*the area's first column in map order (where x wraps to 0)*/
+/*BCD0*/extern int16 AreaFirstRow;/*its first row in map order*/
+/*BCD2*/extern int16 ChunkCacheIdx[16];
+/*BCF2*/extern unsigned char ChunkCache[16][8][8];
+/*C0F2*/extern int16 AreaLastCol;/*its last column in map order*/
+/*C0F4*/extern int16 AreaLastRow;/*its last row in map order*/
+/*C0F6*/extern unsigned char far *ChunkIndexBuf;
+/*C0FA*/extern int16 AreaX;/*the area's top-left corner on the map*/
+/*C0FC*/extern int16 AreaY;
 extern int16 Link[];
 extern int16 MapObjPtr[AREA_H][AREA_W];
 extern int16 D_EBCE;/*Selection.obj*/
@@ -126,22 +129,8 @@ extern char far C_2BB4_21CD[];
 extern char far C_2BB4_22F1[];
 
 #define StatusDirty D_0F12
-#define MovePts D_44C4
-#define NPCFlag D_45CC
-#define NPCMode D_46D0
-#define AreaTiles D_46D4
-#define Party D_4EA4
-#define NPCStatus D_6CBA
 #define TalkFlags D_6EC6
-#define PartySize D_9CC0
 #define MissileHitList D_B9D6
-#define OrigShapeType D_B508
-#define ChunkCacheAge D_BCAE
-#define ChunkCacheIdx D_BCD2
-#define ChunkCache D_BCF2
-#define ChunkIndexBuf D_C0F6
-#define AreaX D_C0FA
-#define AreaY D_C0FC
 #define Selection D_EBCE
 
 
@@ -163,7 +152,7 @@ extern char far C_2BB4_22F1[];
 /*1342*/int16 BuiltAreaZ = -1;/*MapZ of the area tiles currently built*/
 
 /*where the entrances lead (x, y, z), by the entrance object's quality 1-24
-  (see C_1534_096C)*/
+  (see GoThroughEntrance)*/
 /*1344*/int16 Entrances[24][3] = {
 	{0x043,0x051,1},{0x080,0x08D,0},{0x076,0x0F2,3},{0x07A,0x00C,3},
 	{0x09A,0x040,4},{0x2B2,0x1CC,0},{0x073,0x040,4},{0x29D,0x1CE,0},
@@ -172,8 +161,9 @@ extern char far C_2BB4_22F1[];
 	{0x07C,0x028,4},{0x13E,0x118,0},{0x00A,0x060,5},{0x3B7,0x1C4,0},
 	{0x05C,0x0B0,5},{0x3DC,0x1DD,0},{0x05E,0x029,4},{0x227,0x1AB,0}
 };
-/*where object 0xc5 leads (x, y on the surface), by its quality 1-4*/
-/*13D4*/int16 D_13D4[4][2] = {
+/*where the alien device chamber (object 0xc5) leads (x, y on the surface),
+  by its quality 1-4*/
+/*13D4*/int16 ChamberDests[4][2] = {
 	{0x0CA,0x295},{0x34D,0x295},{0x13A,0x17A},{0x2CD,0x1FA}
 };
 
@@ -303,18 +293,18 @@ static /*C_1534_0000*/cacheChunk(int16 chunkIdx) {
 		MapCoordMask = 0x3ff;
 	/*where the area crosses the map's edge (0 and 39 if it does not)*/
 	if(AreaX <= 0x3d8) {
-		D_BCCE = 0;
-		D_C0F2 = 39;
+		AreaFirstCol = 0;
+		AreaLastCol = 39;
 	} else {
-		D_BCCE = 0x400 - AreaX;
-		D_C0F2 = D_BCCE - 1;
+		AreaFirstCol = 0x400 - AreaX;
+		AreaLastCol = AreaFirstCol - 1;
 	}
 	if(AreaY <= 0x3d8) {
-		D_BCD0 = 0;
-		D_C0F4 = 39;
+		AreaFirstRow = 0;
+		AreaLastRow = 39;
 	} else {
-		D_BCD0 = 0x400 - AreaY;
-		D_C0F4 = D_BCD0 - 1;
+		AreaFirstRow = 0x400 - AreaY;
+		AreaLastRow = AreaFirstRow - 1;
 	}
 	if(anX != BuiltAreaX || anY != BuiltAreaY || MapZ != BuiltAreaZ) {
 		OBJ_RebuildMapObjPtr();
@@ -514,8 +504,8 @@ static /*C_1534_0000*/cacheChunk(int16 chunkIdx) {
 }
 
 /*go through the entrance objNum (cave, stairs...): the party moves to the
-  place its quality gives (table Entrances, D_13D4 for object 0xc5)*/
-/*C_1534_096C*/C_1534_096C(int16 objNum) {
+  place its quality gives (table Entrances, ChamberDests for object 0xc5)*/
+/*C_1534_096C*/GoThroughEntrance(int16 objNum) {
 	int16 obj;
 	int16 x, y, z;
 	register int16 qual, type;
@@ -535,8 +525,8 @@ static /*C_1534_0000*/cacheChunk(int16 chunkIdx) {
 			CON_printf(C_2BB4_22F1);
 			return;
 		}
-		x = D_13D4[qual - 1][0];
-		y = D_13D4[qual - 1][1];
+		x = ChamberDests[qual - 1][0];
+		y = ChamberDests[qual - 1][1];
 		z = 0;
 	} else {
 		if(qual < 1 || qual > 24) {
@@ -598,7 +588,7 @@ static /*C_1534_0000*/cacheChunk(int16 chunkIdx) {
   experience) and bring the party to (0xa4, 0xc3, 4) when talk flag
   TalkFlags[0x46] & 8 is set, else to (0x19d, 0x278, 0); a week passes, the
   party wakes up at 7 o'clock and conversation 0x12 runs*/
-/*C_1534_0C51*/C_1534_0C51() {
+/*C_1534_0C51*/ResurrectParty() {
 	int16 i, flag, clip;
 	int16 next;
 	int16 memberObj, bodyObj;
@@ -661,7 +651,7 @@ static /*C_1534_0000*/cacheChunk(int16 chunkIdx) {
 		} else if(!(ObjStatus[Party[i]] & 0x04)) {
 			NPCMode[Party[i]] = flag;
 			if(flag == 1)
-				D_50CA[Party[i]] = i;
+				Leader[Party[i]] = i;
 		}
 	}
 	if(SoloMember < 0)

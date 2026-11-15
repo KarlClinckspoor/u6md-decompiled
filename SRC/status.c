@@ -93,20 +93,20 @@ extern int16 MapZ;
 extern int32 GameFlags;/*0x10: in a dream*/
 extern struct { unsigned a:4, psychic:4, c:4, d:4; } Talents[];/*talents (shown as tiles 0x120, 0x121, 0x122)*/
 extern unsigned char ObjStatus[];
-extern unsigned char D_4EA4[];/*Party*/
+extern unsigned char Party[];
 extern unsigned char far *Level;
 extern char D_50CE[][14];/*Names*/
 extern uint16 ExpPoints[];
-extern unsigned char far *D_53AE;/*NPCComMode*/
+extern unsigned char far *NPCComMode;
 extern int16 Amount[];
-extern unsigned char D_6CBA[];/*NPCStatus: 0x08 poisoned*/
+extern unsigned char NPCStatus[];/*0x08 poisoned*/
 extern unsigned char HitPoints[];
 extern int16 far *D_6EBE;/*BaseTile*/
 extern unsigned char far *D_7606;/*TypeWeight*/
 extern struct coord ObjPos[];
-extern unsigned char D_9CC0;/*PartySize*/
+extern unsigned char PartySize;
 extern uint16 ObjShapeType[];
-extern int16 far *D_B508;/*OrigShapeType*/
+extern int16 far *OrigShapeType;
 extern union tHandler D_BA6A;/*GrDriver*/
 extern int16 Link[];
 extern int16 D_EAD8[16];/*InvenSlotObj*/
@@ -125,14 +125,9 @@ extern int16 D_EBF6, D_EBF8;/*Selection.x, Selection.y*/
 extern int16 MapX, MapY;
 
 #define PromptFlag D_0F13
-#define Party D_4EA4
 #define Names D_50CE
-#define NPCComMode D_53AE
-#define NPCStatus D_6CBA
 #define BaseTile D_6EBE
 #define TypeWeight D_7606
-#define PartySize D_9CC0
-#define OrigShapeType D_B508
 #define GrDriver D_BA6A
 #define InvenSlotObj D_EAD8
 #define InvenSize D_EAF8

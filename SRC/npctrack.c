@@ -5,15 +5,15 @@
  * from Ultima VI's) reworked:
  *
  * - the passability test went to canmove.c (SE's CanMoveTo is MD's
- *   NPC_TryStep, NPC_TryStep), and with it MoveFromX/Y/Set; SE's type
- *   tests (C_130F_0002-01C6), Board/Unboard, FindAdjacentPlate and the
- *   big creatures made of several objects are gone;
- * - new: C_170D_0002/007E (is an object/a square outside the 40x40 area
- *   around the player, with WrapDelta), the turn/step wrappers
- *   C_170D_083F/0853 of UpdateMoveFrame (which gained a "step" argument:
- *   the humanoids sit on the chairs of the square they step to), the seat
- *   test C_170D_2BB4, C_170D_3E97 (an NPC turns into an object) and
- *   C_170D_3F3E (mode 0x95: talk to NPC 1 when near);
+ *   NPC_TryStep), and with it MoveFromX/Y/Set; SE's type tests
+ *   (C_130F_0002-01C6), Board/Unboard, FindAdjacentPlate and the big
+ *   creatures made of several objects are gone;
+ * - new: IsSquareOutOfArea (IsOutOfArea for a square; both use WrapDelta),
+ *   the turn/step wrappers UpdateTurnFrame/UpdateStepFrame of
+ *   UpdateMoveFrame (which gained a "step" argument: the humanoids sit on
+ *   the chairs of the square they step to), IsMale (a humanoid type's sex,
+ *   for rest.c), NPC_BecomeObject (mode 0x1a: an NPC turns into an object)
+ *   and TalkWhenNear (mode 0x95: talk to NPC 1 when near);
  * - coordinates wrap: differences go through WrapDelta and MapDistance,
  *   sums are masked with 0x3ff;
  * - MoveFollowers walks the party to its places on a barge (CurrentBarge)
@@ -60,7 +60,7 @@ extern MAP_LoadAround();
 extern unsigned char GetTileAtXYZ(int16, int16, int16);
 extern int16 WrapDelta(int16);
 extern int16 MapDistance(int16, int16);
-extern C_1534_096C(int16);/*goes through an entrance*/
+extern GoThroughEntrance(int16);/*goes through an entrance*/
 extern PartyTeleport(int16, int16, int16, int16);
 /*objects*/
 extern int16 NextLoc();
@@ -130,8 +130,8 @@ extern char far C_2BB4_2180[];
 extern char far C_2BB4_22F1[];/*failure message*/
 /*functions of this file called before their definition*/
 extern int16 TryMoveTo(int16, int16, int16);
-extern C_170D_3E97(int16);
-extern C_170D_3F3E(int16);
+extern NPC_BecomeObject(int16);
+extern TalkWhenNear(int16);
 
 extern char DirIncrX[], DirIncrY[];
 extern int16 MousePress;
@@ -157,76 +157,49 @@ extern int32 GameFlags;/*0x10: in a dream*/
 extern int16 ViewRotation;
 extern unsigned char far *D_3262;/*0x100 bytes (0x80: NPC's "WAIT" flag)*/
 extern unsigned char ObjStatus[];
-extern char D_44C4[];/*MovePts*/
-extern unsigned char far *D_45C4;/*SchedIndex: current schedule entry of each NPC, relative to SchedPointer*/
-extern struct tPathData far *D_45C8;/*PathData*/
-extern unsigned char far *D_45CC;/*NPCFlag*/
+/*44C4*/extern char MovePts[];/*movement points left this turn*/
+/*45C4*/extern unsigned char far *SchedIndex;/*current schedule entry of each NPC, relative to SchedPointer*/
+/*45C8*/extern struct tPathData far *PathData;
+/*45CC*/extern unsigned char far *NPCFlag;/*0x80 walking (step frame), 0x10 dragged under, bits 0-2 direction*/
 extern unsigned char DEXTE[];/*the base value; GetDex adds the modifiers*/
-extern unsigned char far *D_46D0;/*NPCMode*/
-extern unsigned char D_46D4[AREA_H][AREA_W];/*AreaTiles: the ground tiles of the area*/
-extern unsigned char D_4EA4[];/*Party*/
-extern struct tSchedule far *D_4EBA;/*Schedule*/
-extern int16 D_4EBE[0x101];/*SchedPointer: first schedule entry of each NPC*/
-extern t40x40 far *D_50C0;/*ScratchBuf (the path search work area)*/
-extern unsigned char far *D_50CA;/*Leader: path slot of an NPC following a path (else its leader/target)*/
-extern unsigned char far *D_53AE;/*NPCComMode*/
+/*46D0*/extern unsigned char far *NPCMode;/*the A.I. mode of each NPC (see the header)*/
+extern unsigned char AreaTiles[AREA_H][AREA_W];/*the ground tiles of the area*/
+/*4EA4*/extern unsigned char Party[];/*the party members' object numbers*/
+/*4EBA*/extern struct tSchedule far *Schedule;
+/*4EBE*/extern int16 SchedPointer[0x101];/*first schedule entry of each NPC*/
+/*50C0*/extern t40x40 far *ScratchBuf;/*the path search work area (main.c: 0x7900 bytes)*/
+/*50CA*/extern unsigned char far *Leader;/*path slot of an NPC following a path (else its leader/target)*/
+/*53AE*/extern unsigned char far *NPCComMode;/*the combat mode of each NPC*/
 extern int16 Amount[];
-extern unsigned char D_6CBA[];/*NPCStatus*/
+/*6CBA*/extern unsigned char NPCStatus[];/*0x80 in the party, 0x60 alignment, 0x10 dead, 0x08 poisoned, 0x04 asleep, 0x02 paralyzed, 0x01 protected*/
 extern unsigned char far *D_6DBA;/*TileFlag*/
 extern unsigned char HitPoints[];
 extern int16 far *D_6EBE;/*BaseTile*/
 extern unsigned char D_6EC6[];/*TalkFlags*/
 extern struct coord ObjPos[];
-extern unsigned char D_9CC0;/*PartySize*/
+/*9CC0*/extern unsigned char PartySize;
 extern uint16 ObjShapeType[];
 extern unsigned char far *D_B4C4;/*TerrainType*/
-extern int16 far *D_B508;/*OrigShapeType*/
-extern int16 D_B978[9];/*CurrentBarge*/
-extern int16 D_C0FA, D_C0FC;/*AreaX, AreaY*/
-extern unsigned char D_C102[];/*FormationObjs: the leader then the followers placed so far*/
-extern unsigned char D_C112;/*PTH_Cur: cost bucket being expanded*/
-extern int16 D_C114, D_C116;/*PTH_AnX, PTH_AnY: edge square reached (goal outside the area)*/
-extern unsigned char D_C118;/*PTH_MaxCost: highest cost queued so far*/
-extern unsigned char D_C119;/*PTH_Index: path slot being searched*/
-extern int16 D_C11C;/*PTH_Top: head of the free node list*/
-extern int16 D_C11E;/*PTH_object: object type seeked, -1 if none*/
-extern int16 D_C120;/*PTH_direct: area edge to reach (0 N, 1 E, 2 S, 3 W), -1 if none*/
-extern int16 D_C122;/*PTH_Found*/
+/*B508*/extern int16 far *OrigShapeType;/*the shape an NPC gets back when it wakes up*/
+extern int16 CurrentBarge[9];
+extern int16 AreaX, AreaY;
+/*C102*/extern unsigned char FormationObjs[];/*the leader then the followers placed so far*/
+/*C112*/extern unsigned char PTH_Cur;/*cost bucket being expanded*/
+/*C114*/extern int16 PTH_AnX;/*edge square reached (goal outside the area)*/
+/*C116*/extern int16 PTH_AnY;
+/*C118*/extern unsigned char PTH_MaxCost;/*highest cost queued so far*/
+/*C119*/extern unsigned char PTH_Index;/*path slot being searched*/
+/*C11C*/extern int16 PTH_Top;/*head of the free node list*/
+/*C11E*/extern int16 PTH_object;/*object type seeked, -1 if none*/
+/*C120*/extern int16 PTH_direct;/*area edge to reach (0 N, 1 E, 2 S, 3 W), -1 if none*/
+/*C122*/extern int16 PTH_Found;
 
 
 #define PromptFlag D_0F13
-#define MovePts D_44C4
-#define SchedIndex D_45C4
-#define PathData D_45C8
-#define NPCFlag D_45CC
-#define NPCMode D_46D0
-#define AreaTiles D_46D4
-#define Party D_4EA4
-#define Schedule D_4EBA
-#define SchedPointer D_4EBE
-#define _ScratchBuf D_50C0
-#define Leader D_50CA
-#define NPCComMode D_53AE
-#define NPCStatus D_6CBA
 #define TileFlag D_6DBA
 #define BaseTile D_6EBE
 #define TalkFlags D_6EC6
-#define PartySize D_9CC0
 #define TerrainType D_B4C4
-#define OrigShapeType D_B508
-#define CurrentBarge D_B978
-#define AreaX D_C0FA
-#define AreaY D_C0FC
-#define FormationObjs D_C102
-#define PTH_Cur D_C112
-#define PTH_AnX D_C114
-#define PTH_AnY D_C116
-#define PTH_MaxCost D_C118
-#define PTH_Index D_C119
-#define PTH_Top D_C11C
-#define PTH_object D_C11E
-#define PTH_direct D_C120
-#define PTH_Found D_C122
 
 #define TypeFrame(t, s) ((t) + ((s) << 10))
 #define GetType(i) (ObjShapeType[i] & 0x3ff)
@@ -301,7 +274,7 @@ extern int16 D_C122;/*PTH_Found*/
 
 /*is objNum outside the 40x40 area around the player (AreaX, AreaY) or on
  another level?*/
-/*C_170D_0002*/C_170D_0002(int16 objNum) {
+/*C_170D_0002*/IsOutOfArea(int16 objNum) {
 	int16 dx, dy;
 
 	dx = WrapDelta(GetX(objNum) - AreaX);
@@ -310,7 +283,7 @@ extern int16 D_C122;/*PTH_Found*/
 }
 
 /*the same for the square (x, y, z)*/
-/*C_170D_007E*/C_170D_007E(int16 x, int16 y, int16 z) {
+/*C_170D_007E*/IsSquareOutOfArea(int16 x, int16 y, int16 z) {
 	int16 dx, dy;
 
 	dx = WrapDelta(x - AreaX);
@@ -363,7 +336,7 @@ extern int16 D_C122;/*PTH_Found*/
 		cur_x = (cur_x + DirIncrX[dir]) & 0x3ff;
 		cur_y = (cur_y + DirIncrY[dir]) & 0x3ff;
 	}
-	if(!C_170D_0002(objNum)) {
+	if(!IsOutOfArea(objNum)) {
 		for(tmpObj = FindLoc(cur_x, cur_y, GetZ(objNum)); tmpObj >= 0; tmpObj = NextLoc()) {
 			chairType = GetType(tmpObj);
 			if(
@@ -515,12 +488,12 @@ extern int16 D_C122;/*PTH_Found*/
 #undef FACE_TOWARD
 
 /*turn objNum toward dir*/
-/*C_170D_083F*/C_170D_083F(int16 objNum, int16 dir) {
+/*C_170D_083F*/UpdateTurnFrame(int16 objNum, int16 dir) {
 	return UpdateMoveFrame(objNum, dir, 0);
 }
 
 /*step animation of objNum moving in direction dir*/
-/*C_170D_0853*/C_170D_0853(int16 objNum, int16 dir) {
+/*C_170D_0853*/UpdateStepFrame(int16 objNum, int16 dir) {
 	return UpdateMoveFrame(objNum, dir, 1);
 }
 
@@ -688,7 +661,7 @@ extern int16 D_C122;/*PTH_Found*/
 				}
 				if(new_dir >= 0) {
 					StepMovesParts = 1;
-					if(C_170D_0853(follower, new_dir) == 1)
+					if(UpdateStepFrame(follower, new_dir) == 1)
 						MoveObj(follower, (follower_x + DirIncrX[new_dir]) & 0x3ff, (follower_y + DirIncrY[new_dir]) & 0x3ff, MapZ);
 				}
 			}
@@ -723,7 +696,7 @@ extern int16 D_C122;/*PTH_Found*/
 			if(SoloMember != -1)
 				needPartyMode = 1;
 			else
-				C_1534_096C(objNum);
+				GoThroughEntrance(objNum);
 			break;
 		}
 		if(objType == 0x1cd) {
@@ -831,7 +804,7 @@ extern int16 D_C122;/*PTH_Found*/
 				GetX(obj) == new_x && GetY(obj) == new_y && GetZ(obj) == MapZ
 			) {
 				StepMovesParts = 1;
-				C_170D_0853(obj, (tmp_dir + 4) & 7);
+				UpdateStepFrame(obj, (tmp_dir + 4) & 7);
 				MoveObj(obj, MapX, MapY, MapZ);
 				break;
 			}
@@ -847,7 +820,7 @@ extern int16 D_C122;/*PTH_Found*/
 		SubTerrainMov(obj);
 	}
 	StepMovesParts = 1;
-	if(C_170D_0853(obj, tmp_dir) == 1)
+	if(UpdateStepFrame(obj, tmp_dir) == 1)
 		SetDirection(obj, tmp_dir);
 	MapX = new_x;
 	MapY = new_y;
@@ -906,7 +879,7 @@ extern int16 D_C122;/*PTH_Found*/
 	if(action == 0x91/*AI_SLEEP*/) {
 		isAtDest = 1;
 		SetAsleep(objNum);
-		if(!C_170D_0002(objNum))
+		if(!IsOutOfArea(objNum))
 			SetTypeUnconscious(objNum);
 		else
 			NPCMode[objNum] = 0x80/*AI_SCHEDULE*/;
@@ -934,17 +907,17 @@ extern int16 D_C122;/*PTH_Found*/
 	dir = 0;
 	PathData->content[PTH_Index][0] = 0;
 
-	while(_ScratchBuf->PTH_map[area_y][area_x]) {
+	while(ScratchBuf->PTH_map[area_y][area_x]) {
 		some_min = 0xff;
 		for(i = 0; i < 4; i ++) {
 			new_x = (area_x + PTH_DirX[i]) & 0x3ff;
 			new_y = (area_y + PTH_DirY[i]) & 0x3ff;
 			if(new_x >= 0 && new_x <= (AREA_W-1) && new_y >= 0 && new_y <= (AREA_H-1)) {
 				if(
-					_ScratchBuf->PTH_map[new_y][new_x] < some_min ||
-					(_ScratchBuf->PTH_map[new_y][new_x] == some_min && dir == i)
+					ScratchBuf->PTH_map[new_y][new_x] < some_min ||
+					(ScratchBuf->PTH_map[new_y][new_x] == some_min && dir == i)
 				) {
-					some_min = _ScratchBuf->PTH_map[new_y][new_x];
+					some_min = ScratchBuf->PTH_map[new_y][new_x];
 					dir_min = i;
 				}
 			}
@@ -970,23 +943,23 @@ extern int16 D_C122;/*PTH_Found*/
 		area_x = back_x;
 		area_y = back_y;
 
-		_ScratchBuf->PTH_map[area_y][area_x] = 0xff;
+		ScratchBuf->PTH_map[area_y][area_x] = 0xff;
 
 		/*follow the goal front (values >= 0x80) down to the goal (0x80)*/
-		while(_ScratchBuf->PTH_map[area_y][area_x] > 0x80) {
+		while(ScratchBuf->PTH_map[area_y][area_x] > 0x80) {
 			some_min = 0xff;
 			for(i = 0; i < 4; i ++) {
 				new_x = (area_x + PTH_DirX[i]) & 0x3ff;
 				new_y = (area_y + PTH_DirY[i]) & 0x3ff;
 				if(new_x >= 0 && new_x <= (AREA_W-1) && new_y >= 0 && new_y <= (AREA_H-1)) {
 					/*only through the goal front*/
-					if(_ScratchBuf->PTH_map[(area_y + PTH_DirY[i]) & 0x3ff][(area_x + PTH_DirX[i]) & 0x3ff] < 0x80)
+					if(ScratchBuf->PTH_map[(area_y + PTH_DirY[i]) & 0x3ff][(area_x + PTH_DirX[i]) & 0x3ff] < 0x80)
 						continue;
 					if(
-						_ScratchBuf->PTH_map[new_y][new_x] < some_min ||
-						(_ScratchBuf->PTH_map[new_y][new_x] == some_min && dir == i)
+						ScratchBuf->PTH_map[new_y][new_x] < some_min ||
+						(ScratchBuf->PTH_map[new_y][new_x] == some_min && dir == i)
 					) {
-						some_min = _ScratchBuf->PTH_map[new_y][new_x];
+						some_min = ScratchBuf->PTH_map[new_y][new_x];
 						dir_min = i;
 					}
 				}
@@ -1045,7 +1018,7 @@ extern int16 D_C122;/*PTH_Found*/
 	) return;
 
 	/*reached a cell of the other front: the two searches met*/
-	if(_ScratchBuf->PTH_map[y][x] != 0xff && (_ScratchBuf->PTH_map[y][x] & 0x80) != flag_80) {
+	if(ScratchBuf->PTH_map[y][x] != 0xff && (ScratchBuf->PTH_map[y][x] & 0x80) != flag_80) {
 		PTH_Found = 1;
 		PTH_BuildPath(x, y);
 		return;
@@ -1071,7 +1044,7 @@ extern int16 D_C122;/*PTH_Found*/
 		}
 	}
 	/*already reached at a lower or equal cost (0xff & 0x7f = 0x7f = never)*/
-	if((_ScratchBuf->PTH_map[y][x] & 0x7f) <= resist)
+	if((ScratchBuf->PTH_map[y][x] & 0x7f) <= resist)
 		return;
 	/*take a node from the free list (none left: give up on this cell)*/
 	newTop = PTH_Top;
@@ -1080,12 +1053,12 @@ extern int16 D_C122;/*PTH_Found*/
 	/*PTH_MaxCost is in fact the highest cost queued so far*/
 	if(PTH_MaxCost < resist)
 		PTH_MaxCost = resist;
-	PTH_Top = _ScratchBuf->PTH_link[newTop];
-	_ScratchBuf->PTH_link[newTop] = _ScratchBuf->PTH_rank[resist];
-	_ScratchBuf->PTH_x[newTop] = x;
-	_ScratchBuf->PTH_y[newTop] = y;
-	_ScratchBuf->PTH_rank[resist] = newTop;
-	_ScratchBuf->PTH_map[y][x] = resist | flag_80;
+	PTH_Top = ScratchBuf->PTH_link[newTop];
+	ScratchBuf->PTH_link[newTop] = ScratchBuf->PTH_rank[resist];
+	ScratchBuf->PTH_x[newTop] = x;
+	ScratchBuf->PTH_y[newTop] = y;
+	ScratchBuf->PTH_rank[resist] = newTop;
+	ScratchBuf->PTH_map[y][x] = resist | flag_80;
 }
 
 /*reverse path slot "index" in place: entries in reverse order and each
@@ -1172,13 +1145,13 @@ extern int16 D_C122;/*PTH_Found*/
 	/*reset the map, the node free list and the buckets*/
 	for(i = 0; i < AREA_H; i ++) {
 		for(j = 0; j < AREA_W; j ++)
-			_ScratchBuf->PTH_map[i][j] = 0xff;
+			ScratchBuf->PTH_map[i][j] = 0xff;
 	}
 	for(i = 0; i < 0x100; i ++)
-		_ScratchBuf->PTH_link[i] = i + 1;
+		ScratchBuf->PTH_link[i] = i + 1;
 	for(i = 0; i < 0x100; i ++)
-		_ScratchBuf->PTH_rank[i] = -1;
-	_ScratchBuf->PTH_link[0xff] = -1;
+		ScratchBuf->PTH_rank[i] = -1;
+	ScratchBuf->PTH_link[0xff] = -1;
 	PTH_Top = PTH_Found = 0;
 	PTH_Cur = PTH_MaxCost = 0;
 
@@ -1190,23 +1163,23 @@ extern int16 D_C122;/*PTH_Found*/
 
 	/*pop the cheapest cell, give its node back to the free list and
 	expand its 4 neighbours*/
-	while(_ScratchBuf->PTH_rank[PTH_Cur] >= 0 && !PTH_Found) {
-		node = _ScratchBuf->PTH_rank[PTH_Cur];
-		_ScratchBuf->PTH_rank[PTH_Cur] = _ScratchBuf->PTH_link[node];
-		x = _ScratchBuf->PTH_x[node];
-		y = _ScratchBuf->PTH_y[node];
-		_ScratchBuf->PTH_link[node] = PTH_Top;
+	while(ScratchBuf->PTH_rank[PTH_Cur] >= 0 && !PTH_Found) {
+		node = ScratchBuf->PTH_rank[PTH_Cur];
+		ScratchBuf->PTH_rank[PTH_Cur] = ScratchBuf->PTH_link[node];
+		x = ScratchBuf->PTH_x[node];
+		y = ScratchBuf->PTH_y[node];
+		ScratchBuf->PTH_link[node] = PTH_Top;
 		PTH_Top = node;
-		cost = _ScratchBuf->PTH_map[y][x];
+		cost = ScratchBuf->PTH_map[y][x];
 		flag_80 = cost & 0x80;
 		cost &= 0x7f;
-		PTH_Visit(cost + _ScratchBuf->PTH_resist[y][(x - 1) & 0x3ff], (x - 1) & 0x3ff, y, flag_80);
-		PTH_Visit(cost + _ScratchBuf->PTH_resist[y][(x + 1) & 0x3ff], (x + 1) & 0x3ff, y, flag_80);
-		PTH_Visit(cost + _ScratchBuf->PTH_resist[(y - 1) & 0x3ff][x], x, (y - 1) & 0x3ff, flag_80);
-		PTH_Visit(cost + _ScratchBuf->PTH_resist[(y + 1) & 0x3ff][x], x, (y + 1) & 0x3ff, flag_80);
+		PTH_Visit(cost + ScratchBuf->PTH_resist[y][(x - 1) & 0x3ff], (x - 1) & 0x3ff, y, flag_80);
+		PTH_Visit(cost + ScratchBuf->PTH_resist[y][(x + 1) & 0x3ff], (x + 1) & 0x3ff, y, flag_80);
+		PTH_Visit(cost + ScratchBuf->PTH_resist[(y - 1) & 0x3ff][x], x, (y - 1) & 0x3ff, flag_80);
+		PTH_Visit(cost + ScratchBuf->PTH_resist[(y + 1) & 0x3ff][x], x, (y + 1) & 0x3ff, flag_80);
 		/*bucket empty: advance to the next non-empty one*/
-		if(_ScratchBuf->PTH_rank[PTH_Cur] < 0) {
-			while(PTH_Cur < PTH_MaxCost && _ScratchBuf->PTH_rank[PTH_Cur] < 0)
+		if(ScratchBuf->PTH_rank[PTH_Cur] < 0) {
+			while(PTH_Cur < PTH_MaxCost && ScratchBuf->PTH_rank[PTH_Cur] < 0)
 				PTH_Cur ++;
 		}
 	}
@@ -1287,7 +1260,7 @@ extern int16 D_C122;/*PTH_Found*/
 		frm = GetFrame(objNum);
 		AvoidHazards = 0;
 		StepMovesParts = 1;
-		if(C_170D_0853(objNum, dir) == 1) {
+		if(UpdateStepFrame(objNum, dir) == 1) {
 			if(GetType(objNum) == 0x91) {
 				/*leaves a trail of 0x91 objects*/
 				for(obj = OBJ_FindTypeAt(0x91, new_x, new_y); obj >= 0; obj = OBJ_NextOfTypeAt(obj)) {
@@ -1345,7 +1318,7 @@ extern int16 D_C122;/*PTH_Found*/
 	PassThroughParty = 0;
 	if(NPC_TryStep(objNum, new_x, new_y)) {
 		StepMovesParts = 1;
-		if(C_170D_0853(objNum, dir) == 1) {
+		if(UpdateStepFrame(objNum, dir) == 1) {
 			AvoidHazards = 0;
 			MoveObj(objNum, new_x, new_y, MapZ);
 			SetDirection(objNum, dir);
@@ -1547,8 +1520,9 @@ extern int16 D_C122;/*PTH_Found*/
 	return slot;
 }
 
-/*does humanoid objNum take a seat? (by type; 1 in 2 for the others)*/
-/*C_170D_2BB4*/C_170D_2BB4(int16 objNum) {
+/*is objNum a man? by its humanoid type (0x157 the male player, 0x158 the
+ female one, ...); a coin toss for the other types*/
+/*C_170D_2BB4*/IsMale(int16 objNum) {
 	int16 objTyp;
 
 	objTyp = GetType(objNum);
@@ -1609,7 +1583,7 @@ extern int16 D_C122;/*PTH_Found*/
 			}
 			LoiterNear(objNum, sched_x, sched_y);
 		break;
-		case 0x95: C_170D_3F3E(objNum); break;
+		case 0x95: TalkWhenNear(objNum); break;
 		case 0x96:
 			/*converse*/
 			if(MapDistance(sched_x, MapX) < 5 && MapDistance(sched_y, MapY) < 5) {
@@ -1727,7 +1701,7 @@ extern int16 D_C122;/*PTH_Found*/
 		case 0x17: COMBAT_AI_Together(objNum); break;
 		case 0x18: C_2F63_083C(objNum); break;
 		case 0x19: COMBAT_AI_Tentacle(objNum); break;
-		case 0x1a: C_170D_3E97(objNum); break;
+		case 0x1a: NPC_BecomeObject(objNum); break;
 		case 0x0f:
 		case 0x10:
 		case 0x8b:
@@ -1748,16 +1722,16 @@ extern int16 D_C122;/*PTH_Found*/
 /*C_170D_337D*/PTH_AddObjResist(int16 tile, int16 area_x, int16 area_y) {
 	int16 sum;
 
-	if(_ScratchBuf->PTH_resist[area_y][area_x] == 0xff) {
+	if(ScratchBuf->PTH_resist[area_y][area_x] == 0xff) {
 		if(IsTerrainWet(AreaTiles[area_y][area_x]) && !IsTerrainImpass(tile))
-			_ScratchBuf->PTH_resist[area_y][area_x] = (TerrainType[tile] >> 4) + 1;
+			ScratchBuf->PTH_resist[area_y][area_x] = (TerrainType[tile] >> 4) + 1;
 	} else if(IsTerrainImpass(tile)) {
-		_ScratchBuf->PTH_resist[area_y][area_x] = 0xff;
+		ScratchBuf->PTH_resist[area_y][area_x] = 0xff;
 	} else if(!IsTerrainWall(tile)) {
-		sum = _ScratchBuf->PTH_resist[area_y][area_x] + (TerrainType[tile] >> 4);
+		sum = ScratchBuf->PTH_resist[area_y][area_x] + (TerrainType[tile] >> 4);
 		if(sum > 0xff)
 			sum = 0xff;
-		_ScratchBuf->PTH_resist[area_y][area_x] = sum;
+		ScratchBuf->PTH_resist[area_y][area_x] = sum;
 	}
 }
 
@@ -1774,9 +1748,9 @@ extern int16 D_C122;/*PTH_Found*/
 		for(col = 0; col < AREA_W; col ++) {
 			tile = AreaTiles[row][col];
 			if(IsTerrainImpass(tile))
-				_ScratchBuf->PTH_resist[row][col] = 0xff;
+				ScratchBuf->PTH_resist[row][col] = 0xff;
 			else
-				_ScratchBuf->PTH_resist[row][col] = (TerrainType[tile] >> 4) + 1;
+				ScratchBuf->PTH_resist[row][col] = (TerrainType[tile] >> 4) + 1;
 		}
 	}
 
@@ -2086,7 +2060,7 @@ extern int16 D_C122;/*PTH_Found*/
 
 /*NPC objNum becomes an object (its shape, its quality and hit points in
  the amount) where it stands (mode 0x1a)*/
-/*C_170D_3E97*/C_170D_3E97(int16 objNum) {
+/*C_170D_3E97*/NPC_BecomeObject(int16 objNum) {
 	int16 obj;
 
 	if(IsNPC(objNum)) {
@@ -2101,8 +2075,8 @@ extern int16 D_C122;/*PTH_Found*/
 }
 
 /*mode 0x95: talks to NPC 1 when he comes within 2 squares*/
-/*C_170D_3F3E*/C_170D_3F3E(int16 objNum) {
-	if(!C_170D_0002(objNum) && GetZ(objNum) == MapZ) {
+/*C_170D_3F3E*/TalkWhenNear(int16 objNum) {
+	if(!IsOutOfArea(objNum) && GetZ(objNum) == MapZ) {
 		if(COMBAT_range(GetX(objNum), GetY(objNum), GetX(1), GetY(1)) > 2)
 			SubMov(objNum, 5);
 		else
