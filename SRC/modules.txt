@@ -11,7 +11,7 @@
 0E1A C 1EAF gfx.c 0804-0BB2
 1005 C 62 OSILIB/KBD.ASM
 100B E 429 objtype.c 0BB2-0E96
-104E 7 1093 -
+104E 7 1093 canmove.c 0E96-0EA0
 1157 A B6F visible.c 0EA0-0F10
 120E 9 3257 -
 1534 0 1159 map.c 132E-13F0
@@ -63,7 +63,7 @@
 2F55 0 232 revive.c  # overlay
 2F58 0 552 bridge.c 1CD6-1DA4  # overlay
 2F5B 0 8F disk.c 1DA4-1E48  # overlay
-2F5F 0 C13 -  # overlay
+2F5F 0 C13 dream.c 1E48-1E88  # overlay
 2F63 0 D00 -  # overlay
 2F68 0 1A87 -  # overlay
 2F6E 0 60F lever.c 1F28-20F4  # overlay
