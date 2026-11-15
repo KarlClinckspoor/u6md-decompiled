@@ -18,7 +18,7 @@ every IF and every string of a random-reply array is exported, whatever the
 game state.
 
 Usage:
-    python tools/se/dialogue_export.py [-d GAMEDATA] [-o OUT.json] [options]
+    python tools/md/dialogue_export.py [-d GAMEDATA] [-o OUT.json] [options]
 
     --format full     (default) per NPC: the description and the whole script
                       as "code" segments of items: text, IF / ELSE / ENDIF,

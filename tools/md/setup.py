@@ -1,13 +1,16 @@
 #!/usr/bin/env python3
-"""Unpack Turbo C++ 1.00 (and 1.01, for reference) and MASM 3.0 from the disk-image
-archives in tools/, with 7-Zip (it reads the FAT images and Borland's imploded ZIPs, so
-neither mtools nor Info-ZIP is needed; this works on Windows).
+"""Unpack Turbo C++ 1.00 and 1.01 from the disk-image archives in tools/
+(tools/*1.00*.7z, tools/*1.01*.7z), and MASM 3.0's MASM.EXE from the floppy image in
+tools/masm300/ (unless MASM.EXE is already there), with 7-Zip (it reads the FAT images
+and Borland's imploded ZIPs, so neither mtools nor Info-ZIP is needed; this works on
+Windows).
 
     python tools/md/setup.py
 
 Result:
   tools/tcpp100/   TCC.EXE TLINK.EXE TLIB.EXE ... INCLUDE\\ LIB\\ (C0M.OBJ, CM.LIB, OVERLAY.LIB)
-  tools/tcpp101/   the same from 1.01 (reference only)
+  tools/tcpp101/   the same from 1.01 (Origin's library C files that name it:
+                   /* compiler: Turbo C++ 1.01 */)
   tools/masm300/MASM.EXE
 
 Martian Dreams links Turbo C++ 1.00's CM.LIB as shipped (unlike Savage Empire, which had
@@ -60,11 +63,9 @@ def unpack(archive, dst):
 def main():
     a100 = glob.glob(os.path.join(TOOLS, '*1.00*.7z'))
     a101 = glob.glob(os.path.join(TOOLS, '*1.01*.7z'))
-    if not a100:
-        sys.exit('put the Turbo C++ 1.00 .7z archive in tools/')
+    if not a100 or not a101:
+        sys.exit('put the Turbo C++ 1.00 and 1.01 .7z archives in tools/ (names with "1.00" and "1.01")')
     for arcs, d in ((a100, 'tcpp100'), (a101, 'tcpp101')):
-        if not arcs:
-            continue
         dst = os.path.join(TOOLS, d)
         shutil.rmtree(dst, ignore_errors=True)
         unpack(arcs[0], dst)
@@ -74,10 +75,12 @@ def main():
         img = [n for n in os.listdir(mdir) if n.lower().endswith('.img')]
         if img:
             x(None, 'e', '-y', '-o' + mdir, os.path.join(mdir, img[0]), 'MASM.EXE')
-    print('MASM.EXE:', os.path.exists(os.path.join(mdir, 'MASM.EXE')))
+    print('%-16s %s' % ('MASM.EXE', 'ok' if os.path.exists(os.path.join(mdir, 'MASM.EXE')) else
+                        'MISSING: put MASM 3.0 (MASM.EXE or its floppy image, .img) in tools/masm300/'))
     for f in ('TCC.EXE', 'TLINK.EXE', 'TLIB.EXE', os.path.join('LIB', 'C0M.OBJ'), os.path.join('LIB', 'CM.LIB'),
               os.path.join('LIB', 'OVERLAY.LIB')):
         print('%-16s %s' % (f, 'ok' if os.path.exists(os.path.join(TOOLS, 'tcpp100', f)) else 'MISSING'))
+    print('%-16s %s' % ('1.01 TCC.EXE', 'ok' if os.path.exists(os.path.join(TOOLS, 'tcpp101', 'TCC.EXE')) else 'MISSING'))
 
 
 if __name__ == '__main__':

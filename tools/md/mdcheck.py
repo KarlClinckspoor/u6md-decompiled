@@ -15,7 +15,7 @@ from concurrent.futures import ThreadPoolExecutor
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
-import target  # noqa: E402
+import dos, target  # noqa: E402
 
 
 def modules():
@@ -55,6 +55,8 @@ def check(m):
 
 
 def main():
+    target.require_exe()
+    dos.dosbox()  # exits with a message when there is no DOSBox
     want = [w.upper() for w in sys.argv[1:]]
     mods = [m for m in modules() if m[3] != '-' and m[0] != '-' and (not want or m[0] in want or m[3].upper() in want or
                                                       os.path.splitext(m[3])[0].upper() in want)]

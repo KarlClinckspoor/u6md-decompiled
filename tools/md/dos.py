@@ -8,10 +8,24 @@ TOOLS = os.environ.get('MD_DOSTOOLS') or os.path.join(ROOT, 'tools')
 
 def dosbox():
     """MD_DOSBOX, else DOSBox-X or DOSBox on the PATH, else the GOG release's DOSBox 0.74
-    (gamedata/DOSBOX/DOSBox.exe)"""
+    (gamedata/DOSBOX/DOSBox.exe); exits with a message when there is none"""
     gog = os.path.join(ROOT, 'gamedata', 'DOSBOX', 'DOSBox.exe')
-    return (os.environ.get('MD_DOSBOX') or shutil.which('dosbox-x') or shutil.which('dosbox') or
-            (gog if os.path.exists(gog) else 'dosbox'))
+    db = (os.environ.get('MD_DOSBOX') or shutil.which('dosbox-x') or shutil.which('dosbox') or
+          (gog if os.path.exists(gog) else None))
+    if not db:
+        raise SystemExit('DOSBox not found: put dosbox or dosbox-x on the PATH, set MD_DOSBOX, '
+                         'or copy the DOSBOX folder of the GOG release to gamedata/DOSBOX')
+    return db
+
+
+def masm_exe(tools=None):
+    """tools/masm300/MASM.EXE (tools/md/setup.py takes it out of a floppy image there)"""
+    mdir = os.path.join(tools or TOOLS, 'masm300')
+    exe = [n for n in os.listdir(mdir) if n.upper() == 'MASM.EXE'] if os.path.isdir(mdir) else []
+    if not exe:
+        raise SystemExit('tools/masm300/MASM.EXE missing: put MASM 3.0 (MASM.EXE or its floppy image) '
+                         'in tools/masm300/ and run python3 tools/md/setup.py')
+    return os.path.join(mdir, exe[0])
 
 
 def crlf(src, dst):
@@ -39,11 +53,4 @@ def install_tools(cdir, masm=True):
         raise SystemExit('tools/tcpp100 missing: run python3 tools/md/setup.py')
     shutil.copytree(tc, os.path.join(cdir, 'TC'))
     if masm:
-        mdir = os.path.join(TOOLS, 'masm300')
-        exe = [n for n in os.listdir(mdir) if n.upper() == 'MASM.EXE']
-        if exe:
-            shutil.copy(os.path.join(mdir, exe[0]), os.path.join(cdir, 'TC', 'MASM.EXE'))
-        else:
-            img = [n for n in os.listdir(mdir) if n.lower().endswith('.img')][0]
-            subprocess.run(['mcopy', '-o', '-i', os.path.join(mdir, img), '::MASM.EXE',
-                            os.path.join(cdir, 'TC', 'MASM.EXE')], check=True)
+        shutil.copy(masm_exe(), os.path.join(cdir, 'TC', 'MASM.EXE'))

@@ -69,21 +69,14 @@ def compile_files(files, flags=DEFAULT_FLAGS, out=None, tools=None, includes=(),
             return res
         compiler = next(iter(groups), 'tcpp100')
     tc = os.path.join(tools, compiler or 'tcpp100')
+    if not os.path.isdir(tc):
+        raise SystemExit('%s missing: run python3 tools/md/setup.py' % tc)
     res = {}
     with tempfile.TemporaryDirectory() as tmp:
         c = os.path.join(tmp, 'c')
         os.makedirs(os.path.join(c, 'TOOLS'))
         shutil.copytree(tc, os.path.join(c, 'TOOLS', 'TC'))
         os.makedirs(os.path.join(c, 'S'))
-        if masm:
-            mdir = os.path.join(tools, 'masm300')
-            exe = [n for n in os.listdir(mdir) if n.upper() == 'MASM.EXE']
-            if exe:
-                shutil.copy(os.path.join(mdir, exe[0]), os.path.join(c, 'TOOLS', 'MASM.EXE'))
-            else:
-                img = [n for n in os.listdir(mdir) if n.lower().endswith('.img')][0]
-                subprocess.run(['mcopy', '-i', os.path.join(mdir, img), '::MASM.EXE',
-                                os.path.join(c, 'TOOLS', 'MASM.EXE')], check=True)
         incs = []
         for k, d in enumerate(includes):
             dst = os.path.join(c, 'I%d' % k)
@@ -98,15 +91,9 @@ def compile_files(files, flags=DEFAULT_FLAGS, out=None, tools=None, includes=(),
         lines = ['@echo off', 'set PATH=\\TOOLS\\TC', 'cd \\S']
         names = []
         need_masm = masm or any(has_inline_asm(f) for f in files)
-        if need_masm and not masm:
-            mdir = os.path.join(tools, 'masm300')
-            exe = [n for n in os.listdir(mdir) if n.upper() == 'MASM.EXE']
-            if exe:
-                shutil.copy(os.path.join(mdir, exe[0]), os.path.join(c, 'TOOLS', 'MASM.EXE'))
-            else:
-                img = [n for n in os.listdir(mdir) if n.lower().endswith('.img')][0]
-                subprocess.run(['mcopy', '-o', '-i', os.path.join(mdir, img), '::MASM.EXE',
-                                os.path.join(c, 'TOOLS', 'MASM.EXE')], check=True)
+        if need_masm:
+            import dos
+            shutil.copy(dos.masm_exe(tools), os.path.join(c, 'TOOLS', 'MASM.EXE'))
         for k, f in enumerate(files):
             base = 'F%03d' % k
             src = open(f, 'rb').read().replace(b'\r\n', b'\n').replace(b'\n', b'\r\n')

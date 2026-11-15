@@ -41,11 +41,21 @@ def get(name=None):
 
 
 def find_exe(name):
+    """MD_GAMEDIR/name, else gamedata/MARTIAN/name, else gamedata/name (the first, when none
+    exists: require_exe() says so)"""
     for p in (os.environ.get('MD_GAMEDIR') and os.path.join(os.environ['MD_GAMEDIR'], name),
               os.path.join(ROOT, 'gamedata', 'MARTIAN', name), os.path.join(ROOT, 'gamedata', name)):
         if p and os.path.exists(p):
             return p
     return os.path.join(ROOT, 'gamedata', 'MARTIAN', name)
+
+
+def require_exe(t=None):
+    """exit with a message when the target's original executable is not there"""
+    t = t or T
+    if not os.path.exists(t['exe_path']):
+        raise SystemExit('the original %s is not in gamedata/MARTIAN/ (or MD_GAMEDIR): copy it from your '
+                         'copy of the game' % t['exe'])
 
 
 def mz(d):

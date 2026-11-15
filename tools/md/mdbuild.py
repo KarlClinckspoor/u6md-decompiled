@@ -5,7 +5,8 @@ compare the result with the original executable byte for byte.
     python3 tools/md/mdbuild.py [--target martian|game] [--keep DIR] [--log]
 
 <SRC>/modules.txt gives the modules in link order (their sources: .c compiled with the
-flags of their first line or the target's, .asm assembled with MASM 3.0 /Mx and their
+flags of their first line or the target's, by Turbo C++ 1.00 or the 1.01 their first lines
+name (tools/md/tcc.py file_compiler), .asm assembled with MASM 3.0 /Mx and their
 fixups put in TASM's order, tools/md/tasmorder.py). The link is
     TLINK /m /i [<link_first>] C0M <modules> BSS, <EXE>, <MAP>, <libraries>
 with C0M.OBJ and the libraries of Turbo C++ 1.00 (tools/md/setup.py): EMU MATHM CM for
@@ -33,6 +34,7 @@ def main():
     ap.add_argument('--log', action='store_true')
     a = ap.parse_args()
     t = target.T
+    target.require_exe(t)
     src = t['src']
     mods = mdcheck.modules()
     missing = [m for m in mods if m[3] == '-']
@@ -71,6 +73,8 @@ def main():
                     if fn.lower().endswith(('.h', '.inc')) and not os.path.exists(os.path.join(s, fn.upper())):
                         dos.crlf(os.path.join(dp, fn), os.path.join(s, fn.upper()))
         if any(tcc.file_compiler(os.path.join(src, f)) == 'tcpp101' for f in files):
+            if not os.path.isdir(os.path.join(dos.TOOLS, 'tcpp101')):
+                sys.exit('tools/tcpp101 missing: run python3 tools/md/setup.py')
             shutil.copytree(os.path.join(dos.TOOLS, 'tcpp101'), os.path.join(c, 'TC101'))
         lines = ['set PATH=\\TC', 'cd \\S']
         for f, base, ext in names:
