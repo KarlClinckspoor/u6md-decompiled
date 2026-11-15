@@ -34,7 +34,8 @@ the library's C files name their own flags (cdecl) and often Turbo C++ 1.01.
   drvnames.c), main.c, console.c, talkdr.c (overlay 2F88, the first overlay done),
   talk.c (overlay 2F83), status.c (2077), objtype.c (100B), typetest.c (222C),
   revive.c (overlay 2F55), disk.c (overlay 2F5B), map.c (1534), egg.c (1649), jet.c
-  (overlay 2F80), visible.c (1157), use.c (2597), power.c (overlay 2F72).
+  (overlay 2F80), visible.c (1157), use.c (2597), power.c (overlay 2F72), barge.c (03CE),
+  belt.c (overlay 2F52), bridge.c (overlay 2F58).
 - Next: the SE-like modules, then the new code and the other overlays (docs/PLAN.md
   Phase 4). SRC/se.h is SE's.
 

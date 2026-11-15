@@ -4,7 +4,7 @@
 # LEN: bytes up to the next module (hex); SOURCE: the file ("-" while not decompiled).
 02CD D 1009 main.c 00A8-028C
 0000 242 421 OSILIB/OSI_FILE.ASM 07FA-0804  # linked after main.c: its code joins C0M's _TEXT, its data follow main's
-03CE 6 AC8 -
+03CE 6 AC8 barge.c 028C-042A
 047A E 356F -
 07D1 D 6456 -
 0E17 4 38 LIB/PTRNORM.ASM
@@ -59,9 +59,9 @@
 2AE7 D A7 LIB/LIBREAD.C
 2AF2 4 E8 LIB/LIBSEEK.C
 2B00 C 212 LIB/EMSALLOC.ASM
-2F52 0 4AD -  # overlay
+2F52 0 4AD belt.c  # overlay
 2F55 0 232 revive.c  # overlay
-2F58 0 552 -  # overlay
+2F58 0 552 bridge.c 1CD6-1DA4  # overlay
 2F5B 0 8F disk.c 1DA4-1E48  # overlay
 2F5F 0 C13 -  # overlay
 2F63 0 D00 -  # overlay
