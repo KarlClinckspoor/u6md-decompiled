@@ -16,6 +16,8 @@ method and tools come from the Savage Empire decompilation.
 - [`MD-WRITEUP.md`](MD-WRITEUP.md): what the decompilation taught (the overlays, Turbo C++'s
   code shapes, how the work was organised, the comparison with Savage Empire).
 - [`docs/FINDINGS.md`](docs/FINDINGS.md): the engine compared with Savage Empire's, point by point.
+- [`docs/MECHANICS.md`](docs/MECHANICS.md): how the game works, from the code: formulas, chances,
+  tables and conditions, with the function where each rule lives.
 - [`docs/MAP.md`](docs/MAP.md): the layout of both executables.
 - [`SRC_M/DECOMP.md`](SRC_M/DECOMP.md), [`SRC/DECOMP.md`](SRC/DECOMP.md): the rules of the
   sources, the tools, and the status of each program; `modules.txt` in each folder lists the
