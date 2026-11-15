@@ -70,6 +70,11 @@ apply`.
 - Every code module of GAME.EXE has an identical source.
   SRC/se.h is SE's.
 
+## Documents
+
+`docs/FINDINGS.md`: how Martian Dreams' engine differs from Savage Empire's, by subject.
+`docs/MAP.md`: both executables (layout, every module in link order, the data files read).
+
 ## Rules of the sources
 
 As MARTIAN.EXE's (`SRC_M/DECOMP.md`) and Savage Empire's GAME.EXE
