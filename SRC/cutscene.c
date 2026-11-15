@@ -1,0 +1,678 @@
+/* flags: -d -mm -p -c -Z -O -y */
+/*
+ * Martian Dreams - GAME.EXE overlay 2F75: the cut scenes. New code (Savage
+ * Empire has nothing like it).
+ *
+ * C_2F75_0000 shows cut scene n of MIDGAMEX.LZC (MIDGAME1.LZC ...: the
+ * digit is "123456789abcdef"[n - 1]): each page is five entries of the
+ * file, three texts (one page of the text window each, "*E" skips one)
+ * and two pictures (the second drawn over the first, by the player's sex).
+ * The others play one cut scene each and change the world to what it
+ * tells (the power station, the canal pumps, the dream, the end).
+ * C_2F75_032D shows a map of MDMAP.LZC; C_2F75_16A8 is the end of the
+ * game: it shuts everything down and starts "martian.exe !".
+ */
+#include "se.h"
+
+/*text window (Ultima VI's)*/
+struct tClipInfo/*size:9*/ {
+	unsigned char originX, originY, cols, rows;
+	unsigned char curX, curY;
+	unsigned char fgColor, bgColor;
+	unsigned char attrFlags;/*1 wrap, 2 center, 4 capitalize, 8 runes, 0x10 paginate, 0x20 scroll*/
+};
+
+/*the graphic driver's state (Ultima VI's tGr)*/
+struct tGr {
+	unsigned char header[6];/*_00*/
+	void far *font;/*_06*/
+	unsigned char textFg, textBg;/*_0a,_0b*/
+	unsigned char xorMode;
+	unsigned char unknown0d;
+	unsigned char animOn;
+	unsigned char toBackBuffer;/*_0f*/
+};
+
+/*OSI routines (asm)*/
+extern cdecl MOUSE_SHOW();
+extern cdecl MOUSE_HIDE();
+extern cdecl ShutdownSound(void);
+extern cdecl MEM_shutdown(int16);
+extern cdecl UnhookAll(void);
+extern void far *LZC_loadType(char far *name, int16 index, void far *out, int16 memflags, char far *work);
+
+/*other game modules*/
+extern C_047A_024B(int16);/*ShowPortrait*/
+extern C_07D1_15F0(int16);
+extern C_0E1A_1E2B(int16);/*ClearMapWindow*/
+extern VIS_UpdateView();
+extern C_120E_0084(int16);/*DrawMapWindow*/
+extern C_120E_18B4();/*RefreshStatus*/
+extern MAP_LoadAround();
+extern C_1B09_0DD7();/*NextArea: next object of SearchArea*/
+extern int16 C_1B09_0EDE(int16, int16, int16, int16);/*SearchArea(x1, y1, x2, y2)*/
+extern int16 C_1B09_116E(int16, int16, int16, int16, int16, int16);/*AddMapObj(shape, status, amount, x, y, z)*/
+extern C_1B09_1872(int16);/*DeleteObj*/
+extern C_1B09_1F52(int16, int16, int16, int16);/*MoveObj(obj, x, y, z)*/
+extern C_1B09_2CD2();/*OBJ_DeleteTmpBlocks*/
+extern C_1FA9_01B4(int16);/*MUS_PlaySong*/
+extern C_1FA9_02B5();/*MUS_PlayAreaSong*/
+extern CON_setClip(struct tClipInfo *);
+extern CON_gotoxy(int16, int16);
+extern int16 CON_getch();
+extern CON_WaitKeyOrClick();
+extern cdecl CON_printf(char far *, ...);
+extern char far C_2BB4_22F1[];/*failure message*/
+
+extern unsigned char MouseOn;
+extern int16 D_080E;/*ScreenFade*/
+extern int16 D_081C;/*ColorPaper*/
+extern int16 D_081E;/*ColorText*/
+extern int16 D_0826;
+extern char D_0F12;/*StatusDirty*/
+extern char D_0F13;/*PromptFlag*/
+extern int16 D_0F18;/*MapAnimEnabled*/
+extern int16 D_167C, D_167E, D_1680;/*MapX, MapY, MapZ*/
+extern unsigned char D_16A8;/*the player is a woman*/
+extern char SelectMode;
+extern char D_1B8D;/*AnimateAtPrompt*/
+extern int16 D_1B90;/*EndPagingAtPrompt*/
+extern int16 StatusDisplay;
+extern struct tClipInfo *CurClip;
+extern unsigned char D_2805;/*IsInConversation*/
+extern char D_3232;/*a drawing surface (main.c)*/
+extern unsigned char far *D_3262;/*talk flags 8-15*/
+extern unsigned char D_3266[];/*ObjStatus*/
+extern char far *D_3E80;/*work area of the .lzc loader*/
+extern unsigned char far *D_45C4;/*0x100 bytes*/
+extern unsigned char far *D_46D0;/*NPCMode*/
+extern char far *D_4EBA;/*Schedule (5 bytes each)*/
+extern int16 D_4EBE[0x101];/*SchedPointer*/
+extern char far *D_50C0;/*ScratchBuf*/
+extern unsigned char D_6CBA[];/*NPCStatus*/
+extern char far *D_6EC2;/*TalkBuf*/
+extern struct coord D_78AE[];/*ObjPos*/
+extern uint16 D_9CC4[];/*ObjShapeType*/
+extern struct tGr far *D_BA66;/*GrInfo*/
+extern union tHandler D_BA6A;/*GrDriver*/
+extern int16 D_C0FA, D_C0FC;/*AreaX, AreaY*/
+extern struct tClipInfo D_EBD0[4];/*TextWindows*/
+extern int16 D_EC42;/*LinesBeforeMore*/
+
+#define ScreenFade D_080E
+#define ColorPaper D_081C
+#define ColorText D_081E
+#define StatusDirty D_0F12
+#define PromptFlag D_0F13
+#define MapAnimEnabled D_0F18
+#define MapX D_167C
+#define MapY D_167E
+#define MapZ D_1680
+#define AnimateAtPrompt D_1B8D
+#define EndPagingAtPrompt D_1B90
+#define IsInConversation D_2805
+#define ObjStatus D_3266
+#define NPCMode D_46D0
+#define Schedule D_4EBA
+#define SchedPointer D_4EBE
+#define ScratchBuf D_50C0
+#define NPCStatus D_6CBA
+#define TalkBuf D_6EC2
+#define ObjPos D_78AE
+#define ObjShapeType D_9CC4
+#define GrInfo D_BA66
+#define GrDriver D_BA6A
+#define AreaX D_C0FA
+#define AreaY D_C0FC
+#define TextWindows D_EBD0
+#define LinesBeforeMore D_EC42
+
+#define ShowPortrait C_047A_024B
+#define ClearMapWindow C_0E1A_1E2B
+#define DrawMapWindow C_120E_0084
+#define RefreshStatus C_120E_18B4
+#define NextArea C_1B09_0DD7
+#define SearchArea C_1B09_0EDE
+#define AddMapObj C_1B09_116E
+#define DeleteObj C_1B09_1872
+#define MoveObj C_1B09_1F52
+#define OBJ_DeleteTmpBlocks C_1B09_2CD2
+#define MUS_PlaySong C_1FA9_01B4
+#define MUS_PlayAreaSong C_1FA9_02B5
+
+#define GR_SET_COLOR(c)              (GrDriver.iii.ofs = 0x06, (*GrDriver.f)(c))
+#define GR_FILL_RECT(x0,y0,x1,y1)    (GrDriver.iii.ofs = 0x12, (*GrDriver.f)(x0,y0,x1,y1))
+#define GR_DRAW_BITMAP(s,x,y,p,m)    (GrDriver.iii.ofs = 0x30, (*GrDriver.f)(s,x,y,p,m))
+
+#define GetType(i) (ObjShapeType[i] & 0x3ff)
+#define GetFrame(i) (ObjShapeType[i] >> 10)
+#define GetX(i) ((*(int16 *)&(ObjPos[i].raw[0]))&0x3ff)
+#define GetY(i) (((*(int16 *)&(ObjPos[i].raw[1]))>>2)&0x3ff)
+#define GetZ(i) (ObjPos[i].raw[2] >> 4)
+
+/*an object of the map (not an NPC, not in an inventory) on MapZ in the
+  rectangle (x1, y1)-(x2, y2)*/
+#define InRect(i, x1, y1, x2, y2) (!(!ObjShapeType[i] || (ObjStatus[i] & 0x18) || GetZ(i) != MapZ || \
+	GetX(i) < (x1) || GetX(i) > (x2) || GetY(i) < (y1) || GetY(i) > (y2)))
+
+/*clears the text window (the lower right of the screen)*/
+#define ClearText() \
+	GR_SET_COLOR(ColorPaper); \
+	GR_FILL_RECT(0xb8, 0x80, 0x137, 0xbf); \
+	CON_gotoxy(0, 0); \
+	LinesBeforeMore = CurClip->rows
+
+/*NPC n (removed from the map) back to (x, y, z), its shape type plus
+  frame f << 10*/
+#define PutBack(n, f, x, y, z) \
+	D_3262[n] |= 0x80; \
+	NPCMode[n] = 0; \
+	ObjShapeType[n] = GetType(n) + ((f) << 10); \
+	MoveObj(n, x, y, z)
+
+/*after a cut scene: the map window and the status back*/
+#define EndCutscene() \
+	AnimateAtPrompt = 1; \
+	VIS_UpdateView(); \
+	ScreenFade = 1; \
+	DrawMapWindow(0); \
+	IsInConversation = 0; \
+	StatusDirty ++; \
+	RefreshStatus()
+
+/*20F4*/int16 D_20F4 = 0;/*C_2F75_0000 starts song 3 at the second page (set by C_2F75_0757)*/
+
+/*cut scene num (1-15: MIDGAME1.LZC ... MIDGAMEF.LZC, as MIDGAMEX.LZC), pages
+  pages of five entries (three texts, two pictures); portraits[page] the
+  portrait shown first (0: none)*/
+/*C_2F75_0000*/C_2F75_0000(int16 num, int16 pages, char *portraits) {
+	int16 toBack;
+	int16 j;
+	int16 oldStatus;
+	char fname[13] = "MIDGAMEX.LZC";
+	char digits[16] = "123456789abcdef";
+	register int16 page, k;
+
+	IsInConversation = 1;
+	ClearMapWindow(1);
+	SelectMode = 0;
+	CON_setClip(&TextWindows[3]);
+	CurClip->attrFlags |= 1;
+	CurClip->attrFlags |= 0x20;
+	CurClip->attrFlags |= 4;
+	EndPagingAtPrompt = 1;
+	ClearText();
+	fname[7] = digits[num - 1];
+	k = 0;
+	toBack = GrInfo->toBackBuffer;
+	GrInfo->toBackBuffer = 0;
+	oldStatus = StatusDisplay;
+	StatusDisplay = 0x9e;
+	if(MouseOn)
+		MOUSE_HIDE();
+	for(page = 0; page < pages; page ++, k ++) {
+		if(D_20F4 && page == 1)
+			MUS_PlaySong(3);
+		if(portraits[k])
+			ShowPortrait((unsigned char)portraits[k]);
+		if(LZC_loadType(fname, page * 5 + 4, ScratchBuf, 0, D_3E80) == 0)
+			break;
+		GR_DRAW_BITMAP(&D_3232, 8, 0x10, ScratchBuf, 0);
+		if(LZC_loadType(fname, page * 5 + 5, ScratchBuf, 0, D_3E80))
+			GR_DRAW_BITMAP(&D_3232, 8, 0x10, ScratchBuf, D_16A8);
+		ClearText();
+		for(j = 0; j < 3; j ++) {
+			LZC_loadType(fname, page * 5 + j + 1, TalkBuf, 0, D_3E80);
+			if(TalkBuf[0] == '*' && TalkBuf[1] == 'E')
+				continue;
+			CurClip->fgColor = ColorText;
+			CON_printf(TalkBuf);
+			CurClip->fgColor = D_0826;
+			MapAnimEnabled = 0;
+			CON_getch();
+			MapAnimEnabled = 1;
+			ClearText();
+		}
+		CurClip->fgColor = ColorText;
+	}
+	if(MouseOn)
+		MOUSE_SHOW();
+	StatusDisplay = oldStatus;
+	GrInfo->toBackBuffer = toBack;
+}
+
+/*cut scene 1*/
+/*C_2F75_02E1*/C_2F75_02E1() {
+	char portraits[2];
+
+	portraits[0] = portraits[1] = 0;
+	C_2F75_0000(1, 2, portraits);
+	EndCutscene();
+	MUS_PlayAreaSong();
+}
+
+/*map n of MDMAP.LZC, until a key is pressed*/
+/*C_2F75_032D*/C_2F75_032D(int16 n) {
+	char fname[10] = "MDMAP.LZC";
+
+	ClearMapWindow(1);
+	SelectMode = 0;
+	GR_SET_COLOR(ColorPaper);
+	GR_FILL_RECT(0xb8, 0x80, 0x137, 0xbf);
+	GrInfo->toBackBuffer = 0;
+	if(MouseOn)
+		MOUSE_HIDE();
+	if(LZC_loadType(fname, n, ScratchBuf, 0, D_3E80)) {
+		GR_DRAW_BITMAP(&D_3232, 8, 0x10, ScratchBuf, 0);
+		MapAnimEnabled = 0;
+		CON_printf("Press any key...");
+		CON_WaitKeyOrClick();
+		MapAnimEnabled = 1;
+		CON_printf("\n");
+	}
+	AnimateAtPrompt = 1;
+	VIS_UpdateView();
+	ScreenFade = 1;
+	DrawMapWindow(0);
+	MUS_PlayAreaSong();
+	if(MouseOn)
+		MOUSE_SHOW();
+}
+
+/*cut scene 2 (the underground power is on: LeverMachinery 1): around
+  (0x3e0, 0x1e0, 0) the objects 0xc9 get frame bit 2, 0xd6 become 0xd7*/
+/*C_2F75_042D*/C_2F75_042D() {
+	char portraits[3];
+	int16 x, y, z;
+	register int16 obj;
+
+	portraits[0] = portraits[1] = portraits[2] = 0;
+	C_2F75_0000(2, 3, portraits);
+	x = MapX;
+	y = MapY;
+	z = MapZ;
+	MapX = 0x3e0;
+	MapY = 0x1e0;
+	MapZ = 0;
+	MAP_LoadAround();
+	for(obj = SearchArea(0x3d0, 0x1d0, 0x3f0, 0x1e7); obj >= 0; obj = NextArea()) {
+		switch(GetType(obj)) {
+			case 0xd6:
+				ObjShapeType[obj] = (ObjShapeType[obj] & 0xfc00) + 0xd7;
+				break;
+			case 0xc9:
+				ObjShapeType[obj] = GetType(obj) + ((GetFrame(obj) | 4) << 10);
+				break;
+		}
+	}
+	MapX = x;
+	MapY = y;
+	MapZ = z;
+	MAP_LoadAround();
+	EndCutscene();
+	PromptFlag = 1;
+	MUS_PlayAreaSong();
+}
+
+/*cut scene 3 (the surface power is on: LeverMachinery 2): around
+  (0x3e0, 0x1e0, 0) the objects 0xd7 become 0xd6 again; the objects 0x13b
+  around (0xca, 0x295), (0x34d, 0x295), (0x13a, 0x17a), (0x2cd, 0x1fa)
+  removed*/
+/*C_2F75_0532*/C_2F75_0532() {
+	char portraits[2];
+	int16 x, y, z;
+	register int16 obj, next;
+
+	portraits[0] = portraits[1] = 0;
+	C_2F75_0000(3, 2, portraits);
+	x = MapX;
+	y = MapY;
+	z = MapZ;
+	MapX = 0x3e0;
+	MapY = 0x1e0;
+	MapZ = 0;
+	MAP_LoadAround();
+	for(obj = SearchArea(0x3d0, 0x1d0, 0x3f0, 0x1e7); obj >= 0; obj = NextArea()) {
+		if(GetType(obj) == 0xd7)
+			ObjShapeType[obj] = (ObjShapeType[obj] & 0xfc00) + 0xd6;
+	}
+	MapX = 0xca;
+	MapY = 0x295;
+	MapZ = 0;
+	MAP_LoadAround();
+	for(obj = SearchArea(0xc8, 0x290, 0xd7, 0x2a0); obj >= 0; obj = next) {
+		next = NextArea();
+		if(GetType(obj) == 0x13b)
+			DeleteObj(obj);
+	}
+	MapX = 0x34d;
+	MapY = 0x295;
+	MapZ = 0;
+	MAP_LoadAround();
+	for(obj = SearchArea(0x348, 0x290, 0x357, 0x2a0); obj >= 0; obj = next) {
+		next = NextArea();
+		if(GetType(obj) == 0x13b)
+			DeleteObj(obj);
+	}
+	MapX = 0x13a;
+	MapY = 0x17a;
+	MapZ = 0;
+	MAP_LoadAround();
+	for(obj = SearchArea(0x138, 0x178, 0x147, 0x187); obj >= 0; obj = next) {
+		next = NextArea();
+		if(GetType(obj) == 0x13b)
+			DeleteObj(obj);
+	}
+	MapX = 0x2cd;
+	MapY = 0x1fa;
+	MapZ = 0;
+	MAP_LoadAround();
+	for(obj = SearchArea(0x2c8, 0x1f8, 0x2d7, 0x207); obj >= 0; obj = next) {
+		next = NextArea();
+		if(GetType(obj) == 0x13b)
+			DeleteObj(obj);
+	}
+	MapX = x;
+	MapY = y;
+	MapZ = z;
+	MAP_LoadAround();
+	EndCutscene();
+	MUS_PlayAreaSong();
+}
+
+/*cut scene 4 (the dream, overlay 2F5F), with song 3 from its second page*/
+/*C_2F75_0757*/C_2F75_0757() {
+	char portraits[2];
+
+	portraits[0] = portraits[1] = 0;
+	D_20F4 = 1;
+	C_2F75_0000(4, 2, portraits);
+	D_20F4 = 0;
+	EndCutscene();
+}
+
+/*cut scene 5*/
+/*C_2F75_07AA*/C_2F75_07AA() {
+	char portraits[3];
+
+	portraits[0] = portraits[1] = portraits[2] = 0;
+	C_2F75_0000(5, 3, portraits);
+	EndCutscene();
+	MUS_PlayAreaSong();
+}
+
+/*cut scene 6 (the canal pumps on: LeverMachinery 3): the objects 0xd2 of
+  frame 0-1 in (0x13b, 0x116)-(0x140, 0x11a) on MapZ 0 removed*/
+/*C_2F75_07FA*/C_2F75_07FA() {
+	char portraits[3];
+	int16 x, y, z;
+	register int16 obj;
+
+	portraits[0] = portraits[1] = portraits[2] = 0;
+	C_2F75_0000(6, 3, portraits);
+	x = MapX;
+	y = MapY;
+	z = MapZ;
+	MapX = 0x13d;
+	MapY = 0x118;
+	MapZ = 0;
+	MAP_LoadAround();
+	for(obj = 0x101; obj < 0xc00; obj ++) {
+		if(InRect(obj, 0x13b, 0x116, 0x140, 0x11a) && GetType(obj) == 0xd2 && GetFrame(obj) < 2)
+			DeleteObj(obj);
+	}
+	MapX = x;
+	MapY = y;
+	MapZ = z;
+	MAP_LoadAround();
+	EndCutscene();
+	MUS_PlayAreaSong();
+}
+
+/*cut scene 7 (the canal pumps off: LeverMachinery 4): around (0x241,
+  0x27b, 0) the objects 0x1cb of frame 1 get frame 2, a new 0x1cc at
+  (0x243, 0x27a)*/
+/*C_2F75_0951*/C_2F75_0951() {
+	char portraits[3];
+	int16 x, y, z;
+	register int16 obj;
+
+	portraits[0] = portraits[1] = portraits[2] = 0;
+	C_2F75_0000(7, 3, portraits);
+	x = MapX;
+	y = MapY;
+	z = MapZ;
+	MapX = 0x241;
+	MapY = 0x27b;
+	MapZ = 0;
+	MAP_LoadAround();
+	for(obj = SearchArea(AreaX, AreaY, AreaX + 0x27, AreaY + 0x27); obj >= 0; obj = NextArea()) {
+		if(ObjShapeType[obj] == 0x5cb)
+			ObjShapeType[obj] = GetType(obj) + 0x800;
+	}
+	if((obj = AddMapObj(0x1cc, 0, 0, 0x243, 0x27a, 0)) < 0)
+		CON_printf(C_2BB4_22F1);
+	else
+		ObjStatus[obj] &= ~0x20;
+	MapX = x;
+	MapY = y;
+	MapZ = z;
+	MAP_LoadAround();
+	EndCutscene();
+	MUS_PlayAreaSong();
+}
+
+/*cut scene 8 (LeverMachinery 6): C_07D1_15F0 on NPCs 0x41, 0x43-0x45;
+  NPCs 0x42 to (0x394, 0x284, 0), 0x46 to (0x393, 0x282, 0), 0x40 removed*/
+/*C_2F75_0A64*/C_2F75_0A64() {
+	char portraits[3];
+	int16 x, y, z;
+
+	portraits[0] = portraits[1] = portraits[2] = 0;
+	C_2F75_0000(8, 3, portraits);
+	x = MapX;
+	y = MapY;
+	z = MapZ;
+	MapX = 0x384;
+	MapY = 0x280;
+	MapZ = 0;
+	MAP_LoadAround();
+	C_07D1_15F0(0x41);
+	C_07D1_15F0(0x43);
+	C_07D1_15F0(0x44);
+	C_07D1_15F0(0x45);
+	D_3262[0x42] |= 0x80;
+	NPCMode[0x42] = 0;
+	MoveObj(0x42, 0x394, 0x284, 0);
+	D_3262[0x40] |= 0x80;
+	NPCMode[0x40] = 0;
+	MoveObj(0x40, 0x40, 0x40, 6);
+	D_3262[0x46] |= 0x80;
+	NPCMode[0x46] = 0;
+	MoveObj(0x46, 0x393, 0x282, 0);
+	MapX = x;
+	MapY = y;
+	MapZ = z;
+	MAP_LoadAround();
+	EndCutscene();
+	MUS_PlayAreaSong();
+}
+
+/*cut scene 9 (no music): three objects 0xef at (-2, -2), (-2, -1),
+  (-2, 0) from the avatar on MapZ 0; on MapZ 4 NPC 5 (unless NPCStatus bit
+  7), 0x10-0x16, 0x19-0x1c, 0x1e, 0x2a-0x2c in a row at y 0xc4 (frame 9),
+  0x2d-0x31, 0x34-0x39, 0x3b, 0x3d, 0x3e, 0x42, 0x46 at y 0xc2 (frame 1),
+  0x33 at (0xa1, 0xbd) (frame 13)*/
+/*C_2F75_0B90*/C_2F75_0B90() {
+	char portraits[2];
+	int16 x, y, z;
+	register int16 obj;
+
+	MUS_PlaySong(-1);
+	portraits[0] = portraits[1] = 0;
+	C_2F75_0000(9, 2, portraits);
+	x = MapX;
+	y = MapY;
+	z = MapZ;
+	MapX = GetX(1);
+	MapY = GetY(1);
+	MapZ = 0;
+	MAP_LoadAround();
+	if((obj = AddMapObj(0xef, 0, 0, MapX - 2, MapY - 2, MapZ)) < 0)
+		CON_printf(C_2BB4_22F1);
+	else
+		ObjStatus[obj] &= ~0x20;
+	if((obj = AddMapObj(0xef, 0, 0, MapX - 2, MapY - 1, MapZ)) < 0)
+		CON_printf(C_2BB4_22F1);
+	else
+		ObjStatus[obj] &= ~0x20;
+	if((obj = AddMapObj(0xef, 0, 0, MapX - 2, MapY, MapZ)) < 0)
+		CON_printf(C_2BB4_22F1);
+	else
+		ObjStatus[obj] &= ~0x20;
+	MapX = 0xb0;
+	MapY = 0xb0;
+	MapZ = 4;
+	MAP_LoadAround();
+	if(!(NPCStatus[5] & 0x80)) {
+		PutBack(5, 9, 0xa3, 0xc4, 4);
+	}
+	PutBack(0x10, 9, 0xa4, 0xc4, 4);
+	PutBack(0x11, 9, 0xa5, 0xc4, 4);
+	PutBack(0x12, 9, 0xa6, 0xc4, 4);
+	PutBack(0x13, 9, 0xa7, 0xc4, 4);
+	PutBack(0x14, 9, 0xa8, 0xc4, 4);
+	PutBack(0x15, 9, 0xa9, 0xc4, 4);
+	PutBack(0x16, 9, 0xaa, 0xc4, 4);
+	PutBack(0x19, 9, 0xab, 0xc4, 4);
+	PutBack(0x1a, 9, 0xac, 0xc4, 4);
+	PutBack(0x1b, 9, 0xad, 0xc4, 4);
+	PutBack(0x1c, 9, 0xae, 0xc4, 4);
+	PutBack(0x1e, 9, 0xaf, 0xc4, 4);
+	PutBack(0x2a, 9, 0xb0, 0xc4, 4);
+	PutBack(0x2b, 9, 0xb1, 0xc4, 4);
+	PutBack(0x2c, 9, 0xb2, 0xc4, 4);
+	PutBack(0x2d, 1, 0xa3, 0xc2, 4);
+	PutBack(0x2e, 1, 0xa4, 0xc2, 4);
+	PutBack(0x2f, 1, 0xa5, 0xc2, 4);
+	PutBack(0x30, 1, 0xa6, 0xc2, 4);
+	PutBack(0x31, 1, 0xa7, 0xc2, 4);
+	PutBack(0x34, 1, 0xa9, 0xc2, 4);
+	PutBack(0x35, 1, 0xaa, 0xc2, 4);
+	PutBack(0x36, 1, 0xab, 0xc2, 4);
+	PutBack(0x37, 1, 0xac, 0xc2, 4);
+	PutBack(0x38, 1, 0xad, 0xc2, 4);
+	PutBack(0x39, 1, 0xae, 0xc2, 4);
+	PutBack(0x3b, 1, 0xaf, 0xc2, 4);
+	PutBack(0x3d, 1, 0xb0, 0xc2, 4);
+	PutBack(0x3e, 1, 0xb1, 0xc2, 4);
+	PutBack(0x42, 1, 0xb2, 0xc2, 4);
+	PutBack(0x46, 1, 0xa8, 0xc2, 4);
+	PutBack(0x33, 13, 0xa1, 0xbd, 4);
+	MapX = x;
+	MapY = y;
+	MapZ = z;
+	MAP_LoadAround();
+	AnimateAtPrompt = 1;
+	ScreenFade = 1;
+	IsInConversation = 0;
+}
+
+/*cut scene 10 (talk.c): NPCs 0x20, 0x22-0x29 and 0x50-0x57 removed,
+  0x2a-0x31 back to their schedule's place*/
+/*C_2F75_1429*/C_2F75_1429() {
+	char portraits[2];
+	int16 x, y, z;
+	struct coord pos;
+	register int16 i;
+
+	portraits[0] = portraits[1] = 0;
+	C_2F75_0000(10, 2, portraits);
+	x = MapX;
+	y = MapY;
+	z = MapZ;
+	for(i = 0x20; i <= 0x29; i ++) {
+		if(i == 0x21)
+			continue;
+		D_3262[i] |= 0x80;
+		NPCMode[i] = 0;
+		MoveObj(i, i, i, 6);
+	}
+	for(i = 0x2a; i <= 0x31; i ++) {
+		D_3262[i] &= ~0x80;
+		pos = *(struct coord far *)(Schedule + (D_45C4[i] + SchedPointer[i]) * 5 + 2);
+		MoveObj(i, (*(int16 *)&pos.raw[0]) & 0x3ff, ((*(int16 *)&pos.raw[1]) >> 2) & 0x3ff, pos.raw[2] >> 4);
+	}
+	MapX = 0x64;
+	MapY = 0x3b;
+	MapZ = 2;
+	MAP_LoadAround();
+	for(i = 0x50; i <= 0x57; i ++) {
+		D_3262[i] |= 0x80;
+		NPCMode[i] = 0;
+		MoveObj(i, i, i, 6);
+	}
+	MapX = x;
+	MapY = y;
+	MapZ = z;
+	MAP_LoadAround();
+	EndCutscene();
+	MUS_PlayAreaSong();
+}
+
+/*cut scene 11 (the dream, overlay 2F5F; song 0xf)*/
+/*C_2F75_157A*/C_2F75_157A() {
+	char portraits[2];
+	int16 x, y, z;
+
+	MUS_PlaySong(0xf);
+	portraits[0] = portraits[1] = 0;
+	C_2F75_0000(0xb, 1, portraits);
+	x = MapX;
+	y = MapY;
+	z = MapZ;
+	MapX = 0;
+	MapY = 0;
+	MapZ = 0;
+	MAP_LoadAround();
+	MapX = x;
+	MapY = y;
+	MapZ = z;
+	MAP_LoadAround();
+	EndCutscene();
+}
+
+/*cut scene 12*/
+/*C_2F75_1607*/C_2F75_1607() {
+	char portraits[3];
+
+	portraits[0] = portraits[1] = portraits[2] = 0;
+	C_2F75_0000(0xc, 3, portraits);
+	EndCutscene();
+	MUS_PlayAreaSong();
+}
+
+/*cut scene 13 (no music)*/
+/*C_2F75_1657*/C_2F75_1657() {
+	char portraits[1];
+
+	MUS_PlaySong(-1);
+	portraits[0] = 0;
+	C_2F75_0000(0xd, 1, portraits);
+	EndCutscene();
+	MUS_PlayAreaSong();
+}
+
+/*the end of the game (talk.c): song 0xc, everything shut down, then
+  MARTIAN.EXE runs the ending ("!")*/
+/*C_2F75_16A8*/C_2F75_16A8() {
+	MUS_PlaySong(0xc);
+	OBJ_DeleteTmpBlocks();
+	ShutdownSound();
+	MEM_shutdown(8);
+	UnhookAll();
+	GrDriver.iii.ofs = 3;
+	(*GrDriver.f)();
+	for(;;)
+		execl("martian.exe", "martian.exe", "!", 0L);
+}
