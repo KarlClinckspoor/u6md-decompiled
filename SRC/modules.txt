@@ -5,7 +5,7 @@
 02CD D 1009 main.c 00A8-028C
 0000 242 421 OSILIB/OSI_FILE.ASM 07FA-0804  # linked after main.c: its code joins C0M's _TEXT, its data follow main's
 03CE 6 AC8 barge.c 028C-042A
-047A E 356F objcmd.c 042A-06B9
+047A E 356F objcmd.c 042A-06BA
 07D1 D 6456 -
 0E17 4 38 LIB/PTRNORM.ASM
 0E1A C 1EAF gfx.c 0804-0BB2

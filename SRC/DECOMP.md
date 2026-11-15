@@ -41,6 +41,10 @@ the library's C files name their own flags (cdecl) and often Turbo C++ 1.01.
   dreamstg.c (overlay 2F68),
   cutscene.c (overlay 2F75), gameloop.c (120E), npctrack.c (170D), object.c (1B09),
   gamestat.c (data only, DS 1672-16DA), objcmd.c (047A).
+- In progress: 07D1 (combat, SE's combat.c reworked; DS 06BA-07FA): its first half,
+  07D1:000D-30BA (33 of 63 functions) and all its _DATA, is identical in
+  build/game-07d1 (partial file, not in SRC yet); the second half is to do
+  (docs/GAME_NOTES.md M30, handover).
 - Next: the SE-like modules, then the new code and the other overlays (docs/PLAN.md
   Phase 4). SRC/se.h is SE's.
 
