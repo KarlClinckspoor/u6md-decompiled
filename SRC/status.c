@@ -68,7 +68,7 @@ extern int16 QuanType(int16);/*4 quantity on 16 bits, 2 on 8 bits, else 0*/
 extern int16 STAT_GetEquipSlot(int16);
 extern DrawPortrait(int16, int16, int16);/*DrawPortrait(npcNum, x, y)*/
 extern DrawPaperDoll(int16, int16, int16);/*DrawPaperDoll(x, y, npcNum)*/
-extern C_2FA1_0000(int16, int16, int16);
+extern UsePutOutLight(int16, int16, int16);
 extern char far TongsProtectMsg[];
 extern char far BurnOutMsg[];
 extern char far AarghMsg[];
@@ -795,7 +795,7 @@ extern int16 MapX, MapY;
 		return 2;
 	}
 	if(IsLitLightType(objTyp))
-		C_2FA1_0000(objNum, objNum, -1);
+		UsePutOutLight(objNum, objNum, -1);
 	else if(objTyp == 0xf) {
 		CON_printf(/*1B3D*/"They won't come off!\n");
 		return 1;

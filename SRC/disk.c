@@ -18,7 +18,8 @@ extern int16 CON_getch();
 extern cdecl CON_printf(char far *, ...);
 
 extern int16 MapAnimEnabled;
-extern unsigned char D_EC5A, D_EC5B;/*DosVerMajor, DosVerMinor*/
+/*EC5A*/extern unsigned char DosVerMajor;/*the DOS version*/
+/*EC5B*/extern unsigned char DosVerMinor;
 
 static DISK_NullCallback();
 
@@ -70,6 +71,6 @@ static DISK_NullCallback();
 	/*get dos version*/
 	regs.h.ah = 0x30;
 	intdos(&regs, &regs);
-	D_EC5A = regs.h.al;
-	D_EC5B = regs.h.ah;
+	DosVerMajor = regs.h.al;
+	DosVerMinor = regs.h.ah;
 }

@@ -42,13 +42,13 @@ extern DreamWakeUp();
 extern SetPartyMode();
 extern STAT_ShowParty(int16);
 extern TALK_talkTo(int16, int16, int16);
-extern C_2F75_07AA();
-extern C_2F75_07FA();
-extern C_2F75_0951();
-extern C_2F75_0A64();
-extern C_2F75_1607();
-extern C_2F75_1657();
-extern C_2F75_16A8();
+extern Cutscene5();
+extern Cutscene6();
+extern Cutscene7();
+extern Cutscene8();
+extern Cutscene12();
+extern Cutscene13();
+extern GameEnd();
 extern int16 COMBAT_Missile(int16, int16 *, int16 *, int16, int16);
 extern int16 far *Explosion(int16, int16, int16);/*Explosion(x, y, missileTile): the objects hit, -1 terminated*/
 extern int16 IsBreakableType(int16);
@@ -92,7 +92,7 @@ extern int16 COMBAT_TryTeleport(int16, int16);
 extern int16 CanMoveTo(int16, int16, int16);
 extern int16 EGG_generate(int16, int16, int16, int16);/*EGG_generate(type, x, y, z)*/
 extern int16 SPELL_ReviveNPC(int16);
-extern C_2F8D_0476(int16, int16, int16);/*take and ready (useact1.c)*/
+extern UseTakeAndReady(int16, int16, int16);/*take and ready (useact1.c)*/
 extern void PrintTileArticle(int16);
 extern PrintObjCountOrArticle(int16);
 extern DrawSlotCursor(int16);
@@ -107,7 +107,7 @@ extern char SoloMember;
 extern int32 GameFlags;/*0x10: in a dream*/
 extern int16 StatusMember;
 extern int16 StatusDisplay;
-extern unsigned char far *D_3262;/*NPC flags: 0x80 ?, bits 0-7: talk flags 8-15*/
+extern unsigned char far *TalkFlagsHi;/*talk flags 8-15 (0x80: waiting)*/
 extern unsigned char far *NPCMode;
 extern unsigned char far *NPCComMode;
 extern int16 far *OrigShapeType;
@@ -224,7 +224,7 @@ extern char far AarghMsg[];/*"Aargh!\n"*/
  * 0x190 at (x - 1, y) and (x, y) (made with random frames) roll while
  * OSI_rand(0, 40) < GetDex
  */
-/*C_2F98_0000*/C_2F98_0000(int16 obj, int16 on, int16 to) {
+/*C_2F98_0000*/UseBilliards(int16 obj, int16 on, int16 to) {
 	register int16 x;
 	register int16 b2;
 	int16 b1, i, y, frames;
@@ -272,7 +272,7 @@ extern char far AarghMsg[];/*"Aargh!\n"*/
  * action 36 (pipe organ 0xa5, its seat 0x199): with the seat left of it,
  * Bach (MUS_PlayMelody); else keys 1-0 play sfx key - 10
  */
-/*C_2F98_0267*/C_2F98_0267(register int16 obj, int16 on, int16 to) {
+/*C_2F98_0267*/UseOrgan(register int16 obj, int16 on, int16 to) {
 	register int16 seat = -1;
 	int16 o, done, key;
 
@@ -316,7 +316,7 @@ extern char far AarghMsg[];/*"Aargh!\n"*/
  * action 46 (0x90 on the rollers 0xc0): fix the rollers (0xbc, a 0xbd every
  * fourth); TalkFlags[0x72] 4
  */
-/*C_2F98_03AA*/C_2F98_03AA(int16 obj, int16 on, int16 to) {
+/*C_2F98_03AA*/UseFixRollers(int16 obj, int16 on, int16 to) {
 	register int16 o;
 	register int16 x;
 	int16 y, n, cnt, r;
@@ -352,7 +352,7 @@ extern char far AarghMsg[];/*"Aargh!\n"*/
  * steel balls (quality) blow a door 0xad open (TalkFlags[0x41] 4); explosion
  * 0x107
  */
-/*C_2F98_0503*/C_2F98_0503(int16 obj, int16 on, int16 to) {
+/*C_2F98_0503*/UseCannon(int16 obj, int16 on, int16 to) {
 	register int16 dir;
 	register int16 i;
 	int16 x, y;
@@ -409,7 +409,7 @@ extern char far AarghMsg[];/*"Aargh!\n"*/
 /*
  * action 41 (0x8a on the cannon 0x14d): load steel cannon balls (quality 1)
  */
-/*C_2F98_0777*/C_2F98_0777(int16 obj, int16 on, int16 to) {
+/*C_2F98_0777*/UseLoadCannon(int16 obj, int16 on, int16 to) {
 	register int16 q;
 
 	if((q = GetQual(on)) != 0) {
@@ -425,7 +425,7 @@ extern char far AarghMsg[];/*"Aargh!\n"*/
  * panel 4: the dream machines (chair 0x122, headgear 0x121/0x64, setting
  * 0x120; machine 0x123: NPC 0x21, robot 0x11f: NPC 6)
  */
-/*C_2F98_07C3*/static C_2F98_07C3(int16 obj, int16 panel) {
+/*C_2F98_07C3*/static PanelDreamMachine(int16 obj, int16 panel) {
 	register int16 o;
 	int16 typ, frame, x, y, chair = -1, mach = -1, c = -1;
 	register int16 npc = -1;
@@ -464,12 +464,12 @@ extern char far AarghMsg[];/*"Aargh!\n"*/
 		if(TalkFlags[0x21] & 4 || !(TalkFlags[0x61] & 0x10)) {
 			CON_printf(NoEffectMsg);
 		} else {
-			C_2F75_07AA();
+			Cutscene5();
 			TALK_talkTo(1, 0x21, 0);
 			TalkFlags[0x21] |= 4;
 			MoveObj(0x61, 0x61, 0x61, 6);
 			NPCMode[0x61] = NPCComMode[0x61] = 0;
-			D_3262[0x61] |= 0xcb;
+			TalkFlagsHi[0x61] |= 0xcb;
 			MoveObj(npc, x, (y + 1) & 0x3ff, MapZ);
 			COMBAT_Kill(npc);
 			DeleteObj(mach);
@@ -482,7 +482,7 @@ extern char far AarghMsg[];/*"Aargh!\n"*/
 			return;
 		}
 		npc = 6;
-		C_2F75_1607();
+		Cutscene12();
 		if(PartySize == 5) {
 			if(SoloMember >= 0 && Party[SoloMember] == 5)
 				SetPartyMode();
@@ -501,7 +501,7 @@ extern char far AarghMsg[];/*"Aargh!\n"*/
 		MoveObj(npc, x, (y + 1) & 0x3ff, MapZ);
 		MoveObj(0x63, 0x63, 0x63, 6);
 		NPCMode[0x63] = NPCComMode[0x63] = 0;
-		D_3262[0x63] |= 0xcb;
+		TalkFlagsHi[0x63] |= 0xcb;
 		DeleteObj(mach);
 		return;
 	}
@@ -529,7 +529,7 @@ extern char far AarghMsg[];/*"Aargh!\n"*/
 /*
  * panel 5: the rubber sprayer 0x114 coats NPC 6 (0x165 becomes 0x162)
  */
-/*C_2F98_0B2F*/static C_2F98_0B2F(int16 obj, int16 panel) {
+/*C_2F98_0B2F*/static PanelRubberSprayer(int16 obj, int16 panel) {
 	register int16 spr, npc;
 	int16 o, q;
 
@@ -570,7 +570,7 @@ extern char far AarghMsg[];/*"Aargh!\n"*/
 	ObjShapeType[npc] = (ObjShapeType[npc] & 0xfc00) + 0x162;
 	TalkFlags[6] |= 0x22;
 	OrigShapeType[6] = 0x162 | (OrigShapeType[6] >> 10 << 10);
-	C_2F75_0A64();
+	Cutscene8();
 	TALK_talkTo(1, 6, 0);
 	TalkFlags[6] &= ~0x20;
 }
@@ -579,7 +579,7 @@ extern char far AarghMsg[];/*"Aargh!\n"*/
  * panel 6: align the ruby lenses (a coordinate within 5 of the time
  * H * 100 + M; at night wait until dawn)
  */
-/*C_2F98_0CF3*/C_2F98_0CF3() {
+/*C_2F98_0CF3*/PanelRubyLenses() {
 	register int16 t;
 	int16 n;
 	char buf[10];
@@ -604,7 +604,7 @@ extern char far AarghMsg[];/*"Aargh!\n"*/
 			TalkFlags[0x30] |= 0x80;
 			TalkFlags[0x76] |= 0x20;
 			BargePumps(1);
-			C_2F75_07FA();
+			Cutscene6();
 			TalkFlags[5] |= 0x10;
 			TALK_talkTo(1, 5, 0);
 			TalkFlags[5] &= ~0x10;
@@ -619,7 +619,7 @@ extern char far AarghMsg[];/*"Aargh!\n"*/
 /*
  * action 45 (panel 0x1ca on a cabinet 0x1c9): by the cabinet's quality
  */
-/*C_2F98_0E53*/C_2F98_0E53(int16 obj, int16 on, int16 to) {
+/*C_2F98_0E53*/UseCabinetPanel(int16 obj, int16 on, int16 to) {
 	register int16 cab = -1;
 	register int16 q;
 
@@ -650,13 +650,13 @@ extern char far AarghMsg[];/*"Aargh!\n"*/
 		CON_printf(LightsFlashMsg);
 		break;
 	case 4:
-		C_2F98_07C3(obj, cab);
+		PanelDreamMachine(obj, cab);
 		break;
 	case 5:
-		C_2F98_0B2F(obj, cab);
+		PanelRubberSprayer(obj, cab);
 		break;
 	case 6:
-		C_2F98_0CF3();
+		PanelRubyLenses();
 		break;
 	case 7:
 		if(TalkFlags[0x76] & 0x40) {
@@ -664,7 +664,7 @@ extern char far AarghMsg[];/*"Aargh!\n"*/
 		} else if(TalkFlags[0x76] & 0x20) {
 			TalkFlags[0x76] |= 0x40;
 			BargePumps(0);
-			C_2F75_0951();
+			Cutscene7();
 		} else {
 			CON_printf(NoWaterPressureMsg);
 		}
@@ -677,7 +677,7 @@ extern char far AarghMsg[];/*"Aargh!\n"*/
 /*
  * action 48 (paint 0x77, weed killer 0x80 on spray guns 0x81/0x105): charge
  */
-/*C_2F98_0F88*/C_2F98_0F88(int16 obj, register int16 on, int16 to) {
+/*C_2F98_0F88*/UseChargeSprayGun(int16 obj, register int16 on, int16 to) {
 	register int16 t;
 	int16 x, y, p, quan, qual;
 
@@ -709,7 +709,7 @@ extern char far AarghMsg[];/*"Aargh!\n"*/
  * action 49 (spray guns 0x105, 0x81): paint (quality 1) shows invisible
  * actors, weed killer hurts actors and kills plants (IsPlantType)
  */
-/*C_2F98_1088*/C_2F98_1088(int16 obj, register int16 on, int16 to) {
+/*C_2F98_1088*/UseSprayGun(int16 obj, register int16 on, int16 to) {
 	register int16 t;
 	int16 quan, qual;
 
@@ -757,7 +757,7 @@ extern char far AarghMsg[];/*"Aargh!\n"*/
  * action 52 (headgear 0x128 on 0x120/0x121): install it (0x64, frame 1);
  * TalkFlags[0x74] 0x10
  */
-/*C_2F98_1237*/C_2F98_1237(int16 obj, register int16 on, int16 to) {
+/*C_2F98_1237*/UseInstallHeadgear(int16 obj, register int16 on, int16 to) {
 	register int16 o;
 
 	if(GetType(on) == 0x121) {
@@ -783,7 +783,7 @@ extern char far AarghMsg[];/*"Aargh!\n"*/
  * action 23 (lever 0x1a2): set the frame to a direction (AdvanceDir) or 4
  * (center); needs TalkFlags[0x76] 0x20 and 0x40, or the dream
  */
-/*C_2F98_1334*/C_2F98_1334(register int16 obj, int16 on, int16 to) {
+/*C_2F98_1334*/UseBargeController(register int16 obj, int16 on, int16 to) {
 	register int16 key;
 
 	if((!(TalkFlags[0x76] & 0x20) || !(TalkFlags[0x76] & 0x40)) && !(GameFlags & 0x10)) {
@@ -809,9 +809,9 @@ extern char far AarghMsg[];/*"Aargh!\n"*/
 }
 
 /*
- * action 33 (0x60): latitude and longitude of the party (not underground)
+ * action 33 (sextant 0x60): latitude and longitude of the party (not underground)
  */
-/*C_2F98_1449*/C_2F98_1449(int16 obj, int16 on, int16 to) {
+/*C_2F98_1449*/UseSextant(int16 obj, int16 on, int16 to) {
 	register int16 lon, lat;
 	unsigned char ns, ew;
 	int16 p;
@@ -842,7 +842,7 @@ extern char far AarghMsg[];/*"Aargh!\n"*/
 /*
  * action 50 (bin 0xd4): 20 oxium 0x83 into the inventory
  */
-/*C_2F98_1568*/C_2F98_1568(int16 obj, int16 on, int16 to) {
+/*C_2F98_1568*/UseOxiumBin(int16 obj, int16 on, int16 to) {
 	register int16 p, d;
 	int16 x, y;
 
@@ -867,7 +867,7 @@ extern char far AarghMsg[];/*"Aargh!\n"*/
  * action 58 (plant 0x9d): harvest a seed 0x9e (frame >= 1; frame 0 and
  * quality 10-15 again)
  */
-/*C_2F98_166A*/C_2F98_166A(register int16 obj, int16 on, int16 to) {
+/*C_2F98_166A*/UseHarvestSeed(register int16 obj, int16 on, int16 to) {
 	register int16 p;
 	int16 o, d, x, y;
 
@@ -899,7 +899,7 @@ extern char far AarghMsg[];/*"Aargh!\n"*/
 /*
  * action 59 (seed 0x9e): plant it on the selected square
  */
-/*C_2F98_17B5*/C_2F98_17B5(register int16 obj, int16 on, int16 to) {
+/*C_2F98_17B5*/UsePlantSeed(register int16 obj, int16 on, int16 to) {
 	register int16 p;
 	int16 key, x, y, d;
 
@@ -947,7 +947,7 @@ extern char far AarghMsg[];/*"Aargh!\n"*/
 /*
  * action 66 (spittoon 0x11e)
  */
-/*C_2F98_1988*/C_2F98_1988(int16 obj, int16 on, int16 to) {
+/*C_2F98_1988*/UseSpittoon(int16 obj, int16 on, int16 to) {
 	if(ObjStatus[Party[Active]] & 0x40)
 		CON_printf(MouthTooDryMsg);
 	else
@@ -956,14 +956,14 @@ extern char far AarghMsg[];/*"Aargh!\n"*/
 
 /*
  * action 67 (ruby slippers 0xc): readied, click three times (quality), then
- * the Grand Finale (C_2F75_16A8) or not (C_2F75_1657)
+ * the Grand Finale (GameEnd) or not (Cutscene13)
  */
-/*C_2F98_19BD*/C_2F98_19BD(register int16 obj, int16 on, int16 to) {
+/*C_2F98_19BD*/UseRubySlippers(register int16 obj, int16 on, int16 to) {
 	register int16 ch;
 	int16 q;
 
 	if((ObjStatus[obj] & 0x18) != 0x18) {
-		C_2F8D_0476(obj, -1, -1);
+		UseTakeAndReady(obj, -1, -1);
 		return;
 	}
 	if((q = GetQual(obj)) < 2) {
@@ -977,16 +977,16 @@ extern char far AarghMsg[];/*"Aargh!\n"*/
 	for(ch = 0; ch != 'Y' && ch != 'N'; ch = toupper(CON_prompt()))
 		;
 	if(ch == 'N')
-		C_2F75_1657();
+		Cutscene13();
 	else
-		C_2F75_16A8();
+		GameEnd();
 }
 
 /*
  * action 54 (dreamstuff hoard 0x1c7): with the psychic talent, a dreamstuff
  * 0x14b holding 0x139 (the hoard's quality) or a random 0x31-0x38
  */
-/*C_2F98_1A75*/C_2F98_1A75(int16 obj, int16 on, int16 to) {
+/*C_2F98_1A75*/UseDreamstuffHoard(int16 obj, int16 on, int16 to) {
 	register int16 p, d;
 	int16 o;
 
@@ -1016,7 +1016,7 @@ extern char far AarghMsg[];/*"Aargh!\n"*/
  * action 53 (dreamstuff 0x14b): imagine what it holds: an object (< 0x156) in
  * its place, else an actor next to the party (alignment from the quality)
  */
-/*C_2F98_1BB6*/C_2F98_1BB6(int16 obj, int16 on, int16 to) {
+/*C_2F98_1BB6*/UseDreamstuff(int16 obj, int16 on, int16 to) {
 	register int16 npc, inner;
 	int16 t, i, x, y;
 
@@ -1081,10 +1081,10 @@ extern char far AarghMsg[];/*"Aargh!\n"*/
 }
 
 /*
- * action 55 (0x79 on an object): NPC 0x68 talks; on object 0 heals (NPC 1's
+ * action 55 (healing elixir 0x79 on an object): NPC 0x68 talks; on object 0 heals (NPC 1's
  * MaxHP and name, NPC 0's HitPoints, as the original)
  */
-/*C_2F98_1E08*/C_2F98_1E08(int16 obj, int16 on, int16 to) {
+/*C_2F98_1E08*/UseHealingElixir(int16 obj, int16 on, int16 to) {
 	if(SelectionObj == 0x68) {
 		TalkFlags[0x68] |= 0x40;
 		TALK_talkTo(Active, 0x68, 0);
@@ -1099,13 +1099,13 @@ extern char far AarghMsg[];/*"Aargh!\n"*/
 /*
  * action 72 (valve 0xdc): start the canals (as panel 7)
  */
-/*C_2F98_1E83*/C_2F98_1E83(int16 obj, int16 on, int16 to) {
+/*C_2F98_1E83*/UseValve(int16 obj, int16 on, int16 to) {
 	if(TalkFlags[0x76] & 0x40) {
 		CON_printf(CanalsWorkingMsg);
 	} else if(TalkFlags[0x76] & 0x20) {
 		TalkFlags[0x76] |= 0x40;
 		BargePumps(0);
-		C_2F75_0951();
+		Cutscene7();
 	} else {
 		CON_printf(NoWaterPressureMsg);
 	}
@@ -1115,7 +1115,7 @@ extern char far AarghMsg[];/*"Aargh!\n"*/
  * action 74 (oxygenated air 0x144 on an object): revive a body 0x155, heal an
  * actor (NPCStatus 0x80); n is tested uninitialised (the original's bug)
  */
-/*C_2F98_1EC7*/C_2F98_1EC7(int16 obj, register int16 on, int16 to) {
+/*C_2F98_1EC7*/UseOxygenatedAir(int16 obj, register int16 on, int16 to) {
 	register int16 n;
 	int16 t;
 

@@ -153,7 +153,7 @@ extern void far *LinearToPtr(int32);
 /*3232*/extern struct tSurface Screen;/*the screen's surface (scanline table ScreenScanlines), for the mouse code*/
 /*3240*/extern unsigned char AnimFrameMask[0x20];/*animdata: the frame mask of each animated tile*/
 /*3260*/extern int16 GrMemoryKB;/*memory given to the graphic driver for the tiles, in KB*/
-extern char far *D_3262;/*0x100 bytes*/
+extern char far *TalkFlagsHi;/*0x100 bytes*/
 /*3E66*/extern struct tMouse Mouse;/*the mouse state*/
 /*3E80*/extern char far *LzcWorkBuf;/*work area of the .lzc loader (0x3500 bytes)*/
 extern char far *SchedIndex;/*0x100 bytes*/
@@ -653,7 +653,7 @@ extern char far *ChunkIndexBuf;/*0x600 bytes*/
 	__MemAlloc(&TileFlag2, 0x800);
 	__MemAlloc(&Schedule, 3000);
 	__MemAlloc(&NPCMode, 0x100);
-	__MemAlloc(&D_3262, 0x100);
+	__MemAlloc(&TalkFlagsHi, 0x100);
 	__MemAlloc(&NPCComMode, 0x100);
 	__MemAlloc(&SchedIndex, 0x100);
 	__MemAlloc(&Leader, 0x100);

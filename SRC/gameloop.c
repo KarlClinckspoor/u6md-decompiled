@@ -153,15 +153,15 @@ extern MUS_SplashSfx();
 extern int16 QuanType(int16);
 extern int16 AddMapObj(int16, int16, int16, int16, int16, int16);/*AddMapObj(shape, status, amount, x, y, z)*/
 extern int16 AddInvObj(int16, int16, int16, int16);/*AddInvObj(shape, status, amount, owner)*/
-extern C_2F75_02E1();
-extern C_2F75_042D();
-extern C_2F75_0532();
-extern C_2F75_0757();
-extern C_2F75_07AA();
-extern C_2F75_07FA();
-extern C_2F75_0951();
-extern C_2F75_0A64();
-extern C_2F75_0B90();
+extern Cutscene1();
+extern Cutscene2();
+extern Cutscene3();
+extern Cutscene4();
+extern Cutscene5();
+extern Cutscene6();
+extern Cutscene7();
+extern Cutscene8();
+extern Cutscene9();
 extern char far PassMsg[];/*pass*/
 extern char far CombatMsg[];/*combat*/
 extern char far BreakOffMsg[];/*break off*/
@@ -212,7 +212,7 @@ extern int16 AvatarNotSolid;
 extern unsigned char DefaultCommand;
 extern int16 cdecl emsInUse;/*EMSINIT.ASM*/
 extern int16 GrMemoryKB;
-extern unsigned char far *D_3262;/*talk flags 8-15*/
+extern unsigned char far *TalkFlagsHi;/*talk flags 8-15*/
 extern char MovePts[];
 extern unsigned char far *Level;
 extern void far *ScreenParts;/*mdscreen.lzc entry 2: frames 0/1 mark/unmark a command icon*/
@@ -1626,7 +1626,7 @@ Exits on <ALT+X>/<CTRL+Q>/<CTRL+E> confirmed (ch == 0x12D).*/
 								CON_printf("%d is ", num2);
 							else
 								CON_printf("WAIT flag ");
-							num4 = num2 < 8 ? TalkFlags[num] & (1 << num2) : D_3262[num] & 0x80;
+							num4 = num2 < 8 ? TalkFlags[num] & (1 << num2) : TalkFlagsHi[num] & 0x80;
 							if(num4)
 								CON_printf("on.");
 							else
@@ -1636,13 +1636,13 @@ Exits on <ALT+X>/<CTRL+Q>/<CTRL+E> confirmed (ch == 0x12D).*/
 								if(num2 < 8)
 									TalkFlags[num] |= 1 << num2;
 								else
-									D_3262[num] |= 0x80;
+									TalkFlagsHi[num] |= 0x80;
 								CON_printf("on.");
 							} else {
 								if(num2 < 8)
 									TalkFlags[num] &= ~(1 << num2);
 								else
-									D_3262[num] &= ~0x80;
+									TalkFlagsHi[num] &= ~0x80;
 								CON_printf("off.");
 							}
 						}
@@ -1664,15 +1664,15 @@ Exits on <ALT+X>/<CTRL+Q>/<CTRL+E> confirmed (ch == 0x12D).*/
 							CON_printf("Do midgame: ");
 							num = ReadDecNumber(2);
 							switch(num) {
-								case 1: C_2F75_02E1(); break;
-								case 2: C_2F75_042D(); break;
-								case 3: C_2F75_0532(); break;
-								case 4: C_2F75_0757(); break;
-								case 5: C_2F75_07AA(); break;
-								case 6: C_2F75_07FA(); break;
-								case 7: C_2F75_0951(); break;
-								case 8: C_2F75_0A64(); break;
-								case 9: C_2F75_0B90(); break;
+								case 1: Cutscene1(); break;
+								case 2: Cutscene2(); break;
+								case 3: Cutscene3(); break;
+								case 4: Cutscene4(); break;
+								case 5: Cutscene5(); break;
+								case 6: Cutscene6(); break;
+								case 7: Cutscene7(); break;
+								case 8: Cutscene8(); break;
+								case 9: Cutscene9(); break;
 								default: CON_printf("None!\n");
 							}
 						}

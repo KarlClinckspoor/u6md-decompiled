@@ -5,14 +5,15 @@
  * overlay 2F5F, and dreamstg.c, overlay 2F68). New code (Savage Empire has
  * no dream).
  *
- * C_2F63_0000 is AddMapObj clearing the new object's ObjStatus 0x20 (the
- * dream's stages make their objects with it); C_2F63_0043 speeds up the
- * animation of tile 0x6f (AnimTile entry D_1E48, steps D_1E4A); the
- * dreamer passing out (C_2F63_0086) wakes the party in the real world;
- * C_2F63_062F calls conversation 0x66 after creatures 0x181/0x16b;
- * C_2F63_083C moves a creature towards an object 0xfb (or the party),
- * scoring the squares with C_2F63_0726; C_2F63_0A13, C_2F63_0ACF and
- * C_2F63_0C0C make a chain of objects 0x85 go off.
+ * DreamAddMapObj is AddMapObj clearing the new object's ObjStatus 0x20 (the
+ * dream's stages make their objects with it); DreamAnimFaster speeds up the
+ * animation of tile 0x6f (AnimTile entry DreamAnimEntry, steps DreamAnimSteps); the
+ * dreamer passing out (DreamerPassesOut) wakes the party in the real world;
+ * DreamLastFoeKilled calls conversation 0x66 after creatures 0x181/0x16b;
+ * AI_SeekSeed (A.I. mode 0x18) moves a creature towards a covered seed 0xfb
+ * (or the party), scoring the squares with DreamStepScore; BurnMoney (a
+ * light source on money 0x84), FireBurnAt and FireSpread make a chain of
+ * fires 0x85 go off.
  */
 #include "se.h"
 
@@ -86,8 +87,8 @@ extern char InCombat;
 extern int16 DreamStage;
 extern int16 StatusDisplay;/*0x90 a member, 0x91 the party, 0x92 the equipment*/
 extern unsigned char AnimateAtPrompt;
-extern int16 D_1E48;/*dream.c's: the AnimTile entry of tile 0x6f (-1: not looked up)*/
-extern int16 D_1E4A;/*dream.c's: how fast it animates (0-4)*/
+extern int16 DreamAnimEntry;/*dream.c's: the AnimTile entry of tile 0x6f (-1: not looked up)*/
+extern int16 DreamAnimSteps;/*dream.c's: how fast it animates (0-4)*/
 extern struct tClipInfo *CurClip;
 extern unsigned char AnimFrameMask[0x20];
 extern unsigned char ObjStatus[];
@@ -118,7 +119,7 @@ extern char DirIncrX[8], DirIncrY[8];
 #define GetQual(i) (((unsigned char *)(Amount + (i)))[1])
 
 /*AddMapObj, the new object's ObjStatus 0x20 cleared*/
-/*C_2F63_0000*/C_2F63_0000(int16 type, int16 status, int16 amount, int16 x, int16 y, int16 z) {
+/*C_2F63_0000*/DreamAddMapObj(int16 type, int16 status, int16 amount, int16 x, int16 y, int16 z) {
 	register int16 obj;
 
 	if((obj = AddMapObj(type, status, amount, x, y, z)) < 0)
@@ -129,13 +130,13 @@ extern char DirIncrX[8], DirIncrY[8];
 }
 
 /*tile 0x6f animates faster (up to 4 steps)*/
-/*C_2F63_0043*/C_2F63_0043() {
-	D_1E4A ++;
-	if(D_1E4A > 4)
-		D_1E4A = 4;
-	AnimFrameShift[D_1E48] = 4 - D_1E4A;
-	AnimFrameMask[D_1E48] = 3 << AnimFrameShift[D_1E48];
-	if(D_1E4A != 1)
+/*C_2F63_0043*/DreamAnimFaster() {
+	DreamAnimSteps ++;
+	if(DreamAnimSteps > 4)
+		DreamAnimSteps = 4;
+	AnimFrameShift[DreamAnimEntry] = 4 - DreamAnimSteps;
+	AnimFrameMask[DreamAnimEntry] = 3 << AnimFrameShift[DreamAnimEntry];
+	if(DreamAnimSteps != 1)
 		CON_printf("...faster!\n");
 }
 
@@ -145,7 +146,7 @@ extern char DirIncrX[8], DirIncrY[8];
   0x14e), 0x14e, 0x38 (turned 0x10) and those of status 0x20 are moved by
   (-0x13, +0x18); the dreamer keeps only its objects 0x38, gets NPC 1's
   inventory and wakes at (0x10, 0x33, 2); DreamStage 0xa0*/
-/*C_2F63_0086*/C_2F63_0086() {
+/*C_2F63_0086*/DreamerPassesOut() {
 	int16 type, k, obj, per, amt;
 	struct tClipInfo *savedClip;
 	int16 slot, mouse, ready;
@@ -277,7 +278,7 @@ extern char DirIncrX[8], DirIncrY[8];
 /*after creature type 0x181 or 0x16b: objects 0x1d2 removed (0x181 also
   puts an object 0x1cd at (0x70, 0x17)), TalkFlags[0x66] gets 0xa or 0x12
   and conversation 0x66 starts*/
-/*C_2F63_062F*/C_2F63_062F(int16 type) {
+/*C_2F63_062F*/DreamLastFoeKilled(int16 type) {
 	register int16 obj;
 
 	if(type == 0x181) {
@@ -310,7 +311,7 @@ extern char DirIncrX[8], DirIncrY[8];
 /*how good a step of npc to (x, y) is when going to (x2, y2): 200 - 15 *
   distance (+50 next to it), -50 or -100 when it cannot step there, -5
   for each object 0x9d around (-1000 if one is open), -1 for each 0x9e*/
-/*C_2F63_0726*/static C_2F63_0726(int16 npc, int16 x, int16 y, int16 x2, int16 y2) {
+/*C_2F63_0726*/static DreamStepScore(int16 npc, int16 x, int16 y, int16 x2, int16 y2) {
 	int16 dist, type, saved, terrain;
 	register int16 score, obj;
 
@@ -347,7 +348,7 @@ extern char DirIncrX[8], DirIncrY[8];
 /*npc goes towards an object 0xfb within 10 squares (or the party), by
   the best of its 8 steps; next to it: the object goes and npc loses 10
   points*/
-/*C_2F63_083C*/C_2F63_083C(int16 npc) {
+/*C_2F63_083C*/AI_SeekSeed(int16 npc) {
 	int16 best, bestScore, score, found, tx, ty, nx, ny;
 	register int16 d, obj;
 
@@ -376,9 +377,9 @@ extern char DirIncrX[8], DirIncrY[8];
 		return;
 	}
 	best = -1;
-	bestScore = C_2F63_0726(npc, nx, ny, tx, ty);
+	bestScore = DreamStepScore(npc, nx, ny, tx, ty);
 	for(d = 0; d < 8; d ++) {
-		if((score = C_2F63_0726(npc, nx + DirIncrX[d], ny + DirIncrY[d], tx, ty)) > bestScore ||
+		if((score = DreamStepScore(npc, nx + DirIncrX[d], ny + DirIncrY[d], tx, ty)) > bestScore ||
 			score == bestScore && OSI_rand(0, 1)) {
 			bestScore = score;
 			best = d;
@@ -392,8 +393,8 @@ extern char DirIncrX[8], DirIncrY[8];
 }
 
 /*obj goes off: on the map an object 0x85 takes its place and the chain
-  starts (C_2F63_0C0C), else the dreamer is hurt*/
-/*C_2F63_0A13*/C_2F63_0A13(register int16 obj) {
+  starts (FireSpread), else the dreamer is hurt*/
+/*C_2F63_0A13*/BurnMoney(register int16 obj) {
 	int16 newObj, x;
 	register int16 y;
 
@@ -406,7 +407,7 @@ extern char DirIncrX[8], DirIncrY[8];
 		else {
 			VisibilityDirty = 1;
 			DisplayTick();
-			C_2F63_0C0C(x, y, newObj, 1);
+			FireSpread(x, y, newObj, 1);
 		}
 	} else {
 		LoseHP(0, OSI_rand(1, 10), 3);
@@ -417,7 +418,7 @@ extern char DirIncrX[8], DirIncrY[8];
 /*the object 0x85 obj at (x, y) goes off: creatures there (MonsterFlags
   0x80 or 0x4000) are hurt, objects IsBurnableType is true for are removed
   (each 0x84 makes the objects 0x84 around it into 0x85 of quality q)*/
-/*C_2F63_0ACF*/C_2F63_0ACF(int16 x, int16 y, int16 obj, int16 q) {
+/*C_2F63_0ACF*/FireBurnAt(int16 x, int16 y, int16 obj, int16 q) {
 	int16 found, type, cls, xx;
 	register int16 o, yy;
 
@@ -446,18 +447,18 @@ extern char DirIncrX[8], DirIncrY[8];
 
 /*the chain: obj at (x, y) goes off, then every object 0x85 of quality q,
   then the first 0x85 of quality 1 - q starts the next round*/
-/*C_2F63_0C0C*/C_2F63_0C0C(int16 x, int16 y, int16 obj, int16 q) {
+/*C_2F63_0C0C*/FireSpread(int16 x, int16 y, int16 obj, int16 q) {
 	register int16 i;
 
 	VisibilityDirty = 1;
 	DisplayTick();
-	C_2F63_0ACF(x, y, obj, 1 - q);
+	FireBurnAt(x, y, obj, 1 - q);
 	for(i = 0xbff; i > 0x100; i --)
 		if(GetType(i) == 0x85 && GetQual(i) == q)
-			C_2F63_0ACF(GetX(i), GetY(i), i, 1 - q);
+			FireBurnAt(GetX(i), GetY(i), i, 1 - q);
 	for(i = 0xbff; i > 0x100; i --) {
 		if(GetType(i) == 0x85 && GetQual(i) == 1 - q) {
-			C_2F63_0C0C(GetX(i), GetY(i), i, 1 - q);
+			FireSpread(GetX(i), GetY(i), i, 1 - q);
 			break;
 		}
 	}

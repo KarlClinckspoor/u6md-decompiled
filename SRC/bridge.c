@@ -34,19 +34,14 @@ extern int16 Amount[];/*quantity (low byte), quality (high byte)*/
 extern unsigned char TalkFlags[];/*per NPC*/
 extern struct coord ObjPos[];
 extern uint16 ObjShapeType[];
-extern int16 D_EC4C;/*BridgeNum: the bridge's number*/
-extern int16 D_EC4E, D_EC50;/*BridgeX1, BridgeY1: the bridge's rectangle*/
-extern int16 D_EC52;/*BridgeLen*/
-extern int16 D_EC54, D_EC56;/*BridgeX2, BridgeY2*/
-extern int16 D_EC58;/*BridgeNS: 0x80 when the bridge runs north-south*/
+/*EC4C*/extern int16 BridgeNum;/*the bridge's number*/
+/*EC4E*/extern int16 BridgeX1;/*the bridge's rectangle*/
+/*EC50*/extern int16 BridgeY1;
+/*EC52*/extern int16 BridgeLen;
+/*EC54*/extern int16 BridgeX2;
+/*EC56*/extern int16 BridgeY2;
+/*EC58*/extern int16 BridgeNS;/*0x80 when the bridge runs north-south*/
 
-#define BridgeNum D_EC4C
-#define BridgeX1 D_EC4E
-#define BridgeY1 D_EC50
-#define BridgeLen D_EC52
-#define BridgeX2 D_EC54
-#define BridgeY2 D_EC56
-#define BridgeNS D_EC58
 
 
 #define GetType(i) (ObjShapeType[i] & 0x3ff)

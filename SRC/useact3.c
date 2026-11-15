@@ -23,9 +23,9 @@ extern void cdecl TimerDelay(int32);/*wait (2383 per millisecond)*/
 extern int16 IsUnlitLightType(int16);
 extern int16 IsBurnableType(int16);
 extern int16 QuanType(int16);/*4 quantity on 16 bits, 2 on 8 bits, else 0*/
-extern C_2F63_0A13(int16);
-extern C_2F75_032D(int16);/*a map of MDMAP.LZC*/
-extern C_2F5F_0AC1(int16);
+extern BurnMoney(int16);
+extern ShowMdMap(int16);/*a map of MDMAP.LZC*/
+extern DreamReleaseNpc(int16);
 extern DreamWakeUp();
 extern MUS_SplashSfx();
 extern MUS_PlaySfx(int16);
@@ -180,7 +180,7 @@ extern char far TooManyTreesMsg[];/*"There are too many moving trees nearby.\n"*
  * becomes the unlit one); a lit torch 0x6e burns out (deleted) unless it is
  * readied ("No."); also called by status.c on unready as (obj, obj, -1)
  */
-/*C_2FA1_0000*/C_2FA1_0000(int16 obj, register int16 on, int16 to) {
+/*C_2FA1_0000*/UsePutOutLight(int16 obj, register int16 on, int16 to) {
 	register int16 t;
 
 	if(obj == on) {
@@ -211,14 +211,14 @@ extern char far TooManyTreesMsg[];/*"There are too many moving trees nearby.\n"*
 }
 
 /*
- * action 19 (a lit light source on anything): 0x84 C_2F63_0A13, a burnable
+ * action 19 (a lit light source on anything): 0x84 BurnMoney, a burnable
  * type (IsBurnableType) is incinerated
  */
-/*C_2FA1_00F7*/C_2FA1_00F7(int16 obj, int16 on, int16 to) {
+/*C_2FA1_00F7*/UseBurn(int16 obj, int16 on, int16 to) {
 	register int16 t;
 
 	if((t = GetType(on)) == 0x84) {
-		C_2F63_0A13(on);
+		BurnMoney(on);
 	} else if(IsBurnableType(t)) {
 		CON_printf(IncineratedMsg, GetObjectString(on));
 		MUS_PlaySfx(9);
@@ -239,7 +239,7 @@ extern char far TooManyTreesMsg[];/*"There are too many moving trees nearby.\n"*
  * 0x7c (0xff / 0xb4), candles 0x6f/0x71 100, others 0xb4; a match is used
  * up; the view is drawn with AmbientLight 7
  */
-/*C_2FA1_017E*/C_2FA1_017E(int16 obj, register int16 on, int16 to) {
+/*C_2FA1_017E*/UseLight(int16 obj, register int16 on, int16 to) {
 	register int16 t;
 	int16 p, fuel, old, n, nt;
 
@@ -326,10 +326,10 @@ extern char far TooManyTreesMsg[];/*"There are too many moving trees nearby.\n"*
 }
 
 /*
- * action 28 (an unlit light source): light it (C_2FA1_017E) with a
+ * action 28 (an unlit light source): light it (UseLight) with a
  * match 0x6c or 0x6b from the active member's inventory
  */
-/*C_2FA1_041A*/C_2FA1_041A(int16 obj, int16 on, int16 to) {
+/*C_2FA1_041A*/UseLightWithMatch(int16 obj, int16 on, int16 to) {
 	register int16 m = -1, p = Party[Active];
 
 	if(m == -1)
@@ -340,14 +340,14 @@ extern char far TooManyTreesMsg[];/*"There are too many moving trees nearby.\n"*
 		CON_printf(NothingToLightWithMsg, GetObjectString(obj));
 		MUS_PlaySfx(5);
 	} else {
-		C_2FA1_017E(m, obj, -1);
+		UseLight(m, obj, -1);
 	}
 }
 
 /*
  * action 30 (oil 0x7c on a lantern 0x73-0x76): refuel it (0xb4 / 0xff)
  */
-/*C_2FA1_048E*/C_2FA1_048E(int16 obj, int16 on, int16 to) {
+/*C_2FA1_048E*/UseRefuelLantern(int16 obj, int16 on, int16 to) {
 	register int16 t, q;
 	int16 p, n;
 
@@ -377,7 +377,7 @@ extern char far TooManyTreesMsg[];/*"There are too many moving trees nearby.\n"*
  * action 31 (switch 0x19b): toggle it and the 0x19d at (x - 1, y - 1);
  * quality 1 "It turns loosely."; a 0x19a there flips its frame bit 0
  */
-/*C_2FA1_0562*/C_2FA1_0562(int16 obj, int16 on, int16 to) {
+/*C_2FA1_0562*/UseSwitch(int16 obj, int16 on, int16 to) {
 	register int16 o = -1, f;
 	int16 a = -1, b = -1, t, x, y, q;
 
@@ -414,7 +414,7 @@ extern char far TooManyTreesMsg[];/*"There are too many moving trees nearby.\n"*
  * (tiles 0xf0-0xfb) gives the dirt 0x1bb / 0x1bc / 0x1ba on a free square
  * around the drill; an actor there is hit for 0x28
  */
-/*C_2FA1_06C9*/C_2FA1_06C9(int16 obj, int16 on, int16 to) {
+/*C_2FA1_06C9*/UseDrill(int16 obj, int16 on, int16 to) {
 	register int16 o = -1, y;
 	int16 f, x, nt, m, a, k, d, q, t;
 
@@ -498,7 +498,7 @@ extern char far TooManyTreesMsg[];/*"There are too many moving trees nearby.\n"*
  * up to 40 squares in a direction (XRayView) from where it stands; not
  * with moving trees 0x198 (invisible) near
  */
-/*C_2FA1_0A1B*/C_2FA1_0A1B(int16 obj, int16 on, int16 to) {
+/*C_2FA1_0A1B*/UseTelescope(int16 obj, int16 on, int16 to) {
 	register int16 o, n = 40;
 	int16 sx, sy, tile = 0, xr;
 
@@ -570,7 +570,7 @@ extern char far TooManyTreesMsg[];/*"There are too many moving trees nearby.\n"*
  * gets the date), plants 0x9e (becomes 0x9d) and 0x9d (frame 1); the bucket
  * stays full in the dream. Bug kept: with on == -1 it goes on to GetType(-1)
  */
-/*C_2FA1_0C42*/C_2FA1_0C42(register int16 obj, register int16 on, int16 to) {
+/*C_2FA1_0C42*/UseBucket(register int16 obj, register int16 on, int16 to) {
 	int16 f, t, q, seed, hole, k;
 
 	f = GetFrame(obj);
@@ -653,7 +653,7 @@ extern char far TooManyTreesMsg[];/*"There are too many moving trees nearby.\n"*
  * the seed 0xfc gets the date), 2 acid kills the seed (the mound becomes
  * 0x102), 4 oil poisons it
  */
-/*C_2FA1_0F95*/C_2FA1_0F95(int16 obj, int16 on, int16 to) {
+/*C_2FA1_0F95*/UseChemicals(int16 obj, int16 on, int16 to) {
 	register int16 seed;
 	int16 f, q, hole;
 
@@ -724,7 +724,7 @@ extern char far TooManyTreesMsg[];/*"There are too many moving trees nearby.\n"*
  * action 60 (oil 0xeb of frame 4 or 0x7c on anything): unstick a rusted
  * door (quality 0xc0 becomes 0x40); on tile 8 NPC 0x51 talks (the dream)
  */
-/*C_2FA1_11E0*/C_2FA1_11E0(int16 obj, int16 on, int16 to) {
+/*C_2FA1_11E0*/UseOil(int16 obj, int16 on, int16 to) {
 	register int16 t;
 	int16 q, n;
 
@@ -733,7 +733,7 @@ extern char far TooManyTreesMsg[];/*"There are too many moving trees nearby.\n"*
 			if(GetTileAtXYZ(SelectionX, SelectionY, MapZ) == 8) {
 				TalkFlags[0x51] |= 0x40;
 				TALK_talkTo(1, 0x51, 0);
-				C_2F5F_0AC1(0x51);
+				DreamReleaseNpc(0x51);
 				DreamWakeUp();
 			} else {
 				CON_printf(NoEffectMsg);
@@ -768,7 +768,7 @@ fail:
  * stand of frame 0 / 1 (TalkFlags[0x2e] / [0x39] 0x80). Bug kept: the stand
  * is searched around GetX(-1)
  */
-/*C_2FA1_1338*/C_2FA1_1338(int16 obj, register int16 on, int16 to) {
+/*C_2FA1_1338*/UseInstallLenses(int16 obj, register int16 on, int16 to) {
 	register int16 o;
 	int16 t, f, k;
 
@@ -819,7 +819,7 @@ fail:
  * action 26 (berries 0x49-0x4c): raise a talent (Level, psychic, c) or
  * hurt and make drunk; not for the mechanical man (NPC 6)
  */
-/*C_2FA1_14D8*/C_2FA1_14D8(int16 obj, int16 on, int16 to) {
+/*C_2FA1_14D8*/UseEatBerries(int16 obj, int16 on, int16 to) {
 	register int16 v;
 	int16 k, inv;
 
@@ -876,9 +876,9 @@ fail:
 }
 
 /*
- * action 27: a battle frenzy (ObjStatus 0x80) in combat
+ * action 27 (no object has it): a battle frenzy (ObjStatus 0x80) in combat
  */
-/*C_2FA1_17D4*/C_2FA1_17D4(int16 obj, int16 on, int16 to) {
+/*C_2FA1_17D4*/UseBattleFrenzy(int16 obj, int16 on, int16 to) {
 	register int16 p;
 	int16 inv;
 
@@ -907,12 +907,12 @@ fail:
 }
 
 /*
- * action 68 (0x58 on 0x54): NPC 0x57 talks (the dream)
+ * action 68 (manuscript 0x58 on the mailbox 0x54): NPC 0x57 talks (the dream)
  */
-/*C_2FA1_18C6*/C_2FA1_18C6(int16 obj, int16 on, int16 to) {
+/*C_2FA1_18C6*/UseManuscript(int16 obj, int16 on, int16 to) {
 	TalkFlags[0x57] |= 0x40;
 	TALK_talkTo(1, 0x57, 0);
-	C_2F5F_0AC1(0x57);
+	DreamReleaseNpc(0x57);
 	DreamWakeUp();
 }
 
@@ -920,11 +920,11 @@ fail:
  * action 69 (mirror 0x93): at (0x76-0x78, 0xca-0xcc, 2) NPC 0x50 talks
  * (the dream), else "You see yourself."
  */
-/*C_2FA1_18F3*/C_2FA1_18F3(int16 obj, int16 on, int16 to) {
+/*C_2FA1_18F3*/UseMirror(int16 obj, int16 on, int16 to) {
 	if(MapX >= 0x76 && MapX <= 0x78 && MapY >= 0xca && MapY <= 0xcc && MapZ == 2) {
 		TalkFlags[0x50] |= 0x40;
 		TALK_talkTo(1, 0x50, 0);
-		C_2F5F_0AC1(0x50);
+		DreamReleaseNpc(0x50);
 		DreamWakeUp();
 	} else {
 		CON_printf("You see yourself.\n");
@@ -932,9 +932,9 @@ fail:
 }
 
 /*
- * action 70 (door 0xb5): open or close it (frames 0-7, quality 0x80 locked)
+ * action 70 (gate 0xb5): open or close it (frames 0-7, quality 0x80 locked)
  */
-/*C_2FA1_1953*/C_2FA1_1953(register int16 obj, int16 on, int16 to) {
+/*C_2FA1_1953*/UseGateB5(register int16 obj, int16 on, int16 to) {
 	register int16 x;
 	int16 y;
 
@@ -968,7 +968,7 @@ fail:
  * action 34 (chests and such): frame 2 locked, 1 closed (open it and
  * SearchObj), else close it
  */
-/*C_2FA1_1A5C*/C_2FA1_1A5C(register int16 obj, int16 on, int16 to) {
+/*C_2FA1_1A5C*/UseChest(register int16 obj, int16 on, int16 to) {
 	register int16 f;
 	int16 t;
 
@@ -989,17 +989,17 @@ fail:
 }
 
 /*
- * action 43 (map 0x96): show map quality (C_2F75_032D)
+ * action 43 (map 0x96): show map quality (ShowMdMap)
  */
-/*C_2FA1_1B00*/C_2FA1_1B00(int16 obj, int16 on, int16 to) {
-	C_2F75_032D(GetQual(obj));
+/*C_2FA1_1B00*/UseMap(int16 obj, int16 on, int16 to) {
+	ShowMdMap(GetQual(obj));
 }
 
 /*
  * action 44 (gates 0xde, 0x98, 0x1a5): open or close (frame bit 1)
  * unless someone stands there
  */
-/*C_2FA1_1B18*/C_2FA1_1B18(register int16 obj, int16 on, int16 to) {
+/*C_2FA1_1B18*/UseGate(register int16 obj, int16 on, int16 to) {
 	if(GetQual(obj) & 0x80) {
 		CON_printf(LockedMsg);
 		return;
@@ -1016,7 +1016,7 @@ fail:
 /*
  * action 51 (rubber 0x14c or dye 0x7b on the sprayer 0x114): quality |= 1 / 2
  */
-/*C_2FA1_1BBC*/C_2FA1_1BBC(int16 obj, int16 on, int16 to) {
+/*C_2FA1_1BBC*/UseLoadSprayer(int16 obj, int16 on, int16 to) {
 	register int16 t;
 
 	if((t = GetType(obj)) == 0x14c) {
@@ -1033,7 +1033,7 @@ fail:
 /*
  * action 56 (doors 0xe3, 0xb3): automatic; why they don't open
  */
-/*C_2FA1_1C2E*/C_2FA1_1C2E(int16 obj, int16 on, int16 to) {
+/*C_2FA1_1C2E*/UseAutoDoor(int16 obj, int16 on, int16 to) {
 	register int16 t;
 
 	t = GetType(obj);
@@ -1050,7 +1050,7 @@ fail:
  * actions 3 and 57 (the instruments 0x118-0x11b, a stick 0xe7 on the
  * gong 0x12a)
  */
-/*C_2FA1_1CB6*/C_2FA1_1CB6(register int16 obj, int16 on, int16 to) {
+/*C_2FA1_1CB6*/UseInstrument(register int16 obj, int16 on, int16 to) {
 	register int16 tmp;
 
 	if(GetType(obj) == 0xe7) {
@@ -1089,7 +1089,7 @@ fail:
 /*
  * action 71 (bucket 0xa0 on a bucket): pour one into the other
  */
-/*C_2FA1_1DAE*/C_2FA1_1DAE(int16 obj, int16 on, int16 to) {
+/*C_2FA1_1DAE*/UsePourBucket(int16 obj, int16 on, int16 to) {
 	register int16 tmp;
 	int16 fo, fn;
 

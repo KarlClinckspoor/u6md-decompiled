@@ -5,7 +5,7 @@
  * (Ultima VI's talkdr.c, by way of Savage Empire's: SE GAME.EXE 0F8D).
  *
  * Interpreter for the NPC conversation scripts, loaded into TalkBuf
- * by LoadConversation (LoadConversation). A script is a byte stream: bytes < 0x80
+ * by LoadConversation (gfx.c). A script is a byte stream: bytes < 0x80
  * are text that is printed as is, bytes >= 0x80 are opcodes (OP_xxx below).
  * Script layout:
  *   OP_SCRIPT_MARK <npc num> <npc name> OP_DESC <description text...>
@@ -17,7 +17,7 @@
  * longs. Numeric constants are prefixed by OP_BYTE / OP_WORD / OP_ADDRESS.
  * Variables: VarInt[] (#0..#9, #A..#Z) and VarStr[] ($0..$9, $A..$Z); a letter
  * variable 'X' lives at index 'X' - 0x37. Flags: 16 per NPC, bits 0-7 in
- * TalkFlags[npc] (TalkFlags), bits 8-15 in D_3262[npc] (OP_SET/OP_CLR/OP_TST).
+ * TalkFlags[npc] (TalkFlags), bits 8-15 in TalkFlagsHi[npc] (OP_SET/OP_CLR/OP_TST).
  * TalkNpcs[0] is the NPC being talked to (the OP_NPC pseudo-number),
  * TalkNpcs[1] the party member talking. TalkDriver() is the entry point.
  *
@@ -216,7 +216,7 @@ extern unsigned char Active;
 extern unsigned char InCombat;
 extern char SoloMember;
 
-extern unsigned char far *D_3262;/*NPC flags: 0x80 ?, bits 0-7: talk flags 8-15*/
+extern unsigned char far *TalkFlagsHi;/*talk flags 8-15 of each NPC*/
 extern unsigned char ObjStatus[];
 extern unsigned char DEXTE[];
 extern unsigned char far *NPCMode;
@@ -240,14 +240,14 @@ extern char *VarStr[10+26];
 extern int16 LinesBeforeMore;
 extern int16 WeightEquip;
 extern int16 WeightInven;
-extern unsigned char D_EC8E[];/*TalkKeyword*/
-extern int32 D_EC9A;/*TalkDescPC*/
-extern int16 D_ECA0;/*TalkBase*/
-extern int16 D_ECA4[2];/*TalkNpcs*/
-extern char D_ECA8[];/*TalkInput*/
-extern unsigned char D_ECDA;/*TalkAnswered*/
-extern int16 D_ECDC;/*Talk_PC*/
-extern int32 D_ECDE;/*TalkSavedPC*/
+/*EC8E*/extern unsigned char TalkKeyword[];
+/*EC9A*/extern int32 TalkDescPC;
+/*ECA0*/extern int16 TalkBase;
+/*ECA4*/extern int16 TalkNpcs[2];
+/*ECA8*/extern char TalkInput[];
+/*ECDA*/extern unsigned char TalkAnswered;
+/*ECDC*/extern int16 Talk_PC;
+/*ECDE*/extern int32 TalkSavedPC;
 extern union tHandler GrDriver;
 extern int16 MapAnimEnabled;
 extern struct tSurface Screen;
@@ -255,13 +255,6 @@ extern void far *ScreenParts;/*mdscreen.lzc entry 2: default command mark*/
 
 #define GR_DRAW_BITMAP(s,x,y,p,m)    (GrDriver.iii.ofs = 0x30, (*GrDriver.f)(s,x,y,p,m))
 
-#define Talk_PC D_ECDC
-#define TalkBase D_ECA0
-#define TalkSavedPC D_ECDE
-#define TalkNpcs D_ECA4
-#define TalkInput D_ECA8
-#define TalkKeyword D_EC8E
-#define TalkAnswered D_ECDA
 
 #define IN_VEHICLE (Active == PartySize)
 #define IsParalyzed(i)   (NPCStatus[i] & 0x02)
@@ -425,7 +418,7 @@ lstack and leaves its result in the lowest operand's slot.*/
 					if(iparam1 <= 7)
 						lstack[sidx - 2] = (TalkFlags[iparam0] >> iparam1) & 1;
 					else if(iparam1 <= 15)
-						lstack[sidx - 2] = (D_3262[iparam0] >> (iparam1 - 8)) & 1;
+						lstack[sidx - 2] = (TalkFlagsHi[iparam0] >> (iparam1 - 8)) & 1;
 					sidx -= 2;
 				break;
 				case OP_OWNER:/*(object): its owner (assoc field)*/
@@ -925,7 +918,7 @@ returns 0:ok, 1:syntax error, -1:unknown opcode*/
 			if(arg1 <= 7)
 				TalkFlags[arg0] |= 1 << arg1;
 			else if(arg1 <= 15)
-				D_3262[arg0] |= 1 << (arg1 - 8);
+				TalkFlagsHi[arg0] |= 1 << (arg1 - 8);
 		break;
 		case OP_CLR:/*(npc, flag bit 0-15)*/
 			arg0 = mk_npcnum(parse_factor());
@@ -933,7 +926,7 @@ returns 0:ok, 1:syntax error, -1:unknown opcode*/
 			if(arg1 <= 7)
 				TalkFlags[arg0] &= ~(1 << arg1);
 			else if(arg1 <= 15)
-				D_3262[arg0] &= ~(1 << (arg1 - 8));
+				TalkFlagsHi[arg0] &= ~(1 << (arg1 - 8));
 		break;
 		case OP_RESURRECT:/*(npc): raise the dead body in npc's inventory; #R := the npc, or -1*/
 			arg0 = mk_npcnum(parse_factor());
@@ -1129,7 +1122,7 @@ until OP_LEAVE/OP_SCRIPT_MARK*/
 		CON_printf("You see ");
 	while(PARSE_U8 != OP_DESC);
 	/*remember the description for "look"*/
-	D_EC9A = Talk_PC;
+	TalkDescPC = Talk_PC;
 	parse_statement(TalkNpcs[0]);
 	CON_printf("\n");
 	while(PARSE_U8 != OP_MAIN);
@@ -1248,7 +1241,7 @@ until OP_LEAVE/OP_SCRIPT_MARK*/
 		if(stricmp(TalkInput, "look") == 0) {
 			/*replay the description, then resume*/
 			CON_printf("You see ");
-			Talk_PC = D_EC9A;
+			Talk_PC = TalkDescPC;
 			parse_statement(TalkNpcs[0]);
 			Talk_PC = TalkSavedPC;
 		} else {

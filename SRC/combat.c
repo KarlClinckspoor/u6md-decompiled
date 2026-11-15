@@ -185,9 +185,9 @@ extern TryMoveTo(int16, int16, int16);
 extern WanderRandomly(int16);
 extern TryStraightMove(int16, int16, int16);
 extern ShakeScreen(int16, int16);
-extern C_2F5F_0AC1(int16);
+extern DreamReleaseNpc(int16);
 extern DreamWakeUp();
-extern C_2F75_0B90();/*a cut scene*/
+extern Cutscene9();/*the weapon 0x139 hits NPC 0x66*/
 extern int16 AreaX, AreaY;
 extern int16 LocPartOffset;
 extern int16 InsertObj(int16, int16, int16);
@@ -238,8 +238,8 @@ extern MUS_AttackedSong(void);/*the music of a combat begun by the enemy*/
 extern MUS_CombatEndSong(int16);/*the music at the end of a combat (CombatOutcome)*/
 extern int16 Missiles(int16, int16, int16, int16 *, int16 *, int16, int16, int16);
 extern int16 far *MissileSpray(int16, int16, int16, int16, int16);/*a spray of 12 missiles: the objects hit, -1 terminated*/
-extern C_2F63_0086(void);/*the dreamer passes out*/
-extern C_2F63_062F(int16);
+extern DreamerPassesOut(void);
+extern DreamLastFoeKilled(int16);
 extern char *GetTileString(int16);
 extern int16 MkDirection(int16, int16);
 extern UpdateTurnFrame(int16, int16);/*turns an NPC towards dir*/
@@ -1125,12 +1125,12 @@ extern int16 COMBAT_FireM60(int16, int16, int16, int16);
 					SetTypeUnconscious(objNum);
 					NPCMode[objNum] = 0;
 					KillBody = OBJ_MakeDeadBody(objNum);
-					C_2F63_0086();
+					DreamerPassesOut();
 					return 0;
 				} else if(DreamStage == 0xa1) {
 					TalkFlags[0x52] |= 2;
 				} else if(DreamStage == 0xc0) {
-					C_2F63_062F(objType);
+					DreamLastFoeKilled(objType);
 					return 0;
 				}
 			}
@@ -2486,7 +2486,7 @@ extern int16 COMBAT_FireM60(int16, int16, int16, int16);
 		}
 		COMBAT_showHit(target);
 		if(!(TalkFlags[0x54] & 0x40) && GetX(objNum) >= 0x37 && GetY(objNum) <= 0x37) {
-			C_2F5F_0AC1(0x54);
+			DreamReleaseNpc(0x54);
 			TalkFlags[0x54] |= 2;
 			TALK_talkTo(0, 0x54, 0);
 			DreamWakeUp();
@@ -3091,7 +3091,7 @@ extern int16 COMBAT_FireM60(int16, int16, int16, int16);
 		if(target == 0x66) {
 			COMBAT_showHit(0x66);
 			TimerDelay(0x122e4cL);
-			C_2F75_0B90();
+			Cutscene9();
 			DreamWakeUp();
 			TalkFlags[0x46] |= 8;
 			return 0;

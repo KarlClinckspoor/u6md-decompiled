@@ -113,7 +113,7 @@ extern unsigned char StateAnimData[];
 
 /*after AnimateTiles: the lamps (type 0xe4) go to frame 7 at night
   (Time_H < 6 or > 17)*/
-/*C_2F72_039E*/C_2F72_039E() {
+/*C_2F72_039E*/LampsAtNight() {
 	int16 night;
 	register int16 type, i;
 

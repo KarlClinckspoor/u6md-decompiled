@@ -102,7 +102,7 @@ extern COMBAT_AI_Worm(int16);/*A.I. of mode 0x0d*/
 extern COMBAT_AI_WormFlee(int16);/*A.I. of mode 0x11*/
 extern COMBAT_AI_MoveSouth(int16);/*A.I. of mode 0x15*/
 extern COMBAT_AI_Together(int16);/*A.I. of mode 0x17*/
-extern C_2F63_083C(int16);/*A.I. of mode 0x18*/
+extern AI_SeekSeed(int16);/*A.I. of mode 0x18*/
 /*other modules*/
 extern int16 OSI_rand(int16, int16);
 extern void cdecl TimerDelay(int32);/*wait (2383 per millisecond)*/
@@ -122,8 +122,8 @@ extern BeltStart();
 extern BargeFindLeader(int16);
 extern MachineryOn();
 extern MachineryOff();
-extern C_2F75_042D();/*a cut scene*/
-extern C_2F63_0043();
+extern Cutscene2();/*the underground power*/
+extern DreamAnimFaster();
 extern DreamTrigger(int16);
 extern char far MustBeInPartyMsg[];/*you must be in party mode to %s*/
 extern char far StokerBlockedMsg[];
@@ -155,7 +155,7 @@ extern char SoloMember;
 extern unsigned char PlayerIsFemale;
 extern int32 GameFlags;/*0x10: in a dream*/
 extern int16 ViewRotation;
-extern unsigned char far *D_3262;/*0x100 bytes (0x80: NPC's "WAIT" flag)*/
+extern unsigned char far *TalkFlagsHi;/*0x100 bytes (0x80: NPC's "WAIT" flag)*/
 extern unsigned char ObjStatus[];
 /*44C4*/extern char MovePts[];/*movement points left this turn*/
 /*45C4*/extern unsigned char far *SchedIndex;/*current schedule entry of each NPC, relative to SchedPointer*/
@@ -677,7 +677,7 @@ extern int16 AreaX, AreaY;
 
 	needPartyMode = 0;
 	if(GetTileAtXYZ(MapX, MapY, MapZ) == 0x6f)
-		C_2F63_0043();
+		DreamAnimFaster();
 	for(objNum = FindLoc(MapX, MapY, MapZ); objNum >= 0; objNum = NextLoc()) {
 		if(Party[Active] == objNum)
 			continue;
@@ -864,7 +864,7 @@ extern int16 AreaX, AreaY;
 		ObjPos[objNum].raw[1] == xyz.raw[1] &&
 		ObjPos[objNum].raw[2] == xyz.raw[2]
 	);
-	if((D_3262[objNum] & 0x80) && !(NPCStatus[objNum] & 0x80)) {
+	if((TalkFlagsHi[objNum] & 0x80) && !(NPCStatus[objNum] & 0x80)) {
 		/*told to wait*/
 		isAtDest = 1;
 		action = NPCMode[objNum];
@@ -1674,7 +1674,7 @@ extern int16 AreaX, AreaY;
 						}
 						TalkFlags[0x73] |= 4;
 						MachineryOn();
-						C_2F75_042D();
+						Cutscene2();
 					}
 				} else {
 					BeltStart();
@@ -1694,7 +1694,7 @@ extern int16 AreaX, AreaY;
 		case 0x11: COMBAT_AI_WormFlee(objNum); break;
 		case 0x15: COMBAT_AI_MoveSouth(objNum); break;
 		case 0x17: COMBAT_AI_Together(objNum); break;
-		case 0x18: C_2F63_083C(objNum); break;
+		case 0x18: AI_SeekSeed(objNum); break;
 		case 0x19: COMBAT_AI_Tentacle(objNum); break;
 		case 0x1a: NPC_BecomeObject(objNum); break;
 		case 0x0f:
@@ -2020,7 +2020,7 @@ extern int16 AreaX, AreaY;
  Schedule[SchedPointer[n] .. SchedPointer[n+1]-1]; SchedIndex[n] = current
  entry relative to SchedPointer[n]. Entry time byte: bits 0-4 hour,
  bits 5-7 day of the week (0 = every day). Mode 0xa0 calms down; an NPC
- waiting (D_3262 0x80) out of the party keeps its mode.*/
+ waiting (TalkFlagsHi 0x80) out of the party keeps its mode.*/
 /*C_170D_3D9D*/UpdateSchedules() {
 	int16 npc, entry;
 	int16 first, last, when;
@@ -2028,7 +2028,7 @@ extern int16 AreaX, AreaY;
 	for(npc = 2; npc < 0xbf; npc ++) {
 		if(NPCMode[npc] == 0xa0)
 			NPCMode[npc] = 0x81/*AI_FINDPATH*/;
-		if((D_3262[npc] & 0x80) && !IsPlrControl(npc))
+		if((TalkFlagsHi[npc] & 0x80) && !IsPlrControl(npc))
 			continue;
 		if(ObjShapeType[npc] == 0)
 			continue;

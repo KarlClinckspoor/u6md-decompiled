@@ -13,7 +13,7 @@
  * the drill on its cart; fixing rails and the power cable; crates; the
  * robot's heartstone; opening a pod; dirt and holes: digging, filling,
  * burying, loading wheelbarrows and rail cars (0x102 and 0x1ba-0x1bc are
- * dirt, 0x101/0xff holes; C_2F8D_03FC/043F map a dirt type to the load's
+ * dirt, 0x101/0xff holes; DirtLoadKind/LoadKindDirt map a dirt type to the load's
  * kind and back); the guns' setting; radium for weapons, the power
  * station and the mechanical man.
  */
@@ -72,10 +72,10 @@ extern cdecl CON_printf(char far *, ...);
 extern int16 OSI_rand(int16, int16);
 extern BeltStart();
 extern DreamWakeUp();
-extern C_2F5F_0AC1(int16);
-extern C_2F72_039E();
-extern C_2F75_02E1();
-extern C_2F75_0532();
+extern DreamReleaseNpc(int16);
+extern LampsAtNight();
+extern Cutscene1();
+extern Cutscene3();
 extern REST_Command(int16, int16);
 extern TALK_talkTo(int16, int16, int16);
 extern int16 IsNpcOnScreen(int16);
@@ -189,12 +189,10 @@ extern int16 InvenOwner;
 extern int16 SelectionObj;
 extern struct tClipInfo TextWindows[4];
 extern int16 SelectionX, SelectionY;
-extern char *D_EC2C;/*the name "$P" stands for*/
+extern char *VarStr[10+26];/*the conversations' string variables ($0-$9, $A-$Z)*/
 extern int16 LinesBeforeMore;
 extern int16 TargetDist;/*distance of the last target (use.c)*/
-extern int16 D_F0CA;/*set when a dirt action failed (the load is not used up)*/
-
-#define PlayerNamePtr D_EC2C
+/*F0CA*/extern int16 DirtFailed;/*set when a dirt action failed (the load is not used up)*/
 
 #define GetType(i) (ObjShapeType[i] & 0x3ff)
 #define GetFrame(i) (ObjShapeType[i] >> 10)
@@ -206,13 +204,13 @@ extern int16 D_F0CA;/*set when a dirt action failed (the load is not used up)*/
 #define GetQuan(o) (((unsigned char *)(Amount + (o)))[0])
 #define SetQuan(o, v) (GetQuan(o) = (v))
 
-/*28F0*/char D_28F0[] = "mdtext.lzc";
+/*28F0*/char MdTextName[] = "mdtext.lzc";
 
 /*
  * action 0 (bed 0x6a): sleep, unless in solo mode or in the dream; the bed's squares
  * (or the party's) must be free of objects and of tiles with TerrainType 2
  */
-/*C_2F8D_0000*/C_2F8D_0000(int16 obj, int16 on, int16 to) {
+/*C_2F8D_0000*/UseBed(int16 obj, int16 on, int16 to) {
 	int16 x, y, i, j, onMap;
 	register int16 o, found;
 
@@ -271,7 +269,7 @@ extern int16 D_F0CA;/*set when a dirt action failed (the load is not used up)*/
  * action 1 (0x94, 0x97, 0xf3): read; quality 0 is the affidavit (signed by
  * those whose TalkFlags 8 is set), else text quality - 1 of MDTEXT.LZC in text window 2
  */
-/*C_2F8D_01C1*/C_2F8D_01C1(int16 obj, int16 on, int16 to) {
+/*C_2F8D_01C1*/UseRead(int16 obj, int16 on, int16 to) {
 	struct tClipInfo *clip;
 	int16 lines, book, done;
 	char line[90];
@@ -286,7 +284,7 @@ extern int16 D_F0CA;/*set when a dirt action failed (the load is not used up)*/
 	CON_gotoxy(0, 0);
 	LinesBeforeMore = CurClip->rows;
 	if((book = GetQual(obj)) == 0) {
-		PlayerNamePtr = Names[0];
+		VarStr['P' - 0x37] = Names[0];/*$P*/
 		MapAnimEnabled = 0;
 		CON_printf(AffidavitMsg);
 		CON_printf(AffidavitText1Msg);
@@ -308,7 +306,7 @@ extern int16 D_F0CA;/*set when a dirt action failed (the load is not used up)*/
 			CON_printf("\n");
 		CON_printf("\n*");
 		MapAnimEnabled = 1;
-	} else if(LZC_loadType(D_28F0, book - 1, TalkBuf, 0, LzcWorkBuf) != 0) {
+	} else if(LZC_loadType(MdTextName, book - 1, TalkBuf, 0, LzcWorkBuf) != 0) {
 		done = 0;
 		pos = 0;
 		while(!done) {
@@ -350,7 +348,7 @@ extern int16 D_F0CA;/*set when a dirt action failed (the load is not used up)*/
 /*
  * the load kind of a dirt type (0x102: 1, 0x1ba: 2, 0x1bb: 3, 0x1bc: 4)
  */
-/*C_2F8D_03FC*/static unsigned char C_2F8D_03FC(int16 type) {
+/*C_2F8D_03FC*/static unsigned char DirtLoadKind(int16 type) {
 	switch(type) {
 	case 0x102:
 		return 1;
@@ -366,9 +364,9 @@ extern int16 D_F0CA;/*set when a dirt action failed (the load is not used up)*/
 }
 
 /*
- * the dirt type of a load kind (the reverse of C_2F8D_03FC)
+ * the dirt type of a load kind (the reverse of DirtLoadKind)
  */
-/*C_2F8D_043F*/static C_2F8D_043F(unsigned char n) {
+/*C_2F8D_043F*/static LoadKindDirt(unsigned char n) {
 	switch(n) {
 	case 1:
 		return 0x102;
@@ -386,7 +384,7 @@ extern int16 D_F0CA;/*set when a dirt action failed (the load is not used up)*/
 /*
  * action 2 (0x191, 0x26, 0x88): take into the inventory and ready
  */
-/*C_2F8D_0476*/C_2F8D_0476(register int16 obj, int16 on, int16 to) {
+/*C_2F8D_0476*/UseTakeAndReady(register int16 obj, int16 on, int16 to) {
 	if((ObjStatus[obj] & 0x18) == 0 && InsertObj(obj, Party[Active], 0x10) == -1) {
 		CON_printf(TooMuchMsg);
 		MUS_PlaySfx(5);
@@ -404,7 +402,7 @@ extern int16 D_F0CA;/*set when a dirt action failed (the load is not used up)*/
  * action 4 (0x87 on 0x19b): fasten (quality 1) or loosen a switch; fastening
  * takes the frame of the 0x19d up-left of it
  */
-/*C_2F8D_04E4*/C_2F8D_04E4(int16 obj, register int16 sw, int16 to) {
+/*C_2F8D_04E4*/UseFastenSwitch(int16 obj, register int16 sw, int16 to) {
 	int16 x, y;
 	register int16 o;
 
@@ -433,7 +431,7 @@ extern int16 D_F0CA;/*set when a dirt action failed (the load is not used up)*/
 /*
  * action 5 (0x87 on drill 0x1b8): install the drill on a drill cart 0x1b7 (makes 0x1b9)
  */
-/*C_2F8D_05DE*/C_2F8D_05DE(int16 obj, int16 drill, int16 to) {
+/*C_2F8D_05DE*/UseInstallDrill(int16 obj, int16 drill, int16 to) {
 	int16 cart;
 	register int16 n;
 
@@ -455,7 +453,7 @@ extern int16 D_F0CA;/*set when a dirt action failed (the load is not used up)*/
  * action 6 (0x87 on panel 0x1ca): fasten a panel onto a cabinet 0x1c9 (quality:
  * the panel kind it takes) or loosen it; the fourth sets TalkFlags[0x74] 8
  */
-/*C_2F8D_06C1*/C_2F8D_06C1(int16 obj, register int16 panel, int16 to) {
+/*C_2F8D_06C1*/UseFastenPanel(int16 obj, register int16 panel, int16 to) {
 	int16 q, cab;
 	register int16 n;
 
@@ -512,7 +510,7 @@ extern int16 D_F0CA;/*set when a dirt action failed (the load is not used up)*/
 /*
  * action 7 (0x34 on 0x194 to 0x195): fix a section of rail
  */
-/*C_2F8D_0849*/C_2F8D_0849(int16 obj, int16 on, int16 to) {
+/*C_2F8D_0849*/UseFixRail(int16 obj, int16 on, int16 to) {
 	MUS_PlaySfx(0x20);
 	CON_printf(WhichRailMsg);
 	DeleteObj(on);
@@ -525,7 +523,7 @@ extern int16 D_F0CA;/*set when a dirt action failed (the load is not used up)*/
  * action 8 (0x35 on cable 0xc7 to 0xc9/0xd7): replace the power cable (only the
  * avatar, wearing rubber gloves 0x26, else a shock)
  */
-/*C_2F8D_0895*/C_2F8D_0895(int16 obj, int16 cable, int16 to) {
+/*C_2F8D_0895*/UseReplaceCable(int16 obj, int16 cable, int16 to) {
 	int16 solo;
 	register int16 npc, o;
 
@@ -562,15 +560,15 @@ extern int16 D_F0CA;/*set when a dirt action failed (the load is not used up)*/
 		if(StatusDisplay == 0x92)
 			STAT_DrawInventory();
 		TalkFlags[0x73] |= 0x10;
-		C_2F72_039E();
-		C_2F75_0532();
+		LampsAtNight();
+		Cutscene3();
 	}
 }
 
 /*
  * actions 17, 22 (crowbars, hammer on crates): pry a crate open, nail it shut (0x111)
  */
-/*C_2F8D_09C9*/C_2F8D_09C9(int16 obj, register int16 crate, int16 to) {
+/*C_2F8D_09C9*/UseOnCrate(int16 obj, register int16 crate, int16 to) {
 	if(GetFrame(crate) == 2) {
 		ObjShapeType[crate] = GetType(crate) + 0x400;
 		MUS_PlaySfx(0x1f);
@@ -584,9 +582,11 @@ extern int16 D_F0CA;/*set when a dirt action failed (the load is not used up)*/
 }
 
 /*
- * action 18 (0x110, 0x66 on 0x1ab)
+ * action 18 (chisel 0x110, pry bar 0x66 on the hatch 0x1ab): only the avatar;
+ * once TalkFlags[0x10] has 0x10 the hatch opens (cut scene 1, NPC 0x12
+ * talks, TalkFlags[0x10] 0x20), else NPC 0x10 talks
  */
-/*C_2F8D_0A67*/C_2F8D_0A67(int16 obj, register int16 o, int16 to) {
+/*C_2F8D_0A67*/UseOpenHatch(int16 obj, register int16 o, int16 to) {
 	register int16 npc;
 
 	if((npc = Party[Active]) != 1) {
@@ -598,7 +598,7 @@ extern int16 D_F0CA;/*set when a dirt action failed (the load is not used up)*/
 		TALK_talkTo(1, 0x10, 0);
 		return;
 	}
-	C_2F75_02E1();
+	Cutscene1();
 	TalkFlags[0x12] |= 0x48;
 	TALK_talkTo(1, 0x12, 0);
 	ObjShapeType[o] = (ObjShapeType[o] & 0xfc00) + 0x1ac;
@@ -611,7 +611,7 @@ extern int16 D_F0CA;/*set when a dirt action failed (the load is not used up)*/
 /*
  * action 65 (heartstone 0x1aa on robot 0x11f)
  */
-/*C_2F8D_0B57*/C_2F8D_0B57(int16 obj, int16 robot, int16 to) {
+/*C_2F8D_0B57*/UseInstallHeartstone(int16 obj, int16 robot, int16 to) {
 	if(GetQual(robot) & 1)
 		CON_printf(HasHeartstoneAlreadyMsg);
 	else {
@@ -625,7 +625,7 @@ extern int16 D_F0CA;/*set when a dirt action failed (the load is not used up)*/
 /*
  * action 20 (on pod 0xfb): open a ripe pod (frame 3); in the dream NPC 0x56 comes out
  */
-/*C_2F8D_0B9D*/C_2F8D_0B9D(int16 obj, register int16 pod, int16 to) {
+/*C_2F8D_0B9D*/UseOpenPod(int16 obj, register int16 pod, int16 to) {
 	register int16 o;
 
 	if(GetFrame(pod) == 3) {
@@ -638,7 +638,7 @@ extern int16 D_F0CA;/*set when a dirt action failed (the load is not used up)*/
 			TimerDelay(0x3a2dcL);
 			TalkFlags[0x56] |= 0x88;
 			TALK_talkTo(1, 0x56, 0);
-			C_2F5F_0AC1(0x56);
+			DreamReleaseNpc(0x56);
 			DreamWakeUp();
 		} else {
 			o = AddMapObj(0x123, 0, 1, GetX(pod), GetY(pod), MapZ);
@@ -659,7 +659,7 @@ extern int16 D_F0CA;/*set when a dirt action failed (the load is not used up)*/
 /*
  * action 21 (on plant 0x82): pick berries 0x83
  */
-/*C_2F8D_0CFC*/C_2F8D_0CFC(int16 obj, register int16 o, int16 to) {
+/*C_2F8D_0CFC*/UsePickBerries(int16 obj, register int16 o, int16 to) {
 	register int16 n;
 
 	if(GetFrame(o) == 0) {
@@ -676,7 +676,7 @@ extern int16 D_F0CA;/*set when a dirt action failed (the load is not used up)*/
 /*
  * actions 9, 64: the messages of tools used on the wrong things
  */
-/*C_2F8D_0DFE*/C_2F8D_0DFE(int16 obj, int16 on, int16 to) {
+/*C_2F8D_0DFE*/UseWrongTool(int16 obj, int16 on, int16 to) {
 	switch(GetType(obj)) {
 	case 0x41: case 0x42: case 0x43: case 0x107: case 0x10b: case 0x147:
 		CON_printf(CantDigDeeperMsg);
@@ -717,7 +717,7 @@ extern int16 D_F0CA;/*set when a dirt action failed (the load is not used up)*/
 /*
  * search (empty) the hole 0x101 at (x, y)
  */
-/*C_2F8D_0EDB*/C_2F8D_0EDB(int16 x, int16 y) {
+/*C_2F8D_0EDB*/SearchHole(int16 x, int16 y) {
 	register int16 o;
 
 	for(o = OBJ_FindTypeAt(0x101, x, y); o != -1 && GetType(o) != 0x101; o = NextLoc())
@@ -729,7 +729,7 @@ extern int16 D_F0CA;/*set when a dirt action failed (the load is not used up)*/
 /*
  * action 10 (shovels on pod plant 0xfb): uproot it (dirt 0x102 next to the party)
  */
-/*C_2F8D_0F1C*/C_2F8D_0F1C(int16 obj, int16 plant, int16 to) {
+/*C_2F8D_0F1C*/UseUprootPlant(int16 obj, int16 plant, int16 to) {
 	int16 npc, hole, pile, x, y;
 	register int16 d, o;
 
@@ -767,7 +767,7 @@ extern int16 D_F0CA;/*set when a dirt action failed (the load is not used up)*/
 /*
  * action 11 (shovels on a square): dig a hole, the dirt next to the party
  */
-/*C_2F8D_1145*/C_2F8D_1145(int16 obj, int16 on, int16 to) {
+/*C_2F8D_1145*/UseDigHole(int16 obj, int16 on, int16 to) {
 	int16 cls, shape, pile, npc, x, y;
 	register int16 d, hole;
 
@@ -807,22 +807,22 @@ extern int16 D_F0CA;/*set when a dirt action failed (the load is not used up)*/
 /*
  * action 13 (shovels: dirt into wheelbarrow 0x10c or rail car 0x19a)
  */
-/*C_2F8D_133F*/C_2F8D_133F(int16 obj, int16 on, register int16 cart) {
+/*C_2F8D_133F*/UseLoadDirt(int16 obj, int16 on, register int16 cart) {
 	int16 ct, n;
 	register int16 t;
 
 	t = GetType(on);
 	ct = GetType(cart);
-	D_F0CA = 0;
+	DirtFailed = 0;
 	if(ct == 0x10c) {
 		if(GetQuan(cart) == 1) {
 			CON_printf(NoMoreRoomMsg);
 			MUS_PlaySfx(5);
-			D_F0CA = 1;
+			DirtFailed = 1;
 		} else {
 			MUS_PlaySfx(0x1b);
 			SetQuan(cart, 1);
-			SetQual(cart, C_2F8D_03FC(t));
+			SetQual(cart, DirtLoadKind(t));
 			CON_printf(IntoWheelbarrowMsg, GetObjectString(on));
 			DeleteObj(on);
 		}
@@ -830,14 +830,14 @@ extern int16 D_F0CA;/*set when a dirt action failed (the load is not used up)*/
 		if((n = GetQuan(cart)) == 7) {
 			CON_printf(NoMoreRoomMsg);
 			MUS_PlaySfx(5);
-			D_F0CA = 1;
-		} else if(n != 0 && C_2F8D_03FC(t) != GetQual(cart)) {
+			DirtFailed = 1;
+		} else if(n != 0 && DirtLoadKind(t) != GetQual(cart)) {
 			CON_printf(CantMixLoadMsg);
 			MUS_PlaySfx(5);
-			D_F0CA = 1;
+			DirtFailed = 1;
 		} else {
 			n++;
-			SetQual(cart, C_2F8D_03FC(t));
+			SetQual(cart, DirtLoadKind(t));
 			if(n == 7)
 				ObjShapeType[cart] = GetType(cart) + (((GetFrame(cart) & 1) + 4) << 10);
 			else
@@ -853,16 +853,16 @@ extern int16 D_F0CA;/*set when a dirt action failed (the load is not used up)*/
 /*
  * action 62 (shovels: dirt into a hole 0x101): fill the hole
  */
-/*C_2F8D_14BC*/C_2F8D_14BC(int16 obj, int16 hole, int16 pile) {
+/*C_2F8D_14BC*/UseFillHole(int16 obj, int16 hole, int16 pile) {
 	register int16 o;
 
-	D_F0CA = 0;
+	DirtFailed = 0;
 	if((o = FindInv(pile)) >= 0) {
 		SearchObj(pile);
-		D_F0CA = 1;
+		DirtFailed = 1;
 		return;
 	}
-	C_2F8D_0EDB(GetX(hole), GetY(hole));
+	SearchHole(GetX(hole), GetY(hole));
 	DeleteObj(hole);
 	DeleteObj(pile);
 	MUS_PlaySfx(0x1b);
@@ -873,7 +873,7 @@ extern int16 D_F0CA;/*set when a dirt action failed (the load is not used up)*/
 /*
  * action 12 (shovels on dirt 0x1ba-0x1bc, to a square): move the dirt there
  */
-/*C_2F8D_1545*/C_2F8D_1545(int16 obj, register int16 dirt, int16 to) {
+/*C_2F8D_1545*/UseMoveDirt(int16 obj, register int16 dirt, int16 to) {
 	int16 x, y, tx;
 	register int16 ty;
 
@@ -881,20 +881,20 @@ extern int16 D_F0CA;/*set when a dirt action failed (the load is not used up)*/
 	ty = SelectionY;
 	x = GetX(dirt);
 	y = GetY(dirt);
-	D_F0CA = 0;
+	DirtFailed = 0;
 	if(TerrainType[GetTileAtXYZ(tx, ty, MapZ)] & 2) {
 		CON_printf(NotPossibleMsg);
 		MUS_PlaySfx(5);
-		D_F0CA = -1;
+		DirtFailed = -1;
 	} else if(OBJ_MapObjAt(tx, ty) != -1) {
 		MUS_PlaySfx(5);
-		D_F0CA = -1;
+		DirtFailed = -1;
 	} else {
 		MUS_PlaySfx(0x1b);
 		MoveObj(dirt, tx, ty, MapZ);
 		if(GetFrame(dirt) != 0)
 			ObjShapeType[dirt] = GetType(dirt);
-		C_2F8D_0EDB(x, y);
+		SearchHole(x, y);
 	}
 }
 
@@ -902,7 +902,7 @@ extern int16 D_F0CA;/*set when a dirt action failed (the load is not used up)*/
  * action 15 (shovels: dirt onto objects): bury them in the hole under them (a seed
  * 0xfc makes a pod plant 0xfb)
  */
-/*C_2F8D_1621*/C_2F8D_1621(int16 obj, register int16 dirt, int16 target) {
+/*C_2F8D_1621*/UseBury(int16 obj, register int16 dirt, int16 target) {
 	int16 hole, seed, fail, shape, t, count, x, y, tx, ty;
 	register int16 o;
 
@@ -912,19 +912,19 @@ extern int16 D_F0CA;/*set when a dirt action failed (the load is not used up)*/
 	y = GetY(dirt);
 	shape = 0x102;
 	if(target == -1) {
-		C_2F8D_1545(obj, dirt, target);
+		UseMoveDirt(obj, dirt, target);
 		return;
 	}
 	if(target < 0x100 && target >= 0) {
 		MUS_PlaySfx(5);
 		CON_printf(DontBuryPeopleMsg);
-		D_F0CA = 1;
+		DirtFailed = 1;
 		return;
 	}
 	if(obj == target) {
 		MUS_PlaySfx(5);
 		CON_printf(CantBuryWithItselfMsg);
-		D_F0CA = 1;
+		DirtFailed = 1;
 		return;
 	}
 	tx = GetX(target);
@@ -934,12 +934,12 @@ extern int16 D_F0CA;/*set when a dirt action failed (the load is not used up)*/
 	if(o != -1) {
 		MUS_PlaySfx(5);
 		CON_printf(NoMoreDirtMsg);
-		D_F0CA = 1;
+		DirtFailed = 1;
 		return;
 	}
 	if((hole = OBJ_FindTypeAt(0x101, tx, ty)) == -1) {
 		CON_printf(BuryInHoleMsg, GetObjectString(target));
-		D_F0CA = 1;
+		DirtFailed = 1;
 		return;
 	}
 	shape = 0x102;
@@ -964,14 +964,14 @@ extern int16 D_F0CA;/*set when a dirt action failed (the load is not used up)*/
 	}
 	if(fail) {
 		MUS_PlaySfx(5);
-		D_F0CA = 1;
+		DirtFailed = 1;
 		return;
 	}
 	for(o = FindLoc(tx, ty, MapZ); o != -1 && GetType(o) != 0x101; o = NextLoc()) {
 		if(!(TileFlag2[BaseTile[GetType(o)] + GetFrame(o)] & 0x10) && InsertObj(o, hole, 8) == -1) {
 			CON_printf(AarghMsg);
 			SearchObj(hole);
-			D_F0CA = 1;
+			DirtFailed = 1;
 			return;
 		}
 	}
@@ -987,13 +987,13 @@ extern int16 D_F0CA;/*set when a dirt action failed (the load is not used up)*/
 		CON_printf(CoveredWithDirtMsg);
 	else
 		CON_printf(TheyCoveredWithDirtMsg);
-	C_2F8D_0EDB(x, y);
+	SearchHole(x, y);
 }
 
 /*
  * action 16 (shovels: dirt 0x1bc onto the coal belt 0xe9)
  */
-/*C_2F8D_1929*/C_2F8D_1929(int16 obj, int16 dirt, int16 to) {
+/*C_2F8D_1929*/UseDirtOnBelt(int16 obj, int16 dirt, int16 to) {
 	register int16 f, t;
 
 	t = GetType(dirt);
@@ -1009,17 +1009,17 @@ extern int16 D_F0CA;/*set when a dirt action failed (the load is not used up)*/
 /*
  * action 14 (shovels on wheelbarrow or rail car): unload one load
  */
-/*C_2F8D_1983*/C_2F8D_1983(int16 obj, register int16 cart, int16 target) {
+/*C_2F8D_1983*/UseUnloadCart(int16 obj, register int16 cart, int16 target) {
 	int16 shape, tt, n;
 	register int16 dirt;
 
-	D_F0CA = 0;
+	DirtFailed = 0;
 	if(GetQuan(cart) == 0) {
 		CON_printf(NothingToUnloadMsg);
 		MUS_PlaySfx(5);
 		return;
 	}
-	shape = C_2F8D_043F(GetQual(cart));
+	shape = LoadKindDirt(GetQual(cart));
 	if((dirt = AddMapObj(shape, 0, 1, GetX(cart), GetY(cart), MapZ)) == -1) {
 		CON_printf(AarghMsg);
 		MUS_PlaySfx(5);
@@ -1027,24 +1027,24 @@ extern int16 D_F0CA;/*set when a dirt action failed (the load is not used up)*/
 	}
 	ObjStatus[dirt] &= 0xdf;
 	if(target == -1)
-		C_2F8D_1545(obj, dirt, target);
+		UseMoveDirt(obj, dirt, target);
 	else {
 		switch(tt = GetType(target)) {
 		case 0x10c: case 0x19a:
-			C_2F8D_133F(obj, dirt, target);
+			UseLoadDirt(obj, dirt, target);
 			break;
 		case 0xe9:
-			C_2F8D_1929(obj, dirt, target);
+			UseDirtOnBelt(obj, dirt, target);
 			break;
 		case 0x101:
-			C_2F8D_14BC(obj, dirt, target);
+			UseFillHole(obj, dirt, target);
 			break;
 		default:
-			C_2F8D_1621(obj, dirt, target);
+			UseBury(obj, dirt, target);
 			break;
 		}
 	}
-	if(D_F0CA) {
+	if(DirtFailed) {
 		DeleteObj(dirt);
 		return;
 	}
@@ -1061,7 +1061,7 @@ extern int16 D_F0CA;/*set when a dirt action failed (the load is not used up)*/
 /*
  * action 40 (guns 0x2d, 0xf0, 0xf1): show and set the setting (quality)
  */
-/*C_2F8D_1B29*/C_2F8D_1B29(register int16 gun, int16 on, int16 to) {
+/*C_2F8D_1B29*/UseGunSetting(register int16 gun, int16 on, int16 to) {
 	int16 q;
 	register int16 ch;
 
@@ -1092,7 +1092,7 @@ extern int16 D_F0CA;/*set when a dirt action failed (the load is not used up)*/
  * actions 47, 61 (radium 0x1c1 on guns, 0x1c0 on 0x122/0x1c0): charge a weapon,
  * install radium (TalkFlags[0x74] 4); hurts without gloves 0x88 or a talent
  */
-/*C_2F8D_1C20*/C_2F8D_1C20(register int16 rad, register int16 on, int16 to) {
+/*C_2F8D_1C20*/UseRadium(register int16 rad, register int16 on, int16 to) {
 	int16 ot, charge, npc, n, installed, owner, glove;
 
 	npc = Party[Active];
@@ -1166,7 +1166,7 @@ extern int16 D_F0CA;/*set when a dirt action failed (the load is not used up)*/
 /*
  * action 73 (radium on the mechanical man 0x166, NPC 0x75)
  */
-/*C_2F8D_1F92*/C_2F8D_1F92(register int16 rad, register int16 man, int16 to) {
+/*C_2F8D_1F92*/UseRadiumOnMechMan(register int16 rad, register int16 man, int16 to) {
 	int16 n;
 
 	if(ObjStatus[rad] & 0x18)

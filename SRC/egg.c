@@ -47,7 +47,7 @@ extern int16 MapX, MapY;
 extern unsigned char DreamFoesLeft;
 extern int32 GameFlags;/*0x10: in a dream*/
 extern unsigned char DirOriginX, DirOriginY;/*screen position of the party*/
-extern unsigned char far *D_3262;/*per NPC: talk flags 8-15 (0x80: waiting)*/
+extern unsigned char far *TalkFlagsHi;/*per NPC: talk flags 8-15 (0x80: waiting)*/
 extern unsigned char ObjStatus[];
 extern char MovePts[];
 extern unsigned char DEXTE[];
@@ -158,7 +158,7 @@ extern int16 OSI_rand(int16, int16);/*OSI_rand(lo, hi)*/
 		Level[objNum] = 1;
 		NPCStatus[objNum] = 0x60;
 	}
-	D_3262[objNum] = 0;
+	TalkFlagsHi[objNum] = 0;
 	OrigShapeType[objNum] = objType;
 	MovePts[objNum] = DEXTE[objNum];
 	ExpPoints[objNum] = 0;

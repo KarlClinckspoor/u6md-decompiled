@@ -199,7 +199,7 @@ extern unsigned char IsInConversation;
 extern int16 TextIdle;
 extern char AnimFrameMask[];
 extern char Screen;/*a struct tSurface (main.c)*/
-extern char far *D_3262;/*0x100 bytes*/
+extern char far *TalkFlagsHi;/*0x100 bytes*/
 extern unsigned char ObjStatus[];
 extern struct tMouse Mouse;
 extern char MovePts[];
@@ -637,7 +637,7 @@ the game's flags, and the status panel colors*/
 	OSI_read(fd, -1, 0x100, Level);
 	OSI_read(fd, -1, 0x100, SchedIndex);
 	OSI_read(fd, -1, 0x100, NPCMode);
-	OSI_read(fd, -1, 0x100, D_3262);
+	OSI_read(fd, -1, 0x100, TalkFlagsHi);
 	OSI_read(fd, -1, 0x100, NPCComMode);
 	OSI_read(fd, -1, 0x100, MovePts);
 	OSI_read(fd, -1, 0x100, MovePts);
@@ -783,7 +783,7 @@ the game's flags, and the status panel colors*/
 	OSI_write(fd, -1, 0x100, Level);
 	OSI_write(fd, -1, 0x100, SchedIndex);
 	OSI_write(fd, -1, 0x100, NPCMode);
-	OSI_write(fd, -1, 0x100, D_3262);
+	OSI_write(fd, -1, 0x100, TalkFlagsHi);
 	OSI_write(fd, -1, 0x100, NPCComMode);
 	OSI_write(fd, -1, 0x100, MovePts);
 	OSI_write(fd, -1, 0x100, MovePts);

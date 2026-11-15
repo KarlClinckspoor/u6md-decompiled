@@ -10,7 +10,7 @@
  * with the same quantity (LeverObjects); 10 is bridge.c's Drawbridge;
  * 20 the levers of the power station and the canal pumps (LeverMachinery,
  * by quantity 1-6); 21 the dream's levers (LeverDream: quantity 1 turns
- * the map view, 2 and 3 call overlay 2F5F).
+ * the map view, 2 and 3 are DreamSleep and DreamEnter).
  * Talk flags: TalkFlags[0x73] & 4 the underground power, & 0x10 the
  * surface power, TalkFlags[0x71] & 8 the power is not yet permanent,
  * TalkFlags[0x76] & 0x20 / & 0x40 the canal pumps, TalkFlags[0x54] & 0x40
@@ -28,15 +28,15 @@ extern Drawbridge(int16);
 extern DreamSleep(int16, int16);
 extern DreamEnter();
 extern DreamWakeUp();
-extern C_2F5F_0AC1(int16);
+extern DreamReleaseNpc(int16);
 extern MachineryOn();
 extern MachineryOff();
-extern C_2F72_039E();
-extern C_2F75_042D();
-extern C_2F75_0532();
-extern C_2F75_07FA();
-extern C_2F75_0951();
-extern C_2F75_0A64();
+extern LampsAtNight();
+extern Cutscene2();
+extern Cutscene3();
+extern Cutscene6();
+extern Cutscene7();
+extern Cutscene8();
 extern TALK_talkTo(int16, int16, int16);
 extern cdecl CON_printf(char far *, ...);
 extern char far LeverStuckMsg[];
@@ -148,7 +148,7 @@ extern uint16 ObjShapeType[];
 				for(i = 0xc0; i < 0x100; i ++) {
 					if(GetType(i) == 0x18e) {
 						if(!(TalkFlags[0x54] & 0x40) && GetZ(i) == MapZ && GetX(i) >= 0x37 && GetY(i) <= 0x37) {
-							C_2F5F_0AC1(0x54);
+							DreamReleaseNpc(0x54);
 							TalkFlags[0x54] |= 2;
 							TALK_talkTo(0, 0x54, 0);
 							DreamWakeUp();
@@ -184,14 +184,14 @@ extern uint16 ObjShapeType[];
 					MachineryOff();
 					TalkFlags[0x73] |= 4;
 					MachineryOn();
-					C_2F75_042D();
+					Cutscene2();
 				} else {
 					CON_printf("Sorry, boss, the power is on for good.\n");
 				}
 			} else {
 				TalkFlags[0x73] |= 4;
 				MachineryOn();
-				C_2F75_042D();
+				Cutscene2();
 			}
 			break;
 		case 2:
@@ -205,8 +205,8 @@ extern uint16 ObjShapeType[];
 				return;
 			}
 			TalkFlags[0x73] |= 0x10;
-			C_2F72_039E();
-			C_2F75_0532();
+			LampsAtNight();
+			Cutscene3();
 			break;
 		case 3:
 			if(TalkFlags[0x76] & 0x20) {
@@ -218,7 +218,7 @@ extern uint16 ObjShapeType[];
 			TalkFlags[0x30] |= 0x80;
 			TalkFlags[0x76] |= 0x20;
 			BargePumps(1);
-			C_2F75_07FA();
+			Cutscene6();
 			break;
 		case 4:
 			if(TalkFlags[0x76] & 0x40) {
@@ -231,7 +231,7 @@ extern uint16 ObjShapeType[];
 			}
 			TalkFlags[0x76] |= 0x40;
 			BargePumps(0);
-			C_2F75_0951();
+			Cutscene7();
 			break;
 		case 5:
 			if(TalkFlags[0x73] & 4) {
@@ -255,7 +255,7 @@ extern uint16 ObjShapeType[];
 			}
 			ObjShapeType[6] = (ObjShapeType[6] & 0xfc00) + 0x162;
 			TalkFlags[6] |= 2;
-			C_2F75_0A64();
+			Cutscene8();
 			break;
 		default:
 			CON_printf("The lever doesn't do anything!\n");
@@ -266,7 +266,7 @@ extern uint16 ObjShapeType[];
 }
 
 /*the dream's levers (quality 21; by quantity): 1 turns the map view
-  (ViewRotation 4) or back, 2 and 3 call overlay 2F5F*/
+  (ViewRotation 4) or back, 2 DreamSleep, 3 DreamEnter (dream.c)*/
 /*C_2F6E_0556*/LeverDream(register int16 objNum) {
 	register int16 quan;
 

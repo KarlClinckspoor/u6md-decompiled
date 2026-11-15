@@ -54,20 +54,20 @@ extern int16 CON_mouseOffAt(int16, int16, int16, int16);
 extern CON_mouseOn(int16);
 extern CON_setClip(struct tClipInfo *);
 extern cdecl CON_printf(char far *, ...);
-extern C_2F68_0000(int16, int16);
-extern C_2F68_02A9();
-extern C_2F68_037E(int16, int16);
-extern C_2F68_03ED();
-extern C_2F68_0494();
-extern C_2F68_0785();
-extern C_2F68_07E6();
-extern C_2F68_0CA9();
-extern C_2F68_0F20();
-extern C_2F68_0FE1(int16, int16);
-extern C_2F68_1393();
-extern C_2F68_165C(int16, int16, int16);
-extern C_2F75_0757();
-extern C_2F75_157A();
+extern DreamStage20(int16, int16);
+extern DreamEndStageA0();
+extern DreamStage25(int16, int16);
+extern DreamStage40();
+extern DreamStage44();
+extern DreamEndStage44();
+extern DreamStageA1();
+extern DreamStage05();
+extern DreamEndStage05();
+extern DreamStage04(int16, int16);
+extern DreamStage60();
+extern DreamStage85(int16, int16, int16);
+extern Cutscene4();
+extern Cutscene11();
 extern char far AarghMsg[];/*failure message*/
 
 extern unsigned char MouseOn;
@@ -103,7 +103,7 @@ extern int16 StatusMember;
 extern int16 StatusDisplay;/*0x90 a member, 0x91 the party, 0x92 the equipment*/
 extern struct tClipInfo *CurClip;
 extern char IsResting;
-extern unsigned char far *D_3262;/*talk flags 8-15*/
+extern unsigned char far *TalkFlagsHi;/*talk flags 8-15*/
 extern unsigned char ObjStatus[];
 extern char MovePts[];
 extern unsigned char DEXTE[];
@@ -135,8 +135,8 @@ extern struct tClipInfo TextWindows[4];
 #define GetQuan(i) (((unsigned char *)(Amount + (i)))[0])
 #define GetQual(i) (((unsigned char *)(Amount + (i)))[1])
 
-/*1E48*/int16 D_1E48 = -1;/*the AnimTile entry of tile 0x6f (-1: not looked up yet; overlays 2F63, 2F68)*/
-/*1E4A*/int16 D_1E4A = 0;/*how much faster tile 0x6f animates, 0-4 (overlays 2F63, 2F68)*/
+/*1E48*/int16 DreamAnimEntry = -1;/*the AnimTile entry of tile 0x6f (-1: not looked up yet; overlays 2F63, 2F68)*/
+/*1E4A*/int16 DreamAnimSteps = 0;/*how much faster tile 0x6f animates, 0-4 (overlays 2F63, 2F68)*/
 
 DreamTrigger(int16);
 
@@ -161,7 +161,7 @@ DreamTrigger(int16);
 		}
 	}
 	if(npc == 1) {
-		C_2F75_0757();
+		Cutscene4();
 		if(SoloMember >= 0)
 			SetPartyMode();
 		CloneObject(1, 0);
@@ -238,7 +238,7 @@ DreamTrigger(int16);
 	int16 mouse;
 	register int16 i;
 
-	C_2F75_157A();
+	Cutscene11();
 	if(SoloMember >= 0)
 		SetPartyMode();
 	CloneObject(1, 0);
@@ -367,11 +367,11 @@ DreamTrigger(int16);
 	frame = GetFrame(obj);
 	if(DreamStage && kind != 0xa5 && kind != 0xe5) {
 		switch(DreamStage) {
-		case 5: C_2F68_0F20(); break;
+		case 5: DreamEndStage05(); break;
 		case 0x20: OBJ_DeleteContents(0); break;
 		case 0x40: ObjShapeType[0] = GetType(1) | 0x2400; break;
-		case 0x44: C_2F68_0785(); break;
-		case 0xa0: C_2F68_02A9(); break;
+		case 0x44: DreamEndStage44(); break;
+		case 0xa0: DreamEndStageA0(); break;
 		}
 	}
 	if(kind) {
@@ -380,26 +380,26 @@ DreamTrigger(int16);
 			DreamStage = 0;
 			return;
 		case 4:
-			C_2F68_0FE1(x, y);
+			DreamStage04(x, y);
 			break;
 		case 0x24:
 			DreamWakeUp();
 			return;
 		case 0x40:
-			C_2F68_03ED();
+			DreamStage40();
 			break;
 		case 0x85:
-			C_2F68_165C(DreamStage != 0x85, x, y);
+			DreamStage85(DreamStage != 0x85, x, y);
 			break;
 		case 0xa1:
-			C_2F68_07E6();
+			DreamStageA1();
 			break;
 		case 0xa4:
 			TalkFlags[0x56] &= 1;
 			MoveObj(0x56, 0x19, 0x6f, 2);
 			ObjShapeType[0x56] = GetType(0x56) + 0x400;
 			NPCMode[0x56] = 0;
-			D_3262[0x56] |= 0x80;
+			TalkFlagsHi[0x56] |= 0x80;
 			NPCStatus[0x56] &= 0x9f;
 			break;
 		case 0xc1:
@@ -450,19 +450,19 @@ DreamTrigger(int16);
 	if(kind) {
 		switch(kind) {
 		case 5:
-			C_2F68_0CA9();
+			DreamStage05();
 			break;
 		case 0x20:
-			C_2F68_0000(x, y);
+			DreamStage20(x, y);
 			break;
 		case 0x25:
-			C_2F68_037E(x, y);
+			DreamStage25(x, y);
 			break;
 		case 0x44:
-			C_2F68_0494();
+			DreamStage44();
 			break;
 		case 0x60:
-			C_2F68_1393();
+			DreamStage60();
 			break;
 		case 0xa5:
 			return;
@@ -493,7 +493,7 @@ DreamTrigger(int16);
   schedule's place, where the objects 0x1cd and 0x124 (above) are
   removed, and gets talk flag 0x80; with NPCs 0x52, 0x54, 0x55 and 0x56
   back TalkFlags[0x60] gets 0x10, with 0x50-0x57 TalkFlags[0x20]*/
-/*C_2F5F_0AC1*/C_2F5F_0AC1(register int16 npc) {
+/*C_2F5F_0AC1*/DreamReleaseNpc(register int16 npc) {
 	struct coord pos;
 	int16 x, y;
 	register int16 obj;
@@ -501,7 +501,7 @@ DreamTrigger(int16);
 	switch(npc) {
 	case 0x5c:
 		MoveObj(npc, npc, npc, 6);
-		D_3262[npc] |= 0x80;
+		TalkFlagsHi[npc] |= 0x80;
 		NPCMode[npc] = 0;
 		npc = 0x53;
 	}

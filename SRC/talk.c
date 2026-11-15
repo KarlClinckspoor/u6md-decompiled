@@ -69,9 +69,9 @@ extern ShowObjects();
 extern char *GetObjectString(int16);
 extern OBJ_DeleteContents(int16);
 extern DreamWakeUp();
-extern C_2F5F_0AC1(int16);
-extern C_2F75_1429();
-extern C_2F75_16A8();
+extern DreamReleaseNpc(int16);
+extern Cutscene10();
+extern GameEnd();
 extern char far CriticalMsg[];
 extern char far HeavilyMsg[];
 extern char far WoundedMsg[];
@@ -97,7 +97,7 @@ extern unsigned char PlayerIsFemale;
 extern int32 GameFlags;/*0x10: in a dream*/
 extern struct { unsigned a:4, psychic:4, b:8; } Talents[];/*talents? (psychic: can read objects)*/
 extern int16 DreamStage;
-extern unsigned char far *D_3262;/*NPC flags: 0x80 ?, bits 0-7: talk flags 8-15*/
+/*3262*/extern unsigned char far *TalkFlagsHi;/*per NPC (0x100 bytes, saved in objlist): talk flags 8-15; flag 15 (0x80): the NPC waits*/
 extern unsigned char ObjStatus[];
 extern unsigned char far *NPCMode;
 extern unsigned char Party[];
@@ -117,11 +117,9 @@ extern unsigned char Obj_11x11[11][11];
 extern int16 Tile_11x11[11][11];
 extern int16 VarInt[10+26];
 extern char *VarStr[10+26];
-extern unsigned char D_EC5C[];/*TalkNpcName*/
-extern char D_ECE2[10][100];/*TalkStrBuf: storage of the string variables $0-$9*/
+/*EC5C*/extern unsigned char TalkNpcName[];/*TALK_GetNpcName's result*/
+/*ECE2*/extern char TalkStrBuf[10][100];/*storage of the string variables $0-$9*/
 
-#define TalkNpcName D_EC5C
-#define TalkStrBuf D_ECE2
 
 #define IN_VEHICLE (Active == PartySize)
 #define IsPlrControl(i)  (NPCStatus[i] & 0x80)
@@ -286,15 +284,15 @@ char *TALK_GetCharName(int16);
 				DisplayTick();
 				switch(TalkEvent) {
 					case 9:
-						C_2F75_16A8();
+						GameEnd();
 					break;
 					case 10:
-						C_2F75_1429();
+						Cutscene10();
 					break;
 					case 0x38:
 						if((TalkFlags[0x55] & 0xc) != 8)
 							break;
-						C_2F5F_0AC1(0x55);
+						DreamReleaseNpc(0x55);
 					case 0x34: case 0x36:
 						DreamWakeUp();
 					break;
@@ -511,7 +509,7 @@ returns 0:ok (or already in the party), 1:party is in a vehicle, 2:party is full
 	else
 		strcpy(Names[PartySize - 1], name);
 	NPCStatus[objNum] |= 0x80;
-	D_3262[objNum] &= 0x7f;
+	TalkFlagsHi[objNum] &= 0x7f;
 	if(GetAlignment(objNum) == NEUTRAL)
 		SetAlignment(objNum, GOOD);
 	NPCMode[objNum] = 1;
@@ -540,7 +538,7 @@ returns 0:ok, 1:party is in a vehicle, 2:not in party*/
 	NPCStatus[objNum] &= ~0x80;
 	if(GetAlignment(objNum) == GOOD)
 		SetAlignment(objNum, NEUTRAL);
-	if(D_3262[objNum] & 0x80) {
+	if(TalkFlagsHi[objNum] & 0x80) {
 		NPCMode[objNum] = 0x92;
 	} else {
 		NPCMode[objNum] = 0x8f;
@@ -598,11 +596,11 @@ returns 0:ok, 1:party is in a vehicle, 2:not in party*/
 		case 3:
 		break;
 		case 4:
-			D_3262[0x1e] &= 0x7f;
-			D_3262[0x18] &= 0x7f;
+			TalkFlagsHi[0x1e] &= 0x7f;
+			TalkFlagsHi[0x18] &= 0x7f;
 		break;
 		case 5:
-			D_3262[0x18] |= 0x80;
+			TalkFlagsHi[0x18] |= 0x80;
 			NPCMode[0x18] = 0;
 			MoveObj(0x18, 0x18, 0x18, 6);
 		break;
@@ -653,7 +651,7 @@ returns 0:ok, 1:party is in a vehicle, 2:not in party*/
 				ObjShapeType[k] = GetType(k) + 0x400;
 		break;
 		case 0x34:
-			C_2F5F_0AC1(0x5c);
+			DreamReleaseNpc(0x5c);
 			TalkEvent = 0x34;
 		break;
 		case 0x35:
@@ -673,7 +671,7 @@ returns 0:ok, 1:party is in a vehicle, 2:not in party*/
 				CON_printf(AarghMsg);
 		break;
 		case 0x36:
-			C_2F5F_0AC1(0x52);
+			DreamReleaseNpc(0x52);
 			TalkEvent = 0x36;
 		break;
 		case 0x37:

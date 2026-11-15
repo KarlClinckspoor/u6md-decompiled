@@ -91,77 +91,77 @@ extern int16 SelectionX, SelectionY;
 
 /*the tables, each a far variable (a paragraph-aligned segment of its own, after the code):
   UseObjects at 2E08, UseActions at 2E67, which points at the overlaid actions' stub entries*/
-extern void C_2F8D_0000(int16, int16, int16);
-extern void C_2F8D_01C1(int16, int16, int16);
-extern void C_2F8D_0476(int16, int16, int16);
-extern void C_2FA1_1CB6(int16, int16, int16);
-extern void C_2F8D_04E4(int16, int16, int16);
-extern void C_2F8D_05DE(int16, int16, int16);
-extern void C_2F8D_06C1(int16, int16, int16);
-extern void C_2F8D_0849(int16, int16, int16);
-extern void C_2F8D_0895(int16, int16, int16);
-extern void C_2F8D_0DFE(int16, int16, int16);
-extern void C_2F8D_0F1C(int16, int16, int16);
-extern void C_2F8D_1145(int16, int16, int16);
-extern void C_2F8D_1545(int16, int16, int16);
-extern void C_2F8D_133F(int16, int16, int16);
-extern void C_2F8D_1983(int16, int16, int16);
-extern void C_2F8D_1621(int16, int16, int16);
-extern void C_2F8D_1929(int16, int16, int16);
-extern void C_2F8D_09C9(int16, int16, int16);
-extern void C_2F8D_0A67(int16, int16, int16);
-extern void C_2FA1_00F7(int16, int16, int16);
-extern void C_2F8D_0B9D(int16, int16, int16);
-extern void C_2F8D_0CFC(int16, int16, int16);
-extern void C_2F98_1334(int16, int16, int16);
+extern void UseBed(int16, int16, int16);
+extern void UseRead(int16, int16, int16);
+extern void UseTakeAndReady(int16, int16, int16);
+extern void UseInstrument(int16, int16, int16);
+extern void UseFastenSwitch(int16, int16, int16);
+extern void UseInstallDrill(int16, int16, int16);
+extern void UseFastenPanel(int16, int16, int16);
+extern void UseFixRail(int16, int16, int16);
+extern void UseReplaceCable(int16, int16, int16);
+extern void UseWrongTool(int16, int16, int16);
+extern void UseUprootPlant(int16, int16, int16);
+extern void UseDigHole(int16, int16, int16);
+extern void UseMoveDirt(int16, int16, int16);
+extern void UseLoadDirt(int16, int16, int16);
+extern void UseUnloadCart(int16, int16, int16);
+extern void UseBury(int16, int16, int16);
+extern void UseDirtOnBelt(int16, int16, int16);
+extern void UseOnCrate(int16, int16, int16);
+extern void UseOpenHatch(int16, int16, int16);
+extern void UseBurn(int16, int16, int16);
+extern void UseOpenPod(int16, int16, int16);
+extern void UsePickBerries(int16, int16, int16);
+extern void UseBargeController(int16, int16, int16);
 extern void UseLever(int16, int16, int16);
-extern void C_2F98_0503(int16, int16, int16);
-extern void C_2FA1_14D8(int16, int16, int16);
-extern void C_2FA1_17D4(int16, int16, int16);
-extern void C_2FA1_041A(int16, int16, int16);
-extern void C_2FA1_017E(int16, int16, int16);
-extern void C_2FA1_048E(int16, int16, int16);
-extern void C_2FA1_0562(int16, int16, int16);
-extern void C_2FA1_0A1B(int16, int16, int16);
-extern void C_2F98_1449(int16, int16, int16);
-extern void C_2FA1_1A5C(int16, int16, int16);
-extern void C_2F98_0000(int16, int16, int16);
-extern void C_2F98_0267(int16, int16, int16);
-extern void C_2FA1_0F95(int16, int16, int16);
-extern void C_2FA1_1338(int16, int16, int16);
-extern void C_2FA1_06C9(int16, int16, int16);
-extern void C_2F8D_1B29(int16, int16, int16);
-extern void C_2F98_0777(int16, int16, int16);
-extern void C_2FA1_0C42(int16, int16, int16);
-extern void C_2FA1_1B00(int16, int16, int16);
-extern void C_2FA1_1B18(int16, int16, int16);
-extern void C_2F98_0E53(int16, int16, int16);
-extern void C_2F98_03AA(int16, int16, int16);
-extern void C_2F8D_1C20(int16, int16, int16);
-extern void C_2F98_0F88(int16, int16, int16);
-extern void C_2F98_1088(int16, int16, int16);
-extern void C_2F98_1568(int16, int16, int16);
-extern void C_2FA1_1BBC(int16, int16, int16);
-extern void C_2F98_1237(int16, int16, int16);
-extern void C_2F98_1BB6(int16, int16, int16);
-extern void C_2F98_1A75(int16, int16, int16);
-extern void C_2F98_1E08(int16, int16, int16);
-extern void C_2FA1_1C2E(int16, int16, int16);
-extern void C_2F98_166A(int16, int16, int16);
-extern void C_2F98_17B5(int16, int16, int16);
-extern void C_2FA1_11E0(int16, int16, int16);
-extern void C_2F8D_14BC(int16, int16, int16);
-extern void C_2FA1_0000(int16, int16, int16);
-extern void C_2F8D_0B57(int16, int16, int16);
-extern void C_2F98_1988(int16, int16, int16);
-extern void C_2F98_19BD(int16, int16, int16);
-extern void C_2FA1_18C6(int16, int16, int16);
-extern void C_2FA1_18F3(int16, int16, int16);
-extern void C_2FA1_1953(int16, int16, int16);
-extern void C_2FA1_1DAE(int16, int16, int16);
-extern void C_2F98_1E83(int16, int16, int16);
-extern void C_2F8D_1F92(int16, int16, int16);
-extern void C_2F98_1EC7(int16, int16, int16);
+extern void UseCannon(int16, int16, int16);
+extern void UseEatBerries(int16, int16, int16);
+extern void UseBattleFrenzy(int16, int16, int16);
+extern void UseLightWithMatch(int16, int16, int16);
+extern void UseLight(int16, int16, int16);
+extern void UseRefuelLantern(int16, int16, int16);
+extern void UseSwitch(int16, int16, int16);
+extern void UseTelescope(int16, int16, int16);
+extern void UseSextant(int16, int16, int16);
+extern void UseChest(int16, int16, int16);
+extern void UseBilliards(int16, int16, int16);
+extern void UseOrgan(int16, int16, int16);
+extern void UseChemicals(int16, int16, int16);
+extern void UseInstallLenses(int16, int16, int16);
+extern void UseDrill(int16, int16, int16);
+extern void UseGunSetting(int16, int16, int16);
+extern void UseLoadCannon(int16, int16, int16);
+extern void UseBucket(int16, int16, int16);
+extern void UseMap(int16, int16, int16);
+extern void UseGate(int16, int16, int16);
+extern void UseCabinetPanel(int16, int16, int16);
+extern void UseFixRollers(int16, int16, int16);
+extern void UseRadium(int16, int16, int16);
+extern void UseChargeSprayGun(int16, int16, int16);
+extern void UseSprayGun(int16, int16, int16);
+extern void UseOxiumBin(int16, int16, int16);
+extern void UseLoadSprayer(int16, int16, int16);
+extern void UseInstallHeadgear(int16, int16, int16);
+extern void UseDreamstuff(int16, int16, int16);
+extern void UseDreamstuffHoard(int16, int16, int16);
+extern void UseHealingElixir(int16, int16, int16);
+extern void UseAutoDoor(int16, int16, int16);
+extern void UseHarvestSeed(int16, int16, int16);
+extern void UsePlantSeed(int16, int16, int16);
+extern void UseOil(int16, int16, int16);
+extern void UseFillHole(int16, int16, int16);
+extern void UsePutOutLight(int16, int16, int16);
+extern void UseInstallHeartstone(int16, int16, int16);
+extern void UseSpittoon(int16, int16, int16);
+extern void UseRubySlippers(int16, int16, int16);
+extern void UseManuscript(int16, int16, int16);
+extern void UseMirror(int16, int16, int16);
+extern void UseGateB5(int16, int16, int16);
+extern void UsePourBucket(int16, int16, int16);
+extern void UseValve(int16, int16, int16);
+extern void UseRadiumOnMechMan(int16, int16, int16);
+extern void UseOxygenatedAir(int16, int16, int16);
 
 /*C_2E08_0000*/struct tUseObject far UseObjects[] = {
 	{0x11b, {57, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}},
@@ -292,81 +292,81 @@ extern void C_2F98_1EC7(int16, int16, int16);
 	{-1, {0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff}}
 };
 /*C_2E67_0000*/struct tUseAction far UseActions[] = {
-	{{-1, -1, -1, -1, -1, -1, -1, -1}, {-1, -1, -1, -1, -1, -1, -1, -1}, C_2F8D_0000},/*0*/
-	{{-1, -1, -1, -1, -1, -1, -1, -1}, {-1, -1, -1, -1, -1, -1, -1, -1}, C_2F8D_01C1},/*1*/
-	{{-1, -1, -1, -1, -1, -1, -1, -1}, {-1, -1, -1, -1, -1, -1, -1, -1}, C_2F8D_0476},/*2*/
-	{{0x12a, -1, -1, -1, -1, -1, -1, -1}, {-1, -1, -1, -1, -1, -1, -1, -1}, C_2FA1_1CB6},/*3*/
-	{{0x19b, -1, -1, -1, -1, -1, -1, -1}, {-1, -1, -1, -1, -1, -1, -1, -1}, C_2F8D_04E4},/*4*/
-	{{0x1b8, -1, -1, -1, -1, -1, -1, -1}, {-1, -1, -1, -1, -1, -1, -1, -1}, C_2F8D_05DE},/*5*/
-	{{0x1ca, -1, -1, -1, -1, -1, -1, -1}, {-1, -1, -1, -1, -1, -1, -1, -1}, C_2F8D_06C1},/*6*/
-	{{0x194, -1, -1, -1, -1, -1, -1, -1}, {0x195, -1, -1, -1, -1, -1, -1, -1}, C_2F8D_0849},/*7*/
-	{{0xc7, -1, -1, -1, -1, -1, -1, -1}, {0xc9, 0xd7, -1, -1, -1, -1, -1, -1}, C_2F8D_0895},/*8*/
-	{{0x101, 0xff, -1, -1, -1, -1, -1, -1}, {-1, -1, -1, -1, -1, -1, -1, -1}, C_2F8D_0DFE},/*9*/
-	{{0xfb, -1, -1, -1, -1, -1, -1, -1}, {-1, -1, -1, -1, -1, -1, -1, -1}, C_2F8D_0F1C},/*10*/
-	{{-2, -1, -1, -1, -1, -1, -1, -1}, {-1, -1, -1, -1, -1, -1, -1, -1}, C_2F8D_1145},/*11*/
-	{{0x1ba, 0x1bb, 0x1bc, -1, -1, -1, -1, 0}, {-2, -1, -1, -1, -1, -1, -1, -1}, C_2F8D_1545},/*12*/
-	{{0x102, 0x1ba, 0x1bb, 0x1bc, -1, -1, -1, -1}, {0x10c, 0x19a, -1, -1, -1, -1, -1, -1}, C_2F8D_133F},/*13*/
-	{{0x10c, 0x19a, -1, -1, -1, -1, -1, -1}, {-2, -1, -1, -1, -1, -1, -1, -1}, C_2F8D_1983},/*14*/
-	{{0x102, -1, -1, -1, -1, -1, -1, -1}, {-2, -1, -1, -1, -1, -1, -1, -1}, C_2F8D_1621},/*15*/
-	{{0x1bc, -1, -1, -1, -1, -1, -1, -1}, {0xe9, -1, -1, -1, -1, -1, -1, -1}, C_2F8D_1929},/*16*/
-	{{0x56, -1, -1, -1, -1, -1, -1, -1}, {-1, -1, -1, -1, -1, -1, -1, -1}, C_2F8D_09C9},/*17*/
-	{{0x1ab, -1, -1, -1, -1, -1, -1, -1}, {-1, -1, -1, -1, -1, -1, -1, -1}, C_2F8D_0A67},/*18*/
-	{{-2, -1, -1, -1, -1, -1, -1, -1}, {-1, -1, -1, -1, -1, -1, -1, -1}, C_2FA1_00F7},/*19*/
-	{{0xfb, -1, -1, -1, -1, -1, -1, -1}, {-1, -1, -1, -1, -1, -1, -1, -1}, C_2F8D_0B9D},/*20*/
-	{{0x82, -1, -1, -1, -1, -1, -1, 0}, {-1, -1, -1, -1, -1, -1, -1, -1}, C_2F8D_0CFC},/*21*/
-	{{0x53, 0x55, 0x57, 0x130, -1, -1, -1, -1}, {-1, -1, -1, -1, -1, -1, -1, -1}, C_2F8D_09C9},/*22*/
-	{{-1, -1, -1, -1, -1, -1, -1, -1}, {-1, -1, -1, -1, -1, -1, -1, -1}, C_2F98_1334},/*23*/
+	{{-1, -1, -1, -1, -1, -1, -1, -1}, {-1, -1, -1, -1, -1, -1, -1, -1}, UseBed},/*0*/
+	{{-1, -1, -1, -1, -1, -1, -1, -1}, {-1, -1, -1, -1, -1, -1, -1, -1}, UseRead},/*1*/
+	{{-1, -1, -1, -1, -1, -1, -1, -1}, {-1, -1, -1, -1, -1, -1, -1, -1}, UseTakeAndReady},/*2*/
+	{{0x12a, -1, -1, -1, -1, -1, -1, -1}, {-1, -1, -1, -1, -1, -1, -1, -1}, UseInstrument},/*3*/
+	{{0x19b, -1, -1, -1, -1, -1, -1, -1}, {-1, -1, -1, -1, -1, -1, -1, -1}, UseFastenSwitch},/*4*/
+	{{0x1b8, -1, -1, -1, -1, -1, -1, -1}, {-1, -1, -1, -1, -1, -1, -1, -1}, UseInstallDrill},/*5*/
+	{{0x1ca, -1, -1, -1, -1, -1, -1, -1}, {-1, -1, -1, -1, -1, -1, -1, -1}, UseFastenPanel},/*6*/
+	{{0x194, -1, -1, -1, -1, -1, -1, -1}, {0x195, -1, -1, -1, -1, -1, -1, -1}, UseFixRail},/*7*/
+	{{0xc7, -1, -1, -1, -1, -1, -1, -1}, {0xc9, 0xd7, -1, -1, -1, -1, -1, -1}, UseReplaceCable},/*8*/
+	{{0x101, 0xff, -1, -1, -1, -1, -1, -1}, {-1, -1, -1, -1, -1, -1, -1, -1}, UseWrongTool},/*9*/
+	{{0xfb, -1, -1, -1, -1, -1, -1, -1}, {-1, -1, -1, -1, -1, -1, -1, -1}, UseUprootPlant},/*10*/
+	{{-2, -1, -1, -1, -1, -1, -1, -1}, {-1, -1, -1, -1, -1, -1, -1, -1}, UseDigHole},/*11*/
+	{{0x1ba, 0x1bb, 0x1bc, -1, -1, -1, -1, 0}, {-2, -1, -1, -1, -1, -1, -1, -1}, UseMoveDirt},/*12*/
+	{{0x102, 0x1ba, 0x1bb, 0x1bc, -1, -1, -1, -1}, {0x10c, 0x19a, -1, -1, -1, -1, -1, -1}, UseLoadDirt},/*13*/
+	{{0x10c, 0x19a, -1, -1, -1, -1, -1, -1}, {-2, -1, -1, -1, -1, -1, -1, -1}, UseUnloadCart},/*14*/
+	{{0x102, -1, -1, -1, -1, -1, -1, -1}, {-2, -1, -1, -1, -1, -1, -1, -1}, UseBury},/*15*/
+	{{0x1bc, -1, -1, -1, -1, -1, -1, -1}, {0xe9, -1, -1, -1, -1, -1, -1, -1}, UseDirtOnBelt},/*16*/
+	{{0x56, -1, -1, -1, -1, -1, -1, -1}, {-1, -1, -1, -1, -1, -1, -1, -1}, UseOnCrate},/*17*/
+	{{0x1ab, -1, -1, -1, -1, -1, -1, -1}, {-1, -1, -1, -1, -1, -1, -1, -1}, UseOpenHatch},/*18*/
+	{{-2, -1, -1, -1, -1, -1, -1, -1}, {-1, -1, -1, -1, -1, -1, -1, -1}, UseBurn},/*19*/
+	{{0xfb, -1, -1, -1, -1, -1, -1, -1}, {-1, -1, -1, -1, -1, -1, -1, -1}, UseOpenPod},/*20*/
+	{{0x82, -1, -1, -1, -1, -1, -1, 0}, {-1, -1, -1, -1, -1, -1, -1, -1}, UsePickBerries},/*21*/
+	{{0x53, 0x55, 0x57, 0x130, -1, -1, -1, -1}, {-1, -1, -1, -1, -1, -1, -1, -1}, UseOnCrate},/*22*/
+	{{-1, -1, -1, -1, -1, -1, -1, -1}, {-1, -1, -1, -1, -1, -1, -1, -1}, UseBargeController},/*23*/
 	{{-1, -1, -1, -1, -1, -1, -1, -1}, {-1, -1, -1, -1, -1, -1, -1, -1}, UseLever},/*24*/
-	{{-1, -1, -1, -1, -1, -1, -1, -1}, {-1, -1, -1, -1, -1, -1, -1, -1}, C_2F98_0503},/*25*/
-	{{-1, -1, -1, -1, -1, -1, -1, -1}, {-1, -1, -1, -1, -1, -1, -1, -1}, C_2FA1_14D8},/*26*/
-	{{-1, -1, -1, -1, -1, -1, -1, -1}, {-1, -1, -1, -1, -1, -1, -1, -1}, C_2FA1_17D4},/*27*/
-	{{-1, -1, -1, -1, -1, -1, -1, -1}, {-1, -1, -1, -1, -1, -1, -1, -1}, C_2FA1_041A},/*28*/
-	{{0x6f, 0x71, 0x75, 0x73, 0x6d, -1, -1, -1}, {-1, -1, -1, -1, -1, -1, -1, -1}, C_2FA1_017E},/*29*/
-	{{0x75, 0x76, 0x73, 0x74, -1, -1, -1, -1}, {-1, -1, -1, -1, -1, -1, -1, -1}, C_2FA1_048E},/*30*/
-	{{-1, -1, -1, -1, -1, -1, -1, -1}, {-1, -1, -1, -1, -1, -1, -1, -1}, C_2FA1_0562},/*31*/
-	{{-1, -1, -1, -1, -1, -1, -1, -1}, {-1, -1, -1, -1, -1, -1, -1, -1}, C_2FA1_0A1B},/*32*/
-	{{-1, -1, -1, -1, -1, -1, -1, -1}, {-1, -1, -1, -1, -1, -1, -1, -1}, C_2F98_1449},/*33*/
-	{{-1, -1, -1, -1, -1, -1, -1, -1}, {-1, -1, -1, -1, -1, -1, -1, -1}, C_2FA1_1A5C},/*34*/
-	{{-1, -1, -1, -1, -1, -1, -1, -1}, {-1, -1, -1, -1, -1, -1, -1, -1}, C_2F98_0000},/*35*/
-	{{-1, -1, -1, -1, -1, -1, -1, -1}, {-1, -1, -1, -1, -1, -1, -1, -1}, C_2F98_0267},/*36*/
-	{{0xfb, -1, -1, -1, -1, -1, -1, -1}, {-1, -1, -1, -1, -1, -1, -1, -1}, C_2FA1_0F95},/*37*/
-	{{0xca, -1, -1, -1, -1, -1, -1, -1}, {-1, -1, -1, -1, -1, -1, -1, -1}, C_2FA1_1338},/*38*/
-	{{-1, -1, -1, -1, -1, -1, -1, -1}, {-1, -1, -1, -1, -1, -1, -1, -1}, C_2FA1_06C9},/*39*/
-	{{-1, -1, -1, -1, -1, -1, -1, -1}, {-1, -1, -1, -1, -1, -1, -1, -1}, C_2F8D_1B29},/*40*/
-	{{0x14d, -1, -1, -1, -1, -1, -1, -1}, {-1, -1, -1, -1, -1, -1, -1, -1}, C_2F98_0777},/*41*/
-	{{-2, -1, -1, -1, -1, -1, -1, -1}, {-1, -1, -1, -1, -1, -1, -1, -1}, C_2FA1_0C42},/*42*/
-	{{-1, -1, -1, -1, -1, -1, -1, -1}, {-1, -1, -1, -1, -1, -1, -1, -1}, C_2FA1_1B00},/*43*/
-	{{-1, -1, -1, -1, -1, -1, -1, -1}, {-1, -1, -1, -1, -1, -1, -1, -1}, C_2FA1_1B18},/*44*/
-	{{-1, -1, -1, -1, -1, -1, -1, -1}, {-1, -1, -1, -1, -1, -1, -1, -1}, C_2F98_0E53},/*45*/
-	{{0xc0, -1, -1, -1, -1, -1, -1, -1}, {-1, -1, -1, -1, -1, -1, -1, -1}, C_2F98_03AA},/*46*/
-	{{0xf0, 0xf1, -1, -1, -1, -1, -1, -1}, {-1, -1, -1, -1, -1, -1, -1, -1}, C_2F8D_1C20},/*47*/
-	{{0x81, 0x105, -1, -1, -1, -1, -1, -1}, {-1, -1, -1, -1, -1, -1, -1, -1}, C_2F98_0F88},/*48*/
-	{{-2, -1, -1, -1, -1, -1, -1, -1}, {-1, -1, -1, -1, -1, -1, -1, -1}, C_2F98_1088},/*49*/
-	{{-1, -1, -1, -1, -1, -1, -1, -1}, {-1, -1, -1, -1, -1, -1, -1, -1}, C_2F98_1568},/*50*/
-	{{0x114, -1, -1, -1, -1, -1, -1, -1}, {-1, -1, -1, -1, -1, -1, -1, -1}, C_2FA1_1BBC},/*51*/
-	{{0x120, 0x121, -1, -1, -1, -1, -1, -1}, {-1, -1, -1, -1, -1, -1, -1, -1}, C_2F98_1237},/*52*/
-	{{-1, -1, -1, -1, -1, -1, -1, -1}, {-1, -1, -1, -1, -1, -1, -1, -1}, C_2F98_1BB6},/*53*/
-	{{-1, -1, -1, -1, -1, -1, -1, -1}, {-1, -1, -1, -1, -1, -1, -1, -1}, C_2F98_1A75},/*54*/
-	{{-2, -1, -1, -1, -1, -1, -1, -1}, {-1, -1, -1, -1, -1, -1, -1, -1}, C_2F98_1E08},/*55*/
-	{{-1, -1, -1, -1, -1, -1, -1, -1}, {-1, -1, -1, -1, -1, -1, -1, -1}, C_2FA1_1C2E},/*56*/
-	{{-1, -1, -1, -1, -1, -1, -1, -1}, {-1, -1, -1, -1, -1, -1, -1, -1}, C_2FA1_1CB6},/*57*/
-	{{-1, -1, -1, -1, -1, -1, -1, -1}, {-1, -1, -1, -1, -1, -1, -1, -1}, C_2F98_166A},/*58*/
-	{{-1, -1, -1, -1, -1, -1, -1, -1}, {-1, -1, -1, -1, -1, -1, -1, -1}, C_2F98_17B5},/*59*/
-	{{-2, -1, -1, -1, -1, -1, -1, -1}, {-1, -1, -1, -1, -1, -1, -1, -1}, C_2FA1_11E0},/*60*/
-	{{0x122, 0x1c0, -1, -1, -1, -1, -1, -1}, {-1, -1, -1, -1, -1, -1, -1, -1}, C_2F8D_1C20},/*61*/
-	{{0x102, -1, -1, -1, -1, -1, -1, -1}, {0x101, -1, -1, -1, -1, -1, -1, -1}, C_2F8D_14BC},/*62*/
-	{{0x76, 0x70, 0x72, 0x74, 0x6e, -1, -1, -1}, {-1, -1, -1, -1, -1, -1, -1, -1}, C_2FA1_0000},/*63*/
-	{{-1, -1, -1, -1, -1, -1, -1, -1}, {-1, -1, -1, -1, -1, -1, -1, -1}, C_2F8D_0DFE},/*64*/
-	{{0x11f, -1, -1, -1, -1, -1, -1, -1}, {-1, -1, -1, -1, -1, -1, -1, -1}, C_2F8D_0B57},/*65*/
-	{{-1, -1, -1, -1, -1, -1, -1, -1}, {-1, -1, -1, -1, -1, -1, -1, -1}, C_2F98_1988},/*66*/
-	{{-1, -1, -1, -1, -1, -1, -1, -1}, {-1, -1, -1, -1, -1, -1, -1, -1}, C_2F98_19BD},/*67*/
-	{{0x54, -1, -1, -1, -1, -1, -1, -1}, {-1, -1, -1, -1, -1, -1, -1, -1}, C_2FA1_18C6},/*68*/
-	{{-1, -1, -1, -1, -1, -1, -1, -1}, {-1, -1, -1, -1, -1, -1, -1, -1}, C_2FA1_18F3},/*69*/
-	{{-1, -1, -1, -1, -1, -1, -1, -1}, {-1, -1, -1, -1, -1, -1, -1, -1}, C_2FA1_1953},/*70*/
-	{{0xa0, -1, -1, -1, -1, -1, -1, -1}, {-1, -1, -1, -1, -1, -1, -1, -1}, C_2FA1_1DAE},/*71*/
-	{{-1, -1, -1, -1, -1, -1, -1, -1}, {-1, -1, -1, -1, -1, -1, -1, -1}, C_2F98_1E83},/*72*/
-	{{0x166, -1, -1, -1, -1, -1, -1, -1}, {-1, -1, -1, -1, -1, -1, -1, -1}, C_2F8D_1F92},/*73*/
-	{{-2, -1, -1, -1, -1, -1, -1, -1}, {-1, -1, -1, -1, -1, -1, -1, -1}, C_2F98_1EC7}/*74*/
+	{{-1, -1, -1, -1, -1, -1, -1, -1}, {-1, -1, -1, -1, -1, -1, -1, -1}, UseCannon},/*25*/
+	{{-1, -1, -1, -1, -1, -1, -1, -1}, {-1, -1, -1, -1, -1, -1, -1, -1}, UseEatBerries},/*26*/
+	{{-1, -1, -1, -1, -1, -1, -1, -1}, {-1, -1, -1, -1, -1, -1, -1, -1}, UseBattleFrenzy},/*27*/
+	{{-1, -1, -1, -1, -1, -1, -1, -1}, {-1, -1, -1, -1, -1, -1, -1, -1}, UseLightWithMatch},/*28*/
+	{{0x6f, 0x71, 0x75, 0x73, 0x6d, -1, -1, -1}, {-1, -1, -1, -1, -1, -1, -1, -1}, UseLight},/*29*/
+	{{0x75, 0x76, 0x73, 0x74, -1, -1, -1, -1}, {-1, -1, -1, -1, -1, -1, -1, -1}, UseRefuelLantern},/*30*/
+	{{-1, -1, -1, -1, -1, -1, -1, -1}, {-1, -1, -1, -1, -1, -1, -1, -1}, UseSwitch},/*31*/
+	{{-1, -1, -1, -1, -1, -1, -1, -1}, {-1, -1, -1, -1, -1, -1, -1, -1}, UseTelescope},/*32*/
+	{{-1, -1, -1, -1, -1, -1, -1, -1}, {-1, -1, -1, -1, -1, -1, -1, -1}, UseSextant},/*33*/
+	{{-1, -1, -1, -1, -1, -1, -1, -1}, {-1, -1, -1, -1, -1, -1, -1, -1}, UseChest},/*34*/
+	{{-1, -1, -1, -1, -1, -1, -1, -1}, {-1, -1, -1, -1, -1, -1, -1, -1}, UseBilliards},/*35*/
+	{{-1, -1, -1, -1, -1, -1, -1, -1}, {-1, -1, -1, -1, -1, -1, -1, -1}, UseOrgan},/*36*/
+	{{0xfb, -1, -1, -1, -1, -1, -1, -1}, {-1, -1, -1, -1, -1, -1, -1, -1}, UseChemicals},/*37*/
+	{{0xca, -1, -1, -1, -1, -1, -1, -1}, {-1, -1, -1, -1, -1, -1, -1, -1}, UseInstallLenses},/*38*/
+	{{-1, -1, -1, -1, -1, -1, -1, -1}, {-1, -1, -1, -1, -1, -1, -1, -1}, UseDrill},/*39*/
+	{{-1, -1, -1, -1, -1, -1, -1, -1}, {-1, -1, -1, -1, -1, -1, -1, -1}, UseGunSetting},/*40*/
+	{{0x14d, -1, -1, -1, -1, -1, -1, -1}, {-1, -1, -1, -1, -1, -1, -1, -1}, UseLoadCannon},/*41*/
+	{{-2, -1, -1, -1, -1, -1, -1, -1}, {-1, -1, -1, -1, -1, -1, -1, -1}, UseBucket},/*42*/
+	{{-1, -1, -1, -1, -1, -1, -1, -1}, {-1, -1, -1, -1, -1, -1, -1, -1}, UseMap},/*43*/
+	{{-1, -1, -1, -1, -1, -1, -1, -1}, {-1, -1, -1, -1, -1, -1, -1, -1}, UseGate},/*44*/
+	{{-1, -1, -1, -1, -1, -1, -1, -1}, {-1, -1, -1, -1, -1, -1, -1, -1}, UseCabinetPanel},/*45*/
+	{{0xc0, -1, -1, -1, -1, -1, -1, -1}, {-1, -1, -1, -1, -1, -1, -1, -1}, UseFixRollers},/*46*/
+	{{0xf0, 0xf1, -1, -1, -1, -1, -1, -1}, {-1, -1, -1, -1, -1, -1, -1, -1}, UseRadium},/*47*/
+	{{0x81, 0x105, -1, -1, -1, -1, -1, -1}, {-1, -1, -1, -1, -1, -1, -1, -1}, UseChargeSprayGun},/*48*/
+	{{-2, -1, -1, -1, -1, -1, -1, -1}, {-1, -1, -1, -1, -1, -1, -1, -1}, UseSprayGun},/*49*/
+	{{-1, -1, -1, -1, -1, -1, -1, -1}, {-1, -1, -1, -1, -1, -1, -1, -1}, UseOxiumBin},/*50*/
+	{{0x114, -1, -1, -1, -1, -1, -1, -1}, {-1, -1, -1, -1, -1, -1, -1, -1}, UseLoadSprayer},/*51*/
+	{{0x120, 0x121, -1, -1, -1, -1, -1, -1}, {-1, -1, -1, -1, -1, -1, -1, -1}, UseInstallHeadgear},/*52*/
+	{{-1, -1, -1, -1, -1, -1, -1, -1}, {-1, -1, -1, -1, -1, -1, -1, -1}, UseDreamstuff},/*53*/
+	{{-1, -1, -1, -1, -1, -1, -1, -1}, {-1, -1, -1, -1, -1, -1, -1, -1}, UseDreamstuffHoard},/*54*/
+	{{-2, -1, -1, -1, -1, -1, -1, -1}, {-1, -1, -1, -1, -1, -1, -1, -1}, UseHealingElixir},/*55*/
+	{{-1, -1, -1, -1, -1, -1, -1, -1}, {-1, -1, -1, -1, -1, -1, -1, -1}, UseAutoDoor},/*56*/
+	{{-1, -1, -1, -1, -1, -1, -1, -1}, {-1, -1, -1, -1, -1, -1, -1, -1}, UseInstrument},/*57*/
+	{{-1, -1, -1, -1, -1, -1, -1, -1}, {-1, -1, -1, -1, -1, -1, -1, -1}, UseHarvestSeed},/*58*/
+	{{-1, -1, -1, -1, -1, -1, -1, -1}, {-1, -1, -1, -1, -1, -1, -1, -1}, UsePlantSeed},/*59*/
+	{{-2, -1, -1, -1, -1, -1, -1, -1}, {-1, -1, -1, -1, -1, -1, -1, -1}, UseOil},/*60*/
+	{{0x122, 0x1c0, -1, -1, -1, -1, -1, -1}, {-1, -1, -1, -1, -1, -1, -1, -1}, UseRadium},/*61*/
+	{{0x102, -1, -1, -1, -1, -1, -1, -1}, {0x101, -1, -1, -1, -1, -1, -1, -1}, UseFillHole},/*62*/
+	{{0x76, 0x70, 0x72, 0x74, 0x6e, -1, -1, -1}, {-1, -1, -1, -1, -1, -1, -1, -1}, UsePutOutLight},/*63*/
+	{{-1, -1, -1, -1, -1, -1, -1, -1}, {-1, -1, -1, -1, -1, -1, -1, -1}, UseWrongTool},/*64*/
+	{{0x11f, -1, -1, -1, -1, -1, -1, -1}, {-1, -1, -1, -1, -1, -1, -1, -1}, UseInstallHeartstone},/*65*/
+	{{-1, -1, -1, -1, -1, -1, -1, -1}, {-1, -1, -1, -1, -1, -1, -1, -1}, UseSpittoon},/*66*/
+	{{-1, -1, -1, -1, -1, -1, -1, -1}, {-1, -1, -1, -1, -1, -1, -1, -1}, UseRubySlippers},/*67*/
+	{{0x54, -1, -1, -1, -1, -1, -1, -1}, {-1, -1, -1, -1, -1, -1, -1, -1}, UseManuscript},/*68*/
+	{{-1, -1, -1, -1, -1, -1, -1, -1}, {-1, -1, -1, -1, -1, -1, -1, -1}, UseMirror},/*69*/
+	{{-1, -1, -1, -1, -1, -1, -1, -1}, {-1, -1, -1, -1, -1, -1, -1, -1}, UseGateB5},/*70*/
+	{{0xa0, -1, -1, -1, -1, -1, -1, -1}, {-1, -1, -1, -1, -1, -1, -1, -1}, UsePourBucket},/*71*/
+	{{-1, -1, -1, -1, -1, -1, -1, -1}, {-1, -1, -1, -1, -1, -1, -1, -1}, UseValve},/*72*/
+	{{0x166, -1, -1, -1, -1, -1, -1, -1}, {-1, -1, -1, -1, -1, -1, -1, -1}, UseRadiumOnMechMan},/*73*/
+	{{-2, -1, -1, -1, -1, -1, -1, -1}, {-1, -1, -1, -1, -1, -1, -1, -1}, UseOxygenatedAir}/*74*/
 };
 
 /*let the player aim at a second/third object from (x, y): returns it, -1
