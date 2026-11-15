@@ -32,7 +32,7 @@
  * 0x9e conversation view, 0x9f container up, 0xa0 open container,
  * 0xa6 refresh status, 0xa7 ready, 0xa8 unready, 0xa9 default action.
  * Differences from Savage Empire's: the map coordinates wrap (& 0x3ff),
- * the view can be rotated (D_16AE), the flag D_16AA & 0x10 shows one
+ * the view can be rotated (ViewRotation), the flag GameFlags & 0x10 shows one
  * inventory only (no party/portrait views), no disk swapping in the
  * load/save, the empty slot tiles follow the panel color, locked
  * containers, the "more" prompt waits for any key or click.
@@ -153,7 +153,7 @@ extern OBJ_CommitBlocks();
 extern OBJ_InitLists();
 extern OBJ_RelinkNPCs();
 extern int16 IsContainerType(int16);
-extern int16 QuanType(int16);/*QuanType: 4 quantity on 16 bits, 2 on 8 bits, else 0*/
+extern int16 QuanType(int16);/*4 quantity on 16 bits, 2 on 8 bits, else 0*/
 extern STAT_refreshComMode();
 extern STAT_RefreshInventory(int16);
 extern int16 STAT_PickInvenSlot();
@@ -166,7 +166,7 @@ extern COMBAT_breakOff();
 extern int16 COMBAT_GetTargetAt(int16, int16, int16);/*COMBAT_GetTargetAt(objNum, x, y)*/
 extern MUS_PlayAreaSong();
 extern MUS_PlaySfx(int16);/*play a sound effect?*/
-extern int16 InRange_10_17_C0_C3(int16);
+extern int16 IsWaterTile(int16);
 
 
 extern int16 ScreenFade;
@@ -184,13 +184,13 @@ extern int16 HatchingDisabled;
 extern int16 AdvanceBlocked;
 extern int16 ObjBlkTmpPending[0x45];
 extern int16 MoveAppliesTerrain;
-extern unsigned char IsOnQuest;/*IsOnQuest: first byte of the saved game state*/
+extern unsigned char IsOnQuest;/*first byte of the saved game state*/
 extern unsigned char Active;
 extern int16 MapX, MapY, MapZ;
 extern char InCombat;
 extern unsigned char DefaultCommand;
-extern int32 D_16AA;
-extern int16 D_16AE;/*rotation of the map view (eighths of a turn)?*/
+extern int32 GameFlags;
+extern int16 ViewRotation;/*rotation of the map view (eighths of a turn)?*/
 extern char GameStateEnd;
 extern unsigned char PartyListTop;
 extern unsigned char InvenScroll;
@@ -200,42 +200,42 @@ extern int16 TextIdle;
 extern char D_3240[];
 extern char D_3232;/*a drawing surface (main.c)*/
 extern char far *D_3262;/*0x100 bytes*/
-extern unsigned char D_3266[];/*ObjStatus*/
+extern unsigned char ObjStatus[];
 extern struct tMouse D_3E66;/*Mouse*/
 extern char D_44C4[];/*MovePts*/
 extern char far *D_45C4;/*0x100 bytes*/
 extern char far *D_45C8;/*0x100 bytes*/
 extern char far *D_45CC;/*0x100 bytes*/
-extern unsigned char D_45D0[];/*DEXTE*/
+extern unsigned char DEXTE[];
 extern unsigned char far *D_46D0;/*NPCMode*/
 extern unsigned char D_4EA4[];/*Party*/
-extern unsigned char far *D_4EB6;/*Level*/
+extern unsigned char far *Level;
 extern char far *D_4EBA;/*Schedule (5 bytes each)*/
 extern int16 D_4EBE[0x101];/*SchedPointer*/
 extern void far *D_50C6;/*PointerShapes*/
 extern char far *D_50CA;/*0x100 bytes*/
 extern char D_50CE[][14];/*Names*/
-extern uint16 D_51AE[];/*ExpPoints*/
+extern uint16 ExpPoints[];
 extern unsigned char far *D_53AE;/*NPCComMode*/
-extern unsigned char D_53B2[];/*STREN*/
-extern int16 D_54BA[];/*Amount*/
+extern unsigned char STREN[];
+extern int16 Amount[];
 extern unsigned char D_6CBA[];/*NPCStatus*/
-extern unsigned char D_6DBE[];/*HitPoints*/
+extern unsigned char HitPoints[];
 extern int16 far *D_6EBE;/*BaseTile*/
 extern unsigned char D_6EC6[];/*TalkFlags*/
-extern unsigned char D_760E[];/*INTEL*/
+extern unsigned char INTEL[];
 extern int16 D_770E[];
-extern struct coord D_78AE[];/*ObjPos*/
+extern struct coord ObjPos[];
 extern unsigned char D_9CC0;/*PartySize*/
 extern int16 D_9CC2;/*NumAnimData*/
-extern uint16 D_9CC4[];/*ObjShapeType*/
+extern uint16 ObjShapeType[];
 extern int16 D_B4C8[];
 extern int16 far *D_B508;/*OrigShapeType*/
 extern struct tGr far *D_BA66;/*GrInfo*/
 extern union tHandler D_BA6A;/*GrDriver*/
 extern void far *D_BA7E;/*mdscreen.lzc entry 2: default command mark*/
 extern unsigned char D_BC8E[];/*StateAnimData*/
-extern unsigned char D_C130[11][11];/*Obj_11x11: objects shown in the map window*/
+extern unsigned char Obj_11x11[11][11];/*objects shown in the map window*/
 extern int16 D_C4AA[11][11];/*Tile_11x11: the tiles of the map window*/
 extern unsigned char D_EAF9[8];/*Party_2Handed*/
 extern int16 D_EB00;/*ShowNPCInven*/
@@ -262,25 +262,20 @@ extern int16 D_EC44;/*SelectionIsDark*/
 #define IsArmageddon D_0F15
 #define IdleAnimTick D_0F16
 #define MapAnimEnabled D_0F18
-#define ObjStatus D_3266
 #define Mouse D_3E66
 #define NPCMode D_46D0
 #define Party D_4EA4
 #define SchedPointer D_4EBE
 #define PointerShapes D_50C6
 #define NPCComMode D_53AE
-#define Amount D_54BA
 #define BaseTile D_6EBE
 #define TalkFlags D_6EC6
-#define ObjPos D_78AE
 #define PartySize D_9CC0
 #define NumAnimData D_9CC2
-#define ObjShapeType D_9CC4
 #define OrigShapeType D_B508
 #define GrInfo D_BA66
 #define GrDriver D_BA6A
 #define StateAnimData D_BC8E
-#define Obj_11x11 D_C130
 #define Tile_11x11 D_C4AA
 #define Party_2Handed D_EAF9
 #define ShowNPCInven D_EB00
@@ -367,7 +362,7 @@ extern int16 D_EC44;/*SelectionIsDark*/
 /*screen pixel used as origin by MkDirection() (88,88: party leader in the map view)*/
 /*1BB6*/unsigned char DirOriginX = 88;
 /*1BB7*/unsigned char DirOriginY = 88;
-/*rotation of the pointer around DirOriginX/Y by D_16AE eighths of a turn
+/*rotation of the pointer around DirOriginX/Y by ViewRotation eighths of a turn
   (mkMouseCommand): x' = x*RotCos - y*RotSin, y' = x*RotSin + y*RotCos*/
 /*1BB8*/char RotCos[8] = {1, 1, 0, -1, -1, -1, 0, 1};
 /*1BC0*/char RotSin[8] = {0, 1, 1, 1, 0, -1, -1, -1};
@@ -646,7 +641,7 @@ the game's flags, and the status panel colors*/
 	if(TalkFlags[0x76] & 0x20) {
 		if(TalkFlags[0x76] & 0x40) {
 			for(i = 0; i < NumAnimData; i ++)
-				if(InRange_10_17_C0_C3(D_B4C8[i]))
+				if(IsWaterTile(D_B4C8[i]))
 					D_770E[i] --;
 		}
 		for(i = 0; i < NumAnimData; i ++)
@@ -670,15 +665,15 @@ the game's flags, and the status panel colors*/
 	OSI_read(fd, -1, 0x200, ObjShapeType);
 	OSI_read(fd, -1, 0x200, Amount);
 	OSI_read(fd, -1, 0x100, D_6CBA);
-	OSI_read(fd, -1, 0x100, D_53B2);
-	OSI_read(fd, -1, 0x100, D_45D0);
-	OSI_read(fd, -1, 0x100, D_760E);
-	OSI_read(fd, -1, 0x200, D_51AE);
-	OSI_read(fd, -1, 0x100, D_6DBE);
+	OSI_read(fd, -1, 0x100, STREN);
+	OSI_read(fd, -1, 0x100, DEXTE);
+	OSI_read(fd, -1, 0x100, INTEL);
+	OSI_read(fd, -1, 0x200, ExpPoints);
+	OSI_read(fd, -1, 0x100, HitPoints);
 	OSI_read(fd, -1, 16 * 14, D_50CE);
 	OSI_read(fd, -1, 0x10, Party);
 	OSI_read(fd, -1, 1, &PartySize);
-	OSI_read(fd, -1, 0x100, D_4EB6);
+	OSI_read(fd, -1, 0x100, Level);
 	OSI_read(fd, -1, 0x100, D_45C4);
 	OSI_read(fd, -1, 0x100, NPCMode);
 	OSI_read(fd, -1, 0x100, D_3262);
@@ -712,7 +707,7 @@ the game's flags, and the status panel colors*/
 			(D_B4C8[i] >= BaseTile[0x1b3] && D_B4C8[i] < BaseTile[0x1b4])
 		)) {
 			StateAnimData[i] = 0;
-		} else if(InRange_10_17_C0_C3(D_B4C8[i])) {
+		} else if(IsWaterTile(D_B4C8[i])) {
 			D_3240[i] = 0;
 			if((TalkFlags[0x76] & 0x20) && (TalkFlags[0x76] & 0x40))
 				D_770E[i] ++;
@@ -768,7 +763,7 @@ the game's flags, and the status panel colors*/
 		}
 	}
 
-	if(D_16AA & 0x10) {
+	if(GameFlags & 0x10) {
 		ColorPaper = 7;
 		StatusDisplay = 0x92;
 		StatusMember = PartySize;
@@ -798,7 +793,7 @@ the game's flags, and the status panel colors*/
 	if(TalkFlags[0x76] & 0x20) {
 		if(TalkFlags[0x76] & 0x40) {
 			for(i = 0; i < NumAnimData; i ++)
-				if(InRange_10_17_C0_C3(D_B4C8[i]))
+				if(IsWaterTile(D_B4C8[i]))
 					D_770E[i] --;
 		}
 		for(i = 0; i < NumAnimData; i ++)
@@ -816,15 +811,15 @@ the game's flags, and the status panel colors*/
 	OSI_write(fd, -1, 0x200, ObjShapeType);
 	OSI_write(fd, -1, 0x200, Amount);
 	OSI_write(fd, -1, 0x100, D_6CBA);
-	OSI_write(fd, -1, 0x100, D_53B2);
-	OSI_write(fd, -1, 0x100, D_45D0);
-	OSI_write(fd, -1, 0x100, D_760E);
-	OSI_write(fd, -1, 0x200, D_51AE);
-	OSI_write(fd, -1, 0x100, D_6DBE);
+	OSI_write(fd, -1, 0x100, STREN);
+	OSI_write(fd, -1, 0x100, DEXTE);
+	OSI_write(fd, -1, 0x100, INTEL);
+	OSI_write(fd, -1, 0x200, ExpPoints);
+	OSI_write(fd, -1, 0x100, HitPoints);
 	OSI_write(fd, -1, 16 * 14, D_50CE);
 	OSI_write(fd, -1, 0x10, Party);
 	OSI_write(fd, -1, 1, &PartySize);
-	OSI_write(fd, -1, 0x100, D_4EB6);
+	OSI_write(fd, -1, 0x100, Level);
 	OSI_write(fd, -1, 0x100, D_45C4);
 	OSI_write(fd, -1, 0x100, NPCMode);
 	OSI_write(fd, -1, 0x100, D_3262);
@@ -1097,7 +1092,7 @@ Selection.obj = party index*/
 static /*C_2238_16A2*/MouseInPartyView() {
 	int16 cmd;
 
-	if(D_16AA & 0x10) {
+	if(GameFlags & 0x10) {
 		SelectionObj = PartySize;
 		return 0x92;
 	}
@@ -1124,7 +1119,7 @@ returns the command (0 = none)*/
 static /*C_2238_172A*/MouseInPortraitView() {
 	int16 cmd;
 
-	if(D_16AA & 0x10) {
+	if(GameFlags & 0x10) {
 		SelectionObj = PartySize;
 		return 0x92;
 	}
@@ -1158,7 +1153,7 @@ static /*C_2238_17AC*/MouseInEquipView() {
 
 	/*combat mode button: cycles 2, 4, 5, 7, 8*/
 	if(
-		!(D_16AA & 0x10) &&
+		!(GameFlags & 0x10) &&
 		StatusMember != 0 &&
 		PointerX >= 248 && PointerX < 264 &&
 		PointerY >= 102 &&
@@ -1178,7 +1173,7 @@ static /*C_2238_17AC*/MouseInEquipView() {
 		) NPCMode[Party[StatusMember]] = NPCComMode[Party[StatusMember]];
 		STAT_refreshComMode();
 	} else if(PointerY >= 102) {
-		if(D_16AA & 0x10) {
+		if(GameFlags & 0x10) {
 			cmd = 0x92;
 			SelectionObj = -1;
 		} else if(PointerX >= 200 && PointerX < 216) {/*to party view*/
@@ -1196,7 +1191,7 @@ static /*C_2238_17AC*/MouseInEquipView() {
 		PointerY >= 16 && PointerY < 32 &&
 		MouseMode == 0
 	) {/*container slot (top right): back to the parent container/owner*/
-		if((D_16AA & 0x10) && IsNPC(InvenOwner))
+		if((GameFlags & 0x10) && IsNPC(InvenOwner))
 			cmd = 0x92;
 		else
 			cmd = 0x9f;
@@ -1264,14 +1259,14 @@ static /*C_2238_1ADC*/mkMouseCommand() {
 	}
 	switch(zone) {
 		case 0:/*map view*/
-			if(D_16AE) {
+			if(ViewRotation) {
 				/*rotated view: rotate the pointer around the party*/
 				int16 dx, dy;
 
 				dx = PointerX - DirOriginX;
 				dy = PointerY - DirOriginY;
-				PointerX = DirOriginX + RotCos[D_16AE] * dx - RotSin[D_16AE] * dy;
-				PointerY = DirOriginY + RotSin[D_16AE] * dx + RotCos[D_16AE] * dy;
+				PointerX = DirOriginX + RotCos[ViewRotation] * dx - RotSin[ViewRotation] * dy;
+				PointerY = DirOriginY + RotSin[ViewRotation] * dx + RotCos[ViewRotation] * dy;
 			}
 			if(MouseMode == 0) {
 				if(DefaultCommand != 0xff && RIGHT_CLICK) {
@@ -1408,7 +1403,7 @@ mkMouseSelection()/MouseInEquipView() can hit-test it.*/
 	} else if(mode == 0) {
 		selKind = mkMouseSelection();
 		if(SlotCursorRow > 3) {
-			if(!(D_16AA & 0x10))
+			if(!(GameFlags & 0x10))
 				GR_PUT_TILE_SCREEN(SlotButtonTiles[SlotCursorCol], x, y);
 			else
 				GR_PUT_TILE_SCREEN(EMPTY_SLOT_TILE, x, y);
@@ -1536,8 +1531,8 @@ returns a key code or a command code, never 0*/
 			case 0x116: setDefaultCommand(0x87); ch = 0; break;/*<ALT U>*/
 		}
 		/*rotated view: the direction keys turn with it*/
-		if(D_16AE && ch == 0x80)
-			AdvanceDir = (AdvanceDir + D_16AE) & 7;
+		if(ViewRotation && ch == 0x80)
+			AdvanceDir = (AdvanceDir + ViewRotation) & 7;
 		if(MouseMode == 0 && !FreeAimMode) {
 			DrawSlotCursor(0);
 			SelectMode = 0;
@@ -1634,7 +1629,7 @@ returns a key code or a command code, never 0*/
 					ch = 0;
 					newX = SlotCursorCol + DirIncrX[AdvanceDir];
 					newY = SlotCursorRow + DirIncrY[AdvanceDir];
-					if((D_16AA & 0x10) && newY > 3)
+					if((GameFlags & 0x10) && newY > 3)
 						newY = 3;
 					if(
 						newX >= 0 && newX < 7 &&
@@ -1709,22 +1704,22 @@ returns a key code or a command code, never 0*/
 		}
 		if(StatusDisplay == 0x92 && !IsInConversation) {
 			/*equipment view*/
-			if(ch == '*' && !(D_16AA & 0x10)) {
+			if(ch == '*' && !(GameFlags & 0x10)) {
 				ch = 0x90;
 				SelectionObj = -1;
-			} else if((ch == '/' || ch == 0x144/*F10*/) && !(D_16AA & 0x10)) {
+			} else if((ch == '/' || ch == 0x144/*F10*/) && !(GameFlags & 0x10)) {
 				ch = 0x91;
-			} else if(ch == '+' && !(D_16AA & 0x10)) {
+			} else if(ch == '+' && !(GameFlags & 0x10)) {
 				ch = 0x99;
-			} else if(ch == '-' && !(D_16AA & 0x10)) {
+			} else if(ch == '-' && !(GameFlags & 0x10)) {
 				ch = 0x9a;
-			} else if((ch == '`' || ch == '~') && !(D_16AA & 0x10)) {
+			} else if((ch == '`' || ch == '~') && !(GameFlags & 0x10)) {
 				/*"click" on the combat mode button*/
 				PointerX = 248;
 				PointerY = 102;
 				MouseInEquipView();
 				ch = 0;
-			} else if(ch >= 0x13b/*F1*/ && PartySize + 0x13b > ch && !(D_16AA & 0x10)) {
+			} else if(ch >= 0x13b/*F1*/ && PartySize + 0x13b > ch && !(GameFlags & 0x10)) {
 				SelectionObj = ch - 0x13b;
 				ch = 0x92;
 			}

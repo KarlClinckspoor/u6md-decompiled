@@ -23,19 +23,16 @@ extern DeleteObj(int16);
 extern int16 VisibilityDirty;
 extern unsigned char Time_H;
 extern int16 MapZ;
-extern unsigned char D_3266[];/*ObjStatus*/
+extern unsigned char ObjStatus[];
 extern int16 far *D_6EBE;/*BaseTile*/
-extern struct coord D_78AE[];/*ObjPos*/
+extern struct coord ObjPos[];
 extern int16 D_9CC2;/*NumAnimData*/
-extern uint16 D_9CC4[];/*ObjShapeType*/
+extern uint16 ObjShapeType[];
 extern int16 D_B4C8[];/*AnimTiles: the animated tiles*/
 extern unsigned char D_BC8E[];/*StateAnimData*/
 
-#define ObjStatus D_3266
 #define BaseTile D_6EBE
-#define ObjPos D_78AE
 #define NumAnimData D_9CC2
-#define ObjShapeType D_9CC4
 #define AnimTiles D_B4C8
 #define StateAnimData D_BC8E
 

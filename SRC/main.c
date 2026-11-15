@@ -111,8 +111,8 @@ extern cdecl MOUSE_SHOW();
 
 /*other game modules*/
 extern int16 HatchingDisabled;
-extern int16 SoundFlag;/*SoundFlag: music on*/
-extern char AvatarPortrait;/*AvatarPortrait: 0 = no character*/
+extern int16 SoundFlag;/*music on*/
+extern char AvatarPortrait;/*0 = no character*/
 extern char AnimateAtPrompt;
 extern struct tClipInfo *CurClip;
 extern GameLoop();
@@ -161,7 +161,7 @@ extern char far *D_45C8;/*0x100 bytes*/
 extern char far *D_45CC;/*0x100 bytes*/
 extern char far *D_46D0;/*0x100 bytes*/
 extern uint16 D_4D14[200];/*ScreenScanlines*/
-extern char far *D_4EB6;/*0x100 bytes*/
+extern char far *Level;/*0x100 bytes*/
 extern char far *D_4EBA;/*3000 bytes*/
 extern char far *D_50C0;/*ScratchBuf: 0x7900 bytes, also the map view back buffer*/
 extern uint16 D_50C4;/*GrMemorySeg*/
@@ -659,7 +659,7 @@ extern struct tClipInfo D_EBD0[4];/*TextWindows*/
 	__MemAlloc(&D_50CA, 0x100);
 	__MemAlloc(&D_45CC, 0x100);
 	__MemAlloc(&D_B508, 0x100 * sizeof(int16));
-	__MemAlloc(&D_4EB6, 0x100);
+	__MemAlloc(&Level, 0x100);
 	__MemAlloc(&D_45C8, 0x100);
 	__MemAlloc(&D_C0F6, 0x600);
 

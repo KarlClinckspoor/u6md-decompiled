@@ -7,7 +7,7 @@
  * When the avatar (NPC 1) sleeps, NPC 0, the dreamer (shape 0x157, or 0x158
  * for a woman), goes alone into the dream world on MapZ 2 or 3: the party
  * is reduced to it (Active = PartySize, Party[Active] = 0, its name copied),
- * the panel turns gray (ColorPaper 7) and D_16AA gets 0x10. Dream triggers
+ * the panel turns gray (ColorPaper 7) and GameFlags gets 0x10. Dream triggers
  * are map objects stepped on: their status bits (& 0xe5) give the kind,
  * quality and quantity a place, the frame a teleport mode
  * (DreamTrigger). Waking up (DreamWakeUp) puts everything back at 8:00 on
@@ -86,63 +86,54 @@ extern int16 Date_Y;
 extern unsigned char Active;
 extern char AmbientLight;
 extern int16 MapX, MapY, MapZ;
-extern unsigned char D_1684, D_1685;/*where the dreamer wakes up (x, y)*/
+extern unsigned char WakeX, WakeY;/*where the dreamer wakes up (x, y)*/
 extern unsigned char DrunkCounter;
-extern unsigned char D_16A3;
+extern unsigned char DreamFoesLeft;
 extern char InCombat;
 extern char SoloMember;
 extern char SavedNPCMode;
-extern unsigned char D_16A8;/*the player is a woman*/
-extern int32 D_16AA;/*flags (0x10: the dream)*/
-extern int16 D_16AE;/*rotation of the map view*/
-extern struct { unsigned a:4, b:4, c:4, d:4; } D_16B0[];/*talents*/
-extern unsigned char D_16D0, D_16D1;/*the day and month to wake up*/
-extern int16 D_16D2;/*the year to wake up*/
-extern int16 DreamStage;/*DreamStage: the kind of the last dream trigger*/
+extern unsigned char PlayerIsFemale;
+extern int32 GameFlags;/*0x10: in a dream*/
+extern int16 ViewRotation;
+extern struct { unsigned a:4, b:4, c:4, d:4; } Talents[];
+extern unsigned char WakeDay, WakeMonth;/*the day and month to wake up*/
+extern int16 WakeYear;/*the year to wake up*/
+extern int16 DreamStage;/*the kind of the last dream trigger*/
 extern int16 StatusMember;
 extern int16 StatusDisplay;/*0x90 a member, 0x91 the party, 0x92 the equipment*/
 extern struct tClipInfo *CurClip;
 extern char IsResting;
 extern unsigned char far *D_3262;/*talk flags 8-15*/
-extern unsigned char D_3266[];/*ObjStatus*/
+extern unsigned char ObjStatus[];
 extern char D_44C4[];/*MovePts*/
-extern unsigned char D_45D0[];/*DEXTE*/
+extern unsigned char DEXTE[];
 extern unsigned char far *D_46D0;/*NPCMode*/
 extern unsigned char D_4EA4[];/*Party*/
 extern char far *D_4EBA;/*Schedule (5 bytes each)*/
 extern int16 D_4EBE[0x101];/*SchedPointer*/
 extern char D_50CE[][14];/*Names*/
-extern int16 D_54BA[];/*Amount: quantity (low byte), quality (high byte)*/
+extern int16 Amount[];/*quantity (low byte), quality (high byte)*/
 extern unsigned char D_6CBA[];/*NPCStatus*/
-extern unsigned char D_6DBE[];/*HitPoints*/
+extern unsigned char HitPoints[];
 extern unsigned char D_6EC6[];/*TalkFlags*/
-extern struct coord D_78AE[];/*ObjPos*/
+extern struct coord ObjPos[];
 extern unsigned char D_9CC0;/*PartySize*/
-extern uint16 D_9CC4[];/*ObjShapeType*/
+extern uint16 ObjShapeType[];
 extern union tHandler D_BA6A;/*GrDriver*/
 extern struct tClipInfo D_EBD0[4];/*TextWindows*/
 
 #define StatusDirty D_0F12
 #define PromptFlag D_0F13
 #define MapAnimEnabled D_0F18
-#define WakeDay D_16D0
-#define WakeMonth D_16D1
-#define WakeYear D_16D2
-#define ObjStatus D_3266
 #define MovePts D_44C4
-#define DEXTE D_45D0
 #define NPCMode D_46D0
 #define Party D_4EA4
 #define Schedule D_4EBA
 #define SchedPointer D_4EBE
 #define Names D_50CE
-#define Amount D_54BA
 #define NPCStatus D_6CBA
-#define HitPoints D_6DBE
 #define TalkFlags D_6EC6
-#define ObjPos D_78AE
 #define PartySize D_9CC0
-#define ObjShapeType D_9CC4
 #define GrDriver D_BA6A
 #define TextWindows D_EBD0
 
@@ -200,9 +191,9 @@ DreamTrigger(int16);
 			MoveObj(0, 0x64, 0x3b, 2);
 		else
 			MoveObj(0, 0x93, 0x34, 2);
-		ObjShapeType[0] = (ObjShapeType[0] & 0xfc00) + (D_16A8 ? 0x158 : 0x157);
+		ObjShapeType[0] = (ObjShapeType[0] & 0xfc00) + (PlayerIsFemale ? 0x158 : 0x157);
 		NPCMode[0] = 2;
-		*(int16 *)D_16B0 = 0;
+		*(int16 *)Talents = 0;
 		Party[Active = PartySize] = 0;
 		for(i = 0; i < 14; i ++)
 			Names[Active][i] = Names[0][i];
@@ -227,11 +218,11 @@ DreamTrigger(int16);
 			CurClip->bgColor = 7;
 		}
 		CON_setClip(savedClip);
-		D_16AA |= 0x10;
+		GameFlags |= 0x10;
 		AmbientLight = 6;
 		DreamStage = 0;
-		D_1684 = 0;
-		D_1685 = 0;
+		WakeX = 0;
+		WakeY = 0;
 		MUS_PlayAreaSong();
 	} else {
 		NPCStatus[npc] |= 4;
@@ -273,9 +264,9 @@ DreamTrigger(int16);
 	NPCStatus[0] &= 0xe0;
 	MovePts[0] = DEXTE[0];
 	MoveObj(0, 0x35, 0x26, 3);
-	ObjShapeType[0] = (ObjShapeType[0] & 0xfc00) + (D_16A8 ? 0x158 : 0x157);
+	ObjShapeType[0] = (ObjShapeType[0] & 0xfc00) + (PlayerIsFemale ? 0x158 : 0x157);
 	NPCMode[0] = 2;
-	*(int16 *)D_16B0 = 0;
+	*(int16 *)Talents = 0;
 	OBJ_DeleteContents(0);
 	Party[Active = PartySize] = 0;
 	for(i = 0; i < 14; i ++)
@@ -300,11 +291,11 @@ DreamTrigger(int16);
 		CurClip->bgColor = 7;
 	}
 	CON_setClip(savedClip);
-	D_16AA |= 0x10;
+	GameFlags |= 0x10;
 	DreamStage = 0xe1;
 	AmbientLight = 6;
-	D_1684 = 0x35;
-	D_1685 = 0x26;
+	WakeX = 0x35;
+	WakeY = 0x26;
 }
 
 /*wake up from the dream: 8:00 on the wake-up date, the talents cleared,
@@ -318,8 +309,8 @@ DreamTrigger(int16);
 	Active = 0;
 	NPCStatus[0] &= 0x7f;
 	OBJ_DeleteContents(0);
-	D_16AE = 0;
-	D_16A3 = 0;
+	ViewRotation = 0;
+	DreamFoesLeft = 0;
 	Time_H = 8;
 	Time_M = 0;
 	Date_D = WakeDay;
@@ -327,9 +318,9 @@ DreamTrigger(int16);
 	Date_Y = WakeYear;
 	for(i = 0; i < PartySize; i ++) {
 		npc = Party[i];
-		D_16B0[npc].a = 0;
-		D_16B0[npc].b = 0;
-		D_16B0[npc].c = 0;
+		Talents[npc].a = 0;
+		Talents[npc].b = 0;
+		Talents[npc].c = 0;
 		if(NPCStatus[npc] & 8) {
 			if(HitPoints[npc] > 30)
 				HitPoints[npc] -= OSI_rand(24, 30);
@@ -358,7 +349,7 @@ DreamTrigger(int16);
 		CurClip->bgColor = D_082E;
 	}
 	CON_setClip(savedClip);
-	D_16AA &= ~0x10L;
+	GameFlags &= ~0x10L;
 	StatusMember = 0;
 	MapAnimEnabled = 1;
 	PromptFlag = 1;
@@ -464,11 +455,11 @@ DreamTrigger(int16);
 	}
 	if(kind != 0xa5) {
 		OBJ_PurgeFarLocals(-1, -1, -1);
-		D_16A3 = 0;
+		DreamFoesLeft = 0;
 	}
-	D_16B0[0].a = 0;
-	D_16B0[0].b = 0;
-	D_16B0[0].c = 0;
+	Talents[0].a = 0;
+	Talents[0].b = 0;
+	Talents[0].c = 0;
 	PartyTeleport(x, y, MapZ, frame);
 	if(kind) {
 		switch(kind) {
@@ -490,21 +481,21 @@ DreamTrigger(int16);
 		case 0xa5:
 			return;
 		case 0xc4:
-			D_1684 = x;
-			D_1685 = y;
+			WakeX = x;
+			WakeY = y;
 			break;
 		case 0xc5:
 			TalkFlags[0x68] = 0;
 			break;
 		case 0xc0:
 			HitPoints[0] = MaxHP(1);
-			D_1684 = x;
-			D_1685 = y;
+			WakeX = x;
+			WakeY = y;
 			OBJ_DeleteContents(0);
 			break;
 		case 0xe5:
 			if(!(TalkFlags[0x66] & 8))
-				D_16A3 = 6;
+				DreamFoesLeft = 6;
 			return;
 		}
 	}

@@ -25,7 +25,7 @@
  * by MapDistance MapDistance); no VIS_IsInViewSquare; a square keeps the
  * brightest light reaching it instead of the sum, and a light source of
  * level n spreads n + 1 squares; XRayView, or the active member's third
- * talent (D_16B0 bits 8-11), shows the whole view lit and unhidden; objects
+ * talent (Talents bits 8-11), shows the whole view lit and unhidden; objects
  * of type 0x184 near the party (within 1 square) are set to frame 0 with a
  * random quality 6-10 (sound 0x22 when they change), far ones count their
  * quality down and then turn to frame 1; no type 0x0b light exception; the
@@ -40,36 +40,35 @@
 #define AREA_H 40
 
 /*other modules*/
-extern char AmbientLight;/*AmbientLight: sun light level 0..7*/
+extern char AmbientLight;/*sun light level 0..7*/
 extern unsigned char Active;
 extern int16 MapX;
 extern int16 MapY;
-extern struct { unsigned a:4, psychic:4, c:4, d:4; } D_16B0[];/*talents*/
+extern struct { unsigned a:4, psychic:4, c:4, d:4; } Talents[];
 extern unsigned char D_3E84[AREA_H][AREA_W];/*AreaFlags*/
 extern unsigned char D_46D4[AREA_H][AREA_W];/*AreaTiles: the ground tiles of the area*/
 extern unsigned char D_4EA4[];/*Party*/
-extern int16 D_54BA[];/*Amount: quantity (low byte), quality (high byte)*/
+extern int16 Amount[];/*quantity (low byte), quality (high byte)*/
 extern unsigned char far *D_6DBA;/*TileFlag: 0x03 light, 0x04 opaque, 0x08 window, 0x40 double height, 0x80 double width*/
 extern int16 far *D_6EBE;/*BaseTile: first tile of each object type*/
 extern unsigned char D_6FC6[AREA_H][AREA_W];/*AreaLight*/
 extern unsigned char far *D_760A;/*TileFlag2: 0x20 background*/
-extern struct coord D_78AE[];/*ObjPos*/
-extern uint16 D_9CC4[];/*ObjShapeType*/
+extern struct coord ObjPos[];
+extern uint16 ObjShapeType[];
 extern unsigned char far *D_B4C4;/*TerrainType: 0x0f kind (0x04 wall), 0x10 W, 0x20 S, 0x40 E, 0x80 N*/
 extern int16 D_BA82;/*AreaOffset*/
 extern unsigned char D_BA84[256];/*flood fill ring-buffer queue, x*/
 extern unsigned char D_BB84[256];/*flood fill ring-buffer queue, y*/
 extern int16 D_C4AA[11][11];/*Tile_11x11: the tiles of the map window*/
 
-extern int16 MapDistance(int16, int16);/*MapDistance: distance of two map coordinates (wrapping)*/
+extern int16 MapDistance(int16, int16);/*distance of two map coordinates (wrapping)*/
 extern MUS_PlaySfx(int16);/*play a sound effect?*/
 extern int16 SearchArea(int16, int16, int16, int16);/*SearchArea(x1, y1, x2, y2): first object in the rectangle*/
-extern int16 NextArea(void);/*NextArea: next object of SearchArea*/
-extern ShowObjects(void);/*ShowObjects: draw the map window*/
+extern int16 NextArea(void);/*next object of SearchArea*/
+extern ShowObjects(void);/*draw the map window*/
 extern int16 OSI_rand(int16, int16);/*OSI_rand(lo, hi)*/
 
 #define Party D_4EA4
-#define Amount D_54BA
 #define AreaOffset D_BA82
 #define AreaFlags D_3E84
 #define AreaTiles D_46D4
@@ -77,12 +76,11 @@ extern int16 OSI_rand(int16, int16);/*OSI_rand(lo, hi)*/
 #define TileFlag D_6DBA
 #define TileFlag2 D_760A
 #define TerrainType D_B4C4
-#define ObjShapeType D_9CC4
-#define GetType(i) (D_9CC4[i] & 0x3ff)
-#define GetFrame(i) (D_9CC4[i] >> 10)
+#define GetType(i) (ObjShapeType[i] & 0x3ff)
+#define GetFrame(i) (ObjShapeType[i] >> 10)
 #define GetQual(i) (((unsigned char *)(Amount + (i)))[1])
-#define GetX(i) ((*(int16 *)&(D_78AE[i].raw[0]))&0x3ff)
-#define GetY(i) (((*(int16 *)&(D_78AE[i].raw[1]))>>2)&0x3ff)
+#define GetX(i) ((*(int16 *)&(ObjPos[i].raw[0]))&0x3ff)
+#define GetY(i) (((*(int16 *)&(ObjPos[i].raw[1]))>>2)&0x3ff)
 #define TILE_FRAME(i) (D_6EBE[GetType(i)] + GetFrame(i))
 
 /*0EA0*/int16 ViewX = 12;/*the 11x11 view's corner in the area*/
@@ -265,7 +263,7 @@ static /*C_1157_00A6*/VIS_Enqueue(int16 x, int16 y) {
 	register unsigned char *pFlags;
 	register int16 cellY;
 
-	if(XRayView || D_16B0[Party[Active]].c) {
+	if(XRayView || Talents[Party[Active]].c) {
 		/*everything visible and lit*/
 		for(cellX = 8; cellX < 32; cellX ++) {
 			for(cellY = 8; cellY < 32; cellY ++) {

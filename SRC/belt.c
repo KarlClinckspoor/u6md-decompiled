@@ -38,24 +38,20 @@ extern char far C_2BB4_22F1[];/*"Aargh!\n"*/
 extern int16 VisibilityDirty;
 extern unsigned char Active;
 extern int16 MapX, MapY, MapZ;
-extern unsigned char D_3266[];/*ObjStatus*/
+extern unsigned char ObjStatus[];
 extern unsigned char D_4EA4[];/*Party*/
-extern int16 D_54BA[];/*Amount: quantity (low byte), quality (high byte)*/
+extern int16 Amount[];/*quantity (low byte), quality (high byte)*/
 extern unsigned char D_6EC6[];/*TalkFlags (per NPC)*/
 extern unsigned char far *D_7606;/*TypeWeight*/
-extern struct coord D_78AE[];/*ObjPos*/
-extern uint16 D_9CC4[];/*ObjShapeType*/
+extern struct coord ObjPos[];
+extern uint16 ObjShapeType[];
 extern int16 D_B530;/*barge_scrap_count (barge.c)*/
 extern int16 D_B576[0x200];/*barge_scrap (barge.c)*/
 extern int16 D_C0FA, D_C0FC;/*AreaX, AreaY*/
 
-#define ObjStatus D_3266
 #define Party D_4EA4
-#define Amount D_54BA
 #define TalkFlags D_6EC6
 #define TypeWeight D_7606
-#define ObjPos D_78AE
-#define ObjShapeType D_9CC4
 #define barge_scrap_count D_B530
 #define barge_scrap D_B576
 #define AreaX D_C0FA

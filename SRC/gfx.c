@@ -122,7 +122,7 @@ extern int16 NextLoc();
 extern int16 FindLoc(int16, int16, int16);/*FindLoc(x, y, z)*/
 extern int16 NextArea(void);
 extern int16 SearchArea(int16, int16, int16, int16);/*SearchArea(x1, y1, x2, y2)*/
-extern int16 C_100B_038E(int16);
+extern int16 IsBreakableType(int16);
 extern int16 COMBAT_GetTargetAt(int16, int16, int16);/*COMBAT_GetTargetAt(shooter, x, y)*/
 extern MUS_PlaySfx(int16);
 extern int16 CON_mouseOffAt(int16, int16, int16, int16);
@@ -151,8 +151,8 @@ extern int16 MapX;
 extern int16 MapY;
 extern int16 MapZ;
 extern char InCombat;
-extern unsigned char D_16A8;/*the player is a woman*/
-extern int32 D_16AA;/*flags (0x10: the dream)*/
+extern unsigned char PlayerIsFemale;
+extern int32 GameFlags;/*0x10: in a dream*/
 extern int16 MissileShooter;
 extern unsigned char RangeTable[8][8];
 extern int16 ViewX, ViewY;
@@ -160,22 +160,22 @@ extern unsigned char AnimateAtPrompt;
 
 /*uninitialised data*/
 extern struct tSurface D_3232;/*Screen*/
-extern unsigned char D_3266[];/*ObjStatus*/
+extern unsigned char ObjStatus[];
 extern char far *D_3E80;/*work area of the .lzc loader*/
 extern unsigned char D_3E84[AREA_H][AREA_W];/*AreaFlags*/
 extern unsigned char D_46D4[AREA_H][AREA_W];/*AreaTiles*/
 extern char far *D_54B2;/*ScratchBuf + 0x36b0*/
-extern int16 D_54BA[];/*Amount: quantity (low byte), quality (high byte)*/
+extern int16 Amount[];/*quantity (low byte), quality (high byte)*/
 extern unsigned char D_6CBA[];/*NPCStatus*/
 extern unsigned char far *D_6DBA;/*TileFlag*/
 extern int16 far *D_6EBE;/*BaseTile*/
 extern unsigned char D_6EC6[];/*TalkFlags*/
 extern unsigned char D_6FC6[AREA_H][AREA_W];/*AreaLight*/
 extern int16 D_770E[];/*AnimFirstFrame*/
-extern struct coord D_78AE[];/*ObjPos*/
+extern struct coord ObjPos[];
 extern struct tSurface D_9CAE;/*MapSurface*/
 extern int16 D_9CC2;/*NumAnimData*/
-extern uint16 D_9CC4[];/*ObjShapeType*/
+extern uint16 ObjShapeType[];
 extern unsigned char far *D_B4C4;/*TerrainType*/
 extern int16 D_B4C8[];/*AnimTile*/
 extern int16 D_B9D6[];/*MissileHitList*/
@@ -188,20 +188,16 @@ extern int16 D_BA7C;/*its entry, -1: none*/
 extern void far *D_BA7E;/*mdscreen.lzc entry 2: the sky*/
 extern int16 D_C0FA;/*AreaX*/
 extern int16 D_C0FC;/*AreaY*/
-extern unsigned char D_C130[11][11];/*Obj_11x11: first entry of each cell's object tiles*/
-extern int16 D_C1AA[];/*CellObjTile*/
-extern unsigned char D_C3AA[];/*CellObjNext*/
+extern unsigned char Obj_11x11[11][11];/*first entry of each cell's object tiles*/
+extern int16 CellObjTile[];
+extern unsigned char CellObjNext[];
 extern int16 D_C4AA[11][11];/*Tile_11x11*/
-extern int16 D_B9CA;/*MissileHitObj*/
-extern int16 D_B9D2[2];/*MissileEnd*/
+extern int16 MissileHitObj;
+extern int16 MissileEnd[2];
 
-#define ObjStatus D_3266
-#define Amount D_54BA
 #define TileFlag D_6DBA
 #define BaseTile D_6EBE
 #define TalkFlags D_6EC6
-#define ObjPos D_78AE
-#define ObjShapeType D_9CC4
 #define TerrainType D_B4C4
 #define MissileHitList D_B9D6
 #define GetType(i) (ObjShapeType[i] & 0x3ff)
@@ -319,8 +315,8 @@ static DiskConfirm(int16);
 	for(tx = SCR2TIL(x0); tx <= SCR2TIL(x1); tx ++) {
 		for(ty = SCR2TIL(y0); ty <= SCR2TIL(y1); ty ++) {
 			/*objects' tiles of this cell: linked list CellObjNext, tiles in CellObjTile*/
-			for(entry = D_C130[ty][tx]; entry; entry = D_C3AA[entry]) {
-				tile = D_C1AA[entry];
+			for(entry = Obj_11x11[ty][tx]; entry; entry = CellObjNext[entry]) {
+				tile = CellObjTile[entry];
 				if(tile && (TileFlag[tile & 0x7ff] & 0x10))
 					GR_PUT_TILE(tile & 0x7ff, TIL2SCR(tx), TIL2SCR(ty));
 			}
@@ -391,9 +387,9 @@ static DiskConfirm(int16);
         8 = one non rotated sprite (slot 15) drawn at every position
   Out:
    - pX_dst/pY_dst = tile where each projectile stopped,
-   - D_B9D2 = last tile reached by projectile #0,
-   - D_B9CA = object hit at the stop tile of #0 (if MissileShooter, the shooter, is set),
-   - MissileHitList = list of the objects of C_100B_038E types (with a quantity)
+   - MissileEnd = last tile reached by projectile #0,
+   - MissileHitObj = object hit at the stop tile of #0 (if MissileShooter, the shooter, is set),
+   - MissileHitList = list of the objects of IsBreakableType types (with a quantity)
      or type 0xa0 hit, then of the NPCs (< 0x100) crossed/hit (NPCs of
      ObjStatus 2 with the types 0x175, 0x16a, 0xfe, 0x182 count as objects),
      -1 terminated (at most 0x3f).
@@ -439,9 +435,9 @@ static DiskConfirm(int16);
 	HideMouse
 	ret = 1;
 
-	D_B9D2[0] =
+	MissileEnd[0] =
 	tile_x[0] = src_x;
-	D_B9D2[1] =
+	MissileEnd[1] =
 	tile_y[0] = src_y;
 
 	if(attr & 1) {
@@ -598,7 +594,7 @@ stop:
 					(GetType(objNum) != 0x175 && GetType(objNum) != 0x16a && GetType(objNum) != 0xfe && GetType(objNum) != 0x182)
 				)) {
 					collision_mask[objNum >> 3] |= (1 << (objNum & 7));
-				} else if(numHits <= 0x3e && ((GetQuan(objNum) && C_100B_038E(GetType(objNum))) || GetType(objNum) == 0xa0)) {
+				} else if(numHits <= 0x3e && ((GetQuan(objNum) && IsBreakableType(GetType(objNum))) || GetType(objNum) == 0xa0)) {
 					register int16 k;
 
 					for(k = 0; k < numHits; k ++)
@@ -613,8 +609,8 @@ stop:
 			if(objNum >= 0)
 				goto stop;
 			if(dst == 0) {
-				D_B9D2[0] = tile_x[0];
-				D_B9D2[1] = tile_y[0];
+				MissileEnd[0] = tile_x[0];
+				MissileEnd[1] = tile_y[0];
 			}
 		}
 
@@ -667,7 +663,7 @@ stop:
 		pX_dst[dst] = tile_x[dst];
 		pY_dst[dst] = tile_y[dst];
 		if(dst == 0 && MissileShooter >= 0)
-			D_B9CA = COMBAT_GetTargetAt(MissileShooter, tile_x[0], tile_y[0]);
+			MissileHitObj = COMBAT_GetTargetAt(MissileShooter, tile_x[0], tile_y[0]);
 	}
 	ShowMouse
 
@@ -699,7 +695,7 @@ stop:
 
 /*explosion centered on x,y: 9 trails of missileTile toward the pattern
   above (range 3); returns the -1 terminated list (MissileHitList) of the NPCs
-  hit, including those on the center tile and the C_100B_038E objects there*/
+  hit, including those on the center tile and the IsBreakableType objects there*/
 int16 far /*C_0E1A_0EEA*/*Explosion(int16 x, int16 y, int16 missileTile) {
 	register int16 count, objNum;
 	int16 x_dst[9], y_dst[9];
@@ -714,7 +710,7 @@ int16 far /*C_0E1A_0EEA*/*Explosion(int16 x, int16 y, int16 missileTile) {
 		if(MissileHitList[count] < 0)
 			break;
 	for(objNum = FindLoc(x, y, MapZ); count < 0x3f && objNum >= 0; objNum = NextLoc()) {
-		if((objNum < 0x100 && objNum >= 0) || (GetQuan(objNum) && C_100B_038E(GetType(objNum))))
+		if((objNum < 0x100 && objNum >= 0) || (GetQuan(objNum) && IsBreakableType(GetType(objNum))))
 			MissileHitList[count ++] = objNum;
 		if(IsTileNos(TILE_FRAME(objNum) - LocPartOffset))
 			break;
@@ -814,10 +810,10 @@ int16 far /*C_0E1A_1003*/*C_0E1A_1003(int16 x, int16 y, int16 x2, int16 y2, int1
 			D_C4AA[i][j] = 0xff;
 	}
 	for(i = 0; i < 0x100; i++)
-		D_C3AA[i] = i + 1;
+		CellObjNext[i] = i + 1;
 	for(i = 0; i < 11; i ++) {
 		for(j = 0; j < 11; j ++)
-			D_C130[i][j] = 0;
+			Obj_11x11[i][j] = 0;
 	}
 }
 
@@ -878,7 +874,7 @@ int16 far /*C_0E1A_1003*/*C_0E1A_1003(int16 x, int16 y, int16 x2, int16 y2, int1
   field of PortraitBgs (high nibble for even npc), random for NPCs above
   0x79, 0 in the dream*/
 /*C_0E1A_135B*/C_0E1A_135B(register int16 npc) {
-	if(D_16AA & 0x10)
+	if(GameFlags & 0x10)
 		return 0;
 	if(npc > 0x79)
 		return OSI_rand(0, 7);
@@ -887,9 +883,9 @@ int16 far /*C_0E1A_1003*/*C_0E1A_1003(int16 x, int16 y, int16 x2, int16 y2, int1
 
 /*draw the portrait of NPC objNum at screen x,y + 2: a face of mdfaces.lzc
   over its background (C_0E1A_135B, mdback.lzc). NPCs 10-15 use 0x51's;
-  the avatar (0, 1) has face 1, or 0 for a woman (D_16A8); NPC 6 with
+  the avatar (0, 1) has face 1, or 0 for a woman (PlayerIsFemale); NPC 6 with
   TalkFlags[6] & 2 is 0x16; NPCs with ObjStatus & 1 are 0x72/0x73 (by
-  D_16A8); NPC 0x21 without TalkFlags[0x21] & 4 is 0x61; then some NPCs
+  PlayerIsFemale); NPC 0x21 without TalkFlags[0x21] & 4 is 0x61; then some NPCs
   share faces. Nothing is drawn for NPCs 0xbf and up (the test for a
   temporary NPC of type 0x179 behind it cannot succeed)*/
 /*C_0E1A_13A8*/DrawPortrait(register int16 objNum, int16 x, int16 y) {
@@ -903,11 +899,11 @@ int16 far /*C_0E1A_1003*/*C_0E1A_1003(int16 x, int16 y, int16 x2, int16 y2, int1
 				objNum = 0x1d;
 		} else {
 			if(objNum <= 1)
-				objNum = D_16A8 ? 0 : 1;
+				objNum = PlayerIsFemale ? 0 : 1;
 			else if(objNum == 6 && (TalkFlags[objNum] & 2))
 				objNum = 0x16;
 			else if(ObjStatus[objNum] & 1)
-				objNum = D_16A8 ? 0x73 : 0x72;
+				objNum = PlayerIsFemale ? 0x73 : 0x72;
 			else if(objNum == 0x21 && !(TalkFlags[0x21] & 4))
 				objNum = 0x61;
 			else

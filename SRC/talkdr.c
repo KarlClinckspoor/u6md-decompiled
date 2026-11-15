@@ -29,7 +29,7 @@
  *
  * Martian Dreams' changes: SE's TALK_GetNpcName .. FindPartyMemberWithObj and
  * TALK_Event are in overlay 2F83 (another module); mk_npcnum turns NPC 1
- * into 0 when D_16AA & 0x10; the strength of OP_CANCARRY comes from
+ * into 0 when GameFlags & 0x10; the strength of OP_CANCARRY comes from
  * GetStr; OP_GIVEOBJ's #T is inverted; the dead body is type 0x155;
  * TalkDriver has no "Talking to yourself?" or IsArmageddon test, says
  * "You sense " for ObjStatus & 1, stops the map animation (MapAnimEnabled)
@@ -167,10 +167,10 @@ extern CON_setClip(struct tClipInfo *);
 extern CON_gotoxy(int16, int16);
 extern CON_putch(int16);
 extern cdecl CON_printf(char far *, ...);
-extern DrawMapWindow(int16);/*DrawMapWindow: redraws the map window (U6: DrawMapWindow?)*/
-extern DisplayTick();/*DisplayTick: one animation frame*/
+extern DrawMapWindow(int16);/*redraws the map window (U6: DrawMapWindow?)*/
+extern DisplayTick();/*one animation frame*/
 extern VIS_UpdateView();
-extern int16 FindInv(int16);/*FindInv: first object of an inventory*/
+extern int16 FindInv(int16);/*first object of an inventory*/
 extern int16 NextInv();
 extern int16 FindInvType(int16, int16, int16);/*FindInvType(npc, type, quality)*/
 extern InsertObj(int16, int16, int16);/*InsertObj(obj, owner, how)*/
@@ -178,17 +178,17 @@ extern int16 GiveObj(int16, int16, int16);/*GiveObj(npc, type, quality/quantity)
 extern TakeObj(int16, int16, int16);/*TakeObj(npc, type, quality/quantity)*/
 extern int16 TestObj(int16, int16);/*TestObj(npc, type)*/
 extern int16 IsWeightPer10Type(int16);
-extern STAT_ComputeEquipment(int16);/*STAT_ComputeEquipment: STAT_ComputeWeights*/
+extern STAT_ComputeEquipment(int16);/*SE: STAT_ComputeWeights*/
 extern int16 OBJ_FindInContainer(int16, int16, int16);/*OBJ_FindInContainer(npc, type, quality)*/
 extern int16 SPELL_ReviveNPC(int16);/*SPELL_ReviveNPC(dead body): the NPC, or < 0*/
 extern C_170D_083F(int16, int16);/*UpdateMoveFrame(npc, direction)*/
 extern int16 GetStr(int16);/*strength of an NPC (with modifiers?)*/
 extern int16 MaxHP(int16);
-extern SetTypeUnconscious(int16);/*SetTypeUnconscious: an NPC falls asleep (shape)*/
+extern SetTypeUnconscious(int16);/*an NPC falls asleep (shape)*/
 extern int16 ParseNumberInput(char *, int16);
 extern ShowPortrait(int16);/*ShowPortraitAndInventory*/
 extern LoadConversation(int16, unsigned char far *);/*LoadConversation(npc, buffer)*/
-extern int16 HasConversation(int16);/*HasConversation: has the npc a conversation script?*/
+extern int16 HasConversation(int16);/*has the npc a conversation script?*/
 extern ClearMapWindow(int16);
 extern int16 OSI_rand(int16, int16);/*OSI_rand(lo, hi)*/
 #define UpdateMoveFrame C_170D_083F
@@ -199,7 +199,7 @@ extern int16 IsNpcOnScreen(int16);
 extern int16 JoinParty(int16);
 extern int16 LeaveParty(int16);
 extern int16 FindPartyMemberWithObj(int16, int16);
-extern TALK_Event(int16);/*TALK_Event: scripted events (OP_EVENT)*/
+extern TALK_Event(int16);/*scripted events (OP_EVENT)*/
 extern char far C_2BB4_0315[];/*NotInSoloMsg (far messages)*/
 extern char far C_2BB4_02B7[];/*NoResponseMsg (far messages)*/
 #define NotInSoloMsg C_2BB4_0315
@@ -213,7 +213,7 @@ extern int16 StatusDisplay;
 extern int16 PromptCh;
 extern struct tClipInfo *CurClip;
 extern int16 ScreenFade;
-extern int32 D_16AA;/*flags (0x10: ?)*/
+extern int32 GameFlags;/*0x10: in a dream*/
 extern int16 ColorText;
 extern int16 D_0826;/*color of the player's input*/
 extern unsigned char Active;
@@ -221,22 +221,22 @@ extern unsigned char InCombat;
 extern char SoloMember;
 
 extern unsigned char far *D_3262;/*NPC flags: 0x80 ?, bits 0-7: talk flags 8-15*/
-extern unsigned char D_3266[];/*ObjStatus*/
-extern unsigned char D_45D0[];/*DEXTE*/
+extern unsigned char ObjStatus[];
+extern unsigned char DEXTE[];
 extern unsigned char far *D_46D0;/*NPCMode*/
 extern unsigned char D_4EA4[];/*Party*/
-extern unsigned char far *D_4EB6;/*Level*/
-extern uint16 D_51AE[];/*ExpPoints*/
-extern unsigned char D_53B2[];/*STREN*/
+extern unsigned char far *Level;
+extern uint16 ExpPoints[];
+extern unsigned char STREN[];
 extern unsigned char D_6CBA[];/*NPCStatus*/
-extern unsigned char D_6DBE[];/*HitPoints*/
+extern unsigned char HitPoints[];
 extern unsigned char far *D_6EC2;/*TalkBuf*/
 extern unsigned char D_6EC6[];/*TalkFlags*/
 extern unsigned char far *D_7606;/*TypeWeight*/
-extern unsigned char D_760E[];/*INTEL*/
-extern struct coord D_78AE[];/*ObjPos*/
+extern unsigned char INTEL[];
+extern struct coord ObjPos[];
 extern unsigned char D_9CC0;/*PartySize*/
-extern uint16 D_9CC4[];/*ObjShapeType*/
+extern uint16 ObjShapeType[];
 extern int16 D_EB74, D_EB76;/*PointerX, PointerY*/
 extern int16 D_EB86[10+26];/*VarInt*/
 extern struct tClipInfo D_EBD0[4];/*TextWindows*/
@@ -260,7 +260,6 @@ extern void far *D_BA7E;/*mdscreen.lzc entry 2: default command mark*/
 #define GR_DRAW_BITMAP(s,x,y,p,m)    (D_BA6A.iii.ofs = 0x30, (*D_BA6A.f)(s,x,y,p,m))
 
 #define MapAnimEnabled D_0F18
-#define ObjStatus D_3266
 #define PartySize D_9CC0
 #define Party D_4EA4
 #define NPCStatus D_6CBA
@@ -289,10 +288,10 @@ extern void far *D_BA7E;/*mdscreen.lzc entry 2: default command mark*/
 #define EVIL 0x20
 #define GOOD 0x40
 #define CHAOTIC 0x60
-#define GetType(i) (D_9CC4[i] & 0x3ff)
-#define GetX(i) ((*(int16 *)&(D_78AE[i].raw[0]))&0x3ff)
-#define GetY(i) (((*(int16 *)&(D_78AE[i].raw[1]))>>2)&0x3ff)
-#define GetAssoc(i) (*(uint16 *)&(D_78AE[i]))
+#define GetType(i) (ObjShapeType[i] & 0x3ff)
+#define GetX(i) ((*(int16 *)&(ObjPos[i].raw[0]))&0x3ff)
+#define GetY(i) (((*(int16 *)&(ObjPos[i].raw[1]))>>2)&0x3ff)
+#define GetAssoc(i) (*(uint16 *)&(ObjPos[i]))
 #define QualQuan(quality, quantity) ((quality) << 8 | (quantity))
 #define INVEN 0x10
 
@@ -337,7 +336,7 @@ word of <input>*/
 /*C_2F88_007A*/unsigned char mk_npcnum(int16 npc) {
 	if(npc == OP_NPC)
 		return TalkNpcs[0];
-	if((D_16AA & 0x10) && npc == 1)
+	if((GameFlags & 0x10) && npc == 1)
 		return 0;
 	return npc;
 }
@@ -450,7 +449,7 @@ lstack and leaves its result in the lowest operand's slot.*/
 				break;
 				case OP_WOUNDED:/*(npc)*/
 					iparam0 = mk_npcnum(lstack[sidx - 1]);
-					if(MaxHP(iparam0) > D_6DBE[iparam0])
+					if(MaxHP(iparam0) > HitPoints[iparam0])
 						lstack[sidx - 1] = 1;
 					else
 						lstack[sidx - 1] = 0;
@@ -464,44 +463,44 @@ lstack and leaves its result in the lowest operand's slot.*/
 				case OP_ADDEXP:/*(npc, amount): new value, max 9999*/
 					iparam0 = mk_npcnum(lstack[sidx - 2]);
 					iparam1 = lstack[sidx - 1];
-					D_51AE[iparam0] += iparam1;
-					if(D_51AE[iparam0] > 9999)
-						D_51AE[iparam0] = 9999;
-					lstack[sidx - 2] = D_51AE[iparam0];
+					ExpPoints[iparam0] += iparam1;
+					if(ExpPoints[iparam0] > 9999)
+						ExpPoints[iparam0] = 9999;
+					lstack[sidx - 2] = ExpPoints[iparam0];
 					sidx -= 2;
 				break;
 				case OP_ADDLVL:/*(npc, amount): new level*/
 					iparam0 = mk_npcnum(lstack[sidx - 2]);
 					iparam1 = lstack[sidx - 1];
-					D_4EB6[iparam0] += iparam1;
-					lstack[sidx - 2] = D_4EB6[iparam0];
+					Level[iparam0] += iparam1;
+					lstack[sidx - 2] = Level[iparam0];
 					sidx -= 2;
 				break;
 				case OP_ADDSTR:/*(npc, amount): new value, max 30*/
 					iparam0 = mk_npcnum(lstack[sidx - 2]);
 					iparam1 = lstack[sidx - 1];
-					D_53B2[iparam0] += iparam1;
-					if(D_53B2[iparam0] > 30)
-						D_53B2[iparam0] = 30;
-					lstack[sidx - 2] = D_53B2[iparam0];
+					STREN[iparam0] += iparam1;
+					if(STREN[iparam0] > 30)
+						STREN[iparam0] = 30;
+					lstack[sidx - 2] = STREN[iparam0];
 					sidx -= 2;
 				break;
 				case OP_ADDINT:/*(npc, amount): new value, max 30*/
 					iparam0 = mk_npcnum(lstack[sidx - 2]);
 					iparam1 = lstack[sidx - 1];
-					D_760E[iparam0] += iparam1;
-					if(D_760E[iparam0] > 30)
-						D_760E[iparam0] = 30;
-					lstack[sidx - 2] = D_760E[iparam0];
+					INTEL[iparam0] += iparam1;
+					if(INTEL[iparam0] > 30)
+						INTEL[iparam0] = 30;
+					lstack[sidx - 2] = INTEL[iparam0];
 					sidx -= 2;
 				break;
 				case OP_ADDDEX:/*(npc, amount): new value, max 30*/
 					iparam0 = mk_npcnum(lstack[sidx - 2]);
 					iparam1 = lstack[sidx - 1];
-					D_45D0[iparam0] += iparam1;
-					if(D_45D0[iparam0] > 30)
-						D_45D0[iparam0] = 30;
-					lstack[sidx - 2] = D_45D0[iparam0];
+					DEXTE[iparam0] += iparam1;
+					if(DEXTE[iparam0] > 30)
+						DEXTE[iparam0] = 30;
+					lstack[sidx - 2] = DEXTE[iparam0];
 					sidx -= 2;
 				break;
 				case OP_PARTYMEMBER:/*get party member npc num (0 if none)*/
@@ -964,7 +963,7 @@ returns 0:ok, 1:syntax error, -1:unknown opcode*/
 		break;
 		case OP_HEAL:/*(npc): full hit points*/
 			arg0 = mk_npcnum(parse_factor());
-			D_6DBE[arg0] = MaxHP(arg0);
+			HitPoints[arg0] = MaxHP(arg0);
 		break;
 		case OP_CURE:/*(npc)*/
 			arg0 = mk_npcnum(parse_factor());

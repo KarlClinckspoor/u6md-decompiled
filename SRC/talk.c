@@ -9,7 +9,7 @@
  * TALK_talkTo is the "talk" command: talking to an object (not an NPC)
  * gives a psychic impression when the active character has the talent,
  * some objects stand for an NPC (0x72-0x74), talking to yourself wakes you
- * up from the dream (D_16AA & 0x10). TALK_initTalk sets the script
+ * up from the dream (GameFlags & 0x10). TALK_initTalk sets the script
  * variables ($G $N $P $T, #A #D #E #G #H #I #M #N #O #P #S #T #W #X #Y #Z;
  * clears $0-$9/#0-#9) and runs the script interpreter (TalkDriver, overlay
  * 2F88). A script's OP_EVENT runs TALK_Event, which may leave an event
@@ -34,7 +34,7 @@ extern int16 GetDex(int16);/*an NPC attribute (#A)*/
 extern int16 GetInt(int16);/*an NPC attribute (#I)*/
 extern int16 MaxHP(int16);
 extern SetTypeUnconscious(int16);
-extern COMBAT_begin();/*called when not InCombat (COMBAT_begin?)*/
+extern COMBAT_begin();/*called when not InCombat*/
 extern COMBAT_Missile(int16, int16 *, int16 *, int16, int16);
 extern COMBAT_Kill(int16);
 extern int16 HasConversation(int16);
@@ -49,7 +49,7 @@ extern int16 EGG_generate(int16, int16, int16, int16);/*EGG_generate(type, x, y,
 extern C_1FA9_04ED();
 extern MUS_PlaySfx(int16);
 extern int16 OBJ_FindInContainer(int16, int16, int16);/*OBJ_FindInContainer(npc, type, quality)*/
-extern int16 C_1B09_090B(int16);
+extern int16 OBJ_IsOnScreen(int16);
 extern int16 OBJ_FindTypeAt(int16, int16, int16);/*OBJ_FindTypeAt(type, x, y)*/
 extern int16 FindInv(int16);
 extern int16 NextInv();
@@ -89,32 +89,32 @@ extern unsigned char Date_D;
 extern unsigned char Date_M;
 extern unsigned char Active;
 extern int16 MapX, MapY, MapZ;
-extern unsigned char D_1684, D_1685;
+extern unsigned char WakeX, WakeY;
 extern unsigned char DrunkCounter;
-extern unsigned char D_16A3;
+extern unsigned char DreamFoesLeft;
 extern char InCombat;
 extern char SoloMember;
-extern unsigned char D_16A8;/*the player is a woman*/
-extern int32 D_16AA;/*flags (0x10: ?)*/
-extern struct { unsigned a:4, psychic:4, b:8; } D_16B0[];/*talents? (psychic: can read objects)*/
+extern unsigned char PlayerIsFemale;
+extern int32 GameFlags;/*0x10: in a dream*/
+extern struct { unsigned a:4, psychic:4, b:8; } Talents[];/*talents? (psychic: can read objects)*/
 extern int16 DreamStage;
 extern unsigned char far *D_3262;/*NPC flags: 0x80 ?, bits 0-7: talk flags 8-15*/
-extern unsigned char D_3266[];/*ObjStatus*/
+extern unsigned char ObjStatus[];
 extern unsigned char far *D_46D0;/*NPCMode*/
 extern unsigned char D_4EA4[];/*Party*/
 extern char D_50CE[][14];/*Names*/
-extern uint16 D_51AE[];/*ExpPoints*/
+extern uint16 ExpPoints[];
 extern unsigned char far *D_53AE;/*NPCComMode*/
 extern unsigned char far *D_54B2;/*ScratchBuf*/
-extern int16 D_54BA[];/*Amount: quantity (low byte), quality (high byte)*/
+extern int16 Amount[];/*quantity (low byte), quality (high byte)*/
 extern unsigned char D_6CBA[];/*NPCStatus*/
-extern unsigned char D_6DBE[];/*HitPoints*/
+extern unsigned char HitPoints[];
 extern unsigned char D_6EC6[];/*TalkFlags*/
-extern struct coord D_78AE[];/*ObjPos*/
+extern struct coord ObjPos[];
 extern unsigned char D_9CC0;/*PartySize*/
-extern uint16 D_9CC4[];/*ObjShapeType*/
+extern uint16 ObjShapeType[];
 extern int16 far *D_B508;/*OrigShapeType*/
-extern unsigned char D_C130[11][11];/*Obj_11x11*/
+extern unsigned char Obj_11x11[11][11];
 extern int16 D_C4AA[11][11];/*Tile_11x11*/
 extern int16 D_EB86[10+26];/*VarInt*/
 extern char *D_EBFA[10+26];/*VarStr*/
@@ -122,19 +122,14 @@ extern unsigned char D_EC5C[];/*TalkNpcName*/
 extern char D_ECE2[10][100];/*TalkStrBuf: storage of the string variables $0-$9*/
 
 #define MapAnimEnabled D_0F18
-#define ObjStatus D_3266
 #define NPCMode D_46D0
 #define Party D_4EA4
 #define Names D_50CE
-#define ExpPoints D_51AE
 #define NPCComMode D_53AE
 #define ScratchBuf D_54B2
-#define Amount D_54BA
 #define NPCStatus D_6CBA
-#define HitPoints D_6DBE
 #define TalkFlags D_6EC6
 #define PartySize D_9CC0
-#define ObjShapeType D_9CC4
 #define OrigShapeType D_B508
 #define VarInt D_EB86
 #define VarStr D_EBFA
@@ -150,11 +145,11 @@ extern char D_ECE2[10][100];/*TalkStrBuf: storage of the string variables $0-$9*
 #define GOOD 0x40
 #define CHAOTIC 0x60
 #define GetType(i) (ObjShapeType[i] & 0x3ff)
-#define GetX(i) ((*(int16 *)&(D_78AE[i].raw[0]))&0x3ff)
-#define GetY(i) (((*(int16 *)&(D_78AE[i].raw[1]))>>2)&0x3ff)
+#define GetX(i) ((*(int16 *)&(ObjPos[i].raw[0]))&0x3ff)
+#define GetY(i) (((*(int16 *)&(ObjPos[i].raw[1]))>>2)&0x3ff)
 #define GetQuan(i) (((unsigned char *)(Amount + (i)))[0])
 #define GetQual(i) (((unsigned char *)(Amount + (i)))[1])
-#define CanReadObjects() (D_16B0[Party[Active]].psychic)
+#define CanReadObjects() (Talents[Party[Active]].psychic)
 
 char *TALK_GetCharName(int16);
 
@@ -186,7 +181,7 @@ char *TALK_GetCharName(int16);
 	VarInt['Z' - 0x37] = MapZ;
 	VarInt['O' - 0x37] = 0;
 	for(i = 0; i < 0x100; i ++)
-		if(C_1B09_090B(i))
+		if(OBJ_IsOnScreen(i))
 			VarInt['O' - 0x37] ++;
 	/*set strings $*/
 	VarStr['N' - 0x37] = "Winona Ryder is a really hot babe";/*[n]ame of NPC (a buffer)*/
@@ -197,7 +192,7 @@ char *TALK_GetCharName(int16);
 		VarStr['T' - 0x37] = "afternoon";
 	else
 		VarStr['T' - 0x37] = "evening";
-	if(D_16A8) {
+	if(PlayerIsFemale) {
 		VarStr['G' - 0x37] = "Madam";
 		VarInt['G' - 0x37] = 1;
 	} else {
@@ -212,7 +207,7 @@ char *TALK_GetCharName(int16);
 		VarInt[i] = 0;
 	/*--*/
 	handle = CON_mouseOffAt(0, 0, 319, 199);
-	TalkDriver((D_16AA & 0x10)?0:1, objNum);
+	TalkDriver((GameFlags & 0x10)?0:1, objNum);
 	CON_mouseOn(handle);
 }
 
@@ -278,7 +273,7 @@ char *TALK_GetCharName(int16);
 		if(objNum <= 1) {
 			if(showName)
 				CON_printf("yourself\n");
-			if(D_16AA & 0x10) {
+			if(GameFlags & 0x10) {
 				CON_printf("You try to wake yourself up.\n");
 				if(MapZ != 3)
 					DreamWakeUp();
@@ -289,7 +284,7 @@ char *TALK_GetCharName(int16);
 			}
 		} else if(GetType(objNum) == 0x187) {
 			CON_printf("%s\n", GetObjectString(objNum));
-			CON_printf(C_2BB4_114D, D_16A8?"wo":"");
+			CON_printf(C_2BB4_114D, PlayerIsFemale?"wo":"");
 			if(savedSolo >= 0)
 				SoloMember = savedSolo;
 			return;
@@ -400,7 +395,7 @@ char *TALK_GetCharName(int16);
 							TimerDelay(0x122e4cL);
 							ObjShapeType[0] = OrigShapeType[1];
 							ObjShapeType[0x68] = OrigShapeType[0x68];
-							PartyTeleport(D_1684, D_1685, MapZ, 0);
+							PartyTeleport(WakeX, WakeY, MapZ, 0);
 						} else {
 							if((obj2 = OBJ_FindTypeAt(0x189, x, y)) >= 0)
 								ObjShapeType[obj2] = 0x155 | ((GetType(k) - 0x156) << 10);
@@ -494,7 +489,7 @@ and not on a hidden/dark tile)*/
 		x = WrapDelta(GetX(objNum) - (MapX - 5));
 		y = WrapDelta(GetY(objNum) - (MapY - 5));
 		/*objects displayed there, or an object tile*/
-		if(D_C130[y][x] || D_C4AA[y][x] >= 0x200)
+		if(Obj_11x11[y][x] || D_C4AA[y][x] >= 0x200)
 			return 1;
 		tile = D_C4AA[y][x];
 		return (tile != 0xff && tile != 0x10c);
@@ -574,7 +569,7 @@ returns 0:ok, 1:party is in a vehicle, 2:not in party*/
 /*C_2F83_0CC0*/FindPartyMemberWithObj(int16 objType, int16 objQual) {
 	int16 i;
 
-	if(D_16AA & 0x10) {/*in the dream: only the player*/
+	if(GameFlags & 0x10) {/*in the dream: only the player*/
 		if(OBJ_FindInContainer(0, objType, objQual) != -1)
 			return 0;
 	} else {
@@ -676,18 +671,18 @@ returns 0:ok, 1:party is in a vehicle, 2:not in party*/
 		break;
 		case 0x35:
 			C_1FA9_04ED();
-			D_16A3 = 0;
+			DreamFoesLeft = 0;
 			for(k = 0; k < 6; k ++) {
 				if((npc = EGG_generate(0x91, MapX, MapY, MapZ)) >= 0) {
 					if(COMBAT_TryTeleport(npc, 0)) {
 						NPCComMode[npc] = NPCMode[npc] = 8;
-						D_16A3 ++;
+						DreamFoesLeft ++;
 					} else {
 						DeleteObj(npc);
 					}
 				}
 			}
-			if(!D_16A3)
+			if(!DreamFoesLeft)
 				CON_printf(C_2BB4_22F1);
 		break;
 		case 0x36:
@@ -842,21 +837,21 @@ returns 0:ok, 1:party is in a vehicle, 2:not in party*/
 			TalkEvent = 0x69;
 		break;
 		case 0x6a:
-			PartyTeleport(D_1684, D_1685, MapZ, 0);
+			PartyTeleport(WakeX, WakeY, MapZ, 0);
 		break;
 		case 0x6b:
 			MUS_PlaySfx(4);
 			OBJ_PurgeFarLocals(-1, -1, -1);
 			PartyTeleport(0x6a, 0x2c, MapZ, 0);
 			OBJ_DeleteContents(0);
-			D_1684 = 0x6a;
-			D_1685 = 0x2c;
+			WakeX = 0x6a;
+			WakeY = 0x2c;
 			DreamStage = 0xe4;
 		break;
 		case 0x6c:
 			if(!InCombat)
 				COMBAT_begin();
-			D_16A3 = 6;
+			DreamFoesLeft = 6;
 			OBJ_PurgeFarLocals(-1, -1, -1);
 			ForceHatching = 1;
 			PartyTeleport(0x6e, 0x17, MapZ, 0);
@@ -871,7 +866,7 @@ returns 0:ok, 1:party is in a vehicle, 2:not in party*/
 		case 0x6d:
 			if(!InCombat)
 				COMBAT_begin();
-			D_16A3 = 6;
+			DreamFoesLeft = 6;
 			ForceHatching = 1;
 			OBJ_PurgeFarLocals(-1, -1, -1);
 			PartyTeleport(0x7a, 0xd, MapZ, 0);

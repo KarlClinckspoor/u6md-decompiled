@@ -59,37 +59,33 @@ extern char far C_2BB4_1C41[];/*"%s has no effect.\n"*/
 
 extern unsigned char Active;
 extern int16 MapZ;
-extern struct { unsigned a:4, psychic:4, c:4, d:4; } D_16B0[];/*talents*/
+extern struct { unsigned a:4, psychic:4, c:4, d:4; } Talents[];
 extern unsigned char SelectMode;
 extern char AimX, AimY, SelectRange;
 extern int16 EndPagingAtPrompt;
 extern int16 MouseMode;
 extern struct { unsigned char originX, originY, cols, rows, curX, curY, fgColor, bgColor, attrFlags; } *CurClip;
-extern unsigned char D_3266[];/*ObjStatus*/
+extern unsigned char ObjStatus[];
 extern unsigned char D_4EA4[];/*Party*/
-extern unsigned char far *D_4EB6;/*Level*/
+extern unsigned char far *Level;
 extern int16 far *D_6EBE;/*BaseTile*/
 extern unsigned char far *D_760A;/*TileFlag2: 0x10 ignored*/
-extern struct coord D_78AE[];/*ObjPos*/
-extern uint16 D_9CC4[];/*ObjShapeType*/
+extern struct coord ObjPos[];
+extern uint16 ObjShapeType[];
 extern int16 D_EB74, D_EB76;/*PointerX, PointerY*/
 extern int16 D_EBCE;/*Selection.obj*/
 extern int16 D_EBF6, D_EBF8;/*Selection.x, Selection.y*/
-extern int16 D_EC46;/*distance of the last target*/
+/*the distance of the last target (GetUseTarget)*/
+/*EC46*/extern int16 TargetDist;
 
 #define Party D_4EA4
-#define Level D_4EB6
-#define ObjStatus D_3266
 #define BaseTile D_6EBE
 #define TileFlag2 D_760A
-#define ObjPos D_78AE
-#define ObjShapeType D_9CC4
 #define PointerX D_EB74
 #define PointerY D_EB76
 #define SelectionObj D_EBCE
 #define SelectionX D_EBF6
 #define SelectionY D_EBF8
-#define TargetDist D_EC46
 #define UpdateMoveFrame C_170D_083F
 #define OnMsg C_2BB4_01C0
 #define NoEffectMsg C_2BB4_02A4
@@ -104,7 +100,7 @@ extern int16 D_EC46;/*distance of the last target*/
 #define IsTileIg(t) (TileFlag2[t] & 0x10)
 #define GetCoordUse(i) (ObjStatus[i] & 0x18)
 /*the active member's reach: its level when its first talent is set*/
-#define REACH (D_16B0[Party[Active]].a ? Level[Party[Active]] : 0)
+#define REACH (Talents[Party[Active]].a ? Level[Party[Active]] : 0)
 
 /*the tables, each a far variable (a paragraph-aligned segment of its own, after the code):
   UseObjects at 2E08, UseActions at 2E67, which points at the overlaid actions' stub entries*/

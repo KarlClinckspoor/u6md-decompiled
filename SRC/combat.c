@@ -10,27 +10,27 @@
  *   MaxHP: 240 for NPC 6, 2*STR + 24*level for the party, the class's
  *   MonsterHP for the others),
  * - targets and missiles (COMBAT_GetTargetAt, COMBAT_Missile,
- *   COMBAT_FireRangedWeapon with C_100B_00FF's missile tile, sound and
- *   ammunition), the spraying weapons (C_07D1_0D54),
+ *   COMBAT_FireRangedWeapon with GetMissileInfo's missile tile, sound and
+ *   ammunition), the spraying weapons (COMBAT_Spray),
  * - death (SetTypeUnconscious: MD's bodies 0x151-0x155; COMBAT_Kill: the
- *   creature 0x175 and its parts, the NPCs whose death makes the game
- *   unwinnable, the dream stages), bleeding (C_07D1_1483), damage
+ *   giant maw 0x175 and its tentacles, the NPCs whose death makes the game
+ *   unwinnable, the dream stages), bleeding (COMBAT_Bleed), damage
  *   (LoseHP(obj, damage, kind): kind 1 paralyzes and freezes, 3 burns),
  * - resolving one attack (__TryHit -> __AttackTest -> __DoHit -> LoseHP),
  * - the "Attack" command (COMBAT_attack, COMBAT_AttackWithNextWeapon:
- *   MD's ammunition checks; the weapon 0x139 strikes through C_07D1_5FEF),
- *   combat distances (COMBAT_range, C_07D1_35F5 for the tiles of two or
- *   four squares), the choice of weapons (__PickWeapon, C_07D1_3D62) and
+ *   MD's ammunition checks; the weapon 0x139 strikes through COMBAT_FireM60),
+ *   combat distances (COMBAT_range, COMBAT_RangeToObj for the tiles of two or
+ *   four squares), the choice of weapons (__PickWeapon, COMBAT_PickRangedWeapon) and
  *   of targets (COMBAT_pickOpponent),
  * - the combat A.I. modes: SE's (Assault, Range, Berserk, Retreat, Like,
  *   Unfriendly, Immobile) reworked, and MD's own: 0x13 and 0x16 (the
- *   dream's crushers), 0x12 and 0x19 (the creature 0x175 under the sand
- *   and its parts 0x16a), 0x14 (the oxium thief), 0x0d and 0x11 (the
- *   worms 0x172/0x174/0x173, C_07D1_52E6 backing up), 0x15, 0x17 (the
- *   0x198 and 0x1a8 together), COMBAT_beginAttacked,
- * - special deaths and hits: C_07D1_5DB2 (the 0x17b swallowing a body),
- *   C_07D1_5F2B (class flag 0x800 explodes), C_07D1_632C (NPC 0x40 hurls
- *   the player).
+ *   dream's crushers), 0x12 and 0x19 (the giant maw 0x175 under the sand
+ *   and its tentacles 0x16a), 0x14 (the oxium thief), 0x0d and 0x11 (the
+ *   rockworms 0x172/0x174/0x173, COMBAT_WormBackUp backing up), 0x15, 0x17 (the
+ *   0x198 (a tree) and 0x1a8 together), COMBAT_beginAttacked,
+ * - special deaths and hits: COMBAT_CanalWormGulp (the canal worm 0x17b
+ *   swallowing a body), COMBAT_Explode (class flag 0x800 explodes),
+ *   COMBAT_RasputinThrow (Rasputin, NPC 0x40, hurls the player).
  * Kept from SE but for addresses: IsInvulnerable's form, COMBAT_stopCharm,
  * GetDex, GetInt, ComputeLevel, AddXP, COMBAT_canSee, COMBAT_Missile,
  * COMBAT_InitWeaponList, COMBAT_attack (but its pending command 0x81),
@@ -50,13 +50,13 @@ struct tClipInfo/*size:9*/ {
 #undef abs
 
 /*monster tables (MD's monsdata, far segment 2DE5; class + 1)*/
-extern unsigned char far C_2DE5_0066[];/*MonsterStr*/
-extern unsigned char far C_2DE5_0098[];/*MonsterDex*/
-extern unsigned char far C_2DE5_00CA[];/*MonsterInt*/
-extern unsigned char far C_2DE5_00FC[];/*MonsterArmor*/
-extern unsigned char far C_2DE5_012E[];/*MonsterDamage*/
-extern unsigned char far C_2DE5_0160[];/*MonsterHP*/
-extern int16 far C_2DE5_01C6[];/*MonsterFlags (by GetMonsterClass)*/
+extern unsigned char far MonsterStr[];
+extern unsigned char far MonsterDex[];
+extern unsigned char far MonsterInt[];
+extern unsigned char far MonsterArmor[];
+extern unsigned char far MonsterDamage[];
+extern unsigned char far MonsterHP[];
+extern int16 far MonsterFlags[];/*by GetMonsterClass*/
 
 /*far messages (segment 2BB4)*/
 extern char far C_2BB4_0000[];/*"critical!\n"*/
@@ -100,54 +100,59 @@ extern int16 VisibilityDirty;
 extern int16 EnemyWarningGiven;
 extern unsigned char Active;
 extern int16 MapX, MapY, MapZ;
-extern unsigned char D_1684, D_1685;/*where the dreamer wakes up (x, y)*/
-extern unsigned char D_16A3;/*creatures left to kill in the dream stage*/
+extern unsigned char WakeX, WakeY;/*where the dreamer wakes up (x, y)*/
+extern unsigned char DreamFoesLeft;
 extern char InCombat;
-extern char SoloMember;/*SoloMember: -1 in party mode*/
+extern char SoloMember;/*-1 in party mode*/
 extern unsigned char SavedNPCMode;
-extern unsigned char D_16A8;/*the player is a woman*/
-extern int32 D_16AA;/*flags (0x10: the dream)*/
-extern struct { unsigned a:4, b:4, c:4, d:4; } D_16B0[];/*talents*/
+extern unsigned char PlayerIsFemale;
+extern int32 GameFlags;/*0x10: in a dream*/
+extern struct { unsigned a:4, b:4, c:4, d:4; } Talents[];
 extern int16 DreamStage;
 extern unsigned char PartyListTop;
 extern char SelectMode;
 extern int16 TextOn;
 extern int16 EndPagingAtPrompt;
 extern int16 LastAttackTarget;
-extern int16 StatusDisplay;/*StatusDisplay: 0x92 when the equipment view is shown*/
+extern int16 StatusDisplay;/*0x92 when the equipment view is shown*/
 extern int16 StatusMember;
 extern unsigned char IsInConversation;
 extern struct tSurface D_3232;/*Screen*/
-extern unsigned char D_3266[];/*ObjStatus*/
+extern unsigned char ObjStatus[];
 extern char D_44C4[];/*MovePts*/
 extern unsigned char far *D_45C4;/*SchedIndex*/
 extern unsigned char far *D_45CC;/*NPCFlag*/
-extern unsigned char D_45D0[];/*DEXTE*/
+/*45D0*/extern unsigned char DEXTE[];
 extern unsigned char far *D_46D0;/*NPCMode*/
 extern unsigned char D_4EA4[];/*Party*/
-extern unsigned char far *D_4EB6;/*Level*/
+/*4EB6*/extern unsigned char far *Level;
 extern unsigned char far *D_50CA;/*Leader*/
 extern char D_50CE[][14];/*Names*/
-extern uint16 D_51AE[];/*ExpPoints*/
+/*51AE*/extern uint16 ExpPoints[];
 extern unsigned char far *D_53AE;/*NPCComMode*/
-extern unsigned char D_53B2[];/*STREN*/
-extern int16 D_54BA[];/*Amount*/
+/*53B2*/extern unsigned char STREN[];
+extern int16 Amount[];
 extern unsigned char D_6CBA[];/*NPCStatus*/
-extern unsigned char D_6DBE[];/*HitPoints*/
+/*6DBE*/extern unsigned char HitPoints[];
 extern int16 far *D_6EBE;/*BaseTile*/
 extern unsigned char D_6EC6[];/*TalkFlags*/
 extern unsigned char far *D_760A;/*TileFlag2*/
-extern unsigned char D_760E[];/*INTEL*/
-extern struct coord D_78AE[];/*ObjPos*/
+/*760E*/extern unsigned char INTEL[];
+extern struct coord ObjPos[];
 extern unsigned char D_9CC0;/*PartySize*/
-extern uint16 D_9CC4[];/*ObjShapeType*/
+extern uint16 ObjShapeType[];
 extern unsigned char far *D_B4C4;/*TerrainType*/
 extern int16 far *D_B508;/*OrigShapeType*/
-extern int16 D_B9CA;/*MissileHitObj*/
-extern int16 D_B9CC, D_B9CE;/*KillX, KillY: where the last actor killed was*/
-extern int16 D_B9D0;/*KillBody: its body (-1: none)*/
-extern int16 D_B9D2[2];/*MissileEnd*/
-extern int16 D_BA56[8];/*EquipWeapons*/
+/*set by Missiles (gfx.c): the object hit where missile #0 stopped (with
+  MissileShooter set), and where it stopped*/
+/*B9CA*/extern int16 MissileHitObj;
+/*B9D2*/extern int16 MissileEnd[2];
+/*where the last actor killed was, and its body (-1: none)*/
+/*B9CC*/extern int16 KillX;
+/*B9CE*/extern int16 KillY;
+/*B9D0*/extern int16 KillBody;
+/*the weapons of the attacker (COMBAT_InitWeaponList)*/
+/*BA56*/extern int16 EquipWeapons[8];
 extern union tHandler D_BA6A;/*GrDriver*/
 extern void far *D_BA7E;/*mdscreen.lzc entry 2: default command mark*/
 extern int16 D_EB04[8];/*Equipment*/
@@ -188,12 +193,12 @@ extern int16 LocPartOffset;
 extern int16 InsertObj(int16, int16, int16);
 extern int16 OBJ_FindNPCAt(int16, int16, int16);/*OBJ_FindNPCAt(startNum, x, y)*/
 extern int16 C_170D_0002(int16);
-extern int16 C_1B09_090B(int16);/*on the screen*/
+extern int16 OBJ_IsOnScreen(int16);
 extern int16 far *Explosion(int16, int16, int16);/*Explosion(x, y, missileTile): the objects hit, -1 terminated*/
 extern int16 C_170D_007E(int16, int16, int16);
 extern int16 C_170D_0853(int16, int16);
 extern int16 NPC_TryStep(int16, int16, int16);
-extern int16 C_1B09_0A5D(int16);/*the next map object of the same type on the same square*/
+extern int16 OBJ_NextOfTypeAt(int16);/*the next map object of the same type on the same square*/
 extern void cdecl TimerDelay(int32);/*wait (2383 per millisecond)*/
 extern int16 FindInvType(int16, int16, int16);/*FindInvType(owner, type, quality)*/
 extern int16 SearchArea(int16, int16, int16, int16);/*SearchArea(x1, y1, x2, y2)*/
@@ -204,7 +209,7 @@ extern int16 AddInvObj(int16, int16, int16, int16);/*AddInvObj(shapeType, status
 extern DeleteObj(int16);
 extern int16 OBJ_MakeDeadBody(int16);
 extern MoveObj(int16, int16, int16, int16);
-extern int16 C_1B09_268D(int16);/*moves a map object after the last one of its square*/
+extern int16 OBJ_MoveLastOnSquare(int16);/*moves a map object after the last one of its square*/
 extern TakeObj(int16, int16, int16);/*TakeObj(npc, type, quantity)*/
 extern ShowObject(int16, int16, int16, int16);/*ShowObject(tile, x, y, mode)*/
 extern ShowObjects(void);
@@ -212,16 +217,16 @@ extern char *GetObjectString(int16);
 extern OBJ_DeleteContents(int16);
 extern int16 GetDamagePoints(int16);
 extern int16 GetWeaponRange(int16);
-extern int16 C_100B_00C4(int16);/*protection of an armour object*/
-extern C_100B_00FF(int16, int16 *, int16 *, int16 *);/*the missile tile, sound and ammunition of a weapon type*/
-extern int16 C_100B_0247(int16);
+extern int16 GetArmorPoints(int16);/*protection of an armour object*/
+extern GetMissileInfo(int16, int16 *, int16 *, int16 *);/*the missile tile, sound and ammunition of a weapon type*/
+extern int16 IsBurnableType(int16);
 extern int16 QuanType(int16);
-extern int16 C_100B_038E(int16);/*breakable type*/
-extern int16 C_100B_0410(int16);
+extern int16 IsBreakableType(int16);
+extern int16 IsPlantType(int16);
 extern int16 EGG_generate(int16, int16, int16, int16);/*EGG_generate(type, x, y, z)*/
 extern PartyTeleport(int16, int16, int16, int16);
-extern int16 Is_6C_6D_6E_4D_4F(int16);
-extern int16 C_047A_13C5(int16, int16);/*open water*/
+extern int16 IsTrackTile(int16);
+extern int16 IsOpenWater(int16, int16);
 extern STAT_ShowParty(int16);
 extern STAT_refreshComMode(void);
 extern STAT_ShowInventory(int16);
@@ -270,47 +275,24 @@ extern unsigned char far *D_6DBA;/*TileFlag*/
 #define PromptFlag D_0F13
 #define IsArmageddon D_0F15
 #define Screen D_3232
-#define ObjStatus D_3266
 #define MovePts D_44C4
 #define SchedIndex D_45C4
 #define NPCFlag D_45CC
-#define DEXTE D_45D0
 #define NPCMode D_46D0
 #define Party D_4EA4
-#define Level D_4EB6
 #define Leader D_50CA
 #define Names D_50CE
-#define ExpPoints D_51AE
 #define NPCComMode D_53AE
-#define STREN D_53B2
-#define Amount D_54BA
 #define NPCStatus D_6CBA
-#define HitPoints D_6DBE
 #define BaseTile D_6EBE
 #define TalkFlags D_6EC6
 #define TileFlag2 D_760A
-#define INTEL D_760E
-#define ObjPos D_78AE
 #define PartySize D_9CC0
-#define ObjShapeType D_9CC4
 #define TerrainType D_B4C4
 #define OrigShapeType D_B508
-#define MissileHitObj D_B9CA
-#define KillX D_B9CC
-#define KillY D_B9CE
-#define KillBody D_B9D0
-#define MissileEnd D_B9D2
-#define EquipWeapons D_BA56
 #define GrDriver D_BA6A
 #define Equipment D_EB04
 #define SelectionObj D_EBCE
-#define MonsterStr C_2DE5_0066
-#define MonsterDex C_2DE5_0098
-#define MonsterInt C_2DE5_00CA
-#define MonsterArmor C_2DE5_00FC
-#define MonsterDamage C_2DE5_012E
-#define MonsterHP C_2DE5_0160
-#define MonsterFlags C_2DE5_01C6
 
 #define GR_DRAW_BITMAP(s,x,y,p,m)    (GrDriver.iii.ofs = 0x30, (*GrDriver.f)(s,x,y,p,m))
 
@@ -361,15 +343,15 @@ extern unsigned char far *D_6DBA;/*TileFlag*/
 #define IsDraggedUnder(i) (NPCFlag[i] & 0x10)
 
 /*this module's functions used before their definition*/
-C_07D1_1378(int16);
-C_07D1_1483(int16, int16, int16, int16);
+COMBAT_showEffectHit(int16);
+COMBAT_Bleed(int16, int16, int16, int16);
 __DoHit(int16, int16, int16, int16);
-extern int16 C_07D1_35F5(int16, int16, int16);/*distance of (x, y) from an object*/
-extern COMBAT_beginAttacked(void);/*C_07D1_5CAF*/
-extern C_07D1_5DB2(int16);
-extern C_07D1_5F2B(int16, int16);
-extern C_07D1_632C(void);
-extern int16 C_07D1_5FEF(int16, int16, int16, int16);
+extern int16 COMBAT_RangeToObj(int16, int16, int16);/*distance of (x, y) from an object*/
+extern COMBAT_beginAttacked(void);
+extern COMBAT_CanalWormGulp(int16);
+extern COMBAT_Explode(int16, int16);
+extern COMBAT_RasputinThrow(void);
+extern int16 COMBAT_FireM60(int16, int16, int16, int16);
 
 /*when 0, the next COMBAT_showHit() call skips the hit flash*/
 /*06BA*/int16 ShowHitFlash = 1;
@@ -395,9 +377,11 @@ extern int16 C_07D1_5FEF(int16, int16, int16, int16);
 
 /*0700*/static int16 NumEquipWeapons = 0;/*number of equiped weapons in EquipWeapons*/
 /*0702*/static int16 CurEquipWeapon = 0;/*index in EquipWeapons of the weapon currently attacking*/
-/*0704*/char D_0704 = 0;
+/*set when a hit ended in COMBAT_RasputinThrow: COMBAT_AttackWithNextWeapon
+  skips the weapon's spray*/
+/*0704*/char CancelSpray = 0;
 
-/*the spraying weapons (C_07D1_0D54): their type, missile tile (0xff:
+/*the spraying weapons (COMBAT_Spray): their type, missile tile (0xff:
   none), kind of hit (__DoHit), damage and sound; 0xf1 freezes*/
 /*0705*/int16 SprayTypes[] = {0x2b, 0x2d, 0xf0, 0xf1, 0};
 /*070F*/int16 SprayTiles[] = {0x106, 0x106, 0x14e, 0x14f, 0xff};
@@ -406,7 +390,7 @@ extern int16 C_07D1_5FEF(int16, int16, int16, int16);
 /*0723*/unsigned char SpraySfx[] = {8, 8, 10, 10, 0xff};
 /*direction (0 N, 1 NE ... 7 NW) from (x0, y0) towards (x1, y1), on the
   wrapping map*/
-/*C_07D1_000D*/C_07D1_000D(int16 x0, int16 y0, int16 x1, int16 y1) {
+/*C_07D1_000D*/COMBAT_DirTo(int16 x0, int16 y0, int16 x1, int16 y1) {
 	int16 delta_x, delta_y;
 
 	delta_x = WrapDelta(x1 - x0);
@@ -575,7 +559,7 @@ extern int16 C_07D1_5FEF(int16, int16, int16, int16);
 	int16 value = STREN[objNum];
 	if(IsCursed(objNum))
 		value -= 3;
-	if(objNum <= 15 && D_16B0[objNum].a)
+	if(objNum <= 15 && Talents[objNum].a)
 		value -= 3;
 	if(ObjStatus[objNum] & 0x80)
 		value += 3;
@@ -659,7 +643,7 @@ extern int16 C_07D1_5FEF(int16, int16, int16, int16);
   C_120E_024B(1) when near the party); 0x156-0x165 fall as 0x155 (asleep
   on a 0x8d: 0x8e), 0x169-0x171 as 0x151, 0x167/0x168 as 0x152, 0x178 as
   0x153, 0x174 as 0x9f, 0x198 as 0xfd; class flag 0x2000 bleeds
-  (C_07D1_1483, four squares for 0x175). returns 1 if the actor has a body
+  (COMBAT_Bleed, four squares for 0x175). returns 1 if the actor has a body
   (0: it must disappear)*/
 /*C_07D1_06C1*/SetTypeUnconscious(int16 objNum) {
 	int16 objCls, isDead, obj, ret;
@@ -713,11 +697,11 @@ extern int16 C_07D1_5FEF(int16, int16, int16, int16);
 	}
 	if(isDead) {
 		if(MonsterFlags[objCls] & 0x2000) {
-			C_07D1_1483(objCls, GetX(objNum), GetY(objNum), 1);
+			COMBAT_Bleed(objCls, GetX(objNum), GetY(objNum), 1);
 			if(objType == 0x175) {
-				C_07D1_1483(objCls, GetX(objNum) - 1, GetY(objNum), 1);
-				C_07D1_1483(objCls, GetX(objNum), GetY(objNum) - 1, 1);
-				C_07D1_1483(objCls, GetX(objNum) - 1, GetY(objNum) - 1, 1);
+				COMBAT_Bleed(objCls, GetX(objNum) - 1, GetY(objNum), 1);
+				COMBAT_Bleed(objCls, GetX(objNum), GetY(objNum) - 1, 1);
+				COMBAT_Bleed(objCls, GetX(objNum) - 1, GetY(objNum) - 1, 1);
 			}
 		}
 		if((MonsterFlags[objCls] & 0x800) || (MonsterFlags[objCls] & 0x1000)) {
@@ -785,14 +769,14 @@ extern int16 C_07D1_5FEF(int16, int16, int16, int16);
 	return firstObj;
 }
 
-/*total protection of an actor: its equipped armours (C_100B_00C4)*/
+/*total protection of an actor: its equipped armours (GetArmorPoints)*/
 /*C_07D1_0CC2*/GetProtection(int16 objNum) {
 	int16 protection, invObj;
 
 	protection = 0;
 	for(invObj = FindInv(objNum); invObj >= 0; invObj = NextInv()) {
 		if(GetCoordUse(invObj) == 0x18)
-			protection += C_100B_00C4(invObj);
+			protection += GetArmorPoints(invObj);
 	}
 	return protection;
 }
@@ -813,7 +797,7 @@ extern int16 C_07D1_5FEF(int16, int16, int16, int16);
   (OSI_rand(1, 60) against their dexterity); 0xf1 freezes the water
   (0xa0 frame 1 to frame 2) and paralyzes the actors of class flag 0x4000
   or 0x80 (0x80 alone also hurts, 0x4000 shows the hit)*/
-/*C_07D1_0D54*/C_07D1_0D54(int16 attacker, int16 x, int16 y, int16 weapType) {
+/*C_07D1_0D54*/COMBAT_Spray(int16 attacker, int16 x, int16 y, int16 weapType) {
 	int16 far *hits;
 	int16 objCls, i;
 
@@ -837,7 +821,7 @@ extern int16 C_07D1_5FEF(int16, int16, int16, int16);
 						if((MonsterFlags[objCls] & 0x80) && !(MonsterFlags[objCls] & 0x4000))
 							__DoHit(attacker, *hits, SprayDamages[i], 1);
 						else
-							C_07D1_1378(*hits);
+							COMBAT_showEffectHit(*hits);
 					} else {
 						CON_printf(C_2BB4_02A4);
 					}
@@ -862,7 +846,7 @@ extern int16 C_07D1_5FEF(int16, int16, int16, int16);
 
 /*fire a ranged weapon (or throw an object) from att_objNum toward
   *pX_dest,*pY_dest: the missile, sound and ammunition come from
-  C_100B_00FF (ammo >= 0: one object of that type is used; -2: the
+  GetMissileInfo (ammo >= 0: one object of that type is used; -2: the
   weapon's own quantity; -3: nothing); without ammunition an object
   thrown further than 1 square lands where the missile stopped (gone in
   the water) and the next one of its type is readied in its hand. returns 1*/
@@ -872,12 +856,12 @@ extern int16 C_07D1_5FEF(int16, int16, int16, int16);
 
 	typ = GetType(weap_objNum);
 	range = GetWeaponRange(weap_objNum);
-	C_100B_00FF(typ, &missileTile, &sfx, &ammo);
+	GetMissileInfo(typ, &missileTile, &sfx, &ammo);
 	if(sfx >= 0)
 		MUS_PlaySfx(sfx);
 	dest_x = *pX_dest;
 	dest_y = *pY_dest;
-	thrown = C_07D1_35F5(dest_x, dest_y, att_objNum) > 1;
+	thrown = COMBAT_RangeToObj(dest_x, dest_y, att_objNum) > 1;
 	if(missileTile == 0 && att_objNum != weap_objNum)
 		missileTile = TILE_FRAME(weap_objNum);
 	COMBAT_Missile(att_objNum, pX_dest, pY_dest, range, missileTile);
@@ -896,7 +880,7 @@ extern int16 C_07D1_5FEF(int16, int16, int16, int16);
 			slot = 8;
 		else
 			slot = -1;
-		if(C_047A_13C5(MissileEnd[0], MissileEnd[1]))
+		if(IsOpenWater(MissileEnd[0], MissileEnd[1]))
 			DeleteObj(weap_objNum);
 		else
 			MoveObj(weap_objNum, MissileEnd[0], MissileEnd[1], MapZ);
@@ -964,7 +948,7 @@ extern int16 C_07D1_5FEF(int16, int16, int16, int16);
 }
 
 /*the same with the tile 0x102 (a paralyzing hit)*/
-/*C_07D1_1378*/C_07D1_1378(int16 objNum) {
+/*C_07D1_1378*/COMBAT_showEffectHit(int16 objNum) {
 	if(ShowHitFlash) {
 		int16 x = (GetX(objNum) - MapX + 5) & 0x3ff;
 		int16 y = (GetY(objNum) - MapY + 5) & 0x3ff;
@@ -994,14 +978,14 @@ extern int16 C_07D1_5FEF(int16, int16, int16, int16);
   0x14f (flags 0x80 and 0x4000), 0x150 (0x80) or 0x14e (0x4000), with a
   random frame; a blood object already there (0x14e-0x150) is reused (moved
   to the end of the square, or with move set by MoveObj); none on the
-  tiles of Is_6C_6D_6E_4D_4F or with an object 0x19c-0x19f/0x1a3 there*/
-/*C_07D1_1483*/C_07D1_1483(int16 objCls, int16 x, int16 y, int16 move) {
+  tiles of IsTrackTile or with an object 0x19c-0x19f/0x1a3 there*/
+/*C_07D1_1483*/COMBAT_Bleed(int16 objCls, int16 x, int16 y, int16 move) {
 	int16 obj;
 	int16 tile, blood;
 
 	blood = -1;
 	if(MonsterFlags[objCls] & 0x2000) {
-		if(Is_6C_6D_6E_4D_4F(GetTileAtXYZ(x, y, MapZ)))
+		if(IsTrackTile(GetTileAtXYZ(x, y, MapZ)))
 			return;
 		for(obj = FindLoc(x, y, MapZ); obj >= 0; obj = NextLoc()) {
 			switch(GetType(obj)) {
@@ -1028,7 +1012,7 @@ extern int16 C_07D1_5FEF(int16, int16, int16, int16);
 			if(move)
 				MoveObj(blood, x, y, MapZ);
 			else
-				C_1B09_268D(blood);
+				OBJ_MoveLastOnSquare(blood);
 			SetType(blood, tile);
 			SetFrame(blood, OSI_rand(0, 2));
 		}
@@ -1168,7 +1152,7 @@ extern int16 C_07D1_5FEF(int16, int16, int16, int16);
 					xp += MonsterDex[objCls + 1] * MonsterDamage[objCls + 1];
 				xp += (MonsterHP[objCls + 1] + MonsterArmor[objCls + 1]) * MonsterDex[objCls + 1];
 			}
-			if((D_16AA & 0x10) && DreamStage && D_16A3 && objType != 0x16a && objType != 0x180 && --D_16A3 == 0) {
+			if((GameFlags & 0x10) && DreamStage && DreamFoesLeft && objType != 0x16a && objType != 0x180 && --DreamFoesLeft == 0) {
 				if(DreamStage == 0x20) {
 					SetTypeUnconscious(objNum);
 					NPCMode[objNum] = 0;
@@ -1226,7 +1210,7 @@ extern int16 C_07D1_5FEF(int16, int16, int16, int16);
 				ObjShapeType[objNum] = 0;
 		}
 		if(MonsterFlags[objCls] & 0x800)
-			C_07D1_5F2B(KillX, KillY);
+			COMBAT_Explode(KillX, KillY);
 		VisibilityDirty = 1;
 	}
 	if(Party[Active] == objNum)
@@ -1235,13 +1219,13 @@ extern int16 C_07D1_5FEF(int16, int16, int16, int16);
 }
 
 /*inflict damage to an object; kind 0 a normal hit (actors may bleed),
-  1 a paralyzing one (C_07D1_1378: freezes the water 0xa0), 3 a burning
+  1 a paralyzing one (COMBAT_showEffectHit: freezes the water 0xa0), 3 a burning
   one (thaws 0xa0; class flag 8 resists it). Actors: the invulnerable
   ones keep 255 hit points (some talk back, 0x187 hits the player three
-  times, 0x6d/0x67 send the party away, 0x40 calls C_07D1_632C), others
+  times, 0x6d/0x67 send the party away, 0x40 calls COMBAT_RasputinThrow), others
   die (COMBAT_Kill) or lose hit points (the class flag 0x40 divides, the
   dreamer survives stage 0xe0 with 1 point). Breakable items
-  (C_100B_038E) lose "quantity" points and are destroyed at 0, some with
+  (IsBreakableType) lose "quantity" points and are destroyed at 0, some with
   effects (0x133 the pod, 0x184, 0xd9 in dream stage 0x44). returns the
   experience gained by killing a hostile monster*/
 /*C_07D1_1D64*/LoseHP(int16 objNum, int16 damage, int16 kind) {
@@ -1263,7 +1247,7 @@ extern int16 C_07D1_5FEF(int16, int16, int16, int16);
 	if(IsNPC(objNum)) {
 		objCls = GetMonsterClass(objType);
 		if(kind == 1)
-			C_07D1_1378(objNum);
+			COMBAT_showEffectHit(objNum);
 		else
 			COMBAT_showHit(objNum);
 		if(IsInvulnerable(objNum)) {
@@ -1294,15 +1278,15 @@ extern int16 C_07D1_5FEF(int16, int16, int16, int16);
 			}
 			HitPoints[objNum] = 0xff;
 			if(GetType(objNum) == 0x187) {
-				CON_printf("How dare you, young %sman!\n", D_16A8?"wo":"");
+				CON_printf("How dare you, young %sman!\n", PlayerIsFemale?"wo":"");
 				__DoHit(objNum, 0, 0x2d, 0);
 				__DoHit(objNum, 0, 0x2d, 0);
 				__DoHit(objNum, 0, 0x2d, 0);
 			} else if(objNum == 0x6d || objNum == 0x67) {
 				TalkFlags[0x6b] |= 8;
-				PartyTeleport(D_1684, D_1685, MapZ, 1);
+				PartyTeleport(WakeX, WakeY, MapZ, 1);
 			} else if(objNum == 0x40) {
-				C_07D1_632C();
+				COMBAT_RasputinThrow();
 				return 0;
 			}
 			return 0;
@@ -1316,7 +1300,7 @@ extern int16 C_07D1_5FEF(int16, int16, int16, int16);
 				damage << 1;/*(sic)*/
 		}
 		if(kind == 0 && (objNum != 0 || DreamStage != 0xe0) && OSI_rand(6, 100) <= damage)
-			C_07D1_1483(objCls, x, y, 0);
+			COMBAT_Bleed(objCls, x, y, 0);
 		if(HitPoints[objNum] <= damage) {
 			xp = COMBAT_Kill(objNum);
 		} else {
@@ -1346,18 +1330,18 @@ extern int16 C_07D1_5FEF(int16, int16, int16, int16);
 			}
 		}
 		if(IsPlrControl(objNum)) {
-			if((D_16AA & 0x10) || (StatusDisplay == 0x90 && Party[StatusMember] == objNum))
+			if((GameFlags & 0x10) || (StatusDisplay == 0x90 && Party[StatusMember] == objNum))
 				StatusDirty = 1;
 			else if(StatusDisplay == 0x91)
 				STAT_ShowParty(PartyListTop);
 		}
-	} else if(GetQuan(objNum) && C_100B_038E(objType)) {
-		if(kind == 0 || kind == 3 || C_100B_0410(objType)) {
+	} else if(GetQuan(objNum) && IsBreakableType(objType)) {
+		if(kind == 0 || kind == 3 || IsPlantType(objType)) {
 			if(kind == 1)
-				C_07D1_1378(objNum);
+				COMBAT_showEffectHit(objNum);
 			else
 				COMBAT_showHit(objNum);
-			if(kind == 3 && C_100B_0247(objType))
+			if(kind == 3 && IsBurnableType(objType))
 				damage = GetQuan(objNum);
 			if(GetQuan(objNum) > damage) {
 				if(objType == 0x133) {
@@ -1378,7 +1362,7 @@ extern int16 C_07D1_5FEF(int16, int16, int16, int16);
 				if(objType == 0xd9) {
 					MUS_PlaySfx(0x1a);
 					ObjShapeType[objNum] = 0xda;
-					if((D_16AA & 0x10) && DreamStage == 0x44) {
+					if((GameFlags & 0x10) && DreamStage == 0x44) {
 						for(i = SearchArea(0x37, 0x37, 0x47, 0x47); i >= 0; i = NextArea())
 							if(GetType(i) == 0xd9)
 								break;
@@ -1518,7 +1502,7 @@ extern int16 C_07D1_5FEF(int16, int16, int16, int16);
 /*a hit of kind (LoseHP's) landed: roll the damage (1..hitPts; 255 is a
   sure kill), subtract 1..armour (none for kind 2; 2 for an object 0x184
   of frame 0), apply it, print the messages; a creature of class flag 4
-  paralyzes, 0x17b calls C_07D1_5DB2 when its victim left a body*/
+  paralyzes, 0x17b calls COMBAT_CanalWormGulp when its victim left a body*/
 /*C_07D1_274C*/__DoHit(int16 attacker, int16 defender, int16 hitPts, int16 kind) {
 	char *pObjStr;
 	int16 armorPts, defTyp, attCls, defCls;
@@ -1548,7 +1532,7 @@ extern int16 C_07D1_5FEF(int16, int16, int16, int16);
 
 	if(hitPts <= 0) {
 		if(kind == 1)
-			C_07D1_1378(defender);
+			COMBAT_showEffectHit(defender);
 		else
 			COMBAT_showHit(defender);
 		CON_printf(C_2BB4_0038, pObjStr);
@@ -1568,7 +1552,7 @@ extern int16 C_07D1_5FEF(int16, int16, int16, int16);
 		if(StatusDisplay == 0x90 && Party[StatusMember] == attacker)
 			StatusDirty = 1;
 		if(GetType(attacker) == 0x17b && KillBody >= 0)
-			C_07D1_5DB2(attacker);
+			COMBAT_CanalWormGulp(attacker);
 		return;
 	}
 	if(IsNPC(defender) && (MonsterFlags[attCls] & 4) && OSI_rand(0, 3) == 0 && !IsInvulnerable(defender)) {
@@ -1601,7 +1585,7 @@ extern int16 C_07D1_5FEF(int16, int16, int16, int16);
 /*attack (x,y) with a weapon: range, ammunition (0x2f needs 0x3f, 0x29/0x2a
   0x39, 0x2e 0x3c, 0x2c 0x3b, 0x2b 0x3a; 0x81/0x105 their quantity), hit
   test, missile, damage; the sprayers 0x2b, 0x2d, 0xf0, 0xf1 also (or
-  only) spray (C_07D1_0D54, quality 0: both, 1: hit, 2+: spray; four
+  only) spray (COMBAT_Spray, quality 0: both, 1: hit, 2+: spray; four
   charges or one 0x3a), 0xf1 freezes and paralyzes, 0x81/0x105 with a
   quality make invisible actors visible (0x91 becomes 0x16c), 0x28 charms.
   returns 0: done, 1: no ammunition, 2: out of range*/
@@ -1611,7 +1595,7 @@ extern int16 C_07D1_5FEF(int16, int16, int16, int16);
 
 	kind = 0;
 	objTyp = GetType(weap_objNum);
-	if((range = C_07D1_35F5(x, y, att_objNum)) > GetWeaponRange(weap_objNum))
+	if((range = COMBAT_RangeToObj(x, y, att_objNum)) > GetWeaponRange(weap_objNum))
 		return 2;
 	/*ammunition*/
 	if(objTyp == 0x2f && FindInvType(att_objNum, 0x3f, -1) < 0)
@@ -1707,7 +1691,7 @@ extern int16 C_07D1_5FEF(int16, int16, int16, int16);
 					if((MonsterFlags[tmp] & 0x80) && !(MonsterFlags[tmp] & 0x4000))
 						__DoHit(att_objNum, opp_objNum, damage, 1);
 					else
-						C_07D1_1378(opp_objNum);
+						COMBAT_showEffectHit(opp_objNum);
 				} else {
 					CON_printf(C_2BB4_02A4);
 				}
@@ -1732,7 +1716,7 @@ extern int16 C_07D1_5FEF(int16, int16, int16, int16);
 				}
 			} else if(objTyp == 0x28) {
 				if(IsNPC(opp_objNum) && GetAlignment(opp_objNum) != 0x40) {
-					C_07D1_1378(opp_objNum);
+					COMBAT_showEffectHit(opp_objNum);
 					NPCFlag[opp_objNum] = (NPCFlag[opp_objNum] & ~0x60) | GetAlignment(opp_objNum);
 					SetAlignment(opp_objNum, 0x40);
 					ObjStatus[opp_objNum] |= 4;
@@ -1745,11 +1729,11 @@ extern int16 C_07D1_5FEF(int16, int16, int16, int16);
 		if(!doSpray)
 			return 0;
 	}
-	if(D_0704) {
-		D_0704 = 0;
+	if(CancelSpray) {
+		CancelSpray = 0;
 		return 0;
 	}
-	C_07D1_0D54(att_objNum, x, y, objTyp);
+	COMBAT_Spray(att_objNum, x, y, objTyp);
 	if(objTyp == 0x2b || objTyp == 0x2d)
 		TakeObj(att_objNum, 0x3a, 1);
 	else
@@ -1784,7 +1768,7 @@ extern int16 C_07D1_5FEF(int16, int16, int16, int16);
   weapon (EquipWeapons[CurEquipWeapon], bare hands if none; a missing
   ammunition ends it with a sound), then prepare the targeting of the
   next equipped weapon, or end the command. The weapon 0x139 strikes
-  through C_07D1_5FEF with the player's figure turned towards the target*/
+  through COMBAT_FireM60 with the player's figure turned towards the target*/
 /*C_07D1_30BA*/static COMBAT_AttackWithNextWeapon() {
 	int16 attacker, weapTyp;
 	int16 weapObj, hitResult, dir;
@@ -1850,11 +1834,11 @@ extern int16 C_07D1_5FEF(int16, int16, int16, int16);
 			if(SelectionObj < 0)
 				SelectionObj = COMBAT_GetTargetAt(attacker, SelectionX, SelectionY);
 			if(weapTyp == 0x139) {
-				ObjShapeType[0] = (D_16A8 ? 0x18d : 0x18c) | (dir >> 1 << 10);
+				ObjShapeType[0] = (PlayerIsFemale ? 0x18d : 0x18c) | (dir >> 1 << 10);
 				VIS_UpdateView();
 				MapAnimEnabled = 1;
 				DisplayTick();
-				hitResult = C_07D1_5FEF(attacker, SelectionX, SelectionY, weapObj);
+				hitResult = COMBAT_FireM60(attacker, SelectionX, SelectionY, weapObj);
 				ObjShapeType[0] = (ObjShapeType[1] & 0x3ff) | (dir >> 1 << 3 << 10);
 				VIS_UpdateView();
 				MapAnimEnabled = 1;
@@ -1877,7 +1861,7 @@ extern int16 C_07D1_5FEF(int16, int16, int16, int16);
 	if(CurEquipWeapon < NumEquipWeapons) {
 		SelectMode = 1;
 		SelectRange = GetWeaponRange(EquipWeapons[CurEquipWeapon]);
-		if(C_07D1_35F5((AimX + MapX - 5) & 0x3ff, (AimY + MapY - 5) & 0x3ff, attacker) > SelectRange) {
+		if(COMBAT_RangeToObj((AimX + MapX - 5) & 0x3ff, (AimY + MapY - 5) & 0x3ff, attacker) > SelectRange) {
 			AimX =
 			AimY = 5;
 		}
@@ -1908,7 +1892,7 @@ extern int16 C_07D1_5FEF(int16, int16, int16, int16);
 	else
 		weapObj = EquipWeapons[CurEquipWeapon];
 	SelectRange = GetWeaponRange(weapObj);
-	if(C_07D1_35F5((AimX + MapX - 5) & 0x3ff, (AimY + MapY - 5) & 0x3ff, attacker) > SelectRange) {
+	if(COMBAT_RangeToObj((AimX + MapX - 5) & 0x3ff, (AimY + MapY - 5) & 0x3ff, attacker) > SelectRange) {
 		AimX =
 		AimY = 5;
 	}
@@ -1954,7 +1938,7 @@ extern int16 C_07D1_5FEF(int16, int16, int16, int16);
   for the tiles of two squares (TileFlag 0x40 or 0x80: the second square
   above or to the left, by the frame / 4) from the nearer square; for the
   tiles of four squares (TileFlag 0xc0) 1 when (x, y) is next to them*/
-/*C_07D1_35F5*/int16 C_07D1_35F5(int16 x, int16 y, int16 objNum) {
+/*C_07D1_35F5*/int16 COMBAT_RangeToObj(int16 x, int16 y, int16 objNum) {
 	int16 objX, objY, tile;
 	int16 dx, dy;
 
@@ -1980,7 +1964,7 @@ extern int16 C_07D1_5FEF(int16, int16, int16, int16);
 
 /*1 when no member of the party (an actor under the player's control)
   stands in the line of fire from objNum to target*/
-/*C_07D1_3722*/C_07D1_3722(int16 objNum, int16 target) {
+/*C_07D1_3722*/COMBAT_NoPartyInLine(int16 objNum, int16 target) {
 	int16 far *hits;
 
 	for(hits = C_0E1A_1003(GetX(objNum), GetY(objNum), GetX(target), GetY(target), 0); *hits >= 0; hits ++)
@@ -1991,7 +1975,7 @@ extern int16 C_07D1_5FEF(int16, int16, int16, int16);
 
 /*the most damaging of the weapons att holds that reach opp (att itself:
   bare hands, if none). The 0x81/0x105 with a quality only against an
-  invisible opponent, without one only against C_100B_0410's types or
+  invisible opponent, without one only against IsPlantType's types or
   the classes with flag 0x80 and without 0x4000; a clever attacker (not
   hostile to the party, OSI_rand(1, 30) <= its intelligence) does not
   spray (0xf0, 0xf1, 0x2d, or fire a 0x2b) through the party: the
@@ -2009,7 +1993,7 @@ extern int16 C_07D1_5FEF(int16, int16, int16, int16);
 	bestDamage = 0;
 	oppX = GetX(opp_objNum);
 	oppY = GetY(opp_objNum);
-	range = C_07D1_35F5(oppX, oppY, att_objNum);
+	range = COMBAT_RangeToObj(oppX, oppY, att_objNum);
 	oppTyp = GetType(opp_objNum);
 	oppClass = GetMonsterClass(oppTyp);
 	attX = GetX(att_objNum);
@@ -2024,13 +2008,13 @@ extern int16 C_07D1_5FEF(int16, int16, int16, int16);
 			if(GetQual(invObj)) {
 				if(!IsInvisible(opp_objNum))
 					continue;
-			} else if(!C_100B_0410(oppTyp)) {
+			} else if(!IsPlantType(oppTyp)) {
 				if(oppClass == 0 || !(MonsterFlags[oppClass] & 0x80) || (MonsterFlags[oppClass] & 0x4000))
 					continue;
 			}
 		}
 		isSprayer = weapTyp == 0xf0 || weapTyp == 0xf1 || weapTyp == 0x2d;
-		if(clever && (isSprayer || weapTyp == 0x2b) && !C_07D1_3722(att_objNum, opp_objNum)) {
+		if(clever && (isSprayer || weapTyp == 0x2b) && !COMBAT_NoPartyInLine(att_objNum, opp_objNum)) {
 			if(!isSprayer)
 				continue;
 			SetQual(invObj, 1);
@@ -2133,7 +2117,7 @@ extern int16 C_07D1_5FEF(int16, int16, int16, int16);
 		x = GetX(objNum);
 		y = GetY(objNum);
 		range = GetWeaponRange(weapObj);
-		if((dist = C_07D1_35F5(opp_x, opp_y, objNum)) <= range) {
+		if((dist = COMBAT_RangeToObj(opp_x, opp_y, objNum)) <= range) {
 			if(dist <= 1 || COMBAT_Missile(objNum, &opp_x, &opp_y, range, 0)) {
 				__TryHit(objNum, opp_x, opp_y, weapObj);
 				SubMov(objNum, 10);
@@ -2157,7 +2141,7 @@ extern int16 C_07D1_5FEF(int16, int16, int16, int16);
 /*choose a ranged weapon (range 3 or more) for an NPC that keeps its
   distance: the longest range until one reaches the opponent, then the
   best damage; -1 if none*/
-/*C_07D1_3D62*/C_07D1_3D62(int16 att_objNum, int16 opp_objNum) {
+/*C_07D1_3D62*/COMBAT_PickRangedWeapon(int16 att_objNum, int16 opp_objNum) {
 	int16 opp_x, opp_y, att_x, att_y, ret, dmg, max_dmg, itemTyp, range, wrange, oppTyp;
 	int16 maxRange, i;
 
@@ -2169,7 +2153,7 @@ extern int16 C_07D1_5FEF(int16, int16, int16, int16);
 	att_x = GetX(att_objNum);
 	att_y = GetY(att_objNum);
 	oppTyp = GetType(opp_objNum);
-	range = C_07D1_35F5(opp_x, opp_y, att_objNum);
+	range = COMBAT_RangeToObj(opp_x, opp_y, att_objNum);
 	i = FindInv(att_objNum);
 	while(i >= 0) {
 		itemTyp = GetType(i);
@@ -2204,7 +2188,7 @@ extern int16 C_07D1_5FEF(int16, int16, int16, int16);
 	x = GetX(objNum);
 	y = GetY(objNum);
 	SelectionObj = COMBAT_pickOpponent(objNum);
-	weapObj = C_07D1_3D62(objNum, SelectionObj);
+	weapObj = COMBAT_PickRangedWeapon(objNum, SelectionObj);
 	if(SelectionObj >= 0 && MapDistance(GetX(SelectionObj), x) < 3 && MapDistance(GetY(SelectionObj), y) < 3) {
 		TryMoveTo(objNum, (x - GetX(SelectionObj)) & 0x3ff, (y - GetY(SelectionObj)) & 0x3ff);
 	} else if(weapObj == -1) {
@@ -2219,7 +2203,7 @@ extern int16 C_07D1_5FEF(int16, int16, int16, int16);
 			opp_x = GetX(SelectionObj);
 			opp_y = GetY(SelectionObj);
 			range = GetWeaponRange(weapObj);
-			if((dist = C_07D1_35F5(opp_x, opp_y, objNum)) <= range) {
+			if((dist = COMBAT_RangeToObj(opp_x, opp_y, objNum)) <= range) {
 				if(COMBAT_Missile(objNum, &opp_x, &opp_y, range, 0)) {
 					__TryHit(objNum, opp_x, opp_y, weapObj);
 					SubMov(objNum, 10);
@@ -2300,7 +2284,7 @@ extern int16 C_07D1_5FEF(int16, int16, int16, int16);
 		weapObj = __PickWeapon(objNum, bestOpp);
 		weapTyp = GetType(weapObj);
 		range = GetWeaponRange(weapObj);
-		if((dist = C_07D1_35F5(oppX, oppY, objNum)) <= range) {
+		if((dist = COMBAT_RangeToObj(oppX, oppY, objNum)) <= range) {
 			SelectionObj = bestOpp;
 			if(dist <= 1 || COMBAT_Missile(objNum, &oppX, &oppY, range, 0)) {
 				__TryHit(objNum, oppX, oppY, weapObj);
@@ -2458,7 +2442,7 @@ extern int16 C_07D1_5FEF(int16, int16, int16, int16);
 		range = GetWeaponRange(weapObj);
 		opp_x = GetX(SelectionObj);
 		opp_y = GetY(SelectionObj);
-		if((dist = C_07D1_35F5(opp_x, opp_y, objNum)) <= range) {
+		if((dist = COMBAT_RangeToObj(opp_x, opp_y, objNum)) <= range) {
 			if(dist <= 1 || COMBAT_Missile(objNum, &opp_x, &opp_y, range, 0)) {
 				__TryHit(objNum, opp_x, opp_y, weapObj);
 				SubMov(objNum, 10);
@@ -2475,9 +2459,9 @@ extern int16 C_07D1_5FEF(int16, int16, int16, int16);
 }
 
 /*A.I. of mode 0x13: moves at random and hurts everything on its new
-  square (but the invulnerable ones); in dream stage 0x44 the 0x18e
-  moves one turn in two, shaking the screen*/
-/*C_07D1_4912*/C_07D1_4912(int16 objNum) {
+  square (but the invulnerable ones); in dream stage 0x44 the minotaur
+  0x18e moves one turn in two, shaking the screen*/
+/*C_07D1_4912*/COMBAT_AI_Rampage(int16 objNum) {
 	int16 objTyp;
 	int16 i;
 
@@ -2494,12 +2478,12 @@ extern int16 C_07D1_5FEF(int16, int16, int16, int16);
 			LoseHP(i, OSI_rand(1, 10) + OSI_rand(1, 10), 0);
 }
 
-/*A.I. of mode 0x16 (the dream): goes for the 0xa2 (carried by NPC 0, or
+/*A.I. of mode 0x16 (the dream): goes for the red cape 0xa2 (carried by NPC 0, or
   the first one in the area), hurting everything on its way; it strikes
   NPC 0 when next to him; next to a 0xa2 on the map in the zone x >= 0x37,
-  y <= 0x37 (TalkFlags[0x54] & 0x40 clear) the dream ends with NPC 0x54's
-  talk. Without any 0xa2 as mode 0x13; gone in dream stage 0x60*/
-/*C_07D1_4A00*/C_07D1_4A00(int16 objNum) {
+  y <= 0x37 (TalkFlags[0x54] & 0x40 clear) the dream ends with Tiffany's (NPC
+  0x54) talk. Without any 0xa2 as mode 0x13; gone in dream stage 0x60*/
+/*C_07D1_4A00*/COMBAT_AI_ChaseCape(int16 objNum) {
 	int16 target, tx, ty;
 	int16 i;
 
@@ -2522,11 +2506,11 @@ extern int16 C_07D1_5FEF(int16, int16, int16, int16);
 			}
 		}
 		if(target < 0) {
-			C_07D1_4912(objNum);
+			COMBAT_AI_Rampage(objNum);
 			return;
 		}
 	}
-	if(C_07D1_35F5(tx, ty, objNum) <= 1) {
+	if(COMBAT_RangeToObj(tx, ty, objNum) <= 1) {
 		if(SelectionObj == 0) {
 			__TryHit(objNum, tx, ty, objNum);
 			SubMov(objNum, 10);
@@ -2550,16 +2534,16 @@ extern int16 C_07D1_5FEF(int16, int16, int16, int16);
 }
 
 /*A.I. of mode 0x12 (hidden under the sand): when an enemy comes next to
-  it, it bursts out (mode 0xe, visible, combat begins); the creature 0x175
-  then brings up 10 to 30 parts 0x16a (mode 0x19, frame 3, its number in
+  it, it bursts out (mode 0xe, visible, combat begins); the giant maw 0x175
+  then brings up 10 to 30 tentacles 0x16a (mode 0x19, frame 3, its number in
   their quality) on free squares within 6 of it*/
-/*C_07D1_4C0A*/C_07D1_4C0A(int16 objNum) {
+/*C_07D1_4C0A*/COMBAT_AI_HiddenInSand(int16 objNum) {
 	int16 opp, count, x, y, loc;
 	int16 part, j;
 
 	if(
 		(opp = COMBAT_pickOpponent(objNum)) >= 0 &&
-		(C_07D1_35F5(GetX(opp), GetY(opp), objNum) <= 1 || C_07D1_35F5(GetX(objNum), GetY(objNum), opp) <= 1)
+		(COMBAT_RangeToObj(GetX(opp), GetY(opp), objNum) <= 1 || COMBAT_RangeToObj(GetX(objNum), GetY(objNum), opp) <= 1)
 	) {
 		CON_printf("Suddenly, something bursts up through the sand!\n");
 		MUS_PlaySfx(0x21);
@@ -2593,13 +2577,13 @@ extern int16 C_07D1_5FEF(int16, int16, int16, int16);
 	}
 }
 
-/*A.I. of mode 0x19 (the parts 0x16a of the creature 0x175, hidden in the
-  sand): an enemy in range is struck, the part showing itself (frame 3 or
+/*A.I. of mode 0x19 (the tentacles 0x16a of the giant maw 0x175, hidden in
+  the sand): an enemy in range is struck, the part showing itself (frame 3 or
   7) if hidden; out of range a visible part sinks (0xfe, then hidden) one
   turn in two or for good when weak (a quarter of its hit points), a
   hidden one moves toward the enemy (gone when 8 squares from its
   creature) and shows itself now and then (more often when close)*/
-/*C_07D1_4E34*/C_07D1_4E34(int16 objNum) {
+/*C_07D1_4E34*/COMBAT_AI_Tentacle(int16 objNum) {
 	int16 weapObj, range, opp_x, opp_y, dist, weak;
 	int16 head;
 
@@ -2608,7 +2592,7 @@ extern int16 C_07D1_5FEF(int16, int16, int16, int16);
 	range = GetWeaponRange(weapObj);
 	opp_x = GetX(SelectionObj);
 	opp_y = GetY(SelectionObj);
-	if((dist = C_07D1_35F5(opp_x, opp_y, objNum)) <= range) {
+	if((dist = COMBAT_RangeToObj(opp_x, opp_y, objNum)) <= range) {
 		if(dist <= 1 || COMBAT_Missile(objNum, &opp_x, &opp_y, range, 0)) {
 			if(IsInvisible(objNum)) {
 				ClrInvisible(objNum);
@@ -2659,14 +2643,14 @@ extern int16 C_07D1_5FEF(int16, int16, int16, int16);
   another member next to it) it takes a 0x83 (oxium), leaving a random
   part of it, and flees (mode 0x1b) the more likely the more it took;
   next to an enemy without any it strikes; else it moves toward it*/
-/*C_07D1_50B2*/C_07D1_50B2(int16 objNum) {
+/*C_07D1_50B2*/COMBAT_AI_Thief(int16 objNum) {
 	int16 opp_x, opp_y, oxium, member;
 	int16 i;
 
 	if((SelectionObj = COMBAT_pickOpponent(objNum)) >= 0) {
 		opp_x = GetX(SelectionObj);
 		opp_y = GetY(SelectionObj);
-		if(C_07D1_35F5(opp_x, opp_y, objNum) <= 1 || C_07D1_35F5(GetX(objNum), GetY(objNum), SelectionObj) <= 1) {
+		if(COMBAT_RangeToObj(opp_x, opp_y, objNum) <= 1 || COMBAT_RangeToObj(GetX(objNum), GetY(objNum), SelectionObj) <= 1) {
 			if((oxium = FindInvOfType(SelectionObj, 0x83)) >= 0) {
 			steal:
 				COMBAT_showHit(SelectionObj);
@@ -2688,7 +2672,7 @@ extern int16 C_07D1_5FEF(int16, int16, int16, int16);
 					opp_x = GetX(member);
 					opp_y = GetY(member);
 					if(
-						(C_07D1_35F5(opp_x, opp_y, objNum) <= 1 || C_07D1_35F5(GetX(objNum), GetY(objNum), member) <= 1) &&
+						(COMBAT_RangeToObj(opp_x, opp_y, objNum) <= 1 || COMBAT_RangeToObj(GetX(objNum), GetY(objNum), member) <= 1) &&
 						(oxium = FindInvOfType(member, 0x83)) >= 0
 					) {
 						SelectionObj = member;
@@ -2707,13 +2691,13 @@ extern int16 C_07D1_5FEF(int16, int16, int16, int16);
 	}
 }
 
-/*a worm (head objNum, its tail 0x173 holding the head's number in its
+/*a rockworm (head objNum, its tail 0x173 holding the head's number in its
   quality) moves backward onto the square of its tail: the tail goes, the
   head turns to the direction the tail pointed to (from the tail's frame
   and the head's frame). Without a tail, with dieIfStuck the worm dies
   (its body actor, the head's quality, at that square, killed); returns
   the head's old direction, -1 if it did not move*/
-/*C_07D1_52E6*/C_07D1_52E6(int16 objNum, int16 dieIfStuck) {
+/*C_07D1_52E6*/COMBAT_WormBackUp(int16 objNum, int16 dieIfStuck) {
 	int16 x, y, dir, bits, frame, tailFrame, oldDir;
 	int16 tail;
 
@@ -2721,7 +2705,7 @@ extern int16 C_07D1_5FEF(int16, int16, int16, int16);
 	dir = (GetFrame(objNum) + 4) & 6;
 	x = (GetX(objNum) + DirIncrX[dir]) & 0x3ff;
 	y = (GetY(objNum) + DirIncrY[dir]) & 0x3ff;
-	for(tail = OBJ_FindTypeAt(0x173, x, y); tail >= 0 && GetQual(tail) != objNum; tail = C_1B09_0A5D(tail));
+	for(tail = OBJ_FindTypeAt(0x173, x, y); tail >= 0 && GetQual(tail) != objNum; tail = OBJ_NextOfTypeAt(tail));
 	if(tail < 0) {
 		if(dieIfStuck) {
 			if((tail = OBJ_FindNPCAt(GetQual(objNum), x, y)) >= 0) {
@@ -2762,15 +2746,15 @@ extern int16 C_07D1_5FEF(int16, int16, int16, int16);
 	return oldDir;
 }
 
-/*A.I. of mode 0x0d (the worms: the actor 0x172 is the body under the
+/*A.I. of mode 0x0d (the rockworms: the actor 0x172 is the body under the
   sand, its head 0x174 in its quality and the body's number in the head's;
   the tail segments 0x173 hold the head's number). The body dies with its
   head; without a head it raises one (mode 0x0d) next to it toward the
-  enemy, or dies (D_16A3 counted down) when there is no room. The head
+  enemy, or dies (DreamFoesLeft counted down) when there is no room. The head
   strikes an enemy next to it, else moves toward it leaving a segment
-  behind (its frame from the turn), or backs up (C_07D1_52E6, the quantity
+  behind (its frame from the turn), or backs up (COMBAT_WormBackUp, the quantity
   remembering the direction) when blocked or when too far from its body*/
-/*C_07D1_5520*/C_07D1_5520(int16 objNum) {
+/*C_07D1_5520*/COMBAT_AI_Worm(int16 objNum) {
 	int16 x, y, dist, dir, diag, seg, back, segFrame, frame, r, objTyp, other, d;
 	int16 tx, ty;
 
@@ -2794,7 +2778,7 @@ extern int16 C_07D1_5FEF(int16, int16, int16, int16);
 			objTyp == 0x174 && other &&
 			(C_170D_0002(other) || MapDistance(x, GetX(other)) > 8 || MapDistance(y, GetY(other)) > 8)
 		) {
-			if((r = C_07D1_52E6(objNum, 0)) >= 0)
+			if((r = COMBAT_WormBackUp(objNum, 0)) >= 0)
 				SetQuan(objNum, r + 1);
 			else
 				SetQuan(objNum, 0xff);
@@ -2807,8 +2791,8 @@ extern int16 C_07D1_5FEF(int16, int16, int16, int16);
 			y = GetY(objNum);
 			tx = GetX(SelectionObj);
 			ty = GetY(SelectionObj);
-			dist = C_07D1_35F5(tx, ty, objNum);
-			dir = C_07D1_000D(x, y, tx, ty);
+			dist = COMBAT_RangeToObj(tx, ty, objNum);
+			dir = COMBAT_DirTo(x, y, tx, ty);
 			diag = dir & 1;
 			if(diag)
 				dir &= ~1;
@@ -2833,8 +2817,8 @@ extern int16 C_07D1_5FEF(int16, int16, int16, int16);
 								DeleteObj(seg);
 								seg = -1;
 								DeleteObj(objNum);
-								if(D_16A3)
-									D_16A3 --;
+								if(DreamFoesLeft)
+									DreamFoesLeft --;
 							} else {
 								dir = d;
 							}
@@ -2859,9 +2843,9 @@ extern int16 C_07D1_5FEF(int16, int16, int16, int16);
 		retry:
 			tx = (x + DirIncrX[dir]) & 0x3ff;
 			ty = (y + DirIncrY[dir]) & 0x3ff;
-			for(seg = OBJ_FindTypeAt(0x173, tx, ty); seg >= 0 && GetQual(seg) != objNum; seg = C_1B09_0A5D(seg));
+			for(seg = OBJ_FindTypeAt(0x173, tx, ty); seg >= 0 && GetQual(seg) != objNum; seg = OBJ_NextOfTypeAt(seg));
 			if(seg >= 0) {
-				if((r = C_07D1_52E6(objNum, 0)) >= 0)
+				if((r = COMBAT_WormBackUp(objNum, 0)) >= 0)
 					SetQuan(objNum, r + 1);
 				else
 					SetQuan(objNum, 0xff);
@@ -2877,7 +2861,7 @@ extern int16 C_07D1_5FEF(int16, int16, int16, int16);
 					goto retry;
 				}
 				if(OSI_rand(0, 1)) {
-					if((r = C_07D1_52E6(objNum, 0)) >= 0)
+					if((r = COMBAT_WormBackUp(objNum, 0)) >= 0)
 						SetQuan(objNum, r + 1);
 					else
 						SetQuan(objNum, 0xff);
@@ -2903,22 +2887,22 @@ extern int16 C_07D1_5FEF(int16, int16, int16, int16);
 
 /*A.I. of mode 0x11 (a worm fleeing, or critically hurt): the body 0x172
   stays, the head backs up (and the worm dies when it cannot)*/
-/*C_07D1_5AD6*/C_07D1_5AD6(int16 objNum) {
+/*C_07D1_5AD6*/COMBAT_AI_WormFlee(int16 objNum) {
 	if(GetType(objNum) == 0x172)
 		SubMov(objNum, MovePts[objNum]);
 	else
-		C_07D1_52E6(objNum, 1);
+		COMBAT_WormBackUp(objNum, 1);
 }
 
 /*A.I. of mode 0x15: moves south while it can; when it cannot, it hurts
   (__DoHit, 6 points) an enemy next to it*/
-/*C_07D1_5B09*/C_07D1_5B09(int16 objNum) {
+/*C_07D1_5B09*/COMBAT_AI_MoveSouth(int16 objNum) {
 	int16 opp_x, opp_y;
 
 	if(!TryStraightMove(objNum, 4, 1) && (SelectionObj = COMBAT_pickOpponent(objNum)) >= 0) {
 		opp_x = GetX(SelectionObj);
 		opp_y = GetY(SelectionObj);
-		if(C_07D1_35F5(opp_x, opp_y, objNum) < 2) {
+		if(COMBAT_RangeToObj(opp_x, opp_y, objNum) < 2) {
 			__DoHit(objNum, SelectionObj, 6, 0);
 			PromptFlag = 1;
 		}
@@ -2930,7 +2914,7 @@ extern int16 C_07D1_5FEF(int16, int16, int16, int16);
   same square (a 0x198 joining a 0x1a8 already there vanishes; a 0x198
   alone becomes a 0x1a8 and makes itself a 0x198, frame 3), moving at
   random*/
-/*C_07D1_5B8E*/C_07D1_5B8E(int16 objNum) {
+/*C_07D1_5B8E*/COMBAT_AI_Together(int16 objNum) {
 	int16 x, y;
 	int16 other;
 
@@ -2983,11 +2967,11 @@ extern int16 C_07D1_5FEF(int16, int16, int16, int16);
 	C_1FA9_032B();
 }
 
-/*the 0x17b swallows the body (KillBody) of the actor it killed: its
+/*the canal worm 0x17b swallows the body (KillBody) of the actor it killed: its
   contents fall where the actor died (KillX, KillY), but the TileFlag2 8
   ones which vanish; on the screen the 0x17b shows itself gulping (frames
   0x23 to 0x2f)*/
-/*C_07D1_5DB2*/C_07D1_5DB2(int16 attacker) {
+/*C_07D1_5DB2*/COMBAT_CanalWormGulp(int16 attacker) {
 	int16 oldFrame, frame;
 	int16 obj;
 
@@ -3001,7 +2985,7 @@ extern int16 C_07D1_5FEF(int16, int16, int16, int16);
 				DeleteObj(obj);
 		}
 		DeleteObj(KillBody);
-		if(C_1B09_090B(attacker)) {
+		if(OBJ_IsOnScreen(attacker)) {
 			oldFrame = ObjShapeType[attacker] >> 10;
 			SetFrame(attacker, (oldFrame >> 4) % 4 * 8 + 3);
 			ShowObjects();
@@ -3025,7 +3009,7 @@ extern int16 C_07D1_5FEF(int16, int16, int16, int16);
 /*the death of a class with flag 0x800: an explosion (0x107) at (x, y)
   hurting everything it reaches by 1-15 points, the 0x17a (up to 5) last,
   if still alive*/
-/*C_07D1_5F2B*/C_07D1_5F2B(int16 x, int16 y) {
+/*C_07D1_5F2B*/COMBAT_Explode(int16 x, int16 y) {
 	int16 damage, list[5], objTyp;
 	int16 far *hits;
 	int16 n, obj;
@@ -3049,15 +3033,15 @@ extern int16 C_07D1_5FEF(int16, int16, int16, int16);
 	DisplayTick();
 }
 
-/*the strike of the weapon 0x139 (instead of __TryHit; same results:
+/*the strike of the M60 machine gun 0x139 (instead of __TryHit; same results:
   2 out of range, 1 missed or done, 0 the dream ended): where its missile
   stops short of the target on the tiles 0x90/0x91/0x95/0x96 (without a
   0xb6 there), it leaves an object there (0xb6 of frame 0, 1, 2 or 3) and
   a 0xda beside it; with a line of fire (the tiles 0x90-0x97 not blocking:
   TileFlag 0x20 cleared meanwhile) the missile 0x10b hits whoever is
-  there (__DoHit, 0xfe points); hitting NPC 0x66 ends the dream (a cut
+  there (__DoHit, 0xfe points); hitting Raxachk (NPC 0x66) ends the dream (a cut
   scene, TalkFlags[0x46] |= 8)*/
-/*C_07D1_5FEF*/C_07D1_5FEF(int16 attacker, int16 x, int16 y, int16 weapObj) {
+/*C_07D1_5FEF*/COMBAT_FireM60(int16 attacker, int16 x, int16 y, int16 weapObj) {
 	int16 range, target, mx, my;
 	unsigned char savedFlags[8];
 	int16 ret, tx, ty, tile, noLine, sx, sy;
@@ -3065,7 +3049,7 @@ extern int16 C_07D1_5FEF(int16, int16, int16, int16);
 
 	ret = 1;
 	range = GetWeaponRange(weapObj);
-	if(C_07D1_35F5(x, y, attacker) > range)
+	if(COMBAT_RangeToObj(x, y, attacker) > range)
 		return 2;
 	MissileHitObj = SelectionObj;
 	if((head = COMBAT_getHead(MissileHitObj)) >= 0) {
@@ -3108,7 +3092,7 @@ extern int16 C_07D1_5FEF(int16, int16, int16, int16);
 			MUS_PlaySfx(0xb);
 			AddMapObj(i, 0, 0, mx, my, MapZ);
 			if((i = AddMapObj(0xda, 0, 0, mx + sx, y + sy, MapZ)) > 0)
-				C_1B09_268D(i);
+				OBJ_MoveLastOnSquare(i);
 			TimerDelay(0xba2cL);
 			MUS_PlaySfx(0x1a);
 			VIS_UpdateView();
@@ -3150,11 +3134,11 @@ extern int16 C_07D1_5FEF(int16, int16, int16, int16);
 	return ret;
 }
 
-/*NPC 0x40 hit (LoseHP): after its talk it hurls the player (NPC 1, shown
+/*Rasputin (NPC 0x40) hit (LoseHP): after its talk it hurls the player (NPC 1, shown
   as a 0x1a8 for a missile 0x101 from NPC 0x40, then flying as
   0x18e/0x18a) at least 10 squares further south, where the player falls
-  unconscious and dies (D_0704 set: no spray pending)*/
-/*C_07D1_632C*/C_07D1_632C() {
+  unconscious and dies (CancelSpray: the attack's spray is skipped)*/
+/*C_07D1_632C*/COMBAT_RasputinThrow() {
 	int16 x1, y1, x0, deltaX, x2, y2, savedType;
 	int16 deltaY, y0;
 
@@ -3180,13 +3164,13 @@ extern int16 C_07D1_5FEF(int16, int16, int16, int16);
 	ObjShapeType[1] = 0x1a8;
 	ShowObjects();
 	DisplayTick();
-	Missiles(x1, y1, 1, &x2, &y2, 9, D_16A8 ? 0x18e : 0x18a, 0);
+	Missiles(x1, y1, 1, &x2, &y2, 9, PlayerIsFemale ? 0x18e : 0x18a, 0);
 	ObjShapeType[1] = savedType;
 	SetTypeUnconscious(1);
 	MoveObj(1, x2, y2 - 1, MapZ);
 	ShowObjects();
 	DisplayTick();
-	D_0704 = 1;
+	CancelSpray = 1;
 	ObjShapeType[1] = savedType;
 	COMBAT_Kill(1);
 }

@@ -47,21 +47,18 @@ extern char far C_2BB4_12E9[];
 
 extern unsigned char Active;
 extern int16 MapZ;
-extern int32 D_16AA;/*flags (0x10: the dream)*/
-extern int16 D_16AE;/*rotation of the map view (eighths of a turn)?*/
+extern int32 GameFlags;/*0x10: in a dream*/
+extern int16 ViewRotation;/*rotation of the map view (eighths of a turn)?*/
 extern int16 DreamStage;
 extern unsigned char D_4EA4[];/*Party*/
-extern int16 D_54BA[];/*Amount: quantity (low byte), quality (high byte)*/
+extern int16 Amount[];/*quantity (low byte), quality (high byte)*/
 extern unsigned char D_6EC6[];/*TalkFlags (per NPC)*/
-extern struct coord D_78AE[];/*ObjPos*/
-extern uint16 D_9CC4[];/*ObjShapeType*/
+extern struct coord ObjPos[];
+extern uint16 ObjShapeType[];
 
-#define IN_DREAM (D_16AA & 0x10)
+#define IN_DREAM (GameFlags & 0x10)
 #define Party D_4EA4
-#define Amount D_54BA
 #define TalkFlags D_6EC6
-#define ObjPos D_78AE
-#define ObjShapeType D_9CC4
 
 
 #define GetType(i) (ObjShapeType[i] & 0x3ff)
@@ -271,19 +268,19 @@ extern uint16 D_9CC4[];/*ObjShapeType*/
 }
 
 /*the dream's levers (quality 21; by quantity): 1 turns the map view
-  (D_16AE 4) or back, 2 and 3 call overlay 2F5F*/
+  (ViewRotation 4) or back, 2 and 3 call overlay 2F5F*/
 /*C_2F6E_0556*/LeverDream(register int16 objNum) {
 	register int16 quan;
 
 	switch(quan = GetQuan(objNum)) {
 		case 1:
-			if(D_16AE) {
+			if(ViewRotation) {
 				CON_printf("The world returns to normal.\n");
-				D_16AE = 0;
+				ViewRotation = 0;
 				ObjShapeType[objNum] = GetType(objNum);
 			} else {
 				CON_printf("You feel a strange disorientation.\n");
-				D_16AE = 4;
+				ViewRotation = 4;
 				ObjShapeType[objNum] = GetType(objNum) + 0x400;
 			}
 			break;

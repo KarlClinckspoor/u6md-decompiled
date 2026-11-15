@@ -65,7 +65,7 @@ extern cdecl MOUSE_SAVE_BG();
 extern int16 cdecl MOUSE_IN_AREA(struct tSurface *);
 
 /*far data*/
-extern int16 far C_2DE5_01C6[];/*MonsterFlags (by GetMonsterClass)*/
+extern int16 far MonsterFlags[];/*by GetMonsterClass*/
 
 /*other modules*/
 extern int16 IsInvulnerable(int16);
@@ -100,8 +100,8 @@ extern PrintTileArticle(int16);/*shows a tile in the text window*/
 extern COMBAT_stopCharm(int16);
 extern int16 GetStr(int16);/*an NPC's strength*/
 extern int16 GetInt(int16);/*an NPC's intelligence*/
-extern int16 C_100B_015C(int16);/*warmth of a worn type*/
-extern int16 C_100B_01FB(int16);/*a burning light?*/
+extern int16 GetWarmth(int16);/*of a worn type*/
+extern int16 IsLitLightType(int16);
 extern int16 C_170D_0002(int16);
 extern UpdateSchedules();
 extern int16 OBJ_IsLocLoaded(int16, int16, int16);/*OBJ_IsLocLoaded(x, y, z)*/
@@ -114,7 +114,7 @@ extern char far C_2BB4_21E9[];
 extern char far C_2BB4_1737[];
 extern char far C_2BB4_136D[];
 extern int16 WrapDelta(int16);
-extern int16 MapDistance(int16, int16);/*MapDistance (wrapping)*/
+extern int16 MapDistance(int16, int16);/*wrapping*/
 extern InitNPCTracker();
 extern PartyAdvance(int16);
 extern MoveFollowers(int16, int16);
@@ -207,13 +207,13 @@ extern int16 CombatOutcome;
 extern int16 HatchingDisabled;
 extern int16 AllowNPCTeleport;
 extern int16 SoundFlag;
-extern int16 D_1689;/*the avatar is not solid (debug)*/
+extern int16 AvatarNotSolid;
 extern unsigned char DefaultCommand;
 extern int16 cdecl emsInUse;/*EMSINIT.ASM*/
 extern int16 D_3260;/*free memory for the tiles, in KB*/
 extern unsigned char far *D_3262;/*talk flags 8-15*/
 extern char D_44C4[];/*MovePts*/
-extern unsigned char far *D_4EB6;/*Level*/
+extern unsigned char far *Level;
 extern void far *D_BA7E;/*mdscreen.lzc entry 2: default command mark*/
 extern int16 D_EB72;/*AdvanceDir*/
 extern int16 D_EBCE;/*Selection.obj*/
@@ -232,11 +232,11 @@ extern unsigned char DrunkCounter;
 extern char InCombat;
 extern char SoloMember;
 extern unsigned char SavedNPCMode;
-extern struct { unsigned a:4, b:4, c:4, d:4; } D_16B0[];/*talents*/
+extern struct { unsigned a:4, b:4, c:4, d:4; } Talents[];
 extern int16 StatusMember;
 extern int16 StatusDisplay;
 extern unsigned char IsResting;
-extern unsigned char D_3266[];/*ObjStatus*/
+extern unsigned char ObjStatus[];
 extern unsigned char far *D_46D0;/*NPCMode*/
 extern unsigned char D_4EA4[];/*Party*/
 extern char D_50CE[][14];/*Names*/
@@ -247,35 +247,34 @@ extern uint16 far *D_B508;/*OrigShapeType*/
 extern int16 D_EC4A;
 extern unsigned char D_BC84[5];/*HexInputBuf*/
 extern unsigned char D_BC89[6];/*DecInputBuf*/
-extern int32 D_16AA;/*flags (0x10: the dream)*/
+extern int32 GameFlags;/*0x10: in a dream*/
 extern int16 MapX, MapY, MapZ;
 extern struct tSurface D_3232;/*Screen*/
 extern unsigned char D_3240[0x20];/*AnimFrameMask*/
 extern struct tMouse D_3E66;/*Mouse*/
 extern unsigned char far *D_45CC;/*NPCFlag*/
-extern int16 D_54BA[];/*Amount*/
+extern int16 Amount[];
 extern unsigned char D_6CBA[];/*NPCStatus*/
-extern unsigned char D_6DBE[];
+extern unsigned char HitPoints[];
 extern int16 far *D_6EBE;/*BaseTile*/
 extern unsigned char far *D_760A;/*TileFlag2*/
 extern int16 D_770E[0x20];/*AnimFirstFrame*/
-extern struct coord D_78AE[];/*ObjPos*/
+extern struct coord ObjPos[];
 extern struct tSurface D_9CAE;/*MapSurface*/
 extern int16 D_9CC2;/*NumAnimData*/
-extern uint16 D_9CC4[];/*ObjShapeType*/
+extern uint16 ObjShapeType[];
 extern unsigned char far *D_B4C4;/*TerrainType*/
 extern int16 D_B4C8[0x20];/*AnimTile*/
 extern unsigned char D_B50C[0x20];/*AnimFrameShift*/
 extern union tHandler D_BA6A;/*GrDriver*/
 extern unsigned char D_BC8E[0x20];/*StateAnimData*/
-extern unsigned char D_C130[11][11];/*Obj_11x11*/
-extern int16 D_C1AA[];/*CellObjTile*/
-extern unsigned char D_C3AA[];/*CellObjNext*/
+extern unsigned char Obj_11x11[11][11];
+extern int16 CellObjTile[];
+extern unsigned char CellObjNext[];
 extern int16 D_C4AA[11][11];/*Tile_11x11*/
 extern struct tSurface D_EB78;/*MouseArea*/
 
 #define MovePts D_44C4
-#define Level D_4EB6
 #define AdvanceDir D_EB72
 #define Selection_obj D_EBCE
 #define Selection_x D_EBF6
@@ -303,7 +302,6 @@ extern struct tSurface D_EB78;/*MouseArea*/
 #define GR_DRAW_BITMAP(s,x,y,p,m)    (D_BA6A.iii.ofs = 0x30, (*D_BA6A.f)(s,x,y,p,m))
 #define HexInputBuf D_BC84
 #define DecInputBuf D_BC89
-#define ObjStatus D_3266
 #define NPCMode D_46D0
 #define Party D_4EA4
 #define Names D_50CE
@@ -315,25 +313,18 @@ extern struct tSurface D_EB78;/*MouseArea*/
 #define AnimFrameMask D_3240
 #define Mouse D_3E66
 #define NPCFlag D_45CC
-#define Amount D_54BA
 #define NPCStatus D_6CBA
 #define BaseTile D_6EBE
 #define TileFlag2 D_760A
 #define AnimFirstFrame D_770E
-#define ObjPos D_78AE
 #define MapSurface D_9CAE
 #define NumAnimData D_9CC2
-#define ObjShapeType D_9CC4
 #define TerrainType D_B4C4
 #define AnimTile D_B4C8
 #define AnimFrameShift D_B50C
 #define StateAnimData D_BC8E
-#define Obj_11x11 D_C130
-#define CellObjTile D_C1AA
-#define CellObjNext D_C3AA
 #define Tile_11x11 D_C4AA
 #define MouseArea D_EB78
-#define MonsterFlags C_2DE5_01C6
 #define GetOwner(i) (*(int16 *)&(ObjPos[i].raw[0]))
 
 #define GetType(i) (ObjShapeType[i] & 0x3ff)
@@ -495,7 +486,7 @@ window*/
 		case 0xd1:
 			kind = 3;
 			if(npc != 6)
-				dmg = OSI_rand(D_6DBE[npc] / 2, MaxHP(npc) / 2);
+				dmg = OSI_rand(HitPoints[npc] / 2, MaxHP(npc) / 2);
 			else
 				dmg = 0;
 		break;
@@ -519,7 +510,7 @@ window*/
 				PromptFlag = 1;
 				break;
 			}
-			if(D_6DBE[0] < 2)
+			if(HitPoints[0] < 2)
 				break;
 			switch(a) {
 				case 1:
@@ -573,7 +564,7 @@ window*/
 				break;
 			}
 			PromptFlag = 1;
-			dmg = OSI_rand(1, D_6DBE[npc] - 2);
+			dmg = OSI_rand(1, HitPoints[npc] - 2);
 		break;
 	}
 	if(dmg)
@@ -640,7 +631,7 @@ the dream: at random)*/
 		}
 		day = GetQual(inv);
 		month = GetQuan(inv);
-		if(D_16AA & 0x10) {
+		if(GameFlags & 0x10) {
 			month += OSI_rand(1, 2);
 			if(month > 12) {
 				frm = GetFrame(obj) + 1;
@@ -724,14 +715,14 @@ time-dependent state) and process everything that depends on it*/
 			continue;
 		/*-- talents at most 10 --*/
 		if(i <= 0xf) {
-			if(D_16B0[i].a > 10)
-				D_16B0[i].a = 10;
-			if(D_16B0[i].b > 10)
-				D_16B0[i].b = 10;
-			if(D_16B0[i].c > 10)
-				D_16B0[i].c = 10;
+			if(Talents[i].a > 10)
+				Talents[i].a = 10;
+			if(Talents[i].b > 10)
+				Talents[i].b = 10;
+			if(Talents[i].c > 10)
+				Talents[i].c = 10;
 		}
-		if(!(D_16AA & 0x10) && (NPCStatus[i] & 0x80) && !(NPCStatus[i] & 0x10)) {
+		if(!(GameFlags & 0x10) && (NPCStatus[i] & 0x80) && !(NPCStatus[i] & 0x10)) {
 			/*-- party members: air, lights, cold --*/
 			if(i == 0)
 				continue;
@@ -757,8 +748,8 @@ time-dependent state) and process everything that depends on it*/
 					continue;
 				light = TileFlag[TILE_FRAME(inv)] & 3;
 				objTyp = GetType(inv);
-				warmth += C_100B_015C(objTyp);
-				if(!C_100B_01FB(objTyp))
+				warmth += GetWarmth(objTyp);
+				if(!IsLitLightType(objTyp))
 					continue;
 				if(OSI_rand(0, 1)) {
 					if(GetQual(inv) <= minutes) {
@@ -869,9 +860,9 @@ time-dependent state) and process everything that depends on it*/
 			if(i > 7)
 				continue;
 			/*-- talents wear off --*/
-			if(D_16B0[i].a && OSI_rand(1, GetInt(i) << 2) == 1) {
-				if(--D_16B0[i].a == 0 && (NPCStatus[i] & 0x80)) {
-					if(!i && (D_16AA & 0x10) || i && !(D_16AA & 0x10)) {
+			if(Talents[i].a && OSI_rand(1, GetInt(i) << 2) == 1) {
+				if(--Talents[i].a == 0 && (NPCStatus[i] & 0x80)) {
+					if(!i && (GameFlags & 0x10) || i && !(GameFlags & 0x10)) {
 						MUS_PlaySfx(0x32);
 						CON_printf(C_2BB4_21E9);
 						PromptFlag = 1;
@@ -879,9 +870,9 @@ time-dependent state) and process everything that depends on it*/
 					}
 				}
 			}
-			if(D_16B0[i].b && OSI_rand(1, GetInt(i) << 2) == 1) {
-				if(--D_16B0[i].b == 0) {
-					if((NPCStatus[i] & 0x80) && (!i && (D_16AA & 0x10) || i && !(D_16AA & 0x10))) {
+			if(Talents[i].b && OSI_rand(1, GetInt(i) << 2) == 1) {
+				if(--Talents[i].b == 0) {
+					if((NPCStatus[i] & 0x80) && (!i && (GameFlags & 0x10) || i && !(GameFlags & 0x10))) {
 						MUS_PlaySfx(0x32);
 						CON_printf(C_2BB4_21E9);
 						PromptFlag = 1;
@@ -891,9 +882,9 @@ time-dependent state) and process everything that depends on it*/
 						VisibilityDirty = 1;
 				}
 			}
-			if(D_16B0[i].c && OSI_rand(1, GetInt(i) << 2) == 1) {
-				if(--D_16B0[i].c == 0) {
-					if((NPCStatus[i] & 0x80) && (!i && (D_16AA & 0x10) || i && !(D_16AA & 0x10))) {
+			if(Talents[i].c && OSI_rand(1, GetInt(i) << 2) == 1) {
+				if(--Talents[i].c == 0) {
+					if((NPCStatus[i] & 0x80) && (!i && (GameFlags & 0x10) || i && !(GameFlags & 0x10))) {
 						MUS_PlaySfx(0x32);
 						CON_printf(C_2BB4_21E9);
 						PromptFlag = 1;
@@ -965,7 +956,7 @@ time-dependent state) and process everything that depends on it*/
 		if(NextSleep)
 			NextSleep --;
 		/*-- the air bottles (0x83) of the party, one hour each --*/
-		if(!IsResting && !(D_16AA & 0x10) && (TalkFlags[0x10] & 0x20)) {
+		if(!IsResting && !(GameFlags & 0x10) && (TalkFlags[0x10] & 0x20)) {
 			for(i = 0; i < PartySize; i++) {
 				if((j = Party[i]) == 6)
 					continue;
@@ -1025,7 +1016,7 @@ time-dependent state) and process everything that depends on it*/
 		LastHourUpdate = Time_H;
 		MUS_PlayAreaSong();
 	}
-	if(!(D_16AA & 0x10)) {
+	if(!(GameFlags & 0x10)) {
 		/*ambient light*/
 		oldLight = AmbientLight;
 		if(MapZ > 0)
@@ -1158,7 +1149,7 @@ stops at the first non digit*/
 };
 
 /*range of the talent a of npc (its level), 0 without it*/
-#define TALENT_RANGE(n) (D_16B0[n].a?Level[n]:0)
+#define TALENT_RANGE(n) (Talents[n].a?Level[n]:0)
 
 /*game loop:
 one iteration per player turn: read a key (CON_getch also returns mouse
@@ -1607,14 +1598,14 @@ Exits on <ALT+X>/<CTRL+Q>/<CTRL+E> confirmed (ch == 0x12D).*/
 						}
 						break;
 						case 0xde:/*"solid" avatar*/
-							if(D_1689) {
+							if(AvatarNotSolid) {
 								CON_printf("Avatar solidifies!\n");
 								MUS_PlaySfx(0x32);
-								D_1689 = 0;
+								AvatarNotSolid = 0;
 							} else {
 								CON_printf("Avatar desolidifies!\n");
 								MUS_PlaySfx(0x32);
-								D_1689 = 1;
+								AvatarNotSolid = 1;
 							}
 						break;
 						case 0xdf:/*go to an NPC*/
@@ -1830,10 +1821,10 @@ Exits on <ALT+X>/<CTRL+Q>/<CTRL+E> confirmed (ch == 0x12D).*/
 
 							CON_printf("Healing party\n\n");
 							if(IN_VEHICLE) {
-								D_6DBE[0] = MaxHP(1);
+								HitPoints[0] = MaxHP(1);
 							} else {
 								for(num = 0; num < PartySize; num++)
-									D_6DBE[Party[num]] = MaxHP(Party[num]);
+									HitPoints[Party[num]] = MaxHP(Party[num]);
 							}
 							StatusDirty = 1;
 						}

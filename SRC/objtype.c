@@ -17,11 +17,9 @@
 
 extern int16 GetMonsterClass(int16);/*GetMonsterClass(type): < 0 if none*/
 
-extern unsigned char far C_2DE5_012E[];/*MonsterDamage (by GetMonsterClass)*/
-#define MonsterDamage C_2DE5_012E
+extern unsigned char far MonsterDamage[];/*by GetMonsterClass*/
 
-extern uint16 D_9CC4[];/*ObjShapeType*/
-#define ObjShapeType D_9CC4
+extern uint16 ObjShapeType[];
 
 #define GetType(i) (ObjShapeType[i] & 0x3ff)
 #define IsNPC(i) ((i) < 0x100 && (i) >= 0)
@@ -80,45 +78,47 @@ extern uint16 D_9CC4[];/*ObjShapeType*/
 	return range;
 }
 
-/*0C48*/int16 Types0C48[] = {0x3,0x4,0xb,0xe,0xd,0x15,0x16,0x17,0x1b,0x1e,0x22,0x24,0x26,0x27};
-/*0C64*/unsigned char Values0C64[] = {1,2,1,3,2,1,2,2,1,3,1,2,1,3};
+/*0C48*/int16 ArmorTypes[] = {0x3,0x4,0xb,0xe,0xd,0x15,0x16,0x17,0x1b,0x1e,0x22,0x24,0x26,0x27};
+/*0C64*/unsigned char ArmorValues[] = {1,2,1,3,2,1,2,2,1,3,1,2,1,3};
 
-/*a value of an object by its type, 0 if not in Types0C48 (SE's
-  GetArmorPoints; clothes, but not armour: see C_100B_015C)*/
-/*C_100B_00C4*/C_100B_00C4(int16 objNum) {
+/*the protection of a worn object (helmets, boots, coats, gloves...), 0 if
+  its type is not in ArmorTypes (COMBAT's GetProtection adds them up)*/
+/*C_100B_00C4*/GetArmorPoints(int16 objNum) {
 	int16 i, points;
 
 	points = 0;
 	for(i = 0; i < 14; i ++) {
-		if(Types0C48[i] == GetType(objNum)) {
-			points = Values0C64[i];
+		if(ArmorTypes[i] == GetType(objNum)) {
+			points = ArmorValues[i];
 			break;
 		}
 	}
 	return points;
 }
 
-/*0C72*/int16 Types0C72[] = {
+/*0C72*/int16 MissileWeaponTypes[] = {
 	0x29,0x2a,0x2c,0x2d,0x2e,0x2f,0x30,0x28,0xf0,0xf1,0x81,0x105,0x139,0x16e,0x182,0x16c,
 	0x180
 };
-/*0C94*/int16 Tiles0C94[] = {
+/*0C94*/int16 WeaponMissileTiles[] = {
 	0x103,0x103,0x103,0x103,0x103,0x23e,0x23f,0x23f,0x16b,0x16a,0x10a,0x10a,0x10b,0x16f,0x16c,0x16d,
 	0x16e
 };
-/*0CB6*/int16 Values0CB6[] = {7,7,8,8,8,6,6,6,0xa,0xa,6,6,0x32,0x22,0x22,6,6};
-/*0CD8*/int16 Values0CD8[] = {0x39,0x39,0x3b,0x3b,0x3c,0x3f,0x40,-3,-2,-2,-2,-2,-3,-3,-3,-3,-3};
+/*0CB6*/int16 MissileSfx[] = {7,7,8,8,8,6,6,6,0xa,0xa,6,6,0x32,0x22,0x22,6,6};
+/*0CD8*/int16 MissileAmmo[] = {0x39,0x39,0x3b,0x3b,0x3c,0x3f,0x40,-3,-2,-2,-2,-2,-3,-3,-3,-3,-3};
 
-/*the missile of a ranged weapon type? fills *tile, *b and *c from the
-  tables (0, 0, -1 if objType is not in Types0C72)*/
-/*C_100B_00FF*/C_100B_00FF(int16 objType, int16 *tile, int16 *b, register int16 *c) {
+/*the missile of a ranged weapon type (COMBAT_FireRangedWeapon): its tile,
+  its sound effect (*b) and its ammunition (*c: the type used up, -2 the
+  weapon's own quantity, -3 nothing); 0, 0, -1 if objType is not in
+  MissileWeaponTypes*/
+/*C_100B_00FF*/GetMissileInfo(int16 objType, int16 *tile, int16 *b, register int16 *c) {
 	register int16 i;
 
 	for(i = 0; i < 17; i ++) {
-		if(Types0C72[i] == objType) {
-			*tile = Tiles0C94[i];
-			*b = Values0CB6[i];
-			*c = Values0CD8[i];
+		if(MissileWeaponTypes[i] == objType) {
+			*tile = WeaponMissileTiles[i];
+			*b = MissileSfx[i];
+			*c = MissileAmmo[i];
 			return;
 		}
 	}
@@ -127,25 +127,25 @@ extern uint16 D_9CC4[];/*ObjShapeType*/
 	*c = -1;
 }
 
-/*0CFA*/int16 Types0CFA[] = {
+/*0CFA*/int16 WarmTypes[] = {
 	0x1,0x2,0x3,0x4,0x5,0x6,0x7,0x8,0x9,0xa,0xb,0xe,0xd,0x11,0x12,0x13,
 	0x14,0x15,0x16,0x17,0x5a,0x19,0x1a,0x1b,0x1c,0x1d,0x1e,0x21,0x22,0x23,0x24,0x25,
 	0x26,0x27
 };
-/*0D3E*/unsigned char Values0D3E[] = {
+/*0D3E*/unsigned char WarmthValues[] = {
 	1,2,3,3,2,1,1,2,1,1,2,4,3,2,3,3,
 	4,4,3,5,12,2,2,2,3,3,3,1,1,1,2,3,
 	1,3
 };
 
-/*a value of an object type that can be worn (armour points?), 0 if not
-  in Types0CFA*/
-/*C_100B_015C*/C_100B_015C(int16 objType) {
+/*the warmth of a worn object type (the cold, gameloop.c), 0 if not in
+  WarmTypes*/
+/*C_100B_015C*/GetWarmth(int16 objType) {
 	int16 i;
 
 	for(i = 33; i >= 0; i --)
-		if(Types0CFA[i] == objType)
-			return Values0D3E[i];
+		if(WarmTypes[i] == objType)
+			return WarmthValues[i];
 	return 0;
 }
 
@@ -164,59 +164,63 @@ extern uint16 D_9CC4[];/*ObjShapeType*/
 	return 0;
 }
 
-/*0D7E*/int16 Types0D7E[] = {0x133};
+/*0D7E*/int16 FragileTypes[] = {0x133};
 
-/*is objType 0x133? returns 1/0*/
-/*C_100B_01AD*/C_100B_01AD(int16 objType) {
+/*is objType 0x133 (the devil pod: it breaks when thrown farther than the
+  thrower's reach, CmdDrop)? returns 1/0*/
+/*C_100B_01AD*/IsFragileType(int16 objType) {
 	int16 i;
 
 	for(i = 0; i < 1; i ++)
-		if(Types0D7E[i] == objType)
+		if(FragileTypes[i] == objType)
 			return 1;
 	return 0;
 }
 
-/*the unlit light sources? (0x6d is an unlit torch; 0x6e is lit)*/
-/*0D80*/int16 Types0D80[] = {0x6d,0x6f,0x71,0x73,0x75};
+/*the unlit light sources (torch, candle, candelabra, oil lamp, lantern;
+  the lit one is the type + 1)*/
+/*0D80*/int16 UnlitLightTypes[] = {0x6d,0x6f,0x71,0x73,0x75};
 
-/*is objType one of Types0D80? returns 1/0*/
-/*C_100B_01D4*/C_100B_01D4(int16 objType) {
+/*is objType one of UnlitLightTypes? returns 1/0*/
+/*C_100B_01D4*/IsUnlitLightType(int16 objType) {
 	int16 i;
 
 	for(i = 0; i < 5; i ++)
-		if(Types0D80[i] == objType)
+		if(UnlitLightTypes[i] == objType)
 			return 1;
 	return 0;
 }
 
-/*the lit light sources? (0x6e is a lit torch)*/
-/*0D8A*/int16 Types0D8A[] = {0x6e,0x70,0x72,0x74,0x76};
+/*the lit light sources*/
+/*0D8A*/int16 LitLightTypes[] = {0x6e,0x70,0x72,0x74,0x76};
 
-/*is objType one of Types0D8A? returns 1/0 (STAT_CheckUnready)*/
-/*C_100B_01FB*/C_100B_01FB(int16 objType) {
+/*is objType one of LitLightTypes? returns 1/0 (STAT_CheckUnready)*/
+/*C_100B_01FB*/IsLitLightType(int16 objType) {
 	int16 i;
 
 	for(i = 0; i < 5; i ++)
-		if(Types0D8A[i] == objType)
+		if(LitLightTypes[i] == objType)
 			return 1;
 	return 0;
 }
 
-/*is objType 0x19a, 0x10c or 0x1b9? returns 1/0*/
-/*C_100B_0222*/C_100B_0222(register int16 objType) {
+/*is objType 0x19a (rail car), 0x10c (wheelbarrow) or 0x1b9 (no look
+  name; the type after the drill)? These are pushed, not carried (canmove.c, PushObj). returns 1/0*/
+/*C_100B_0222*/IsPushableType(register int16 objType) {
 	return objType == 0x19a || objType == 0x10c || objType == 0x1b9;
 }
 
-/*0D94*/int16 Types0D94[] = {
+/*0D94*/int16 BurnableTypes[] = {
 	0x18,0x84,0xb9,0x3e,0x65,0x6b,0x94,0x96,0x97,0x9e,0xf3,0xfc,0x1bc,0x1bf,0x100
 };
 
-/*is objType one of Types0D94? returns 1/0*/
-/*C_100B_0247*/C_100B_0247(int16 objType) {
+/*is objType one of BurnableTypes (money, paper, seeds, coal, ice...: fire
+  destroys them)? returns 1/0*/
+/*C_100B_0247*/IsBurnableType(int16 objType) {
 	int16 i;
 
 	for(i = 0; i < 15; i ++)
-		if(Types0D94[i] == objType)
+		if(BurnableTypes[i] == objType)
 			return 1;
 	return 0;
 }
@@ -295,25 +299,29 @@ extern uint16 D_9CC4[];/*ObjShapeType*/
 	return -1;
 }
 
-/*0E5C*/int16 Types0E5C[] = {0xb3,0x184,0x133,0x12c,0xd9};
+/*0E5C*/int16 BreakableTypes[] = {0xb3,0x184,0x133,0x12c,0xd9};
 
-/*is objType one of Types0E5C? returns 1/0*/
-/*C_100B_038E*/C_100B_038E(int16 objType) {
+/*is objType one of BreakableTypes (closed door, glow worm, devil pod,
+  devil plant, glass pitcher: hits take points off their quantity)?
+  returns 1/0*/
+/*C_100B_038E*/IsBreakableType(int16 objType) {
 	int16 i;
 
 	for(i = 0; i < 5; i ++)
-		if(Types0E5C[i] == objType)
+		if(BreakableTypes[i] == objType)
 			return 1;
 	return 0;
 }
 
-/*0E66*/int16 Types0E66[] = {
+/*0E66*/int16 CrushableTypes[] = {
 	0x184,0x101,0x102,0xfb,0xfc,0x155,0x151,0x152,0x154,0x153,0x173,0x172,0x1ba,0x1bb,0x1bc,0x12c
 };
 
 /*1 for types 1-0xb7 (the test for 0x11-0x3b and 0x3f-0x5a and 0x5d-0x86
-  that follows is then always false), and the types of Types0E66; else 0*/
-/*C_100B_03B5*/C_100B_03B5(register int16 objType) {
+  that follows is then always false), and the types of CrushableTypes; else 0.
+  The creatures 0x178 and 0x16f crush these objects as they move
+  (TryStraightMove)*/
+/*C_100B_03B5*/IsCrushableType(register int16 objType) {
 	int16 i;
 
 	if(objType >= 1 && objType < 0xb8)
@@ -325,19 +333,20 @@ extern uint16 D_9CC4[];/*ObjShapeType*/
 	if(objType >= 0x5d && objType < 0x87)
 		return 1;
 	for(i = 0; i < 16; i ++)
-		if(Types0E66[i] == objType)
+		if(CrushableTypes[i] == objType)
 			return 1;
 	return 0;
 }
 
-/*0E86*/int16 Types0E86[] = {0xcd,0x198,0xa8,0xaa,0xab,0x12c,0x133,0x12b};
+/*0E86*/int16 PlantTypes[] = {0xcd,0x198,0xa8,0xaa,0xab,0x12c,0x133,0x12b};
 
-/*is objType one of Types0E86? returns 1/0*/
-/*C_100B_0410*/C_100B_0410(int16 objType) {
+/*is objType one of PlantTypes (vine, tree, porcupod, flower, hedge, devil
+  plant...)? returns 1/0*/
+/*C_100B_0410*/IsPlantType(int16 objType) {
 	int16 i;
 
 	for(i = 0; i < 8; i ++)
-		if(Types0E86[i] == objType)
+		if(PlantTypes[i] == objType)
 			return 1;
 	return 0;
 }

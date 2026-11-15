@@ -5,17 +5,17 @@
  * are scattered in objcmd.c and npctrack.c).
  *
  * A creature's movement class comes from its class flags (MonsterFlags,
- * far table C_2DE5_01C6 by GetMonsterClass): 0x100 goes anywhere but walls
+ * far table MonsterFlags by GetMonsterClass): 0x100 goes anywhere but walls
  * (TerrainType 4), 0x200 swims (TerrainType 2 and 1, not 4 nor 8; on tile
  * 8 always, else only while the canal pumps run: TalkFlags[0x76] & 0x20 and
  * & 0x40), 0x400 flies; with none of them it walks (no water 2, wall 4 or
- * 8; 0x8000: only on InRange_20_3F_7C_7F tiles). NPCs 0x100 and more,
+ * 8; 0x8000: only on GetDigClass tiles). NPCs 0x100 and more,
  * and negative numbers, walk. TerrainType bits 0x10/0x20/0x40/0x80 are the
  * passable sides (W/S/E/N) of a "water" (2) tile such as a wall or a fence.
  */
 #include "se.h"
 
-extern int16 far C_2DE5_01C6[];/*MonsterFlags (by GetMonsterClass)*/
+extern int16 far MonsterFlags[];/*by GetMonsterClass*/
 
 extern char DirIncrX[8], DirIncrY[8];
 extern int16 HazardFound;/*the mover stands on a tile of TerrainType 8*/
@@ -24,8 +24,8 @@ extern int16 AvoidHazards;/*TerrainType 8 blocks*/
 extern int16 LocPartOffset;/*tile offset of the objects (animation)*/
 extern unsigned char Active;
 extern int16 MapZ;
-extern int16 D_1689;
-extern unsigned char D_3266[];/*ObjStatus*/
+extern int16 AvatarNotSolid;
+extern unsigned char ObjStatus[];
 extern unsigned char far *D_45CC;/*NPCFlag*/
 extern unsigned char D_4EA4[];/*Party*/
 extern unsigned char D_6CBA[];/*NPCStatus*/
@@ -33,13 +33,13 @@ extern unsigned char far *D_6DBA;/*TileFlag*/
 extern unsigned char D_6EC6[];/*TalkFlags*/
 extern int16 far *D_6EBE;/*BaseTile*/
 extern unsigned char far *D_760A;/*TileFlag2*/
-extern struct coord D_78AE[];/*ObjPos*/
-extern uint16 D_9CC4[];/*ObjShapeType*/
+extern struct coord ObjPos[];
+extern uint16 ObjShapeType[];
 extern unsigned char far *D_B4C4;/*TerrainType*/
 extern char far C_2BB4_0210[];
 
 extern int16 PushObj(int16, int16, int16, int16);/*push obj from (x, y) in dir: 0 moved, 2 message*/
-extern int16 C_100B_0222(int16);/*pushable type*/
+extern int16 IsPushableType(int16);
 extern int16 WrapDelta(int16);
 extern unsigned char GetTileAtXYZ(int16, int16, int16);
 extern int16 GetMonsterClass(int16);/*GetMonsterClass(type): < 0 if none*/
@@ -50,13 +50,11 @@ extern int16 OBJ_MapObjAt(int16, int16);
 extern int16 OBJ_FindTypeAt(int16, int16, int16);/*OBJ_FindTypeAt(type, x, y)*/
 extern MoveObj(int16, int16, int16, int16);/*MoveObj(obj, x, y, z)*/
 extern ShowObjects();
-extern int16 InRange_10_17_C0_C3(int16);/*InRange_10_17_C0_C3: water tiles*/
-extern int16 Class_20_3F_7C_7F(int16);/*InRange_20_3F_7C_7F*/
+extern int16 IsWaterTile(int16);
+extern int16 GetDigClass(int16);
 extern cdecl CON_printf(char far *, ...);
 extern void cdecl TimerDelay(int32);
 
-#define MonsterFlags C_2DE5_01C6
-#define ObjStatus D_3266
 #define NPCFlag D_45CC
 #define Party D_4EA4
 #define NPCStatus D_6CBA
@@ -64,12 +62,8 @@ extern void cdecl TimerDelay(int32);
 #define TalkFlags D_6EC6
 #define BaseTile D_6EBE
 #define TileFlag2 D_760A
-#define ObjPos D_78AE
-#define ObjShapeType D_9CC4
 #define TerrainType D_B4C4
 
-#define IsWaterTile InRange_10_17_C0_C3
-#define InRange_20_3F_7C_7F Class_20_3F_7C_7F
 
 #define GetType(i) (ObjShapeType[i] & 0x3ff)
 #define GetFrame(i) (ObjShapeType[i] >> 10)
@@ -163,7 +157,7 @@ CanStandAt(int16, int16, int16);
 			ok = 1;
 			if((terrain & 4) || (terrain & 2) || (terrain & 8))
 				ok = 0;
-			if(npc < 0x100 && npc >= 0 && (MonsterFlags[class] & 0x8000) && !InRange_20_3F_7C_7F(tile))
+			if(npc < 0x100 && npc >= 0 && (MonsterFlags[class] & 0x8000) && !GetDigClass(tile))
 				ok = 0;
 		}
 		for(obj = FindLoc(x, y, MapZ); obj >= 0; obj = NextLoc()) {
@@ -178,7 +172,7 @@ CanStandAt(int16, int16, int16);
 			objTerrain = TerrainType[tile];
 			if(TileFlag2[tile] & 4) {
 				if(walks) {
-					if(npc >= 0x100 || npc < 0 || !(MonsterFlags[class] & 0x8000) || InRange_20_3F_7C_7F(tile))
+					if(npc >= 0x100 || npc < 0 || !(MonsterFlags[class] & 0x8000) || GetDigClass(tile))
 						ok = 1;
 					if(objTerrain & 2)
 						ok = 0;
@@ -221,7 +215,7 @@ CanStandAt(int16, int16, int16);
 
 	if(npc == -1)
 		return 0;
-	if(Party[Active] == npc && D_1689 == 1)
+	if(Party[Active] == npc && AvatarNotSolid == 1)
 		return 1;
 	dtile = GetTileAtXYZ(x, y, MapZ);
 	if(npc == 0 && dtile == 0x6f) {
@@ -292,7 +286,7 @@ CanStandAt(int16, int16, int16);
 		} else if(terrain & 2) {
 			if((west && !(terrain & 0x40)) || (east && !(terrain & 0x10)) || (north && !(terrain & 0x20)) || (south && !(terrain & 0x80)))
 				okTo = 0;
-		} else if(npc < 0x100 && npc >= 0 && !InRange_20_3F_7C_7F(dtile) && (MonsterFlags[class] & 0x8000)) {
+		} else if(npc < 0x100 && npc >= 0 && !GetDigClass(dtile) && (MonsterFlags[class] & 0x8000)) {
 			okTo = 0;
 		}
 		if(fromTerrain & 2) {
@@ -318,7 +312,7 @@ CanStandAt(int16, int16, int16);
 				continue;
 			objTerrain = TerrainType[dtile];
 			if(TileFlag2[dtile] & 4) {
-				if(npc >= 0x100 || npc < 0 || !(MonsterFlags[class] & 0x8000) || InRange_20_3F_7C_7F(dtile))
+				if(npc >= 0x100 || npc < 0 || !(MonsterFlags[class] & 0x8000) || GetDigClass(dtile))
 					okFrom = 1;
 				if(objTerrain & 2) {
 					if((west && !(objTerrain & 0x10)) || (east && !(objTerrain & 0x40)) || (north && !(objTerrain & 0x80)) || (south && !(objTerrain & 0x20)))
@@ -340,7 +334,7 @@ CanStandAt(int16, int16, int16);
 			if((TileFlag2[dtile] & 0x10) && !(TerrainType[dtile] & 2) && !(TileFlag2[dtile] & 4))
 				continue;
 			objTerrain = TerrainType[dtile];
-			if(Party[Active] == npc && C_100B_0222(objType)) {
+			if(Party[Active] == npc && IsPushableType(objType)) {
 				if(north) {
 					if(west)
 						dir = 7;
@@ -396,7 +390,7 @@ CanStandAt(int16, int16, int16);
 				break;
 			} else if(TileFlag2[dtile] & 4) {
 				if(walks) {
-					if(npc >= 0x100 || npc < 0 || !(MonsterFlags[class] & 0x8000) || InRange_20_3F_7C_7F(dtile))
+					if(npc >= 0x100 || npc < 0 || !(MonsterFlags[class] & 0x8000) || GetDigClass(dtile))
 						okTo = 1;
 					if(objTerrain & 2) {
 						if((west && !(objTerrain & 0x10)) || (east && !(objTerrain & 0x40)) || (north && !(objTerrain & 0x80)) || (south && !(objTerrain & 0x20)))

@@ -63,7 +63,7 @@ extern char *GetObjectString(int16);
 extern MUS_PlaySfx(int16);
 extern STAT_DrawInventory();
 extern STAT_Ready();
-extern int16 Class_20_3F_7C_7F(int16);
+extern int16 GetDigClass(int16);
 extern int16 CON_prompt();
 extern CON_WaitKeyOrClick();
 extern CON_gotoxy(int16, int16);
@@ -160,8 +160,8 @@ extern int16 D_0F18;/*MapAnimEnabled*/
 extern unsigned char Active;
 extern int16 MapX, MapY, MapZ;
 extern char SoloMember;
-extern int32 D_16AA;/*flags (0x10: the dream)*/
-extern struct { unsigned a:4, psychic:4, c:4, d:4; } D_16B0[];/*talents*/
+extern int32 GameFlags;/*0x10: in a dream*/
+extern struct { unsigned a:4, psychic:4, c:4, d:4; } Talents[];
 extern char SelectMode;
 extern char AnimateAtPrompt;
 extern int16 EndPagingAtPrompt;
@@ -169,44 +169,40 @@ extern int16 MouseMode;
 extern int16 StatusDisplay;
 extern int16 PromptCh;
 extern struct tClipInfo *CurClip;
-extern unsigned char D_3266[];/*ObjStatus*/
+extern unsigned char ObjStatus[];
 extern char far *D_3E80;/*work area of the .lzc loader*/
 extern unsigned char D_4EA4[];/*Party*/
-extern unsigned char far *D_4EB6;/*Level*/
+extern unsigned char far *Level;
 extern char D_50CE[][14];/*Names*/
-extern int16 D_54BA[];/*Amount: quantity (low byte), quality (high byte)*/
+extern int16 Amount[];/*quantity (low byte), quality (high byte)*/
 extern unsigned char D_6CBA[];/*NPCStatus*/
 extern int16 far *D_6EBE;/*BaseTile*/
 extern char far *D_6EC2;/*TalkBuf*/
 extern unsigned char D_6EC6[];/*TalkFlags*/
 extern unsigned char far *D_760A;/*TileFlag2*/
-extern struct coord D_78AE[];/*ObjPos*/
+extern struct coord ObjPos[];
 extern unsigned char D_9CC0;/*PartySize*/
-extern uint16 D_9CC4[];/*ObjShapeType*/
+extern uint16 ObjShapeType[];
 extern unsigned char far *D_B4C4;/*TerrainType*/
-extern int16 D_C59C[];/*Link*/
+extern int16 Link[];
 extern int16 D_EB18;/*InvenOwner*/
 extern int16 D_EBCE;/*Selection.obj*/
 extern struct tClipInfo D_EBD0[4];/*TextWindows*/
 extern int16 D_EBF6, D_EBF8;/*Selection.x, Selection.y*/
 extern char *D_EC2C;/*the name "$P" stands for*/
 extern int16 D_EC42;/*LinesBeforeMore*/
-extern int16 D_EC46;/*distance of the last target (use.c)*/
+extern int16 TargetDist;/*distance of the last target (use.c)*/
 extern int16 D_F0CA;/*set when a dirt action failed (the load is not used up)*/
 
 #define MapAnimEnabled D_0F18
-#define ObjStatus D_3266
 #define Party D_4EA4
 #define Names D_50CE
-#define Amount D_54BA
 #define NPCStatus D_6CBA
 #define BaseTile D_6EBE
 #define TalkBuf D_6EC2
 #define TalkFlags D_6EC6
 #define TileFlag2 D_760A
-#define ObjPos D_78AE
 #define PartySize D_9CC0
-#define ObjShapeType D_9CC4
 #define TerrainType D_B4C4
 #define Selection D_EBCE
 #define TextWindows D_EBD0
@@ -546,7 +542,7 @@ extern int16 D_F0CA;/*set when a dirt action failed (the load is not used up)*/
 	int16 solo;
 	register int16 npc, o;
 
-	if(D_EC46 > 1) {
+	if(TargetDist > 1) {
 		CON_printf(C_2BB4_126E);
 		return;
 	}
@@ -647,7 +643,7 @@ extern int16 D_F0CA;/*set when a dirt action failed (the load is not used up)*/
 
 	if(GetFrame(pod) == 3) {
 		ObjShapeType[pod] = GetType(pod) + 0x1000;
-		if(D_16AA & 0x10) {
+		if(GameFlags & 0x10) {
 			MoveObj(0x56, GetX(pod), GetY(pod), MapZ);
 			ShowObjects();
 			MapAnimEnabled = 1;
@@ -793,7 +789,7 @@ extern int16 D_F0CA;/*set when a dirt action failed (the load is not used up)*/
 		return;
 	}
 	npc = Party[Active];
-	if((cls = Class_20_3F_7C_7F(GetTileAtXYZ(D_EBF6, D_EBF8, MapZ))) != 0) {
+	if((cls = GetDigClass(GetTileAtXYZ(D_EBF6, D_EBF8, MapZ))) != 0) {
 		if(cls == 0x102)
 			shape = 0x101;
 		else if(cls == 0x100)
@@ -1118,7 +1114,7 @@ extern int16 D_F0CA;/*set when a dirt action failed (the load is not used up)*/
 		D_0F12 = 1;
 	if(on == rad && ot == 0x1c0) {
 		if((ObjStatus[on] & 0x18) == 0) {
-			owner = D_C59C[on];
+			owner = Link[on];
 			if((ObjStatus[owner] & 0x18) || GetX(owner) != GetX(on) || GetY(owner) != GetY(on) || GetZ(owner) != MapZ) {
 				CON_printf(C_2BB4_02A4);
 				return;
@@ -1132,7 +1128,7 @@ extern int16 D_F0CA;/*set when a dirt action failed (the load is not used up)*/
 	}
 	for(glove = FindInvType(npc, 0x88, -1); glove != -1 && (ObjStatus[glove] & 0x18) != 0x18; glove = NextInvType())
 		;
-	if(!(D_16B0[Party[Active]].a ? D_4EB6[Party[Active]] : 0) && glove == -1 && npc != 6) {
+	if(!(Talents[Party[Active]].a ? Level[Party[Active]] : 0) && glove == -1 && npc != 6) {
 		COMBAT_showHit(Party[Active]);
 		NPCStatus[Party[Active]] |= 8;
 		CON_printf(C_2BB4_0D50);

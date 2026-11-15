@@ -8,7 +8,7 @@
  * tiles), with an NPC within 5 tiles that can be seen ("%s is too near to
  * set up camp"), in solo mode and in the dream (Active == PartySize).
  * Poisoned members are named and the player may give up; members with a
- * talent (D_16B0 fields b and c: "inanimate things talking", "too much
+ * talent (Talents fields b and c: "inanimate things talking", "too much
  * light") cannot sleep. The party camps in a tent (five objects 0x86 put
  * around (x, y), the middle one animated) until sunrise or sunset, or for
  * 1-9 hours. A rest of more than 4 hours heals (2-8 + 2-8) * hours/2 hit
@@ -56,7 +56,7 @@ extern VIS_UpdateView();
 extern MAP_LoadAround();
 extern PartyEnter(int16);
 extern PartyExit(int16, int16, int16, int16);
-extern int16 MapDistance(int16, int16);/*MapDistance (wrapping)*/
+extern int16 MapDistance(int16, int16);/*wrapping*/
 extern int16 C_170D_2BB4(int16);/*true for a man (the dream's pronoun)*/
 extern int16 NextArea(void);
 extern int16 SearchArea(int16, int16, int16, int16);/*SearchArea(x1, y1, x2, y2)*/
@@ -90,7 +90,7 @@ extern int16 MapX, MapY, MapZ;
 extern int16 SoundFlag;
 extern char InCombat;
 extern char SoloMember;
-extern struct { unsigned a:4, b:4, c:4, d:4; } D_16B0[];/*talents*/
+extern struct { unsigned a:4, b:4, c:4, d:4; } Talents[];
 extern char SelectMode;
 extern char AnimateAtPrompt;
 extern int16 EndPagingAtPrompt;
@@ -98,35 +98,27 @@ extern int16 StatusMember;
 extern int16 StatusDisplay;/*0x90 a member, 0x91 the party, 0x92 the equipment*/
 extern struct tClipInfo *CurClip;
 extern char IsInConversation;
-extern unsigned char D_45D0[];/*DEXTE*/
+extern unsigned char DEXTE[];
 extern unsigned char D_4EA4[];/*Party*/
-extern unsigned char far *D_4EB6;/*Level*/
+extern unsigned char far *Level;
 extern char D_50CE[][14];/*Names*/
-extern uint16 D_51AE[];/*ExpPoints*/
-extern unsigned char D_53B2[];/*STREN*/
+extern uint16 ExpPoints[];
+extern unsigned char STREN[];
 extern unsigned char D_6CBA[];/*NPCStatus*/
-extern unsigned char D_6DBE[];/*HitPoints*/
-extern unsigned char D_760E[];/*INTEL*/
-extern struct coord D_78AE[];/*ObjPos*/
+extern unsigned char HitPoints[];
+extern unsigned char INTEL[];
+extern struct coord ObjPos[];
 extern unsigned char D_9CC0;/*PartySize*/
-extern uint16 D_9CC4[];/*ObjShapeType*/
+extern uint16 ObjShapeType[];
 extern struct tClipInfo D_EBD0[4];/*TextWindows*/
 extern int16 D_EC42;/*LinesBeforeMore*/
 
 #define StatusDirty D_0F12
 #define IdleAnimTick D_0F16
-#define DEXTE D_45D0
 #define Party D_4EA4
-#define Level D_4EB6
 #define Names D_50CE
-#define ExpPoints D_51AE
-#define STREN D_53B2
 #define NPCStatus D_6CBA
-#define HitPoints D_6DBE
-#define INTEL D_760E
-#define ObjPos D_78AE
 #define PartySize D_9CC0
-#define ObjShapeType D_9CC4
 #define TextWindows D_EBD0
 #define LinesBeforeMore D_EC42
 
@@ -334,11 +326,11 @@ extern int16 D_EC42;/*LinesBeforeMore*/
 	}
 	cannot = 0;
 	for(i = 0; i < PartySize; i ++) {
-		if(D_16B0[Party[i]].c || D_16B0[Party[i]].b) {
+		if(Talents[Party[i]].c || Talents[Party[i]].b) {
 			cannot = 1;
-			if(D_16B0[Party[i]].c && D_16B0[Party[i]].b)
+			if(Talents[Party[i]].c && Talents[Party[i]].b)
 				CON_printf("\n%s complains of too much light and inanimate things keep talking.*\n", Names[i]);
-			else if(D_16B0[Party[i]].b)
+			else if(Talents[Party[i]].b)
 				CON_printf("\n%s complains of inanimate things talking.*\n", Names[i]);
 			else
 				CON_printf("\n%s complains of too much light.*\n", Names[i]);

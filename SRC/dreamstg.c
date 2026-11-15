@@ -25,14 +25,14 @@ struct tClipInfo/*size:9*/ {
 extern int16 OSI_rand(int16, int16);/*OSI_rand(lo, hi)*/
 
 /*other game modules*/
-extern COMBAT_begin();/*called when not InCombat (COMBAT_begin?)*/
+extern COMBAT_begin();/*called when not InCombat*/
 extern int16 MaxHP(int16);
 extern AnimateTiles();
 extern int16 EGG_generate(int16, int16, int16, int16);/*EGG_generate(type, x, y, z)*/
 extern int16 OBJ_FindTypeAt(int16, int16, int16);/*OBJ_FindTypeAt(type, x, y)*/
-extern int16 FindInv(int16);/*FindInv: first object of an inventory*/
+extern int16 FindInv(int16);/*first object of an inventory*/
 extern int16 NextInv(void);
-extern int16 NextArea(void);/*NextArea: next object of SearchArea*/
+extern int16 NextArea(void);/*next object of SearchArea*/
 extern int16 SearchArea(int16, int16, int16, int16);/*SearchArea(x1, y1, x2, y2)*/
 extern int16 AddInvObj(int16, int16, int16, int16);/*AddInvObj(shape, position, quantity, owner)*/
 extern DeleteObj(int16);
@@ -54,25 +54,25 @@ extern char D_0F12;/*StatusDirty*/
 extern char D_0F13;/*PromptFlag*/
 extern int16 D_0F18;/*MapAnimEnabled*/
 extern int16 MapX, MapY, MapZ;
-extern unsigned char D_16A3;
-extern unsigned char D_16A8;/*the player is a woman*/
-extern struct { unsigned a:4, b:4, c:4, d:4; } D_16B0[];/*talents*/
+extern unsigned char DreamFoesLeft;
+extern unsigned char PlayerIsFemale;
+extern struct { unsigned a:4, b:4, c:4, d:4; } Talents[];
 extern int16 D_1E48;/*dream.c's: the AnimTile entry of tile 0x6f (-1: not looked up)*/
 extern int16 D_1E4A;/*dream.c's*/
 extern struct tClipInfo *CurClip;
 extern unsigned char D_3240[0x20];/*AnimFrameMask*/
 extern unsigned char far *D_3262;/*talk flags 8-15*/
-extern unsigned char D_3266[];/*ObjStatus*/
+extern unsigned char ObjStatus[];
 extern unsigned char far *D_46D0;/*NPCMode*/
 extern unsigned char far *D_53AE;/*NPCComMode*/
-extern int16 D_54BA[];/*Amount: quantity (low byte), quality (high byte)*/
+extern int16 Amount[];/*quantity (low byte), quality (high byte)*/
 extern unsigned char D_6CBA[];/*NPCStatus*/
-extern unsigned char D_6DBE[];/*HitPoints*/
+extern unsigned char HitPoints[];
 extern unsigned char D_6EC6[];/*TalkFlags*/
-extern struct coord D_78AE[];/*ObjPos*/
+extern struct coord ObjPos[];
 extern unsigned char D_9CC0;/*PartySize*/
 extern int16 D_9CC2;/*NumAnimData*/
-extern uint16 D_9CC4[];/*ObjShapeType*/
+extern uint16 ObjShapeType[];
 extern int16 D_B4C8[0x20];/*AnimTile*/
 extern uint16 far *D_B508;/*OrigShapeType*/
 extern union tHandler D_BA6A;/*GrDriver*/
@@ -82,17 +82,12 @@ extern char DirIncrX[8], DirIncrY[8];
 #define StatusDirty D_0F12
 #define PromptFlag D_0F13
 #define MapAnimEnabled D_0F18
-#define ObjStatus D_3266
 #define NPCMode D_46D0
 #define NPCComMode D_53AE
-#define Amount D_54BA
 #define NPCStatus D_6CBA
-#define HitPoints D_6DBE
 #define TalkFlags D_6EC6
-#define ObjPos D_78AE
 #define PartySize D_9CC0
 #define NumAnimData D_9CC2
-#define ObjShapeType D_9CC4
 #define AnimTile D_B4C8
 #define OrigShapeType D_B508
 #define GrDriver D_BA6A
@@ -177,7 +172,7 @@ extern char DirIncrX[8], DirIncrY[8];
 	StatusDirty = 1;
 	if((i = PartySize - 1) < 1)
 		i = 4;
-	D_16A3 = i;
+	DreamFoesLeft = i;
 	while(i-- > 0)
 		EGG_generate(0x16c, x + DirIncrX[i * 2], y + DirIncrY[i * 2], MapZ);
 	COMBAT_begin();
@@ -242,7 +237,7 @@ extern char DirIncrX[8], DirIncrY[8];
 				D_1E48 = i;
 	}
 	CON_printf("You fall off the cliff!\n");
-	ObjShapeType[0] = D_16A8 ? 0x127 : 0x126;
+	ObjShapeType[0] = PlayerIsFemale ? 0x127 : 0x126;
 	AnimateTiles();
 	ShowObjects();
 	for(i = SearchArea(MapX - 1, MapY - 8, MapX + 1, MapY - 4); i >= 0; i = NextArea()) {
@@ -461,7 +456,7 @@ extern char DirIncrX[8], DirIncrY[8];
 	C_2F63_0000(0xf, 0, 0, 0xc7, 0x9a, 2);
 	C_2F63_0000(0x96, 0, 0x100, 0xc1, 0xa1, 2);
 	C_2F63_0000(0x97, 0, 0x800, 0xc1, 0xa1, 2);
-	D_16B0[0].a = 2;
+	Talents[0].a = 2;
 	if((obj = EGG_generate(0x193, 0xb0, 0xa2, MapZ)) < 0)
 		CON_printf(C_2BB4_22F1);
 	else {

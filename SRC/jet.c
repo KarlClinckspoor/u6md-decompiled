@@ -8,7 +8,7 @@
  * its quantity: bits 0-3 the countdown, bits 5-7 the direction (as
  * DirIncrX/DirIncrY). TriggerJet shows the jet (Missiles) along the
  * tiles in front of it and hurts what is hit (MissileHitList): NPCs and
- * C_100B_038E types. UpdateJet counts a jetter down (or, with no delay,
+ * IsBreakableType types. UpdateJet counts a jetter down (or, with no delay,
  * triggers it at random) while talk flag TalkFlags[0x73] & 4 is set.
  */
 #include "se.h"
@@ -16,22 +16,19 @@
 /*other modules*/
 extern int16 LoseHP(int16, int16, int16);/*hurt (objNum, damage, ?)*/
 extern int16 Missiles(int16, int16, int16, int16 *, int16 *, int16, int16, int16);/*show a missile/jet (x, y, length, xs, ys, ?, tile?, ?)*/
-extern int16 C_100B_038E(int16);
+extern int16 IsBreakableType(int16);
 extern FlushViewIfDirty();
 extern MUS_PlaySfx(int16);/*play a sound effect?*/
 extern cdecl CON_printf(char far *, ...);
 extern int16 OSI_rand(int16, int16);/*OSI_rand(lo, hi)*/
 
 extern char DirIncrX[8], DirIncrY[8];
-extern int16 D_54BA[];/*Amount: quantity (low byte), quality (high byte)*/
+extern int16 Amount[];/*quantity (low byte), quality (high byte)*/
 extern unsigned char D_6EC6[];/*TalkFlags*/
-extern struct coord D_78AE[];/*ObjPos*/
-extern uint16 D_9CC4[];/*ObjShapeType*/
+extern struct coord ObjPos[];
+extern uint16 ObjShapeType[];
 extern int16 D_B9D6[0x40];/*MissileHitList: what the last missile hit (-1 ends)*/
-#define Amount D_54BA
 #define TalkFlags D_6EC6
-#define ObjPos D_78AE
-#define ObjShapeType D_9CC4
 #define MissileHitList D_B9D6
 
 #define GetType(i) (ObjShapeType[i] & 0x3ff)
@@ -81,7 +78,7 @@ extern int16 D_B9D6[0x40];/*MissileHitList: what the last missile hit (-1 ends)*
 	MUS_PlaySfx(0x19);
 	Missiles(GetX(objNum), GetY(objNum), len, xs, ys, 8, 0x104, 6);
 	for(p = MissileHitList; *p >= 0; p ++) {
-		if((*p < 0x100 && *p >= 0) || C_100B_038E(GetType(*p)))
+		if((*p < 0x100 && *p >= 0) || IsBreakableType(GetType(*p)))
 			LoseHP(*p, OSI_rand(10, 50), 0);
 	}
 }

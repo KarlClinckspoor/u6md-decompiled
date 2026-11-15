@@ -34,7 +34,7 @@ extern SetTypeUnconscious(int16);
 extern int16 LoseHP(int16, int16, int16);/*hurt (objNum, damage, ?)*/
 extern int16 COMBAT_range(int16, int16, int16, int16);/*distance of (x1, y1) and (x2, y2)*/
 extern ResetMapView();
-extern int16 C_100B_0247(int16);
+extern int16 IsBurnableType(int16);
 extern int16 STAT_GetEquipSlot(int16);
 extern int16 NPC_TryStep(int16, int16, int16);
 extern VIS_UpdateView();
@@ -49,9 +49,9 @@ extern TryStraightMove(int16, int16, int16);
 extern int16 NextLoc();
 extern int16 FindLoc(int16, int16, int16);/*FindLoc(x, y, z)*/
 extern int16 OBJ_FindTypeAt(int16, int16, int16);/*OBJ_FindTypeAt(type, x, y)*/
-extern int16 FindInv(int16);/*FindInv: first object of an inventory*/
+extern int16 FindInv(int16);/*first object of an inventory*/
 extern int16 NextInv(void);
-extern int16 NextArea(void);/*NextArea: next object of SearchArea*/
+extern int16 NextArea(void);/*next object of SearchArea*/
 extern int16 SearchArea(int16, int16, int16, int16);/*SearchArea(x1, y1, x2, y2)*/
 extern int16 AddMapObj(int16, int16, int16, int16, int16, int16);/*AddMapObj(type, status, amount, x, y, z)*/
 extern int16 AddInvObj(int16, int16, int16, int16);/*AddInvObj(shape, position, quantity, owner)*/
@@ -72,7 +72,7 @@ extern cdecl CON_printf(char far *, ...);
 extern char far C_2BB4_04A8[];
 extern char far C_2BB4_11B3[];
 extern char far C_2BB4_22F1[];/*failure message*/
-extern int16 far C_2DE5_01C6[];/*MonsterFlags (by GetMonsterClass)*/
+extern int16 far MonsterFlags[];/*by GetMonsterClass*/
 
 extern int16 MusicAdapter;/*1: AdLib or Roland, 0: none*/
 extern int16 ColorPaper;
@@ -90,13 +90,13 @@ extern int16 D_1E48;/*dream.c's: the AnimTile entry of tile 0x6f (-1: not looked
 extern int16 D_1E4A;/*dream.c's: how fast it animates (0-4)*/
 extern struct tClipInfo *CurClip;
 extern unsigned char D_3240[0x20];/*AnimFrameMask*/
-extern unsigned char D_3266[];/*ObjStatus*/
+extern unsigned char ObjStatus[];
 extern unsigned char D_4EA4[];/*Party*/
-extern int16 D_54BA[];/*Amount: quantity (low byte), quality (high byte)*/
+extern int16 Amount[];/*quantity (low byte), quality (high byte)*/
 extern unsigned char D_6EC6[];/*TalkFlags*/
-extern struct coord D_78AE[];/*ObjPos*/
+extern struct coord ObjPos[];
 extern unsigned char D_9CC0;/*PartySize*/
-extern uint16 D_9CC4[];/*ObjShapeType*/
+extern uint16 ObjShapeType[];
 extern unsigned char far *D_B4C4;/*TerrainType*/
 extern int16 far *D_B508;/*OrigShapeType*/
 extern unsigned char D_B50C[0x20];/*AnimFrameShift*/
@@ -105,18 +105,13 @@ extern struct tClipInfo D_EBD0[4];/*TextWindows*/
 extern char DirIncrX[8], DirIncrY[8];
 
 #define PromptFlag D_0F13
-#define ObjStatus D_3266
 #define Party D_4EA4
-#define Amount D_54BA
 #define TalkFlags D_6EC6
-#define ObjPos D_78AE
 #define PartySize D_9CC0
-#define ObjShapeType D_9CC4
 #define TerrainType D_B4C4
 #define OrigShapeType D_B508
 #define GrDriver D_BA6A
 #define TextWindows D_EBD0
-#define MonsterFlags C_2DE5_01C6
 
 
 #define GR_SET_COLOR(c)              (GrDriver.iii.ofs = 0x06, (*GrDriver.f)(c))
@@ -428,7 +423,7 @@ extern char DirIncrX[8], DirIncrY[8];
 }
 
 /*the object 0x85 obj at (x, y) goes off: creatures there (MonsterFlags
-  0x80 or 0x4000) are hurt, objects C_100B_0247 is true for are removed
+  0x80 or 0x4000) are hurt, objects IsBurnableType is true for are removed
   (each 0x84 makes the objects 0x84 around it into 0x85 of quality q)*/
 /*C_2F63_0ACF*/C_2F63_0ACF(int16 x, int16 y, int16 obj, int16 q) {
 	int16 found, type, cls, xx;
@@ -442,7 +437,7 @@ extern char DirIncrX[8], DirIncrY[8];
 				continue;
 			if((MonsterFlags[cls] & 0x80) || (MonsterFlags[cls] & 0x4000))
 				LoseHP(o, OSI_rand(1, 10), 3);
-		} else if(C_100B_0247(type)) {
+		} else if(IsBurnableType(type)) {
 			DeleteObj(o);
 			if(type == 0x84) {
 				for(xx = x - 1; xx < x + 2; xx ++)

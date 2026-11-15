@@ -29,22 +29,18 @@ extern MUS_PlaySfx(int16);/*play a sound effect?*/
 extern cdecl CON_printf(char far *, ...);
 
 extern int16 MapZ;
-extern unsigned char D_3266[];/*ObjStatus*/
-extern int16 D_54BA[];/*Amount: quantity (low byte), quality (high byte)*/
+extern unsigned char ObjStatus[];
+extern int16 Amount[];/*quantity (low byte), quality (high byte)*/
 extern unsigned char D_6EC6[];/*TalkFlags (per NPC)*/
-extern struct coord D_78AE[];/*ObjPos*/
-extern uint16 D_9CC4[];/*ObjShapeType*/
+extern struct coord ObjPos[];
+extern uint16 ObjShapeType[];
 extern int16 D_EC4C;/*BridgeNum: the bridge's number*/
 extern int16 D_EC4E, D_EC50;/*BridgeX1, BridgeY1: the bridge's rectangle*/
 extern int16 D_EC52;/*BridgeLen*/
 extern int16 D_EC54, D_EC56;/*BridgeX2, BridgeY2*/
 extern int16 D_EC58;/*BridgeNS: 0x80 when the bridge runs north-south*/
 
-#define ObjStatus D_3266
-#define Amount D_54BA
 #define TalkFlags D_6EC6
-#define ObjPos D_78AE
-#define ObjShapeType D_9CC4
 #define BridgeNum D_EC4C
 #define BridgeX1 D_EC4E
 #define BridgeY1 D_EC50

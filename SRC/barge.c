@@ -29,19 +29,19 @@ extern int16 LocPartOffset;
 extern unsigned char Active;
 extern int16 MapX, MapY;
 extern char SoloMember;
-extern int32 D_16AA;/*flags (0x10: the dream)*/
+extern int32 GameFlags;/*0x10: in a dream*/
 extern unsigned char D_4EA4[];/*Party*/
-extern int16 D_54BA[];/*Amount: quantity (low byte), quality (high byte)*/
+extern int16 Amount[];/*quantity (low byte), quality (high byte)*/
 extern unsigned char D_6CBA[];/*NPCStatus*/
 extern unsigned char far *D_6DBA;/*TileFlag*/
 extern int16 far *D_6EBE;/*BaseTile*/
 extern unsigned char D_6EC6[];/*TalkFlags (per NPC)*/
 extern unsigned char far *D_760A;/*TileFlag2*/
 extern int16 D_770E[];/*AnimFirstFrame*/
-extern struct coord D_78AE[];/*ObjPos*/
+extern struct coord ObjPos[];
 extern unsigned char D_9CC0;/*PartySize*/
 extern int16 D_9CC2;/*NumAnimData*/
-extern uint16 D_9CC4[];/*ObjShapeType*/
+extern uint16 ObjShapeType[];
 extern int16 D_B4C8[];/*AnimTile*/
 extern int16 D_B530;/*barge_scrap_count*/
 extern int16 D_B532;/*barge_piece_count*/
@@ -67,22 +67,19 @@ extern int16 SearchArea(int16, int16, int16, int16);/*SearchArea(x1, y1, x2, y2)
 extern MoveObj(int16, int16, int16, int16);
 extern ShowObjects();
 extern MUS_PlaySfx(int16);/*play a sound effect?*/
-extern int16 InRange_10_17_C0_C3(int16);/*InRange_10_17_C0_C3: water tiles*/
+extern int16 IsWaterTile(int16);
 extern cdecl CON_printf(char far *, ...);
 
-#define IN_DREAM (D_16AA & 0x10)
+#define IN_DREAM (GameFlags & 0x10)
 #define Party D_4EA4
-#define Amount D_54BA
 #define NPCStatus D_6CBA
 #define TileFlag D_6DBA
 #define BaseTile D_6EBE
 #define TalkFlags D_6EC6
 #define TileFlag2 D_760A
 #define AnimFirstFrame D_770E
-#define ObjPos D_78AE
 #define PartySize D_9CC0
 #define NumAnimData D_9CC2
-#define ObjShapeType D_9CC4
 #define AnimTile D_B4C8
 #define barge_scrap_count D_B530
 #define barge_piece_count D_B532
@@ -271,7 +268,7 @@ extern cdecl CON_printf(char far *, ...);
 		y = (y + dy) & 0x3ff;
 		if(C_170D_007E(x, y, z))
 			return 0;
-		if(!InRange_10_17_C0_C3(GetTileAtXYZ(x, y, z))) {
+		if(!IsWaterTile(GetTileAtXYZ(x, y, z))) {
 			ObjShapeType[ctrl] = GetType(ctrl) + 0x1000;
 			return 0;
 		}
@@ -381,7 +378,7 @@ extern cdecl CON_printf(char far *, ...);
 		if(TalkFlags[0x76] & 0x40) {
 			TalkFlags[0x76] |= 0x80;
 			for(i = 0; i < NumAnimData; i++) {
-				if(InRange_10_17_C0_C3(AnimTile[i]))
+				if(IsWaterTile(AnimTile[i]))
 					AnimFirstFrame[i] ++;
 			}
 		}

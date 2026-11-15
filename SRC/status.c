@@ -20,9 +20,9 @@
  *
  * Differences from Savage Empire's: the hit points' color has more cases
  * (STAT_PrintHP), the strength/dexterity/intelligence shown are computed
- * (GetStr/0576/05C0) and colored, the talents (D_16B0) are shown as
+ * (GetStr/0576/05C0) and colored, the talents (Talents) are shown as
  * icons, the empty slot tiles follow the panel color, in the dream
- * (D_16AA & 0x10) only one inventory is shown, readying some objects has
+ * (GameFlags & 0x10) only one inventory is shown, readying some objects has
  * side effects, unreadying may be refused, no "modern weapons" rule.
  * STAT_GetEquipSlot and IsWeightPer10Type moved to segment 100B; the
  * inventory scroll stubs and STAT_FindEquipSlotByType are gone.
@@ -62,9 +62,9 @@ extern int16 GetDex(int16);/*an NPC's dexterity*/
 extern int16 GetInt(int16);/*an NPC's intelligence*/
 extern int16 MaxHP(int16);
 extern int16 IsContainerType(int16);
-extern int16 C_100B_01FB(int16);
+extern int16 IsLitLightType(int16);
 extern int16 IsWeightPer10Type(int16);
-extern int16 QuanType(int16);/*QuanType: 4 quantity on 16 bits, 2 on 8 bits, else 0*/
+extern int16 QuanType(int16);/*4 quantity on 16 bits, 2 on 8 bits, else 0*/
 extern int16 STAT_GetEquipSlot(int16);
 extern DrawPortrait(int16, int16, int16);/*DrawPortrait(npcNum, x, y)*/
 extern DrawPaperDoll(int16, int16, int16);/*DrawPaperDoll(x, y, npcNum)*/
@@ -90,25 +90,25 @@ extern int16 D_082A;
 extern int16 D_082C;
 extern char D_0F13;/*PromptFlag?*/
 extern int16 MapZ;
-extern int32 D_16AA;/*flags (0x10: the dream)*/
-extern struct { unsigned a:4, psychic:4, c:4, d:4; } D_16B0[];/*talents (shown as tiles 0x120, 0x121, 0x122)*/
-extern unsigned char D_3266[];/*ObjStatus*/
+extern int32 GameFlags;/*0x10: in a dream*/
+extern struct { unsigned a:4, psychic:4, c:4, d:4; } Talents[];/*talents (shown as tiles 0x120, 0x121, 0x122)*/
+extern unsigned char ObjStatus[];
 extern unsigned char D_4EA4[];/*Party*/
-extern unsigned char far *D_4EB6;/*Level*/
+extern unsigned char far *Level;
 extern char D_50CE[][14];/*Names*/
-extern uint16 D_51AE[];/*ExpPoints*/
+extern uint16 ExpPoints[];
 extern unsigned char far *D_53AE;/*NPCComMode*/
-extern int16 D_54BA[];/*Amount*/
+extern int16 Amount[];
 extern unsigned char D_6CBA[];/*NPCStatus: 0x08 poisoned*/
-extern unsigned char D_6DBE[];/*HitPoints*/
+extern unsigned char HitPoints[];
 extern int16 far *D_6EBE;/*BaseTile*/
 extern unsigned char far *D_7606;/*TypeWeight*/
-extern struct coord D_78AE[];/*ObjPos*/
+extern struct coord ObjPos[];
 extern unsigned char D_9CC0;/*PartySize*/
-extern uint16 D_9CC4[];/*ObjShapeType*/
+extern uint16 ObjShapeType[];
 extern int16 far *D_B508;/*OrigShapeType*/
 extern union tHandler D_BA6A;/*GrDriver*/
-extern int16 D_C59C[];/*Link*/
+extern int16 Link[];
 extern int16 D_EAD8[16];/*InvenSlotObj*/
 extern unsigned char D_EAF8;/*InvenSize*/
 extern unsigned char D_EAF9[8];/*Party_2Handed*/
@@ -125,23 +125,15 @@ extern int16 D_EBF6, D_EBF8;/*Selection.x, Selection.y*/
 extern int16 MapX, MapY;
 
 #define PromptFlag D_0F13
-#define ObjStatus D_3266
 #define Party D_4EA4
-#define Level D_4EB6
 #define Names D_50CE
-#define ExpPoints D_51AE
 #define NPCComMode D_53AE
-#define Amount D_54BA
 #define NPCStatus D_6CBA
-#define HitPoints D_6DBE
 #define BaseTile D_6EBE
 #define TypeWeight D_7606
-#define ObjPos D_78AE
 #define PartySize D_9CC0
-#define ObjShapeType D_9CC4
 #define OrigShapeType D_B508
 #define GrDriver D_BA6A
-#define Link D_C59C
 #define InvenSlotObj D_EAD8
 #define InvenSize D_EAF8
 #define Party_2Handed D_EAF9
@@ -170,7 +162,7 @@ extern int16 MapX, MapY;
 #define GetQuan(i) (((unsigned char *)(Amount + (i)))[0])
 #define GetAssoc(i) (*(int16 *)&(ObjPos[i]))
 #define IsNPC(i) ((i) < 0x100 && (i) >= 0)
-#define IN_DREAM (D_16AA & 0x10)
+#define IN_DREAM (GameFlags & 0x10)
 
 /*the panel's tiles follow its paper color*/
 #define EMPTY_SLOT_TILE (ColorPaper == 7 ? 0x126 : 0x110)
@@ -231,14 +223,14 @@ extern int16 MapX, MapY;
 		objTyp = OrigShapeType[objNum] & 0x3ff;
 		tile = OBJ_MakeDirFrame(objTyp, 4) + BaseTile[objTyp];
 		DrawSlotTile(tile, EMPTY_SLOT_TILE, 192, (i - first) * 24 + 8);
-		if(D_16B0[objNum].a)
+		if(Talents[objNum].a)
 			DrawSlotTile(0x120, EMPTY_SLOT_TILE, 208, (i - first) * 24 + 8);
-		if(D_16B0[objNum].psychic) {
-			if(D_16B0[objNum].c)
+		if(Talents[objNum].psychic) {
+			if(Talents[objNum].c)
 				DrawSlotTile2(0x121, 0x122, EMPTY_SLOT_TILE, 224, (i - first) * 24 + 8);
 			else
 				DrawSlotTile(0x121, EMPTY_SLOT_TILE, 224, (i - first) * 24 + 8);
-		} else if(D_16B0[objNum].c) {
+		} else if(Talents[objNum].c) {
 			DrawSlotTile(0x122, EMPTY_SLOT_TILE, 224, (i - first) * 24 + 8);
 		}
 		CON_gotoxy(12, (i - first) * 3 + 1);
@@ -300,7 +292,7 @@ extern int16 MapX, MapY;
 	CON_gotoxy(14, 1);
 	if(ObjStatus[objNum] & 0x40)
 		CurClip->fgColor = ColorBlue;
-	if(objNum <= 15 && D_16B0[objNum].a)
+	if(objNum <= 15 && Talents[objNum].a)
 		CurClip->fgColor = ColorMagenta;
 	else if(ObjStatus[objNum] & 0x80)
 		CurClip->fgColor = D_0826;
@@ -634,14 +626,14 @@ extern int16 MapX, MapY;
 		GR_PUT_TILE_SCREEN(0x11f, 296, 102);
 	}
 	if(IN_DREAM && !ShowNPCInven) {
-		if(D_16B0[0].a)
+		if(Talents[0].a)
 			DrawSlotTile(0x120, EMPTY_SLOT_TILE, 184, 96);
-		if(D_16B0[0].psychic) {
-			if(D_16B0[0].c)
+		if(Talents[0].psychic) {
+			if(Talents[0].c)
 				DrawSlotTile2(0x121, 0x122, EMPTY_SLOT_TILE, 200, 96);
 			else
 				DrawSlotTile(0x121, EMPTY_SLOT_TILE, 200, 96);
-		} else if(D_16B0[0].c) {
+		} else if(Talents[0].c) {
 			DrawSlotTile(0x122, EMPTY_SLOT_TILE, 200, 96);
 		}
 		CON_gotoxy(0, 11); CON_printf(/*1AD3*/"HP:");
@@ -828,7 +820,7 @@ extern int16 MapX, MapY;
 		CON_printf(BurnOutMsg);
 		return 2;
 	}
-	if(C_100B_01FB(objTyp))
+	if(IsLitLightType(objTyp))
 		C_2FA1_0000(objNum, objNum, -1);
 	else if(objTyp == 0xf) {
 		CON_printf(/*1B3D*/"They won't come off!\n");

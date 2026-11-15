@@ -15,7 +15,7 @@
  * keeps one of them looping (LoopSfx, LoopVoice); a few functions play
  * their own sequences (a sweep, five beeps, a melody).
  * C_1FA9_0603 is SE's "party knocked out" (C_2701_0556): in the dream the
- * dreamer wakes up (back to D_1684/D_1685, conversation 0x66) or, without
+ * dreamer wakes up (back to WakeX/WakeY, conversation 0x66) or, without
  * a place to go back to, shakes itself awake from the nightmare; out of it
  * the party wakes in the Olympus mine or the space capsule, unless the
  * capsule door is not open yet (TalkFlags[0x10] & 0x10), which ends the
@@ -56,21 +56,21 @@ extern int16 D_0F18;/*MapAnimEnabled*/
 extern unsigned char Time_H;
 extern unsigned char Active;
 extern int16 MapX, MapY, MapZ;
-extern unsigned char D_1684, D_1685;/*where the dreamer wakes up (x, y)*/
+extern unsigned char WakeX, WakeY;/*where the dreamer wakes up (x, y)*/
 extern int16 SoundFlag;
-extern char D_16A3;
+extern char DreamFoesLeft;
 extern char InCombat;
-extern int32 D_16AA;/*flags (0x10: the dream)*/
+extern int32 GameFlags;/*0x10: in a dream*/
 extern int16 DreamStage;
 extern char AnimateAtPrompt;
 extern int16 EndPagingAtPrompt;
 extern struct tClipInfo *CurClip;
-extern unsigned char D_3266[];/*ObjStatus*/
+extern unsigned char ObjStatus[];
 extern unsigned char far *D_46D0;/*NPCMode*/
 extern unsigned char D_6CBA[];/*NPCStatus*/
-extern unsigned char D_6DBE[];/*HitPoints*/
+extern unsigned char HitPoints[];
 extern unsigned char D_6EC6[];/*TalkFlags (per NPC)*/
-extern uint16 D_9CC4[];/*ObjShapeType*/
+extern uint16 ObjShapeType[];
 extern COMBAT_breakOff();
 extern int16 MaxHP(int16);
 extern ResetMapView();
@@ -124,13 +124,10 @@ extern void far *D_EA90[16];/*Songs: the songs of music.lzc*/
 
 #define StatusDirty D_0F12
 #define MapAnimEnabled D_0F18
-#define IN_DREAM (D_16AA & 0x10)
-#define ObjStatus D_3266
+#define IN_DREAM (GameFlags & 0x10)
 #define NPCMode D_46D0
 #define NPCStatus D_6CBA
-#define HitPoints D_6DBE
 #define TalkFlags D_6EC6
-#define ObjShapeType D_9CC4
 #define LoopVoice D_EA76
 #define Songs D_EA90
 
@@ -473,13 +470,13 @@ extern int16 MUS_LoadSongs();
 		return;
 	if(IN_DREAM) {
 		NPCStatus[0] &= ~0x10;
-		D_16A3 = 0;
-		if(D_1684) {
+		DreamFoesLeft = 0;
+		if(WakeX) {
 			HitPoints[0] = MaxHP(1);
 			NPCStatus[0] &= ~8;
-			MoveObj(0, D_1684, D_1685, MapZ);
-			MapX = D_1684;
-			MapY = D_1685;
+			MoveObj(0, WakeX, WakeY, MapZ);
+			MapX = WakeX;
+			MapY = WakeY;
 			MAP_LoadAround();
 			COMBAT_breakOff();
 			CON_printf("You feel your dream consciousness returning.\n");

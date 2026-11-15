@@ -66,8 +66,8 @@ extern PartyTeleport(int16, int16, int16, int16);
 extern int16 NextLoc();
 extern int16 FindLoc(int16, int16, int16);/*FindLoc(x, y, z)*/
 extern int16 OBJ_FindTypeAt(int16, int16, int16);/*OBJ_FindTypeAt(type, x, y)*/
-extern int16 C_1B09_0A5D(int16);/*the next object of the same type there*/
-extern int16 C_1B09_090B(int16);
+extern int16 OBJ_NextOfTypeAt(int16);/*the next object of the same type there*/
+extern int16 OBJ_IsOnScreen(int16);
 extern int16 NextArea();
 extern int16 SearchArea(int16, int16, int16, int16);/*SearchArea(x1, y1, x2, y2)*/
 extern int16 AddMapObj(int16, int16, int16, int16, int16, int16);/*AddMapObj(shape, status, amount, x, y, z)*/
@@ -76,12 +76,12 @@ extern OBJ_PurgeFarLocals(int16, int16, int16);
 extern int16 MoveObj(int16, int16, int16, int16);/*MoveObj(objNum, x, y, z)*/
 extern OBJ_ShowMultiTile(int16, int16, int16, int16);
 extern ShowObjects();
-extern int16 C_100B_03B5(int16);
+extern int16 IsCrushableType(int16);
 /*combat*/
 extern COMBAT_stopCharm(int16);
 extern int16 COMBAT_TileDistance(int16, int16, int16);/*COMBAT_TileDistance(objNum, x, y)*/
 extern int16 GetDex(int16);/*an NPC's dexterity*/
-extern SetTypeUnconscious(int16);/*SetTypeUnconscious: an NPC falls asleep (shape)*/
+extern SetTypeUnconscious(int16);/*an NPC falls asleep (shape)*/
 extern int16 COMBAT_canSee(int16, int16);/*COMBAT_canSee(objNum, target)*/
 extern COMBAT_showHit(int16);
 extern int16 COMBAT_range(int16, int16, int16, int16);/*distance of (x1, y1) and (x2, y2)*/
@@ -93,15 +93,15 @@ extern COMBAT_AI_Retreat(int16);
 extern COMBAT_AI_Like(int16);
 extern COMBAT_AI_Unfriendly(int16);
 extern COMBAT_AI_Immobile(int16);
-extern C_07D1_4912(int16);/*A.I. of mode 0x13*/
-extern C_07D1_4A00(int16);/*A.I. of mode 0x16*/
-extern C_07D1_4C0A(int16);/*A.I. of mode 0x12*/
-extern C_07D1_4E34(int16);/*A.I. of mode 0x19*/
-extern C_07D1_50B2(int16);/*A.I. of mode 0x14*/
-extern C_07D1_5520(int16);/*A.I. of mode 0x0d*/
-extern C_07D1_5AD6(int16);/*A.I. of mode 0x11*/
-extern C_07D1_5B09(int16);/*A.I. of mode 0x15*/
-extern C_07D1_5B8E(int16);/*A.I. of mode 0x17*/
+extern COMBAT_AI_Rampage(int16);/*A.I. of mode 0x13*/
+extern COMBAT_AI_ChaseCape(int16);/*A.I. of mode 0x16*/
+extern COMBAT_AI_HiddenInSand(int16);/*A.I. of mode 0x12*/
+extern COMBAT_AI_Tentacle(int16);/*A.I. of mode 0x19*/
+extern COMBAT_AI_Thief(int16);/*A.I. of mode 0x14*/
+extern COMBAT_AI_Worm(int16);/*A.I. of mode 0x0d*/
+extern COMBAT_AI_WormFlee(int16);/*A.I. of mode 0x11*/
+extern COMBAT_AI_MoveSouth(int16);/*A.I. of mode 0x15*/
+extern COMBAT_AI_Together(int16);/*A.I. of mode 0x17*/
 extern C_2F63_083C(int16);/*A.I. of mode 0x18*/
 /*other modules*/
 extern int16 OSI_rand(int16, int16);
@@ -147,21 +147,21 @@ extern unsigned char Date_D;
 extern unsigned char Active;
 extern int16 MapX, MapY, MapZ;
 extern unsigned char DrunkCounter;
-extern unsigned char PathObject[8];/*PathObject: NPC following each path slot (0 = free)*/
-extern unsigned char PathCounter[8];/*PathCounter: current entry of each path*/
-extern unsigned char PathTries[8];/*PathTries: steps done in the current entry*/
+extern unsigned char PathObject[8];/*NPC following each path slot (0 = free)*/
+extern unsigned char PathCounter[8];/*current entry of each path*/
+extern unsigned char PathTries[8];/*steps done in the current entry*/
 extern char InCombat;
 extern char SoloMember;
-extern unsigned char D_16A8;/*the player is a woman*/
-extern int32 D_16AA;/*flags (0x10: the dream)*/
-extern int16 D_16AE;/*rotation of the map view*/
+extern unsigned char PlayerIsFemale;
+extern int32 GameFlags;/*0x10: in a dream*/
+extern int16 ViewRotation;
 extern unsigned char far *D_3262;/*0x100 bytes (0x80: NPC's "WAIT" flag)*/
-extern unsigned char D_3266[];/*ObjStatus*/
+extern unsigned char ObjStatus[];
 extern char D_44C4[];/*MovePts*/
 extern unsigned char far *D_45C4;/*SchedIndex: current schedule entry of each NPC, relative to SchedPointer*/
 extern struct tPathData far *D_45C8;/*PathData*/
 extern unsigned char far *D_45CC;/*NPCFlag*/
-extern unsigned char D_45D0[];/*DEXTE (the base value; GetDex adds the modifiers)*/
+extern unsigned char DEXTE[];/*the base value; GetDex adds the modifiers*/
 extern unsigned char far *D_46D0;/*NPCMode*/
 extern unsigned char D_46D4[AREA_H][AREA_W];/*AreaTiles: the ground tiles of the area*/
 extern unsigned char D_4EA4[];/*Party*/
@@ -170,15 +170,15 @@ extern int16 D_4EBE[0x101];/*SchedPointer: first schedule entry of each NPC*/
 extern t40x40 far *D_50C0;/*ScratchBuf (the path search work area)*/
 extern unsigned char far *D_50CA;/*Leader: path slot of an NPC following a path (else its leader/target)*/
 extern unsigned char far *D_53AE;/*NPCComMode*/
-extern int16 D_54BA[];/*Amount*/
+extern int16 Amount[];
 extern unsigned char D_6CBA[];/*NPCStatus*/
 extern unsigned char far *D_6DBA;/*TileFlag*/
-extern unsigned char D_6DBE[];/*HitPoints*/
+extern unsigned char HitPoints[];
 extern int16 far *D_6EBE;/*BaseTile*/
 extern unsigned char D_6EC6[];/*TalkFlags*/
-extern struct coord D_78AE[];/*ObjPos*/
+extern struct coord ObjPos[];
 extern unsigned char D_9CC0;/*PartySize*/
-extern uint16 D_9CC4[];/*ObjShapeType*/
+extern uint16 ObjShapeType[];
 extern unsigned char far *D_B4C4;/*TerrainType*/
 extern int16 far *D_B508;/*OrigShapeType*/
 extern int16 D_B978[9];/*CurrentBarge*/
@@ -195,12 +195,10 @@ extern int16 D_C122;/*PTH_Found*/
 
 
 #define PromptFlag D_0F13
-#define ObjStatus D_3266
 #define MovePts D_44C4
 #define SchedIndex D_45C4
 #define PathData D_45C8
 #define NPCFlag D_45CC
-#define DEXTE D_45D0
 #define NPCMode D_46D0
 #define AreaTiles D_46D4
 #define Party D_4EA4
@@ -209,15 +207,11 @@ extern int16 D_C122;/*PTH_Found*/
 #define _ScratchBuf D_50C0
 #define Leader D_50CA
 #define NPCComMode D_53AE
-#define Amount D_54BA
 #define NPCStatus D_6CBA
 #define TileFlag D_6DBA
-#define HitPoints D_6DBE
 #define BaseTile D_6EBE
 #define TalkFlags D_6EC6
-#define ObjPos D_78AE
 #define PartySize D_9CC0
-#define ObjShapeType D_9CC4
 #define TerrainType D_B4C4
 #define OrigShapeType D_B508
 #define CurrentBarge D_B978
@@ -753,14 +747,14 @@ extern int16 D_C122;/*PTH_Found*/
 		}
 		if(objType == 0x1ce) {
 			if(GetQual(objNum))
-				ObjShapeType[0] = D_16A8 ? 0x13f : 0x13e;
+				ObjShapeType[0] = PlayerIsFemale ? 0x13f : 0x13e;
 			else
 				ObjShapeType[0] = OrigShapeType[1];
 			continue;
 		}
 		if(objType == 0x1d1) {
-			if(GetQual(objNum) != D_16AE & 7) {
-				D_16AE = GetQual(objNum) & 7;
+			if(GetQual(objNum) != ViewRotation & 7) {
+				ViewRotation = GetQual(objNum) & 7;
 				MUS_PlaySfx(0x32);
 				CON_printf("You feel dizzy...\n");
 				PromptFlag = 1;
@@ -1286,7 +1280,7 @@ extern int16 D_C122;/*PTH_Found*/
 	if(GetType(objNum) == 0x178 || GetType(objNum) == 0x16f) {
 		unused = 0;
 		for(obj = FindLoc(new_x, new_y, MapZ); obj >= 0; obj = NextLoc()) {
-			if(C_100B_03B5(GetType(obj)))
+			if(IsCrushableType(GetType(obj)))
 				DeleteObj(obj);
 		}
 	} else if(NPC_TryStep(objNum, new_x, new_y)) {
@@ -1296,7 +1290,7 @@ extern int16 D_C122;/*PTH_Found*/
 		if(C_170D_0853(objNum, dir) == 1) {
 			if(GetType(objNum) == 0x91) {
 				/*leaves a trail of 0x91 objects*/
-				for(obj = OBJ_FindTypeAt(0x91, new_x, new_y); obj >= 0; obj = C_1B09_0A5D(obj)) {
+				for(obj = OBJ_FindTypeAt(0x91, new_x, new_y); obj >= 0; obj = OBJ_NextOfTypeAt(obj)) {
 					if(!IsNPC(obj))
 						break;
 				}
@@ -1650,7 +1644,7 @@ extern int16 D_C122;/*PTH_Found*/
 				break;
 			if(OBJ_FindTypeAt(0x1be, GetX(objNum), (GetY(objNum) - 2) & 0x3ff) < 0)
 				break;
-			if(C_1B09_090B(objNum))
+			if(OBJ_IsOnScreen(objNum))
 				MUS_PlaySfx(0x10);
 			NPCMode[objNum] = 0x9a;
 		break;
@@ -1681,7 +1675,7 @@ extern int16 D_C122;/*PTH_Found*/
 			}
 			if(TryStraightMove(objNum, 4, 1))
 				break;
-			if(C_1B09_090B(objNum)) {
+			if(OBJ_IsOnScreen(objNum)) {
 				CON_printf(C_2BB4_2180);
 				MUS_PlaySfx(0);
 			}
@@ -1718,21 +1712,21 @@ extern int16 D_C122;/*PTH_Found*/
 					SetFrame(lever, GetFrame(lever | 4));/*sic*/
 				}
 				NPCMode[objNum] = 0x9c;
-			} else if(C_1B09_090B(objNum)) {
+			} else if(OBJ_IsOnScreen(objNum)) {
 				CON_printf(C_2BB4_2180);
 				MUS_PlaySfx(0);
 			}
 		break;
-		case 0x13: C_07D1_4912(objNum); break;
-		case 0x16: C_07D1_4A00(objNum); break;
-		case 0x12: C_07D1_4C0A(objNum); break;
-		case 0x14: C_07D1_50B2(objNum); break;
-		case 0x0d: C_07D1_5520(objNum); break;
-		case 0x11: C_07D1_5AD6(objNum); break;
-		case 0x15: C_07D1_5B09(objNum); break;
-		case 0x17: C_07D1_5B8E(objNum); break;
+		case 0x13: COMBAT_AI_Rampage(objNum); break;
+		case 0x16: COMBAT_AI_ChaseCape(objNum); break;
+		case 0x12: COMBAT_AI_HiddenInSand(objNum); break;
+		case 0x14: COMBAT_AI_Thief(objNum); break;
+		case 0x0d: COMBAT_AI_Worm(objNum); break;
+		case 0x11: COMBAT_AI_WormFlee(objNum); break;
+		case 0x15: COMBAT_AI_MoveSouth(objNum); break;
+		case 0x17: COMBAT_AI_Together(objNum); break;
 		case 0x18: C_2F63_083C(objNum); break;
-		case 0x19: C_07D1_4E34(objNum); break;
+		case 0x19: COMBAT_AI_Tentacle(objNum); break;
 		case 0x1a: C_170D_3E97(objNum); break;
 		case 0x0f:
 		case 0x10:
@@ -1866,9 +1860,9 @@ extern int16 D_C122;/*PTH_Found*/
 
 	if(Active > PartySize)
 		return;
-	if(IsDead(1) || (IsDead(0) && (D_16AA & 0x10))) {
+	if(IsDead(1) || (IsDead(0) && (GameFlags & 0x10))) {
 		C_1FA9_0603();
-		if(D_16AA & 0x10)
+		if(GameFlags & 0x10)
 			return;
 	}
 	if(IN_VEHICLE) {

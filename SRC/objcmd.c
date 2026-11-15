@@ -56,7 +56,7 @@ extern CON_gotoxy(int16, int16);
 extern cdecl CON_printf(char far *, ...);
 /*map*/
 extern unsigned char GetTileAtXYZ(int16, int16, int16);
-extern int16 MapDistance(int16, int16);/*MapDistance (wrapping)*/
+extern int16 MapDistance(int16, int16);/*wrapping*/
 /*visible*/
 extern VIS_UpdateView(void);
 /*object*/
@@ -65,7 +65,7 @@ extern int16 NextLoc(void);
 extern int16 FindInv(int16);
 extern int16 OBJ_FindTypeAt(int16, int16, int16);
 extern int16 OBJ_FindNPCAt(int16, int16, int16);
-extern int16 C_1B09_0D34(int16, int16);/*inventory slots used by objNum with a type added*/
+extern int16 OBJ_InvSlotsUsed(int16, int16);/*inventory slots used by objNum with a type added*/
 extern int16 AddMapObj(int16, int16, int16, int16, int16, int16);
 extern int16 AddInvObj(int16, int16, int16, int16);
 extern DeleteObj(int16);
@@ -74,21 +74,21 @@ extern int16 InsertObj(int16, int16, int16);
 extern char *GetObjectString(int16);
 extern char *GetTileString(int16);
 extern ShowObjects(void);
-extern int16 LocCursor[4];/*LocCursor: FindLoc's cursors*/
+extern int16 LocCursor[4];/*FindLoc's cursors*/
 extern int16 LocPartOffset;
 /*objtype*/
 extern int16 IsContainerType(int16);
-extern int16 C_100B_01AD(int16);/*breakable type*/
-extern int16 C_100B_01D4(int16);/*a lamp type*/
-extern int16 C_100B_01FB(int16);/*a light source type*/
-extern int16 C_100B_0222(int16);/*pushable type*/
-extern int16 C_100B_038E(int16);
+extern int16 IsFragileType(int16);/*breaks when thrown far*/
+extern int16 IsUnlitLightType(int16);
+extern int16 IsLitLightType(int16);
+extern int16 IsPushableType(int16);
+extern int16 IsBreakableType(int16);
 extern int16 IsWeightPer10Type(int16);
 extern int16 QuanType(int16);
 extern int16 STAT_GetEquipSlot(int16);
 /*typetest*/
-extern int16 InRange_10_17_C0_C3(int16);
-extern int16 Is_6C_6D_6E_4D_4F(int16);
+extern int16 IsWaterTile(int16);
+extern int16 IsTrackTile(int16);
 /*status*/
 extern STAT_DrawInventory(void);
 extern int16 GetWeight(int16);
@@ -218,21 +218,21 @@ extern int16 ColorPaper;
 extern unsigned char Time_M, Time_H;
 extern unsigned char Active;
 extern int16 MapX, MapY, MapZ;
-extern unsigned char D_16A8;/*the player is a woman*/
-extern int32 D_16AA;/*flags (0x10: the dream)*/
-extern struct { unsigned a:4, b:4, c:4, d:4; } D_16B0[];/*talents*/
-extern unsigned char D_3266[];/*ObjStatus*/
+extern unsigned char PlayerIsFemale;
+extern int32 GameFlags;/*0x10: in a dream*/
+extern struct { unsigned a:4, b:4, c:4, d:4; } Talents[];
+extern unsigned char ObjStatus[];
 extern unsigned char D_4EA4[];/*Party*/
-extern unsigned char far *D_4EB6;/*Level*/
-extern int16 D_54BA[];/*Amount*/
+extern unsigned char far *Level;
+extern int16 Amount[];
 extern unsigned char D_6CBA[];/*NPCStatus*/
 extern int16 far *D_6EBE;/*BaseTile*/
 extern unsigned char D_6EC6[];/*TalkFlags*/
 extern unsigned char far *D_7606;/*TypeWeight*/
 extern unsigned char far *D_760A;/*TileFlag2*/
-extern struct coord D_78AE[];/*ObjPos*/
+extern struct coord ObjPos[];
 extern unsigned char D_9CC0;/*PartySize*/
-extern uint16 D_9CC4[];/*ObjShapeType*/
+extern uint16 ObjShapeType[];
 extern unsigned char far *D_B4C4;/*TerrainType*/
 extern union tHandler D_BA6A;/*GrDriver*/
 extern unsigned char D_EAF8;/*InvenSize*/
@@ -249,18 +249,13 @@ extern int16 D_EBF6, D_EBF8;/*Selection.x, Selection.y*/
 extern int16 D_EC44;/*SelectionIsDark*/
 
 #define StatusDirty D_0F12
-#define ObjStatus D_3266
 #define Party D_4EA4
-#define Level D_4EB6
-#define Amount D_54BA
 #define NPCStatus D_6CBA
 #define BaseTile D_6EBE
 #define TalkFlags D_6EC6
 #define TypeWeight D_7606
 #define TileFlag2 D_760A
-#define ObjPos D_78AE
 #define PartySize D_9CC0
-#define ObjShapeType D_9CC4
 #define TerrainType D_B4C4
 #define GrDriver D_BA6A
 #define InvenSize D_EAF8
@@ -313,7 +308,7 @@ extern int16 D_EC44;/*SelectionIsDark*/
 #define ShowMouse if(MouseOn) MOUSE_SHOW();
 
 /*how far the active member reaches: its level with the first talent*/
-#define REACH (D_16B0[Party[Active]].a ? Level[Party[Active]] : 0)
+#define REACH (Talents[Party[Active]].a ? Level[Party[Active]] : 0)
 
 /*the plaques: 0xac by its quality 1-12 (on the surface, with the
   coordinates), 0xe8 by quality 1*/
@@ -360,14 +355,14 @@ extern int16 D_EC44;/*SelectionIsDark*/
 	if(itemObj >= 0x100) {
 		itemTyp = GetType(itemObj);
 		contTyp = GetType(containerObj);
-		if(C_1B09_0D34(itemTyp, containerObj) >= 0x10)
+		if(OBJ_InvSlotsUsed(itemTyp, containerObj) >= 0x10)
 			return 0;
 		if(itemTyp == 0x100 && contTyp == 0xa0 && !GetFrame(containerObj))
 			return 1;
 		if(IsContainerType(contTyp) && !GetFrame(containerObj)) {
 			if(contTyp == 0x155)
 				return 0;
-			if(C_100B_01D4(itemObj) && GetFrame(itemObj) > 0)
+			if(IsUnlitLightType(itemObj) && GetFrame(itemObj) > 0)
 				return 0;
 			if(IsContainerType(itemTyp))
 				return 0;
@@ -445,11 +440,11 @@ extern int16 D_EC44;/*SelectionIsDark*/
 		return;
 	}
 	if(ObjStatus[objNum] & 1)
-		objNum = D_16A8 ? 0x73 : 0x72;
+		objNum = PlayerIsFemale ? 0x73 : 0x72;
 	savedClip = CurClip;
 	HideMouse
 	savedStatus = StatusDisplay;
-	if(!(D_16AA & 0x10)) {
+	if(!(GameFlags & 0x10)) {
 		C_0E1A_158A();
 	} else {
 		GR_SET_COLOR(ColorPaper);
@@ -465,7 +460,7 @@ extern int16 D_EC44;/*SelectionIsDark*/
 				name = GetObjectString(objNum);
 				break;
 		}
-	} else if(objNum <= 1 || objNum == (D_16A8 ? 0x73 : 0x72)) {
+	} else if(objNum <= 1 || objNum == (PlayerIsFemale ? 0x73 : 0x72)) {
 		name = "yourself";
 	} else if(!(TalkFlags[objNum] & 1)) {
 		name = GetObjectString(objNum);
@@ -658,7 +653,7 @@ extern int16 D_EC44;/*SelectionIsDark*/
 				case 0x10: CON_printf(C_2BB4_1CE5); break;
 				default: CON_printf(C_2BB4_1CF2);
 			}
-		} else if(C_100B_01D4(objTyp) || C_100B_01FB(objTyp)) {
+		} else if(IsUnlitLightType(objTyp) || IsLitLightType(objTyp)) {
 			/*a light: its fuel or wick*/
 			if((objTyp == 0x6d || objTyp == 0x6e) && GetQuan(SelectionObj) > 1)
 				;
@@ -886,7 +881,7 @@ extern int16 D_EC44;/*SelectionIsDark*/
 /*can an object be put at (x, y): neither the map tile nor an object there
   is impassable (terrain bit 0x02) without one of the side bits 0xf0, and
   the map tile has no bit 0x04? returns 1 when it can*/
-/*C_047A_1325*/C_047A_1325(int16 x, int16 y) {
+/*C_047A_1325*/CanPlaceObjAt(int16 x, int16 y) {
 	int16 flags, obj;
 
 	flags = TerrainType[GetTileAtXYZ(x, y, MapZ)];
@@ -904,7 +899,7 @@ extern int16 D_EC44;/*SelectionIsDark*/
 
 /*is (x, y) water with nothing on it to stand an object on (terrain bits
   0x01 and 0x02, no object whose tile has TileFlag2 0x02 or 0x04)?*/
-/*C_047A_13C5*/C_047A_13C5(int16 x, int16 y) {
+/*C_047A_13C5*/IsOpenWater(int16 x, int16 y) {
 	int16 flags, tile, obj;
 
 	flags = TerrainType[tile = GetTileAtXYZ(x, y, MapZ)];
@@ -922,7 +917,7 @@ extern int16 D_EC44;/*SelectionIsDark*/
 /*"drop" command: drop or throw the selected inventory object of the
  displayed party member to a location (not onto a person): into the water
  (lost, with a splash), into a container, or on the ground; the breakable
- types (C_100B_01AD) break when thrown farther than the actor's reach. The
+ types (IsFragileType) break when thrown farther than the actor's reach. The
  hot objects 0x1c0/0x1c1 burn whoever has no talent or gloves 0x88*/
 /*C_047A_145E*/void CmdDrop() {
 	int16 destX, destY, newObj, actor, target, objFrm, targetTyp, holder;
@@ -948,7 +943,7 @@ extern int16 D_EC44;/*SelectionIsDark*/
 		NPCStatus[Party[Active]] |= 8;
 		CON_printf(C_2BB4_0D50);
 	}
-	if(C_100B_01FB(objTyp) && objTyp != 0x6d)
+	if(IsLitLightType(objTyp) && objTyp != 0x6d)
 		cantDrop = 0;
 	else
 		cantDrop = STAT_CheckUnready(obj, actor);
@@ -978,7 +973,7 @@ extern int16 D_EC44;/*SelectionIsDark*/
 		}
 		target = FindLoc(destX, destY, MapZ);
 		if(COMBAT_Missile(actor, &destX, &destY, 8, 0)) {
-			if(C_047A_13C5(destX, destY) && objTyp != 0x18b) {
+			if(IsOpenWater(destX, destY) && objTyp != 0x18b) {
 				/*into the water: lost*/
 				if(obj >= 0x100 || obj < 0) {
 					COMBAT_Missile(actor, &destX, &destY, 8, TILE_FRAME(obj));
@@ -990,7 +985,7 @@ extern int16 D_EC44;/*SelectionIsDark*/
 					}
 					if(StatusDisplay == 0x92)
 						STAT_DrawInventory();
-					if(InRange_10_17_C0_C3(GetTileAtXYZ(destX, destY, MapZ)) && (TalkFlags[0x76] & 0x40) && (TalkFlags[0x76] & 0x20) ||
+					if(IsWaterTile(GetTileAtXYZ(destX, destY, MapZ)) && (TalkFlags[0x76] & 0x40) && (TalkFlags[0x76] & 0x20) ||
 						GetTileAtXYZ(destX, destY, MapZ) >= 1 && GetTileAtXYZ(destX, destY, MapZ) <= 4 && (TalkFlags[0x76] & 0x20))
 						C_1FA9_0BE4();
 					else
@@ -1008,7 +1003,7 @@ extern int16 D_EC44;/*SelectionIsDark*/
 			MUS_PlaySfx(5);
 			return;
 		}
-		if(!C_047A_1325(destX, destY) && !HasSupportAt(destX, destY)) {
+		if(!CanPlaceObjAt(destX, destY) && !HasSupportAt(destX, destY)) {
 			if(target == -1 || !CanPutInContainer(target, obj)) {
 				CON_printf(C_2BB4_034D);
 				MUS_PlaySfx(5);
@@ -1032,7 +1027,7 @@ extern int16 D_EC44;/*SelectionIsDark*/
 		SubMov(actor, 3);
 		/*animate the throw; destX/destY = where it lands*/
 		COMBAT_Missile(actor, &destX, &destY, 8, TILE_FRAME(obj));
-		if(dist > 1 && REACH < dist && C_100B_01AD(objTyp)) {
+		if(dist > 1 && REACH < dist && IsFragileType(objTyp)) {
 			if(quanType) {
 				qtyCode = QualQuan(GetQual(obj), count);
 				if(GetQuan(obj) > count) {
@@ -1049,7 +1044,7 @@ extern int16 D_EC44;/*SelectionIsDark*/
 				if(StatusDisplay == 0x92)
 					STAT_DrawInventory();
 				return;
-			} else if(C_100B_038E(objTyp) && GetQuan(obj)) {
+			} else if(IsBreakableType(objTyp) && GetQuan(obj)) {
 				MoveObj(obj, destX, destY, MapZ);
 				LoseHP(obj, GetQuan(obj), 0);
 			} else {
@@ -1096,7 +1091,7 @@ extern int16 D_EC44;/*SelectionIsDark*/
 				MoveObj(obj, destX, destY, MapZ);
 			}
 		}
-		if(obj != -1 && C_100B_01D4(obj) && GetFrame(obj))
+		if(obj != -1 && IsUnlitLightType(obj) && GetFrame(obj))
 			PassTime(0);
 		VIS_UpdateView();
 		StatusDirty = 0;
@@ -1271,12 +1266,14 @@ extern int16 D_EC44;/*SelectionIsDark*/
 
 /*can objNum be pushed from (x, y) one square in direction dir? returns 0
   when it can, 1 when it is blocked, 2 when it won't go that way. The
-  barrel 0x19a floats on the canals only along their direction (its frame:
-  even north-south, odd east-west); the type 0x1b9 turns towards the
-  blocked direction instead*/
+  rail car 0x19a runs only on track (track tiles, IsTrackTile, or the
+  track objects 0x19c-0x19e, 0x1a3, 0xaf, 0xa3) and only along it (its
+  frame: even north-south, odd east-west; a rail switch, turntable or
+  frame 2 goes either way); the type 0x1b9 turns towards the blocked
+  direction instead. A plank 0x18b goes over a chasm 0xb0*/
 /*C_047A_234C*/PushObj(int16 objNum, int16 x, int16 y, register int16 dir) {
 	int16 destX, destY, sideX1, sideY1, sideX2, sideY2;
-	int16 frame, f, waterObj, blockObj, cur, ret, tile, isWater;
+	int16 frame, f, trackObj, blockObj, cur, ret, tile, onTrack;
 	int16 cursor0, cursor1, cursor2, cursor3, partOffset;
 	register int16 type;
 
@@ -1284,12 +1281,12 @@ extern int16 D_EC44;/*SelectionIsDark*/
 	destY = (y + DirIncrY[dir]) & 0x3ff;
 	tile = GetTileAtXYZ(destX, destY, MapZ);
 	if((type = GetType(objNum)) == 0x19a) {
-		isWater = Is_6C_6D_6E_4D_4F(tile);
+		onTrack = IsTrackTile(tile);
 		frame = GetFrame(objNum);
 		if(dir % 2 || frame % 2 == 0 && (dir == 0 || dir == 4) || frame % 2 == 1 && (dir == 6 || dir == 2)) {
 			ret = 2;
 		} else {
-			waterObj = -1;
+			trackObj = -1;
 			blockObj = -1;
 			cursor0 = LocCursor[0];
 			cursor1 = LocCursor[1];
@@ -1299,7 +1296,7 @@ extern int16 D_EC44;/*SelectionIsDark*/
 			for(cur = FindLoc(destX, destY, MapZ); cur != -1; cur = NextLoc()) {
 				type = GetType(cur);
 				if(type == 0x19e || type == 0x19d || type == 0x19c || type == 0x1a3 || type == 0xaf || type == 0xa3) {
-					waterObj = cur;
+					trackObj = cur;
 					break;
 				}
 				if(type == 0x14e || type == 0x14f || type == 0x150) {
@@ -1314,12 +1311,12 @@ extern int16 D_EC44;/*SelectionIsDark*/
 			LocCursor[2] = cursor2;
 			LocCursor[3] = cursor3;
 			LocPartOffset = partOffset;
-			if(waterObj == -1 && !isWater || blockObj != -1) {
+			if(trackObj == -1 && !onTrack || blockObj != -1) {
 				ret = 1;
-			} else if(waterObj == -1) {
+			} else if(trackObj == -1) {
 				ret = 0;
 			} else {
-				f = waterObj == -1?isWater - 1:GetFrame(waterObj);
+				f = trackObj == -1?onTrack - 1:GetFrame(trackObj);
 				if(frame % 2 == f || f == 2 || type == 0x19c || type == 0xaf || type == 0xa3)
 					ret = 0;
 				else
@@ -1330,7 +1327,7 @@ extern int16 D_EC44;/*SelectionIsDark*/
 		ret = 0;
 	} else if(CanMoveTo(objNum, destX, destY) || HasSupportAt(destX, destY)) {
 		if(dir & 1) {
-			if(C_100B_0222(type)) {
+			if(IsPushableType(type)) {
 				ret = 2;
 			} else {
 				sideX1 = (x + DirIncrX[dir - 1]) & 0x3ff;
@@ -1462,11 +1459,11 @@ extern int16 D_EC44;/*SelectionIsDark*/
 			SubMov(Party[Active], 5);
 			destX = (objX + DirIncrX[dirMoved]) & 0x3ff;
 			destY = (objY + DirIncrY[dirMoved]) & 0x3ff;
-			if(C_047A_13C5(destX, destY) && objTyp != 0x18b) {
+			if(IsOpenWater(destX, destY) && objTyp != 0x18b) {
 				/*pushed into the water*/
 				if(SelectionObj >= 0x100 || SelectionObj < 0) {
 					DeleteObj(SelectionObj);
-					if(InRange_10_17_C0_C3(GetTileAtXYZ(actorX, actorY, MapZ)) && (TalkFlags[0x76] & 0x40) && (TalkFlags[0x76] & 0x20) ||
+					if(IsWaterTile(GetTileAtXYZ(actorX, actorY, MapZ)) && (TalkFlags[0x76] & 0x40) && (TalkFlags[0x76] & 0x20) ||
 						GetTileAtXYZ(actorX, actorY, MapZ) >= 1 && GetTileAtXYZ(actorX, actorY, MapZ) <= 4 && (TalkFlags[0x76] & 0x20))
 						C_1FA9_0BE4();
 					else
@@ -1581,7 +1578,7 @@ extern int16 D_EC44;/*SelectionIsDark*/
 				} else {
 					weight = GetWeight(obj) + Encumbrance(obj);
 				}
-				if(GetStr(SelectionObj) * 20 < weight + WeightInven + WeightEquip || C_1B09_0D34(objTyp, SelectionObj) >= 0x10) {
+				if(GetStr(SelectionObj) * 20 < weight + WeightInven + WeightEquip || OBJ_InvSlotsUsed(objTyp, SelectionObj) >= 0x10) {
 					CON_printf(C_2BB4_1E8A, GetObjectString(SelectionObj));
 					MUS_PlaySfx(5);
 					STAT_ComputeWeights(Party[StatusMember]);
@@ -1605,7 +1602,7 @@ extern int16 D_EC44;/*SelectionIsDark*/
 						CON_printf(C_2BB4_1E8A, GetObjectString(SelectionObj));
 						MUS_PlaySfx(5);
 					}
-				} else if(C_100B_01D4(obj) && GetFrame(obj) > 0) {
+				} else if(IsUnlitLightType(obj) && GetFrame(obj) > 0) {
 					/*a burning light stays readied*/
 					if(InsertObj(obj, SelectionObj, EQUIP) == -1) {
 						CON_printf(C_2BB4_024E);
@@ -1657,7 +1654,7 @@ extern int16 D_EC44;/*SelectionIsDark*/
 				CON_printf("out of ");
 				CON_printf(GetObjectString(SelectionObj));
 				CON_putch('\n');
-				if(C_1B09_0D34(itemTyp, GetAssoc(SelectionObj)) >= 0x10) {
+				if(OBJ_InvSlotsUsed(itemTyp, GetAssoc(SelectionObj)) >= 0x10) {
 					CON_printf(C_2BB4_024E);
 					MUS_PlaySfx(5);
 					return;
@@ -1684,7 +1681,7 @@ extern int16 D_EC44;/*SelectionIsDark*/
 				CON_printf("into ");
 				CON_printf(GetObjectString(SelectionObj));
 				CON_putch('\n');
-				if(C_1B09_0D34(itemTyp, SelectionObj) >= 0x10) {
+				if(OBJ_InvSlotsUsed(itemTyp, SelectionObj) >= 0x10) {
 					CON_printf(C_2BB4_0493);
 					MUS_PlaySfx(5);
 					return;

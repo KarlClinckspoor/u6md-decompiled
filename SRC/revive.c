@@ -14,25 +14,22 @@ extern int16 MaxHP(int16);
 extern int16 CanMoveTo(int16, int16, int16);/*CanMoveTo(npc, x, y)*/
 extern int16 MoveFollowers(int16, int16);
 extern int16 DeleteObj(int16);/*DeleteObj?*/
-extern int16 OBJ_ReviveFromBody(int16);/*OBJ_ReviveFromBody: the NPC*/
+extern int16 OBJ_ReviveFromBody(int16);/*the NPC*/
 extern MoveObj(int16, int16, int16, int16);/*MoveObj(obj, x, y, z)*/
 extern int16 JoinParty(int16);
 
 extern int16 MapZ;
-extern int16 D_54BA[];/*Amount: quantity (low byte), quality (high byte)*/
+extern int16 Amount[];/*quantity (low byte), quality (high byte)*/
 extern unsigned char D_6CBA[];/*NPCStatus*/
-extern unsigned char D_6DBE[];/*HitPoints*/
-extern struct coord D_78AE[];/*ObjPos*/
-extern uint16 D_9CC4[];/*ObjShapeType*/
+extern unsigned char HitPoints[];
+extern struct coord ObjPos[];
+extern uint16 ObjShapeType[];
 extern int16 far *D_B508;/*OrigShapeType*/
-#define Amount D_54BA
 #define NPCStatus D_6CBA
-#define HitPoints D_6DBE
-#define ObjShapeType D_9CC4
 #define OrigShapeType D_B508
 
-#define GetX(i) ((*(int16 *)&(D_78AE[i].raw[0]))&0x3ff)
-#define GetY(i) (((*(int16 *)&(D_78AE[i].raw[1]))>>2)&0x3ff)
+#define GetX(i) ((*(int16 *)&(ObjPos[i].raw[0]))&0x3ff)
+#define GetY(i) (((*(int16 *)&(ObjPos[i].raw[1]))>>2)&0x3ff)
 #define GetQual(i) (((unsigned char *)(Amount + (i)))[1])
 
 /*brings the NPC of a dead body back to life on a free spot within 4

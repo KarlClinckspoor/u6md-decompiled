@@ -20,8 +20,8 @@
 extern void cdecl TimerDelay(int32);/*wait (2383 per millisecond)*/
 
 /*other modules*/
-extern int16 C_100B_01D4(int16);/*lightable type*/
-extern int16 C_100B_0247(int16);/*burnable type*/
+extern int16 IsUnlitLightType(int16);
+extern int16 IsBurnableType(int16);
 extern int16 QuanType(int16);/*4 quantity on 16 bits, 2 on 8 bits, else 0*/
 extern C_2F63_0A13(int16);
 extern C_2F75_032D(int16);/*a map of MDMAP.LZC*/
@@ -44,9 +44,9 @@ extern int16 COMBAT_GetTargetAt(int16, int16, int16);/*(objNum, x, y)*/
 extern __DoHit(int16, int16, int16, int16);/*(attacker, defender, hitPts, kind) (combat.c)*/
 extern int16 LoseHP(int16, int16, int16);
 extern unsigned char GetTileAtXYZ(int16, int16, int16);
-extern int16 InRange_F0_FB(int16);
-extern int16 InRange_10_17_C0_C3(int16);/*water tiles*/
-extern int16 Class_20_3F_7C_7F(int16);
+extern int16 IsEarthenWallTile(int16);
+extern int16 IsWaterTile(int16);
+extern int16 GetDigClass(int16);
 extern char *GetTileString(int16);
 extern int16 OBJ_FindNPCAt(int16, int16, int16);/*OBJ_FindNPCAt(startNum, x, y)*/
 extern int16 OBJ_FindTypeAt(int16, int16, int16);/*OBJ_FindTypeAt(type, x, y)*/
@@ -81,36 +81,31 @@ extern char AmbientLight;
 extern int16 MapX, MapY, MapZ;
 extern unsigned char DrunkCounter;
 extern char InCombat;
-extern int32 D_16AA;/*flags (0x10: the dream)*/
-extern struct { unsigned a:4, psychic:4, c:4, d:4; } D_16B0[];/*talents*/
+extern int32 GameFlags;/*0x10: in a dream*/
+extern struct { unsigned a:4, psychic:4, c:4, d:4; } Talents[];
 extern unsigned char PartyListTop;
 extern int16 StatusMember;
 extern int16 MouseMode;
 extern int16 StatusDisplay;
-extern unsigned char D_3266[];/*ObjStatus*/
+extern unsigned char ObjStatus[];
 extern unsigned char D_4EA4[];/*Party*/
-extern unsigned char far *D_4EB6;/*Level*/
+extern unsigned char far *Level;
 extern char D_50CE[][14];/*Names*/
-extern int16 D_54BA[];/*Amount: quantity (low byte), quality (high byte)*/
+extern int16 Amount[];/*quantity (low byte), quality (high byte)*/
 extern unsigned char D_6CBA[];/*NPCStatus*/
 extern unsigned char D_6EC6[];/*TalkFlags*/
-extern struct coord D_78AE[];/*ObjPos*/
-extern uint16 D_9CC4[];/*ObjShapeType*/
+extern struct coord ObjPos[];
+extern uint16 ObjShapeType[];
 extern unsigned char far *D_B4C4;/*TerrainType*/
 extern int16 D_EB04[8];/*Equipment*/
 extern int16 D_EB72;/*AdvanceDir*/
 extern int16 D_EBCE;/*Selection.obj*/
 extern int16 D_EBF6, D_EBF8;/*Selection.x, Selection.y*/
 
-#define ObjStatus D_3266
 #define Party D_4EA4
-#define Level D_4EB6
 #define Names D_50CE
-#define Amount D_54BA
 #define NPCStatus D_6CBA
 #define TalkFlags D_6EC6
-#define ObjPos D_78AE
-#define ObjShapeType D_9CC4
 #define TerrainType D_B4C4
 #define Equipment D_EB04
 
@@ -223,14 +218,14 @@ extern char far C_2BB4_2261[];/*"There are too many moving trees nearby.\n"*/
 
 /*
  * action 19 (a lit light source on anything): 0x84 C_2F63_0A13, a burnable
- * type (C_100B_0247) is incinerated
+ * type (IsBurnableType) is incinerated
  */
 /*C_2FA1_00F7*/C_2FA1_00F7(int16 obj, int16 on, int16 to) {
 	register int16 t;
 
 	if((t = GetType(on)) == 0x84) {
 		C_2F63_0A13(on);
-	} else if(C_100B_0247(t)) {
+	} else if(IsBurnableType(t)) {
 		CON_printf(C_2BB4_0479, GetObjectString(on));
 		MUS_PlaySfx(9);
 		DeleteObj(on);
@@ -284,7 +279,7 @@ extern char far C_2BB4_2261[];/*"There are too many moving trees nearby.\n"*/
 		p = Party[Active];
 	}
 	CON_printf(C_2BB4_1171, GetType(obj) != 0x6b ? GetObjectString(obj) : "a match");
-	if(C_100B_01D4(t)) {
+	if(IsUnlitLightType(t)) {
 		switch(GetType(on)) {
 			case 0x6d: nt = 0x6e; break;
 			case 0x6f: nt = 0x70; break;
@@ -446,7 +441,7 @@ extern char far C_2BB4_2261[];/*"There are too many moving trees nearby.\n"*/
 	for(o = FindLoc(x, y, MapZ); o != -1 && GetType(o) != 0x1bd && GetType(o) != 0x1be && GetType(o) != 0xd5; o = NextLoc())
 		;
 	if(o == -1) {
-		if(InRange_F0_FB(GetTileAtXYZ(x, y, MapZ))) {
+		if(IsEarthenWallTile(GetTileAtXYZ(x, y, MapZ))) {
 			nt = 0x1ba;
 		} else {
 			if((o = COMBAT_GetTargetAt(Party[Active], x, y)) >= 0) {
@@ -593,7 +588,7 @@ extern char far C_2BB4_2261[];/*"There are too many moving trees nearby.\n"*/
 			ObjShapeType[obj] = GetType(obj);
 		return;
 	}
-	if(on == -1 && (TalkFlags[0x76] & 0x20) && (GetTileAtXYZ(D_EBF6, D_EBF8, MapZ) >= 1 && GetTileAtXYZ(D_EBF6, D_EBF8, MapZ) <= 4 || (TalkFlags[0x76] & 0x40) && InRange_10_17_C0_C3(GetTileAtXYZ(D_EBF6, D_EBF8, MapZ)))) {
+	if(on == -1 && (TalkFlags[0x76] & 0x20) && (GetTileAtXYZ(D_EBF6, D_EBF8, MapZ) >= 1 && GetTileAtXYZ(D_EBF6, D_EBF8, MapZ) <= 4 || (TalkFlags[0x76] & 0x40) && IsWaterTile(GetTileAtXYZ(D_EBF6, D_EBF8, MapZ)))) {
 		CON_printf(C_2BB4_117D);
 		ObjShapeType[obj] = GetType(obj) + 0x400;
 		return;
@@ -606,7 +601,7 @@ extern char far C_2BB4_2261[];/*"There are too many moving trees nearby.\n"*/
 	if(on == -1) {
 		CON_printf(C_2BB4_0713, GetTileString(GetTileAtXYZ(D_EBF6, D_EBF8, MapZ)));
 		C_1FA9_0BE4();
-		if((D_16AA & 0x10) == 0)
+		if((GameFlags & 0x10) == 0)
 			ObjShapeType[obj] = GetType(obj);
 	}
 	if((t = GetType(on)) == 0xfb) {
@@ -626,7 +621,7 @@ extern char far C_2BB4_2261[];/*"There are too many moving trees nearby.\n"*/
 			}
 		}
 	} else if(t == 0x9e) {
-		if((ObjStatus[D_EBCE] & 0x18) == 0 && Class_20_3F_7C_7F(GetTileAtXYZ(D_EBF6, D_EBF8, MapZ))) {
+		if((ObjStatus[D_EBCE] & 0x18) == 0 && GetDigClass(GetTileAtXYZ(D_EBF6, D_EBF8, MapZ))) {
 			MUS_PlaySfx(4);
 			ObjShapeType[on] = 0x9d;
 			SetQual(on, OSI_rand(10, 15));
@@ -654,7 +649,7 @@ extern char far C_2BB4_2261[];/*"There are too many moving trees nearby.\n"*/
 			CON_printf(C_2BB4_0713, GetObjectString(on));
 		C_1FA9_0BE4();
 	}
-	if((D_16AA & 0x10) == 0)
+	if((GameFlags & 0x10) == 0)
 		ObjShapeType[obj] = GetType(obj);
 }
 
@@ -842,9 +837,9 @@ fail:
 	}
 	MUS_PlaySfx(0x32);
 	switch(k) {
-		case 0: v = D_16B0[Party[Active]].a ? Level[Party[Active]] : 0; break;
-		case 1: v = D_16B0[Party[Active]].psychic; break;
-		case 2: v = D_16B0[Party[Active]].c; break;
+		case 0: v = Talents[Party[Active]].a ? Level[Party[Active]] : 0; break;
+		case 1: v = Talents[Party[Active]].psychic; break;
+		case 2: v = Talents[Party[Active]].c; break;
 		case 3: v = 0; break;
 		default: v = 0;
 	}
@@ -852,19 +847,19 @@ fail:
 	switch(k) {
 		case 0:
 			CON_printf(C_2BB4_0889);
-			v = ++D_16B0[Party[Active]].a;
+			v = ++Talents[Party[Active]].a;
 			break;
 		case 1:
 			CON_printf(C_2BB4_08AF);
 			if(v == 0)
 				VisibilityDirty = 1;
-			v = ++D_16B0[Party[Active]].psychic;
+			v = ++Talents[Party[Active]].psychic;
 			break;
 		case 2:
 			CON_printf(C_2BB4_08E3);
 			if(v == 0)
 				VisibilityDirty = 1;
-			v = ++D_16B0[Party[Active]].c;
+			v = ++Talents[Party[Active]].c;
 			break;
 		case 3:
 			CON_printf(C_2BB4_2138);
@@ -880,7 +875,7 @@ fail:
 		SetQuan(obj, GetQuan(obj) - 1);
 	else
 		DeleteObj(obj);
-	if(inv || (D_16AA & 0x10))
+	if(inv || (GameFlags & 0x10))
 		STAT_ShowInventory(StatusMember);
 	if(StatusDisplay == 0x91)
 		STAT_ShowParty(PartyListTop);

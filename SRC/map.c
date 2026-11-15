@@ -55,26 +55,26 @@ extern unsigned char Date_M;
 extern int16 Date_Y;
 extern unsigned char Active;
 extern int16 MapX, MapY, MapZ;
-extern unsigned char D_16A3;
+extern unsigned char DreamFoesLeft;
 extern char InCombat;
 extern char SoloMember;
 extern char SavedNPCMode;
 extern int16 StatusDisplay;
-extern unsigned char D_3266[];/*ObjStatus*/
+extern unsigned char ObjStatus[];
 extern char D_44C4[];/*MovePts*/
 extern unsigned char far *D_45CC;/*NPCFlag*/
 extern unsigned char far *D_46D0;/*NPCMode*/
 extern unsigned char D_46D4[AREA_H][AREA_W];/*AreaTiles*/
 extern unsigned char D_4EA4[];/*Party*/
 extern unsigned char far *D_50CA;
-extern uint16 D_51AE[];/*ExpPoints*/
-extern int16 D_54BA[];/*Amount: quantity (low byte), quality (high byte)*/
+extern uint16 ExpPoints[];
+extern int16 Amount[];/*quantity (low byte), quality (high byte)*/
 extern unsigned char D_6CBA[];/*NPCStatus*/
-extern unsigned char D_6DBE[];/*HitPoints*/
+extern unsigned char HitPoints[];
 extern unsigned char D_6EC6[];/*TalkFlags (per NPC)*/
-extern struct coord D_78AE[];/*ObjPos*/
+extern struct coord ObjPos[];
 extern unsigned char D_9CC0;/*PartySize*/
-extern uint16 D_9CC4[];/*ObjShapeType*/
+extern uint16 ObjShapeType[];
 extern int16 D_B9D6[0x40];/*MissileHitList*/
 extern int16 far *D_B508;/*OrigShapeType*/
 extern int16 D_BCAE[16];/*ChunkCacheAge*/
@@ -84,8 +84,8 @@ extern unsigned char D_BCF2[16][8][8];/*ChunkCache*/
 extern int16 D_C0F2, D_C0F4;
 extern unsigned char far *D_C0F6;/*ChunkIndexBuf*/
 extern int16 D_C0FA, D_C0FC;/*AreaX, AreaY*/
-extern int16 D_C59C[];/*Link*/
-extern int16 D_DDB2[AREA_H][AREA_W];/*MapObjPtr*/
+extern int16 Link[];
+extern int16 MapObjPtr[AREA_H][AREA_W];
 extern int16 D_EBCE;/*Selection.obj*/
 
 extern DrawSkyBar();
@@ -126,20 +126,14 @@ extern char far C_2BB4_21CD[];
 extern char far C_2BB4_22F1[];
 
 #define StatusDirty D_0F12
-#define ObjStatus D_3266
 #define MovePts D_44C4
 #define NPCFlag D_45CC
 #define NPCMode D_46D0
 #define AreaTiles D_46D4
 #define Party D_4EA4
-#define ExpPoints D_51AE
-#define Amount D_54BA
 #define NPCStatus D_6CBA
-#define HitPoints D_6DBE
 #define TalkFlags D_6EC6
-#define ObjPos D_78AE
 #define PartySize D_9CC0
-#define ObjShapeType D_9CC4
 #define MissileHitList D_B9D6
 #define OrigShapeType D_B508
 #define ChunkCacheAge D_BCAE
@@ -148,8 +142,6 @@ extern char far C_2BB4_22F1[];
 #define ChunkIndexBuf D_C0F6
 #define AreaX D_C0FA
 #define AreaY D_C0FC
-#define Link D_C59C
-#define MapObjPtr D_DDB2
 #define Selection D_EBCE
 
 
@@ -569,7 +561,7 @@ static /*C_1534_0000*/cacheChunk(int16 chunkIdx) {
 				break;
 			MoveObj(obj, x, (y - 1) & 0x3ff, z);
 			if(GetType(obj) == 0x1b9)
-				D_9CC4[obj] = GetType(obj) + 0xc00;
+				ObjShapeType[obj] = GetType(obj) + 0xc00;
 		}
 	} else if(type == 0xa3) {
 		for(obj = FindLoc(MapX, (MapY + 1) & 0x3ff, MapZ); obj >= 0; obj = NextLoc()) {
@@ -585,7 +577,7 @@ static /*C_1534_0000*/cacheChunk(int16 chunkIdx) {
 	}
 	if(MapZ == 3 && qual == 3 && !(TalkFlags[0x66] & 0x10)) {
 		OBJ_PurgeFarLocals(-1, -1, -1);
-		D_16A3 = 6;
+		DreamFoesLeft = 6;
 		ForceHatching = 1;
 	}
 	MapX = x;

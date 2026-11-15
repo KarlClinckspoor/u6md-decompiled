@@ -22,20 +22,20 @@
  * sets OrigShapeType, and creatures without a class get 15/15/15, 30 HP and
  * alignment 0x60; EGG_hatches is reworked as described above (type 0x144
  * makes a pile of objects once, type 0x172 only one creature per egg place and
- * C_07D1_5520 on it, a stackable object one pile, a count of unplaced
- * creatures D_16A3 printed); EGG_hatchArea wraps the area and the distance.
+ * COMBAT_AI_Worm on it, a stackable object one pile, a count of unplaced
+ * creatures DreamFoesLeft printed); EGG_hatchArea wraps the area and the distance.
  */
 #include "se.h"
 
 #undef abs
 
 /*monster tables (MD's monsdata, far segment 2DE5; class + 1)*/
-extern int16 far C_2DE5_0000[];/*MonsterTypes*/
-extern unsigned char far C_2DE5_0066[];/*MonsterStr*/
-extern unsigned char far C_2DE5_0098[];/*MonsterDex*/
-extern unsigned char far C_2DE5_00CA[];/*MonsterInt*/
-extern unsigned char far C_2DE5_0160[];/*MonsterHP*/
-extern unsigned char far C_2DE5_0192[];/*MonsterAlignment*/
+extern int16 far MonsterTypes[];
+extern unsigned char far MonsterStr[];
+extern unsigned char far MonsterDex[];
+extern unsigned char far MonsterInt[];
+extern unsigned char far MonsterHP[];
+extern unsigned char far MonsterAlignment[];
 extern char far C_2BB4_134E[];/*HearSomethingMsg: "You hear something to the %s!\n"*/
 
 extern char *DirNames[];
@@ -44,25 +44,25 @@ extern int16 EnemyWarningGiven;
 extern unsigned char Time_H;
 extern int16 MapZ;
 extern int16 MapX, MapY;
-extern unsigned char D_16A3;/*creatures that could not be placed (counted down)?*/
-extern int32 D_16AA;/*flags (0x10: the dream)*/
+extern unsigned char DreamFoesLeft;
+extern int32 GameFlags;/*0x10: in a dream*/
 extern unsigned char DirOriginX, DirOriginY;/*screen position of the party*/
 extern unsigned char far *D_3262;/*MAGIC?*/
-extern unsigned char D_3266[];/*ObjStatus*/
+extern unsigned char ObjStatus[];
 extern char D_44C4[];/*MovePts*/
-extern unsigned char D_45D0[];/*DEXTE*/
+extern unsigned char DEXTE[];
 extern unsigned char far *D_46D0;/*NPCMode*/
-extern unsigned char far *D_4EB6;/*Level*/
-extern uint16 D_51AE[];/*ExpPoints*/
+extern unsigned char far *Level;
+extern uint16 ExpPoints[];
 extern unsigned char far *D_53AE;/*NPCComMode*/
-extern unsigned char D_53B2[];/*STREN*/
-extern int16 D_54BA[];/*Amount: quantity (low byte), quality (high byte)*/
+extern unsigned char STREN[];
+extern int16 Amount[];/*quantity (low byte), quality (high byte)*/
 extern unsigned char D_6CBA[];/*NPCStatus*/
-extern unsigned char D_6DBE[];/*HitPoints*/
+extern unsigned char HitPoints[];
 extern unsigned char D_6EC6[];/*TalkFlags*/
-extern unsigned char D_760E[];/*INTEL*/
-extern struct coord D_78AE[];/*ObjPos*/
-extern uint16 D_9CC4[];/*ObjShapeType*/
+extern unsigned char INTEL[];
+extern struct coord ObjPos[];
+extern uint16 ObjShapeType[];
 extern unsigned char far *D_B4C4;/*TerrainType*/
 extern int16 far *D_B508;/*OrigShapeType*/
 extern int16 D_C0FA, D_C0FC;/*AreaX, AreaY*/
@@ -70,10 +70,10 @@ extern int16 D_C0FE;/*GetMonsterClass: last type looked up*/
 extern int16 D_C100;/*GetMonsterClass: its class*/
 extern int16 HatchingDisabled;
 
-extern int16 C_047A_13C5(int16, int16);
+extern int16 IsOpenWater(int16, int16);
 extern int16 COMBAT_TryTeleport(int16, int16);
-extern C_07D1_5520(int16);
-extern int16 C_100B_038E(int16);
+extern COMBAT_AI_Worm(int16);
+extern int16 IsBreakableType(int16);
 extern int16 CanMoveTo(int16, int16, int16);/*CanMoveTo(npc, x, y)*/
 extern int16 OBJ_FindTypeAt(int16, int16, int16);/*OBJ_FindTypeAt(type, x, y)*/
 extern int16 FindInv(int16);
@@ -91,29 +91,13 @@ extern unsigned char GetTileAtXYZ(int16, int16, int16);
 extern int16 MapDistance(int16, int16);
 extern int16 OSI_rand(int16, int16);/*OSI_rand(lo, hi)*/
 
-#define MonsterTypes C_2DE5_0000
-#define MonsterStr C_2DE5_0066
-#define MonsterDex C_2DE5_0098
-#define MonsterInt C_2DE5_00CA
-#define MonsterHP C_2DE5_0160
-#define MonsterAlignment C_2DE5_0192
 #define HearSomethingMsg C_2BB4_134E
 #define PromptFlag D_0F13
-#define ObjStatus D_3266
 #define MovePts D_44C4
-#define DEXTE D_45D0
 #define NPCMode D_46D0
-#define Level D_4EB6
-#define ExpPoints D_51AE
 #define NPCComMode D_53AE
-#define STREN D_53B2
-#define Amount D_54BA
 #define NPCStatus D_6CBA
-#define HitPoints D_6DBE
 #define TalkFlags D_6EC6
-#define INTEL D_760E
-#define ObjPos D_78AE
-#define ObjShapeType D_9CC4
 #define TerrainType D_B4C4
 #define OrigShapeType D_B508
 #define AreaX D_C0FA
@@ -250,7 +234,7 @@ extern int16 OSI_rand(int16, int16);/*OSI_rand(lo, hi)*/
 						rx = (eggX + OSI_rand(0, 6) - 3) & 0x3ff;
 						ry = (eggY + OSI_rand(0, 6) - 3) & 0x3ff;
 						if(
-							!C_047A_13C5(rx, ry) &&
+							!IsOpenWater(rx, ry) &&
 							!(TerrainType[GetTileAtXYZ(rx, ry, MapZ)] & 2) &&
 							!(TerrainType[GetTileAtXYZ(rx, ry, MapZ)] & 4) &&
 							OBJ_FindTypeAt(objTyp, rx, ry) < 0
@@ -264,7 +248,7 @@ extern int16 OSI_rand(int16, int16);/*OSI_rand(lo, hi)*/
 					monster = -1;
 					if(objTyp < 0x156 || GetQual(embryo_objNum) == 0x1a) {
 						/*not a creature: plain object*/
-						if(C_100B_038E(objTyp) && objTyp < 0x156)
+						if(IsBreakableType(objTyp) && objTyp < 0x156)
 							quan = GetQual(embryo_objNum);
 						else
 							quan = 0;
@@ -272,7 +256,7 @@ extern int16 OSI_rand(int16, int16);/*OSI_rand(lo, hi)*/
 							rx = (eggX + OSI_rand(0, 6) - 3) & 0x3ff;
 							ry = (eggY + OSI_rand(0, 6) - 3) & 0x3ff;
 							if(
-								!C_047A_13C5(rx, ry) &&
+								!IsOpenWater(rx, ry) &&
 								!(TerrainType[GetTileAtXYZ(rx, ry, MapZ)] & 2) &&
 								!(TerrainType[GetTileAtXYZ(rx, ry, MapZ)] & 4) &&
 								OBJ_FindTypeAt(objTyp, rx, ry) < 0 &&
@@ -306,16 +290,16 @@ extern int16 OSI_rand(int16, int16);/*OSI_rand(lo, hi)*/
 								ObjStatus[monster] |= 2;
 							if(ObjStatus[embryo_objNum] & 0x80)
 								ObjStatus[monster] |= 0x80;
-						} else if(D_16A3) {
-							D_16A3 --;
+						} else if(DreamFoesLeft) {
+							DreamFoesLeft --;
 						}
 						if(monster >= 0) {
 							if(!isFirstBorn || !CanMoveTo(monster, eggX, eggY)) {
 								if(!COMBAT_TryTeleport(monster, onScreenNotOk)) {
 									DeleteObj(monster);
-									if(typParam >= 0x156 && D_16A3) {
-										CON_printf("monster %d (0x%x) unplaced.\n", D_16A3, typParam);
-										D_16A3 --;
+									if(typParam >= 0x156 && DreamFoesLeft) {
+										CON_printf("monster %d (0x%x) unplaced.\n", DreamFoesLeft, typParam);
+										DreamFoesLeft --;
 									}
 									monster = -1;
 								}
@@ -323,13 +307,13 @@ extern int16 OSI_rand(int16, int16);/*OSI_rand(lo, hi)*/
 								isFirstBorn = 0;
 							}
 							if(monster >= 0 && typParam == 0x172)
-								C_07D1_5520(monster);
+								COMBAT_AI_Worm(monster);
 						}
 					}
 				}
 			}
 			/*"You hear something to the <dir>"*/
-			if(!EnemyWarningGiven && hostileOffscreen && !(D_16AA & 0x10)) {
+			if(!EnemyWarningGiven && hostileOffscreen && !(GameFlags & 0x10)) {
 				x = eggX - MapX;
 				y = eggY - MapY;
 				dir = MkDirection((x << 4) + DirOriginX, (y << 4) + DirOriginY);

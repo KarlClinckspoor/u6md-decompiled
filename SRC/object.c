@@ -36,11 +36,12 @@
  * creatures made of several objects (OBJ_MoveCreatureParts and its helpers),
  * OBJ_getHead, C_0A5D_0613/070D, QuanType and StackableTypes (objtype.c),
  * DirConnFlag, MusicianWasNear, DISK_confirm. New: OBJ_MapObjAt,
- * C_1B09_090B, C_1B09_0A5D, FindInvOfType/NextInvOfType, C_1B09_0D34 (the
+ * OBJ_IsOnScreen, OBJ_NextOfTypeAt, FindInvOfType/NextInvOfType, OBJ_InvSlotsUsed (the
  * inventory slots used, as AddInvObj and InsertObj count them),
- * C_1B09_268D, C_1B09_4868 (the creatures 0x17f join up), OBJ_DeleteContents;
+ * OBJ_MoveLastOnSquare, OBJ_JoinCreepingCacti (the creeping cacti 0x17f join up),
+ * OBJ_DeleteContents;
  * AddInvObj/InsertObj weigh against GetStr and check what is worn; the
- * object changes of MoveObj (the barrels 0x19a float on the canals),
+ * object changes of MoveObj (the rail cars 0x19a float on the canals),
  * InsertObj, __ObjectsDeserialize, OBJ_CommitBlocks and ShowObjects (machine
  * sounds, levers and plates, outlines by the talents).
  */
@@ -75,13 +76,13 @@ extern unsigned char D_0F12;/*StatusDirty*/
 extern int16 D_0F18;/*MapAnimEnabled*/
 extern int16 D_0F1A;/*Erupting*/
 extern int16 StatusMember;
-extern int16 StatusDisplay;/*StatusDisplay: 0x92 when the equipment view is shown*/
+extern int16 StatusDisplay;/*0x92 when the equipment view is shown*/
 extern int16 MapCoordMask;
 extern int16 ViewX, ViewY;
 extern int16 VisibilityDirty;
 extern int16 MapX, MapY, MapZ;
 extern int16 DiskFullChoice;
-extern unsigned char D_3266[];/*ObjStatus*/
+/*3266*/extern unsigned char ObjStatus[];
 extern char far *D_3E80;/*the .lzc loader's work area*/
 extern unsigned char D_3E84[AREA_H][AREA_W];/*AreaFlags*/
 extern unsigned char far *D_45CC;/*NPCFlag*/
@@ -90,33 +91,48 @@ extern unsigned char D_4EA4[];/*Party*/
 extern unsigned char far *D_50C0;/*ScratchBuf*/
 extern char D_50CE[][14];/*Names*/
 extern char far *D_54B2;/*ScratchBuf + 0x36b0*/
-extern int16 D_54BA[];/*Amount*/
+/*54BA*/extern int16 Amount[];
 extern unsigned char D_6CBA[];/*NPCStatus*/
 extern unsigned char far *D_6DBA;/*TileFlag*/
 extern int16 far *D_6EBE;/*BaseTile*/
 extern unsigned char D_6FC6[AREA_H][AREA_W];/*AreaLight*/
 extern unsigned char far *D_760A;/*TileFlag2*/
-extern struct coord D_78AE[];/*ObjPos*/
+/*78AE*/extern struct coord ObjPos[];
 extern unsigned char D_9CC0;/*PartySize*/
-extern uint16 D_9CC4[];/*ObjShapeType*/
+/*9CC4*/extern uint16 ObjShapeType[];
 extern unsigned char far *D_B4C4;/*TerrainType*/
 extern int16 far *D_B508;/*OrigShapeType*/
 extern int16 D_C0FA, D_C0FC;/*AreaX, AreaY*/
-extern unsigned char D_C130[11][11];/*Obj_11x11: first display node of each view cell*/
-extern int16 D_C1AA[];/*CellObjTile: tile | frame of each display node*/
-extern unsigned char D_C3AA[];/*CellObjNext: next display node ([0]: free list)*/
+/*the display stacks ShowObjects builds: the first display node of each
+  view cell, the tile | frame of each node, the next node ([0]: free list)*/
+/*C130*/extern unsigned char Obj_11x11[11][11];
+/*C1AA*/extern int16 CellObjTile[];
+/*C3AA*/extern unsigned char CellObjNext[];
 extern int16 D_C4AA[11][11];/*Tile_11x11*/
-extern int16 D_C59C[];/*Link*/
+/*C59C*/extern int16 Link[];
 extern int16 D_BCCE, D_BCD0, D_C0F2, D_C0F4;/*the loaded area's first and last column/row in map order (map.c)*/
-extern int16 D_DD9C;/*FreeMonsterCount*/
-extern int16 D_DD9E, D_DDA6, D_DDAE;/*FindInvOfType/NextInvOfType state: position, owner, type*/
-extern int16 D_DDA0, D_DDA2, D_DDA8, D_DDAA, D_DDAC;/*SearchArea's rectangle: x1, x2, y1, y2, z*/
-extern int16 D_EA4E, D_EA50;/*SearchArea: the rectangle crosses the map's edge in x, in y*/
-extern int16 D_DDA4;/*FreeMonsterHead*/
-extern int16 D_DDB0;/*FreeObjHead*/
-extern int16 D_DDB2[AREA_H][AREA_W];/*MapObjPtr*/
-extern char D_EA32[];/*TileStringBuf*/
-extern int16 D_EA4C;/*FreeObjCount*/
+/*the free lists of the monster slots (0xc0-0xff) and of the objects*/
+/*DD9C*/extern int16 FreeMonsterCount;
+/*DDA4*/extern int16 FreeMonsterHead;
+/*DDB0*/extern int16 FreeObjHead;
+/*EA4C*/extern int16 FreeObjCount;
+/*FindInvOfType/NextInvOfType state: position, owner, type*/
+/*DD9E*/extern int16 InvOfTypeCursor;
+/*DDA6*/extern int16 InvOfTypeOwner;
+/*DDAE*/extern int16 InvOfTypeType;
+/*SearchArea's rectangle: x1, x2, y1, y2, z; whether it crosses the map's
+  edge in x, in y*/
+/*DDA0*/extern int16 AreaX1;
+/*DDA2*/extern int16 AreaX2;
+/*DDA8*/extern int16 AreaY1;
+/*DDAA*/extern int16 AreaY2;
+/*DDAC*/extern int16 AreaZ;
+/*EA4E*/extern int16 AreaWrapX;
+/*EA50*/extern int16 AreaWrapY;
+/*the first object of every tile of the loaded 40x40 area*/
+/*DDB2*/extern int16 MapObjPtr[AREA_H][AREA_W];
+/*GetTileString's buffer*/
+/*EA32*/extern char TileStringBuf[];
 extern int16 D_EB16;/*WeightEquip*/
 extern int16 D_EB1A;/*WeightInven*/
 extern int16 D_EC4A;/*an NPC charmed (gameloop.c)*/
@@ -133,37 +149,23 @@ extern int16 IsContainerType(int16);
 #define StatusDirty D_0F12
 #define MapAnimEnabled D_0F18
 #define Erupting D_0F1A
-#define ObjStatus D_3266
 #define AreaFlags D_3E84
 #define NPCFlag D_45CC
 #define NPCMode D_46D0
 #define Party D_4EA4
 #define ScratchBuf D_50C0
 #define Names D_50CE
-#define Amount D_54BA
 #define NPCStatus D_6CBA
 #define TileFlag D_6DBA
 #define BaseTile D_6EBE
 #define AreaLight D_6FC6
 #define TileFlag2 D_760A
-#define ObjPos D_78AE
 #define PartySize D_9CC0
-#define ObjShapeType D_9CC4
 #define TerrainType D_B4C4
 #define OrigShapeType D_B508
 #define AreaX D_C0FA
 #define AreaY D_C0FC
-#define Obj_11x11 D_C130
-#define CellObjTile D_C1AA
-#define CellObjNext D_C3AA
 #define Tile_11x11 D_C4AA
-#define Link D_C59C
-#define FreeMonsterCount D_DD9C
-#define FreeMonsterHead D_DDA4
-#define FreeObjHead D_DDB0
-#define MapObjPtr D_DDB2
-#define TileStringBuf D_EA32
-#define FreeObjCount D_EA4C
 #define WeightEquip D_EB16
 #define WeightInven D_EB1A
 
@@ -173,8 +175,8 @@ static OBJ_FindListPos(int16, int16, int16);
 NextLoc();
 static OBJ_LastOfSubtree(int16);
 int16 FindInvType(int16, int16, int16);
-int16 C_1B09_129A(int16);
-int16 C_1B09_12BD(int16);
+int16 OBJ_CountInv(int16);
+int16 OBJ_CountEquipped(int16);
 int16 AddMapObj(int16, int16, int16, int16, int16, int16);
 int16 AddInvObj(int16, int16, int16, int16);
 DeleteObj(int16);
@@ -182,14 +184,14 @@ int16 OBJ_IsInside(int16, int16);
 int16 MoveObj(int16, int16, int16, int16);
 int16 InsertObj(int16, int16, int16);
 ShowObjects();
-C_1B09_4868();
+OBJ_JoinCreepingCacti();
 
 /*more of the other modules*/
-extern int16 QuanType(int16);/*QuanType (objtype.c)*/
-extern int16 WrapDelta(int16);/*WrapDelta (map.c)*/
-extern int16 MapDistance(int16, int16);/*MapDistance (map.c)*/
+extern int16 QuanType(int16);/*objtype.c*/
+extern int16 WrapDelta(int16);/*map.c*/
+extern int16 MapDistance(int16, int16);/*map.c*/
 extern unsigned char GetTileAtXYZ(int16, int16, int16);
-extern int16 InRange_10_17_C0_C3(int16);/*InRange_10_17_C0_C3: water tiles*/
+extern int16 IsWaterTile(int16);
 extern int16 GetStr(int16);
 extern DisplayTick();
 extern void cdecl TimerDelay(int32);/*wait (2383 per millisecond)*/
@@ -199,13 +201,14 @@ extern C_1FA9_0AFD();/*machinery sound*/
 extern C_1FA9_0BE4();/*sound effect 35*/
 extern unsigned char Time_H;
 extern unsigned char Active;
-extern int32 D_16AA;/*flags (0x10: the dream)*/
-#define IN_DREAM (D_16AA & 0x10)
-extern struct { unsigned a:4, psychic:4, c:4, d:4; } D_16B0[];/*talents*/
+extern int32 GameFlags;/*0x10: in a dream*/
+#define IN_DREAM (GameFlags & 0x10)
+extern struct { unsigned a:4, psychic:4, c:4, d:4; } Talents[];
 extern int16 DreamStage;
 extern unsigned char D_6EC6[];/*TalkFlags*/
 #define TalkFlags D_6EC6
-extern int16 D_EBC0;/*GiveObj: when set, refuse instead of dropping what does not fit*/
+/*when set, GiveObj refuses instead of dropping what does not fit*/
+/*EBC0*/extern int16 GiveObjRefuses;
 
 #define LOCXYZ 0
 #define CONTAINED 8
@@ -276,13 +279,6 @@ extern int16 D_EBC0;/*GiveObj: when set, refuse instead of dropping what does no
 #define LOC_NEXT(n) while((LocCursor[n] = Link[LocCursor[n]]) >= 0 && GetCoordUse(LocCursor[n]))
 
 /*SearchArea's rectangle*/
-#define AreaX1 D_DDA0
-#define AreaX2 D_DDA2
-#define AreaY1 D_DDA8
-#define AreaY2 D_DDAA
-#define AreaZ D_DDAC
-#define AreaWrapX D_EA4E
-#define AreaWrapY D_EA50
 
 /*when set, NextInv/NextInvType skip equipped items*/
 /*14F0*/int16 InvSkipEquipped = 0;
@@ -306,8 +302,8 @@ extern int16 D_EBC0;/*GiveObj: when set, refuse instead of dropping what does no
   the squares right, below and below-right of it*/
 /*158E*/int16 LocCursor[4] = {1, 1, 1, 1};
 /*unused (SE's LocCursor and LocOnNextRow)*/
-/*1596*/static int16 D_1596 = -1;
-/*1598*/static int16 D_1598 = 0;
+/*1596*/static int16 OldLocCursor = -1;
+/*1598*/static int16 OldLocOnNextRow = 0;
 /*159A*/static struct coord LocTarget[4] = {{0xff, 0xff, 0xff}, {0xff, 0xff, 0xff}, {0xff, 0xff, 0xff}, {0xff, 0xff, 0xff}};
 /*FindInv/NextInv/FindInvType/NextInvType state: position, owner, type,
   quality (-1 = any)*/
@@ -561,7 +557,7 @@ extern int16 D_EBC0;/*GiveObj: when set, refuse instead of dropping what does no
 
 /*is objNum near the middle of the map window (or the right/bottom half of a
   double tile just outside it)?*/
-/*C_1B09_090B*/C_1B09_090B(int16 objNum) {
+/*C_1B09_090B*/OBJ_IsOnScreen(int16 objNum) {
 	int16 x;
 	register int16 y, tile;
 
@@ -601,7 +597,7 @@ extern int16 D_EBC0;/*GiveObj: when set, refuse instead of dropping what does no
 
 /*the next map object on the same square as objNum with objNum's type, -1 if
   none*/
-/*C_1B09_0A5D*/C_1B09_0A5D(register int16 objNum) {
+/*C_1B09_0A5D*/OBJ_NextOfTypeAt(register int16 objNum) {
 	struct coord pos;
 	register int16 objTyp;
 
@@ -664,27 +660,27 @@ extern int16 D_EBC0;/*GiveObj: when set, refuse instead of dropping what does no
 /*C_1B09_0BEE*/FindInvOfType(register int16 objNum, int16 objTyp) {
 	register int16 holder;
 
-	D_DDA6 = objNum;
-	D_DDAE = objTyp;
-	D_DD9E = Link[objNum];
-	if(GetCoordUse(D_DD9E) == LOCXYZ || GetAssoc(D_DD9E) != objNum) {
-		D_DD9E = -1;
+	InvOfTypeOwner = objNum;
+	InvOfTypeType = objTyp;
+	InvOfTypeCursor = Link[objNum];
+	if(GetCoordUse(InvOfTypeCursor) == LOCXYZ || GetAssoc(InvOfTypeCursor) != objNum) {
+		InvOfTypeCursor = -1;
 	} else {
-		for(; D_DD9E >= 0; D_DD9E = Link[D_DD9E]) {
-			if(GetCoordUse(D_DD9E) == LOCXYZ) {
-				D_DD9E = -1;
+		for(; InvOfTypeCursor >= 0; InvOfTypeCursor = Link[InvOfTypeCursor]) {
+			if(GetCoordUse(InvOfTypeCursor) == LOCXYZ) {
+				InvOfTypeCursor = -1;
 				break;
 			}
-			for(holder = GetAssoc(D_DD9E); GetCoordUse(holder) != LOCXYZ; holder = GetAssoc(holder));
+			for(holder = GetAssoc(InvOfTypeCursor); GetCoordUse(holder) != LOCXYZ; holder = GetAssoc(holder));
 			if(holder != objNum) {
-				D_DDA6 = -1;
+				InvOfTypeOwner = -1;
 				return -1;
 			}
-			if(GetCoordUse(D_DD9E) != EQUIP && (objTyp == 0 || GetType(D_DD9E) == objTyp))
-				return D_DD9E;
+			if(GetCoordUse(InvOfTypeCursor) != EQUIP && (objTyp == 0 || GetType(InvOfTypeCursor) == objTyp))
+				return InvOfTypeCursor;
 		}
 	}
-	D_DDA6 = -1;
+	InvOfTypeOwner = -1;
 	return -1;
 }
 
@@ -692,34 +688,34 @@ extern int16 D_EBC0;/*GiveObj: when set, refuse instead of dropping what does no
 /*C_1B09_0CA4*/NextInvOfType() {
 	register int16 holder;
 
-	if(D_DDA6 < 0)
+	if(InvOfTypeOwner < 0)
 		return -1;
-	for(D_DD9E = Link[D_DD9E]; D_DD9E >= 0; D_DD9E = Link[D_DD9E]) {
-		if(GetCoordUse(D_DD9E) == LOCXYZ) {
-			D_DD9E = -1;
+	for(InvOfTypeCursor = Link[InvOfTypeCursor]; InvOfTypeCursor >= 0; InvOfTypeCursor = Link[InvOfTypeCursor]) {
+		if(GetCoordUse(InvOfTypeCursor) == LOCXYZ) {
+			InvOfTypeCursor = -1;
 			break;
 		}
-		for(holder = GetAssoc(D_DD9E); GetCoordUse(holder) != LOCXYZ; holder = GetAssoc(holder));
-		if(holder != D_DDA6) {
-			D_DDA6 = -1;
+		for(holder = GetAssoc(InvOfTypeCursor); GetCoordUse(holder) != LOCXYZ; holder = GetAssoc(holder));
+		if(holder != InvOfTypeOwner) {
+			InvOfTypeOwner = -1;
 			return -1;
 		}
-		if(GetCoordUse(D_DD9E) != EQUIP && (D_DDAE == 0 || GetType(D_DD9E) == D_DDAE))
-			return D_DD9E;
+		if(GetCoordUse(InvOfTypeCursor) != EQUIP && (InvOfTypeType == 0 || GetType(InvOfTypeCursor) == InvOfTypeType))
+			return InvOfTypeCursor;
 	}
-	D_DDA6 = -1;
+	InvOfTypeOwner = -1;
 	return -1;
 }
 
 /*inventory slots objNum uses (equipped objects not counted for NPCs 0-15),
   less one when an object of type objTyp would join a stack it carries*/
-/*C_1B09_0D34*/C_1B09_0D34(int16 objTyp, int16 objNum) {
+/*C_1B09_0D34*/OBJ_InvSlotsUsed(int16 objTyp, int16 objNum) {
 	int16 quan, cursor, owner, type, quality;
 	register int16 obj, n;
 
-	n = C_1B09_129A(objNum);
+	n = OBJ_CountInv(objNum);
 	if(objNum < 0x10)
-		n -= C_1B09_12BD(objNum);
+		n -= OBJ_CountEquipped(objNum);
 	if(!QuanType(objTyp))
 		return n;
 	cursor = InvCursor;
@@ -905,7 +901,7 @@ extern int16 D_EBC0;/*GiveObj: when set, refuse instead of dropping what does no
 }
 
 /*number of objects directly inside objNum*/
-/*C_1B09_129A*/C_1B09_129A(int16 objNum) {
+/*C_1B09_129A*/OBJ_CountInv(int16 objNum) {
 	register int16 count, obj;
 
 	count = 0;
@@ -915,7 +911,7 @@ extern int16 D_EBC0;/*GiveObj: when set, refuse instead of dropping what does no
 }
 
 /*number of objects equipped by objNum*/
-/*C_1B09_12BD*/C_1B09_12BD(int16 objNum) {
+/*C_1B09_12BD*/OBJ_CountEquipped(int16 objNum) {
 	register int16 obj, count;
 
 	count = 0;
@@ -926,7 +922,7 @@ extern int16 D_EBC0;/*GiveObj: when set, refuse instead of dropping what does no
 }
 
 /*create an object inside owner (an NPC or a container); refused (-1) when
-  the owner is not loaded, its inventory is full (16 slots, C_1B09_0D34),
+  the owner is not loaded, its inventory is full (16 slots, OBJ_InvSlotsUsed),
   or the weight is too much for its strength (GetStr: 20 times for all it
   carries, 10 times for what it wears); stackable objects are added to an
   existing stack when possible (QuanType 4: the whole word). Returns the
@@ -951,7 +947,7 @@ extern int16 D_EBC0;/*GiveObj: when set, refuse instead of dropping what does no
 	else
 		count = 1;
 	STAT_RefreshInventory(owner);
-	numInven = C_1B09_0D34(type, owner);
+	numInven = OBJ_InvSlotsUsed(type, owner);
 	if(StatusDisplay == 0x92 && Party[StatusMember] == owner)
 		StatusDirty = 1;
 	coordUse = status & 0x18;
@@ -1038,7 +1034,7 @@ extern int16 D_EBC0;/*GiveObj: when set, refuse instead of dropping what does no
 		if(x < AREA_W && y < AREA_H)
 			MapObjPtr[y][x] = objNum;
 		if(objType == 0x17f)
-			C_1B09_4868();
+			OBJ_JoinCreepingCacti();
 	}
 	return objNum;
 }
@@ -1077,7 +1073,8 @@ extern int16 D_EBC0;/*GiveObj: when set, refuse instead of dropping what does no
 	}
 }
 
-/*delete an object (a creature 0x17f: the others rejoin, C_1B09_4868); the
+/*delete an object (a creeping cactus 0x17f: the others rejoin,
+  OBJ_JoinCreepingCacti); the
   contents of a container are dropped where it was (or put in its owner),
   those of anything else deleted; the slot goes back to the monster or
   object free list*/
@@ -1119,7 +1116,7 @@ extern int16 D_EBC0;/*GiveObj: when set, refuse instead of dropping what does no
 	}
 	OBJ_FixMapObjPtr(GetX(objNum), GetY(objNum), GetZ(objNum), objNum, Link[prev]);
 	if(objTyp == 0x17f && IsNPC(objNum))
-		C_1B09_4868();
+		OBJ_JoinCreepingCacti();
 }
 
 /*delete the local objects and creatures farther than 20 squares from
@@ -1287,11 +1284,11 @@ extern int16 D_EBC0;/*GiveObj: when set, refuse instead of dropping what does no
 }
 
 /*move objNum (with its contents) to (toX, toY, toZ) on the map; returns
-  objNum, or -1 when it is not loaded. Afterwards: type 0x62 becomes 0x5b,
-  the 0x17f creatures join up (C_1B09_4868), and a barrel 0x19a pushed into
-  water (tile 0x10-0x17, nothing else there) floats down the current
+  objNum, or -1 when it is not loaded. Afterwards: the pocketwatch 0x62 becomes 0x5b,
+  the creeping cacti 0x17f join up (OBJ_JoinCreepingCacti), and a rail car
+  0x19a pushed into water (tile 0x10-0x17, nothing else there) floats down the current
   (tiles 0x10-0x15 move it east/south) to a free shore square (tile 0x16/
-  0x17), where it breaks into an object 0x1a0, or sinks when the canal
+  0x17), where it breaks into a smashed rail car 0x1a0, or sinks when the canal
   pumps run (TalkFlags[0x76] & 0x20 and & 0x40)*/
 /*C_1B09_1F52*/MoveObj(register int16 objNum, int16 toX, int16 toY, int16 toZ) {
 	int16 insertAfter, prev, last, oldX, oldY, objTyp, posMask;
@@ -1342,8 +1339,8 @@ extern int16 D_EBC0;/*GiveObj: when set, refuse instead of dropping what does no
 	if(objTyp == 0x62) {
 		ObjShapeType[objNum] = (ObjShapeType[objNum] & 0xfc00) + 0x5b;
 	} else if(objTyp == 0x17f && IsNPC(objNum)) {
-		C_1B09_4868();
-	} else if(objTyp == 0x19a && InRange_10_17_C0_C3(GetTileAtXYZ(x, y, z))) {
+		OBJ_JoinCreepingCacti();
+	} else if(objTyp == 0x19a && IsWaterTile(GetTileAtXYZ(x, y, z))) {
 		other = FindLoc(x, y, z);
 		if((other = NextLoc()) == -1) {
 			/*the direction it was pushed*/
@@ -1415,7 +1412,7 @@ extern int16 D_EBC0;/*GiveObj: when set, refuse instead of dropping what does no
 		return -1;
 	STAT_RefreshInventory(destNum);
 	coordUse = objLoc & 0x18;
-	numInven = C_1B09_0D34(GetType(objNum), destNum);
+	numInven = OBJ_InvSlotsUsed(GetType(objNum), destNum);
 	if(numInven >= 0x10 && (coordUse == INVEN || coordUse == CONTAINED) && !QuanType(objTyp)/*sic: not set yet*/ && GetType(destNum) != 0x155 && !AllowSubmissionMove) {
 		STAT_RefreshInventory(Party[StatusMember]);
 		return -1;
@@ -1482,7 +1479,7 @@ extern int16 D_EBC0;/*GiveObj: when set, refuse instead of dropping what does no
 /*move the map object objNum after the last object of its square in the
   list (only objNum itself is relinked, not what it holds); returns objNum,
   -1 when it is not on the map, nothing when it is already the last*/
-/*C_1B09_268D*/C_1B09_268D(register int16 objNum) {
+/*C_1B09_268D*/OBJ_MoveLastOnSquare(register int16 objNum) {
 	int16 x, y, z, prev, last, end;
 	register int16 next;
 
@@ -1527,7 +1524,7 @@ extern int16 D_EBC0;/*GiveObj: when set, refuse instead of dropping what does no
 
 /*give owner amount (quality << 8 | quantity) objects of objType: as one
   stack (QuanType 2) or one by one; what does not fit is dropped at the
-  owner's place (unless D_EBC0: -1) and the owner moved over it. Returns
+  owner's place (unless GiveObjRefuses: -1) and the owner moved over it. Returns
   the last object made.*/
 /*C_1B09_2837*/GiveObj(int16 owner, int16 objType, int16 amount) {
 	int16 quality, quantity, quanType, coordUse, dropped, x, y;
@@ -1549,7 +1546,7 @@ extern int16 D_EBC0;/*GiveObj: when set, refuse instead of dropping what does no
 		coordUse = CONTAINED;
 	if(quanType == 2) {
 		if((obj = AddInvObj(objType, coordUse, QualQuan(quality, quantity), owner)) == -1) {
-			if(D_EBC0)
+			if(GiveObjRefuses)
 				return -1;
 			obj = AddMapObj(objType, 0, QualQuan(quality, quantity), x, y, MapZ);
 			dropped = 1;
@@ -1557,7 +1554,7 @@ extern int16 D_EBC0;/*GiveObj: when set, refuse instead of dropping what does no
 	} else {
 		for(; quantity > 0; quantity --) {
 			if((obj = AddInvObj(objType, coordUse, QualQuan(quality, 0), owner)) < 0) {
-				if(D_EBC0)
+				if(GiveObjRefuses)
 					return -1;
 				dropped = 1;
 				obj = AddMapObj(objType, 0, QualQuan(quality, 0), x, y, MapZ);
@@ -2310,7 +2307,7 @@ extern int16 D_EBC0;/*GiveObj: when set, refuse instead of dropping what does no
 				k = GetFrame(objNum);
 				dir = k & 2;
 				if((npc = OBJ_FindNPCAt(0, GetX(objNum), GetY(objNum))) >= 0) {
-					if(dir + 9 != k && C_1B09_090B(objNum))
+					if(dir + 9 != k && OBJ_IsOnScreen(objNum))
 						C_1FA9_0AFD();
 					ObjShapeType[objNum] = GetType(objNum) + ((dir + 9) << 10);
 				} else {
@@ -2318,17 +2315,17 @@ extern int16 D_EBC0;/*GiveObj: when set, refuse instead of dropping what does no
 					if(!blocked)
 						blocked = OBJ_FindNPCAt(0, (GetX(objNum) + DirIncrX[dir + 4]) & 0x3ff, (GetY(objNum) + DirIncrY[dir + 4]) & 0x3ff) >= 0;
 					if(k < 4) {
-						if(blocked && C_1B09_090B(objNum)) {
+						if(blocked && OBJ_IsOnScreen(objNum)) {
 							C_1FA9_0AFD();
 							ObjShapeType[objNum] = GetType(objNum) + ((dir + 5) << 10);
 						}
 					} else if(k < 8) {
-						if(!blocked && C_1B09_090B(objNum)) {
+						if(!blocked && OBJ_IsOnScreen(objNum)) {
 							C_1FA9_0AFD();
 							ObjShapeType[objNum] = GetType(objNum) + ((dir + 1) << 10);
 						}
 					} else {
-						if(!blocked && C_1B09_090B(objNum)) {
+						if(!blocked && OBJ_IsOnScreen(objNum)) {
 							C_1FA9_0AFD();
 							ObjShapeType[objNum] = GetType(objNum) + ((dir + 5) << 10);
 						}
@@ -2346,13 +2343,13 @@ extern int16 D_EBC0;/*GiveObj: when set, refuse instead of dropping what does no
 			else
 				ObjShapeType[objNum] = GetType(objNum) + 0x800;
 		}
-		if(!IsInvisible(objNum) || (IsNPC(objNum) && IsPlrControl(objNum)) || D_16B0[Party[Active]].c) {
+		if(!IsInvisible(objNum) || (IsNPC(objNum) && IsPlrControl(objNum)) || Talents[Party[Active]].c) {
 			if(!IsNPC(objNum) || !(NPCFlag[objNum] & 0x10)) {
 				tile = TILE_FRAME(objNum);
 				/*outline drawn with the tile (bits 11-12 of the tile number)*/
 				if(IsInvisible(objNum))
 					newFrame = 0x1000;
-				if((ObjStatus[objNum] & 1) && D_16B0[Party[Active]].psychic)
+				if((ObjStatus[objNum] & 1) && Talents[Party[Active]].psychic)
 					newFrame = 0x1800;
 				if(IsNPC(objNum) && (ObjStatus[objNum] & 4))
 					newFrame = 0x800;
@@ -2494,10 +2491,10 @@ extern int16 D_EBC0;/*GiveObj: when set, refuse instead of dropping what does no
 	return str;
 }
 
-/*the creatures 0x17f (NPCs 0xc0-0xff, not dead) take the frame of their
+/*the creeping cacti 0x17f (NPCs 0xc0-0xff, not dead) take the frame of their
   neighbours: bits 0-3 set when another live 0x17f stands north, east,
   south, west of them*/
-/*C_1B09_4868*/C_1B09_4868() {
+/*C_1B09_4868*/OBJ_JoinCreepingCacti() {
 	int16 x, y, nx, ny, frame, bit, other;
 	register int16 dir, npc;
 

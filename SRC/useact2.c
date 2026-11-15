@@ -31,7 +31,7 @@ extern int cdecl abs(int);
 /*other modules*/
 extern int16 GetDex(int16);
 extern __TryHit(int16, int16, int16, int16);/*(attacker, x, y, weapon) (combat.c)*/
-extern int16 C_100B_0410(int16);
+extern int16 IsPlantType(int16);
 extern BargePumps(int16);
 extern CON_gets(char *, int16);
 extern int16 ParseNumberInput(unsigned char *, int16);
@@ -51,7 +51,7 @@ extern C_2F75_1657();
 extern C_2F75_16A8();
 extern int16 COMBAT_Missile(int16, int16 *, int16 *, int16, int16);
 extern int16 far *Explosion(int16, int16, int16);/*Explosion(x, y, missileTile): the objects hit, -1 terminated*/
-extern int16 C_100B_038E(int16);/*breakable type*/
+extern int16 IsBreakableType(int16);
 extern int16 OBJ_FindNPCAt(int16, int16, int16);/*OBJ_FindNPCAt(startNum, x, y)*/
 extern int16 KBD_GetKey(int16);
 extern MUS_PlaySong(int16);
@@ -80,7 +80,7 @@ extern int16 InsertObj(int16, int16, int16);
 extern ShowObjects();
 extern char *GetObjectString(int16);
 extern MUS_PlaySfx(int16);
-extern int16 Class_20_3F_7C_7F(int16);
+extern int16 GetDigClass(int16);
 extern int16 CON_prompt();
 extern int16 CON_getch();
 extern CON_putch(int16);
@@ -104,7 +104,7 @@ extern int16 D_0F18;/*MapAnimEnabled*/
 extern unsigned char Active;
 extern int16 MapX, MapY, MapZ;
 extern char SoloMember;
-extern int32 D_16AA;/*flags (0x10: the dream)*/
+extern int32 GameFlags;/*0x10: in a dream*/
 extern int16 StatusMember;
 extern int16 StatusDisplay;
 extern unsigned char far *D_3262;/*NPC flags: 0x80 ?, bits 0-7: talk flags 8-15*/
@@ -118,37 +118,33 @@ extern int16 MouseMode;
 extern unsigned char DirOriginX, DirOriginY;/*screen position of the party*/
 extern char *DirNames[];
 extern int16 D_EB72;/*AdvanceDir*/
-extern unsigned char D_6DBE[];/*HitPoints*/
+extern unsigned char HitPoints[];
 extern int16 D_EBCE;/*Selection.obj*/
-extern struct { unsigned a:4, psychic:4, c:4, d:4; } D_16B0[];/*talents*/
+extern struct { unsigned a:4, psychic:4, c:4, d:4; } Talents[];
 extern char SelectMode;
 extern char AimX, AimY;
 extern int16 D_EBF6, D_EBF8;/*Selection.x, Selection.y*/
 extern unsigned char IsResting;
 extern struct tClipInfo *CurClip;
-extern unsigned char D_3266[];/*ObjStatus*/
+extern unsigned char ObjStatus[];
 extern unsigned char D_4EA4[];/*Party*/
-extern int16 D_54BA[];/*Amount: quantity (low byte), quality (high byte)*/
+extern int16 Amount[];/*quantity (low byte), quality (high byte)*/
 extern unsigned char D_6CBA[];/*NPCStatus*/
 extern int16 far *D_6EBE;/*BaseTile*/
 extern unsigned char D_6EC6[];/*TalkFlags*/
-extern struct coord D_78AE[];/*ObjPos*/
+extern struct coord ObjPos[];
 extern unsigned char D_9CC0;/*PartySize*/
-extern uint16 D_9CC4[];/*ObjShapeType*/
+extern uint16 ObjShapeType[];
 
 #define MapAnimEnabled D_0F18
-#define ObjStatus D_3266
 #define OrigShapeType D_B508
 #define NPCMode D_46D0
 #define NPCComMode D_53AE
 #define Party D_4EA4
-#define Amount D_54BA
 #define NPCStatus D_6CBA
 #define BaseTile D_6EBE
 #define TalkFlags D_6EC6
-#define ObjPos D_78AE
 #define PartySize D_9CC0
-#define ObjShapeType D_9CC4
 
 #define GetType(i) (ObjShapeType[i] & 0x3ff)
 #define GetFrame(i) (ObjShapeType[i] >> 10)
@@ -160,7 +156,6 @@ extern uint16 D_9CC4[];/*ObjShapeType*/
 #define GetQuan(o) (((unsigned char *)(Amount + (o)))[0])
 #define SetQuan(o, v) (GetQuan(o) = (v))
 #define GetAssoc(i) (*(int16 *)&(ObjPos[i]))
-#define HitPoints D_6DBE
 
 /*messages (segment 2BB4)*/
 extern char far C_2BB4_0230[];/*"Blocked!\n"*/
@@ -405,7 +400,7 @@ extern char far C_2BB4_22F1[];/*"Aargh!\n"*/
 	MUS_PlaySfx(0xb);
 	for(hits = Explosion(x, y, 0x107); *hits >= 0; hits++) {
 		typ = GetType(*hits);
-		if((*hits < 0x100 && *hits >= 0) || (C_100B_038E(typ) && GetQuan(*hits) != 0))
+		if((*hits < 0x100 && *hits >= 0) || (IsBreakableType(typ) && GetQuan(*hits) != 0))
 			LoseHP(*hits, OSI_rand(1, 0xf) + OSI_rand(1, 0xf), 0);
 	}
 	if(res != 0) {
@@ -721,7 +716,7 @@ extern char far C_2BB4_22F1[];/*"Aargh!\n"*/
 
 /*
  * action 49 (spray guns 0x105, 0x81): paint (quality 1) shows invisible
- * actors, weed killer hurts actors and kills plants (C_100B_0410)
+ * actors, weed killer hurts actors and kills plants (IsPlantType)
  */
 /*C_2F98_1088*/C_2F98_1088(int16 obj, register int16 on, int16 to) {
 	register int16 t;
@@ -748,7 +743,7 @@ extern char far C_2BB4_22F1[];/*"Aargh!\n"*/
 	} else {
 		if(on < 0x100 && on >= 0) {
 			__TryHit(Party[Active], GetX(on), GetY(on), obj);
-		} else if(C_100B_0410(t)) {
+		} else if(IsPlantType(t)) {
 			SetQuan(obj, quan - 1);
 			COMBAT_showHit(on);
 			CON_printf(C_2BB4_0FC7);
@@ -800,7 +795,7 @@ extern char far C_2BB4_22F1[];/*"Aargh!\n"*/
 /*C_2F98_1334*/C_2F98_1334(register int16 obj, int16 on, int16 to) {
 	register int16 key;
 
-	if((!(TalkFlags[0x76] & 0x20) || !(TalkFlags[0x76] & 0x40)) && !(D_16AA & 0x10)) {
+	if((!(TalkFlags[0x76] & 0x20) || !(TalkFlags[0x76] & 0x40)) && !(GameFlags & 0x10)) {
 		CON_printf(C_2BB4_0C5F);
 		return;
 	}
@@ -937,7 +932,7 @@ extern char far C_2BB4_22F1[];/*"Aargh!\n"*/
 		MUS_PlaySfx(5);
 		return;
 	}
-	if(!Class_20_3F_7C_7F(GetTileAtXYZ(x, y, MapZ))) {
+	if(!GetDigClass(GetTileAtXYZ(x, y, MapZ))) {
 		CON_printf(C_2BB4_1A5B);
 		MUS_PlaySfx(5);
 		return;
@@ -1004,7 +999,7 @@ extern char far C_2BB4_22F1[];/*"Aargh!\n"*/
 	register int16 p, d;
 	int16 o;
 
-	if(!D_16B0[Party[Active]].psychic) {
+	if(!Talents[Party[Active]].psychic) {
 		CON_printf(C_2BB4_10B9);
 		return;
 	}
