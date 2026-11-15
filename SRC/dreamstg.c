@@ -47,12 +47,12 @@ extern CON_setClip(struct tClipInfo *);
 extern cdecl CON_printf(char far *, ...);
 extern int16 C_2F63_0000(int16, int16, int16, int16, int16, int16);/*(shape, status, amount, x, y, z)*/
 extern C_2F63_0043();
-extern char far C_2BB4_22F1[];/*failure message*/
+extern char far AarghMsg[];/*failure message*/
 
 extern int16 ColorPaper;
-extern char D_0F12;/*StatusDirty*/
-extern char D_0F13;/*PromptFlag*/
-extern int16 D_0F18;/*MapAnimEnabled*/
+extern char StatusDirty;
+extern char PromptFlag;
+extern int16 MapAnimEnabled;
 extern int16 MapX, MapY, MapZ;
 extern unsigned char DreamFoesLeft;
 extern unsigned char PlayerIsFemale;
@@ -60,7 +60,7 @@ extern struct { unsigned a:4, b:4, c:4, d:4; } Talents[];
 extern int16 D_1E48;/*dream.c's: the AnimTile entry of tile 0x6f (-1: not looked up)*/
 extern int16 D_1E4A;/*dream.c's*/
 extern struct tClipInfo *CurClip;
-extern unsigned char D_3240[0x20];/*AnimFrameMask*/
+extern unsigned char AnimFrameMask[0x20];
 extern unsigned char far *D_3262;/*talk flags 8-15*/
 extern unsigned char ObjStatus[];
 extern unsigned char far *NPCMode;
@@ -68,25 +68,17 @@ extern unsigned char far *NPCComMode;
 extern int16 Amount[];/*quantity (low byte), quality (high byte)*/
 extern unsigned char NPCStatus[];
 extern unsigned char HitPoints[];
-extern unsigned char D_6EC6[];/*TalkFlags*/
+extern unsigned char TalkFlags[];
 extern struct coord ObjPos[];
 extern unsigned char PartySize;
-extern int16 D_9CC2;/*NumAnimData*/
+extern int16 NumAnimData;
 extern uint16 ObjShapeType[];
-extern int16 D_B4C8[0x20];/*AnimTile*/
+extern int16 AnimTile[0x20];
 extern uint16 far *OrigShapeType;
-extern union tHandler D_BA6A;/*GrDriver*/
-extern struct tClipInfo D_EBD0[4];/*TextWindows*/
+extern union tHandler GrDriver;
+extern struct tClipInfo TextWindows[4];
 extern char DirIncrX[8], DirIncrY[8];
 
-#define StatusDirty D_0F12
-#define PromptFlag D_0F13
-#define MapAnimEnabled D_0F18
-#define TalkFlags D_6EC6
-#define NumAnimData D_9CC2
-#define AnimTile D_B4C8
-#define GrDriver D_BA6A
-#define TextWindows D_EBD0
 
 
 #define GR_SET_COLOR(c)              (GrDriver.iii.ofs = 0x06, (*GrDriver.f)(c))
@@ -144,7 +136,7 @@ extern char DirIncrX[8], DirIncrY[8];
 	NPCMode[0x5c] = 0;
 	NPCMode[0x59] = 0;
 	if((i = OBJ_FindTypeAt(0x4f, 9, 0x1f)) < 0)
-		CON_printf(C_2BB4_22F1);
+		CON_printf(AarghMsg);
 	else
 		ObjShapeType[i] = GetType(i);
 	for(i = 0x101; i < 0xc00; i ++) {
@@ -156,11 +148,11 @@ extern char DirIncrX[8], DirIncrY[8];
 		}
 	}
 	if((i = AddInvObj(0x14b, 0x10, 0, 0)) < 0)
-		CON_printf(C_2BB4_22F1);
+		CON_printf(AarghMsg);
 	else {
 		ObjStatus[i] &= 0xdf;
 		if((obj = AddInvObj(0x38, 8, 0, i)) < 0)
-			CON_printf(C_2BB4_22F1);
+			CON_printf(AarghMsg);
 		else
 			ObjStatus[obj] &= 0xdf;
 	}
@@ -213,11 +205,11 @@ extern char DirIncrX[8], DirIncrY[8];
 			if(AnimTile[i] == 0x6f)
 				D_1E48 = i;
 	}
-	D_3240[D_1E48] = 0;
+	AnimFrameMask[D_1E48] = 0;
 	if((i = EGG_generate(0x187, x, y - 1, MapZ)) >= 0)
 		NPCMode[i] = NPCComMode[i] = 0x15;
 	else
-		CON_printf(C_2BB4_22F1);
+		CON_printf(AarghMsg);
 }
 
 /*stage 0x40: the dreamer falls off the cliff (shape 0x126, 0x127 for a
@@ -281,7 +273,7 @@ extern char DirIncrX[8], DirIncrY[8];
 		NPCMode[i] = NPCComMode[i] = 0x16;
 		ObjStatus[i] &= 0xdf;
 	} else
-		CON_printf(C_2BB4_22F1);
+		CON_printf(AarghMsg);
 }
 
 /*end of stage 0x44: TalkFlags[0x54] gets 8, or 0x10 when it has 8
@@ -335,7 +327,7 @@ extern char DirIncrX[8], DirIncrY[8];
 				if((keep = AddInvObj(0x2e, 8, 0, obj)) >= 0)
 					ObjStatus[keep] &= 0xdf;
 				else
-					CON_printf(C_2BB4_22F1);
+					CON_printf(AarghMsg);
 			}
 			break;
 		case 0x68:
@@ -353,7 +345,7 @@ extern char DirIncrX[8], DirIncrY[8];
 				if((keep = AddInvObj(0x3c, 8, 0x10, obj)) >= 0)
 					ObjStatus[keep] &= 0xdf;
 				else
-					CON_printf(C_2BB4_22F1);
+					CON_printf(AarghMsg);
 			}
 			break;
 		case 0x77:
@@ -383,7 +375,7 @@ extern char DirIncrX[8], DirIncrY[8];
 			if((keep = AddInvObj(0x2e, 8, 0, obj)) >= 0)
 				ObjStatus[keep] &= 0xdf;
 			else
-				CON_printf(C_2BB4_22F1);
+				CON_printf(AarghMsg);
 		}
 	}
 	if(!has68) {
@@ -391,7 +383,7 @@ extern char DirIncrX[8], DirIncrY[8];
 			if((keep = AddInvObj(0x3c, 8, 0x10, obj)) >= 0)
 				ObjStatus[keep] &= 0xdf;
 			else
-				CON_printf(C_2BB4_22F1);
+				CON_printf(AarghMsg);
 		}
 	}
 	if(OBJ_FindTypeAt(0x77, 0x7e, 0x21) < 0)
@@ -401,7 +393,7 @@ extern char DirIncrX[8], DirIncrY[8];
 	if(OBJ_FindTypeAt(0x14b, 0x73, 0x21) < 0) {
 		if((keep = C_2F63_0000(0x14b, 0, 0, 0x73, 0x21, MapZ)) >= 0) {
 			if((obj = AddInvObj(0x81, 8, 0, keep)) < 0)
-				CON_printf(C_2BB4_22F1);
+				CON_printf(AarghMsg);
 			else
 				ObjStatus[obj] &= 0xdf;
 		}
@@ -409,7 +401,7 @@ extern char DirIncrX[8], DirIncrY[8];
 	if(OBJ_FindTypeAt(0x14b, 0x75, 0x29) < 0) {
 		if((keep = C_2F63_0000(0x14b, 0, 0, 0x75, 0x29, MapZ)) >= 0) {
 			if((obj = AddInvObj(0x2a, 8, 0, keep)) < 0)
-				CON_printf(C_2BB4_22F1);
+				CON_printf(AarghMsg);
 			else
 				ObjStatus[obj] &= 0xdf;
 		}
@@ -417,7 +409,7 @@ extern char DirIncrX[8], DirIncrY[8];
 	if(OBJ_FindTypeAt(0x14b, 0x76, 0x2a) < 0) {
 		if((keep = C_2F63_0000(0x14b, 0, 0, 0x76, 0x2a, MapZ)) >= 0) {
 			if((obj = AddInvObj(0x39, 8, 0x18, keep)) < 0)
-				CON_printf(C_2BB4_22F1);
+				CON_printf(AarghMsg);
 			else
 				ObjStatus[obj] &= 0xdf;
 		}
@@ -453,13 +445,13 @@ extern char DirIncrX[8], DirIncrY[8];
 	C_2F63_0000(0x97, 0, 0x800, 0xc1, 0xa1, 2);
 	Talents[0].a = 2;
 	if((obj = EGG_generate(0x193, 0xb0, 0xa2, MapZ)) < 0)
-		CON_printf(C_2BB4_22F1);
+		CON_printf(AarghMsg);
 	else {
 		ObjStatus[obj] &= 0xdf;
 		NPCMode[obj] = NPCComMode[obj] = 8;
 	}
 	if((obj = EGG_generate(0x3d7b, 0xa0, 0xa3, MapZ)) < 0)
-		CON_printf(C_2BB4_22F1);
+		CON_printf(AarghMsg);
 	else {
 		ObjStatus[obj] &= 0xdf;
 		NPCMode[obj] = NPCComMode[obj] = 8;
@@ -526,7 +518,7 @@ extern char DirIncrX[8], DirIncrY[8];
 			else if(t) {
 				if((obj = C_2F63_0000(0x14b, 0, 0, GetX(i), GetY(i), MapZ)) >= 0) {
 					if((inv = AddInvObj(t, 8, t == 0x4b ? 4 : 0, obj)) < 0)
-						CON_printf(C_2BB4_22F1);
+						CON_printf(AarghMsg);
 					else
 						ObjStatus[inv] &= 0xdf;
 				}
@@ -632,7 +624,7 @@ extern char DirIncrX[8], DirIncrY[8];
 		}
 		if((obj = C_2F63_0000(0x14b, 0, 0, 0x34, 0x50, 2)) >= 0) {
 			if((i = AddInvObj(0xeb, 8, 0, obj)) < 0)
-				CON_printf(C_2BB4_22F1);
+				CON_printf(AarghMsg);
 			else {
 				ObjShapeType[i] = GetType(i) + 0x1000;
 				ObjStatus[i] &= 0xdf;

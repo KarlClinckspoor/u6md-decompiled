@@ -36,10 +36,10 @@ extern unsigned char far MonsterDex[];
 extern unsigned char far MonsterInt[];
 extern unsigned char far MonsterHP[];
 extern unsigned char far MonsterAlignment[];
-extern char far C_2BB4_134E[];/*HearSomethingMsg: "You hear something to the %s!\n"*/
+extern char far HearSomethingMsg[];/*"You hear something to the %s!\n"*/
 
 extern char *DirNames[];
-extern char D_0F13;/*PromptFlag*/
+extern char PromptFlag;
 extern int16 EnemyWarningGiven;
 extern unsigned char Time_H;
 extern int16 MapZ;
@@ -59,11 +59,11 @@ extern unsigned char STREN[];
 extern int16 Amount[];/*quantity (low byte), quality (high byte)*/
 extern unsigned char NPCStatus[];
 extern unsigned char HitPoints[];
-extern unsigned char D_6EC6[];/*TalkFlags*/
+extern unsigned char TalkFlags[];
 extern unsigned char INTEL[];
 extern struct coord ObjPos[];
 extern uint16 ObjShapeType[];
-extern unsigned char far *D_B4C4;/*TerrainType*/
+extern unsigned char far *TerrainType;
 extern int16 far *OrigShapeType;
 extern int16 AreaX, AreaY;
 /*C0FE*/extern int16 MonClassLastType;/*GetMonsterClass: last type looked up*/
@@ -84,17 +84,13 @@ extern int16 AddMapObj(int16, int16, int16, int16, int16, int16);
 extern int16 AddMonster(int16, int16, int16, int16);
 extern DeleteObj(int16);
 extern int16 QuanType(int16);
-extern C_1FA9_04ED();
+extern MUS_EventJingle();
 extern int16 MkDirection(int16, int16);
 extern cdecl CON_printf(char far *, ...);
 extern unsigned char GetTileAtXYZ(int16, int16, int16);
 extern int16 MapDistance(int16, int16);
 extern int16 OSI_rand(int16, int16);/*OSI_rand(lo, hi)*/
 
-#define HearSomethingMsg C_2BB4_134E
-#define PromptFlag D_0F13
-#define TalkFlags D_6EC6
-#define TerrainType D_B4C4
 
 
 #define GetType(i) (ObjShapeType[i] & 0x3ff)
@@ -310,7 +306,7 @@ extern int16 OSI_rand(int16, int16);/*OSI_rand(lo, hi)*/
 				x = eggX - MapX;
 				y = eggY - MapY;
 				dir = MkDirection((x << 4) + DirOriginX, (y << 4) + DirOriginY);
-				C_1FA9_04ED();
+				MUS_EventJingle();
 				CON_printf(HearSomethingMsg, DirNames[dir]);
 				PromptFlag = 1;
 				EnemyWarningGiven = 1;

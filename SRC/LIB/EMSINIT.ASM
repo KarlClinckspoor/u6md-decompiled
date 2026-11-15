@@ -1,6 +1,6 @@
 ;----------------------------------------
 ;EMS memory: finding the expanded memory manager, allocating all its free
-;pages, giving them back (GAME.EXE 2D17). The EMS pages are a heap of
+;pages, giving them back (GAME.EXE 28E4; SE's GAME.EXE 2D17). The EMS pages are a heap of
 ;"virtual" far pointers: segment C000h-FFFFh, offset; EMS_map maps the
 ;16 KB pages of one into the page frame. Each block of the heap has a
 ;4-byte header: its length (bit 0 set: in use).

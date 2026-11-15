@@ -1,7 +1,7 @@
 ;----------------------------------------
 ;OSI library, low level: critical-error and Ctrl-Break handlers, the computer
 ;speed, memory allocation, and loading a file whole (LZW-compressed or not).
-;Savage Empire's OSILIB/LOW.ASM (GAME.EXE) without its first two code segments
+;Savage Empire's OSILIB/LOW.ASM (SE's GAME.EXE; here 2674) without its first two code segments
 ;(OSI_selectDrive, OSI_getDrive) and their two bytes of data: its third code
 ;segment, identical. In GAME.EXE the driver loader (OSILIB/DRVLOAD.ASM, 263D),
 ;264A, the video-mode reset (OSILIB/VIDRESET.ASM, 2668) and OSIWRITE (2669)
@@ -17,12 +17,12 @@ DSegStart
 
 segment_0	dw 0	;D_2A7C
 PUBLIC CpuSpeed
-CpuSpeed	dw 0	;D_2A7E computer speed?
-D_2A80	dw 0	;equipment flags?
-D_2A82	dw 0
-PUBLIC D_2A84
-D_2A84	dw 0	;set by the critical-error handler (DRVLOAD: the error code)
-D_2A86	db 8 dup(0)
+CpuSpeed	dw 0	;D_2A7E computer speed (loops in a timer tick, scaled)
+MemorySizeKB	dw 0	;D_2A80 conventional memory, in KB (int 12h)
+SpeedTicks	dw 0	;D_2A82 timer ticks, while the speed is measured
+PUBLIC CriticalError
+CriticalError	dw 0	;D_2A84 set by the critical-error handler (DRVLOAD: the error code)
+LowTextWindows	db 8 dup(0)	;D_2A86 text windows (Ultima VI's console; set up, not used)
 	db 8 dup(0)
 	db 8 dup(0)
 	db 8 dup(0)
@@ -38,7 +38,7 @@ D_2ABA	dw 4
 PUBLIC DriveErrorCallback
 DriveErrorCallback	dw OFFSET SEG_2674_TEXT:OSI_nullCallback,SEG_2674_TEXT	;D_2ABC
 D_2AC0	db 2 dup(0)
-D_2AC2	dw 0
+LowCurTextWindow	dw 0	;D_2AC2 the current one
 D_2AC4	db 4 dup(0)
 D_2AC8	db 4 dup(0)
 D_2ACC	dw 0
@@ -70,7 +70,7 @@ nbits	dw 0
 fin_char	db 0
 k	db 0
 
-D_2AFE	db "Out of Memory...",13,10,"$"
+OutOfMemoryStr	db "Out of Memory...",13,10,"$"	;D_2AFE
 D_2B11	db 0
 
 DSegEnd
@@ -84,13 +84,13 @@ ProcStart	OSI_lowInit	;2674:0002
 	PUSH	DS
 	PUSH	CS
 	POP	DS
-	MOV	DX,OFFSET C_2674_00DD
+	MOV	DX,OFFSET CritErrorInt
 	MOV	AL,24h
 	MOV	AH,25h
 	INT	21h
 	PUSH	CS
 	POP	DS
-	MOV	DX,OFFSET C_2674_00F1
+	MOV	DX,OFFSET CtrlBreakInt
 	MOV	AL,23h
 	MOV	AH,25h
 	INT	21h
@@ -103,8 +103,8 @@ ProcEnd	OSI_lowInit
 
 ;initialize some unused feature[text clipping]?
 C_002E	PROC NEAR
-	MOV	SI,OFFSET DGROUP:D_2A86
-	MOV	D_2AC2,SI
+	MOV	SI,OFFSET DGROUP:LowTextWindows
+	MOV	LowCurTextWindow,SI
 	;--
 	XOR	AX,AX
 	MOV	CX,4
@@ -131,7 +131,7 @@ C_002E	ENDP
 ;check computer speed
 C_005E	PROC NEAR
 	MOV	CpuSpeed,0
-	MOV	D_2A82,0
+	MOV	SpeedTicks,0
 	;-- push vector 0x1c
 	MOV	AL,1Ch
 	MOV	AH,35h
@@ -148,12 +148,12 @@ C_005E	PROC NEAR
 	INT	21h
 	POP	DS
 C_0082:	;--
-	CMP	D_2A82,0
+	CMP	SpeedTicks,0
 	JZ	C_0082
-	MOV	D_2A82,0
+	MOV	SpeedTicks,0
 C_008F:	;--
 	INC	CpuSpeed
-	CMP	D_2A82,0
+	CMP	SpeedTicks,0
 	JZ	C_008F
 	;-- restore original vector 0x1c
 	POP	DX
@@ -174,7 +174,7 @@ C_008F:	;--
 	MOV	CpuSpeed,AX
 	;--
 	INT	12h
-	MOV	D_2A80,AX
+	MOV	MemorySizeKB,AX
 	;--
 	RET
 C_005E	ENDP
@@ -188,7 +188,7 @@ INT_00BE:
 	;--
 	MOV	AX,DGROUP
 	MOV	DS,AX
-	MOV	SI,OFFSET DGROUP:D_2A82
+	MOV	SI,OFFSET DGROUP:SpeedTicks
 	INC	WORD PTR [SI]
 	;--
 	POP	AX
@@ -210,7 +210,7 @@ OSI_nullCallback	PROC FAR	;2674:00DC
 OSI_nullCallback	ENDP	;2674:00DC
 ;----------------------------------------
 ;new int 24h
-C_2674_00DD:
+CritErrorInt:
 	STI
 	PUSH	DS
 	PUSH	BX
@@ -218,7 +218,7 @@ C_2674_00DD:
 	MOV	BX,DGROUP
 	MOV	DS,BX
 	;--
-	MOV	BX,OFFSET DGROUP:D_2A84
+	MOV	BX,OFFSET DGROUP:CriticalError
 	MOV	WORD PTR [BX],1
 	;--
 	XOR	AL,AL
@@ -228,7 +228,7 @@ C_2674_00DD:
 	IRET
 ;----------------------------------------
 ;new int 23h
-C_2674_00F1:
+CtrlBreakInt:
 	STI
 	CLC
 	IRET
@@ -239,7 +239,7 @@ C_2674_00F1:
 C_00F4:
 	MOV	AX,3
 	INT	10h
-	MOV	DX,OFFSET DGROUP:D_2AFE	;"Out of Memory...",13,10,"$"
+	MOV	DX,OFFSET DGROUP:OutOfMemoryStr	;"Out of Memory...",13,10,"$"
 	MOV	AH,9
 	INT	21h
 	CALL	OSI_delay_clean
@@ -248,7 +248,7 @@ C_00F4:
 	JMP	$
 ;----------------------------------------
 ;get file size?
-C_2674_010C	PROC FAR	;2674:010C
+FileSizeByName	PROC FAR	;2674:010C
 	MOV	AL,2
 	MOV	AH,3Dh
 	INT	21h
@@ -269,9 +269,9 @@ C_2674_010C	PROC FAR	;2674:010C
 	POP	AX
 C_012A:
 	RET
-C_2674_010C	ENDP
+FileSizeByName	ENDP
 ;----------------------------------------
-C_2674_012B	PROC FAR	;2674:012B
+ReadFileByName	PROC FAR	;2674:012B
 	PUSH	DS
 	PUSH	AX
 	PUSH	BX
@@ -325,7 +325,7 @@ C_016D:
 	POP	BX
 	POP	DS
 	RET
-C_2674_012B	ENDP
+ReadFileByName	ENDP
 ;----------------------------------------
 EVEN
 ;----------------------------------------
@@ -582,7 +582,7 @@ L23:	JMP	L1
 decompress	ENDP
 
 ;load & inflate?
-C_2674_03E8	PROC FAR	;2674:03E8
+LoadLzwFile	PROC FAR	;2674:03E8
 	MOV	output_segment,0
 	MOV	pDest,0
 	MOV	input_segment,0
@@ -667,7 +667,7 @@ C_048E:
 C_0497:
 	MOV	BX,pDest
 	RET
-C_2674_03E8	ENDP
+LoadLzwFile	ENDP
 ;----------------------------------------
 ;is file name in list?
 C_049C	PROC NEAR
@@ -716,14 +716,14 @@ C_049C	ENDP
 ;load a file whole (DX: its name) into memory it allocates: BX the segment,
 ;CF set on an error (a compressed file in the list D_00AC is decompressed);
 ;called by the driver loader (DRVLOAD.ASM)
-PUBLIC C_2674_04D9
-C_2674_04D9	PROC FAR	;2674:04D9
+PUBLIC LoadFileWhole
+LoadFileWhole	PROC FAR	;2674:04D9
 	CALL	C_049C	;is file name in list?
 	JNB	C_04E3
-	JMP	C_2674_03E8	;load & inflate?
+	JMP	LoadLzwFile	;load & inflate?
 C_04E3:	;--
 	PUSH	DX
-	CALL	C_2674_010C	;get file size?
+	CALL	FileSizeByName	;get file size?
 	JB	C_052C
 	PUSH	AX
 	OR	AX,AX
@@ -746,7 +746,7 @@ C_0501:
 	POP	DX
 	PUSH	BX
 	PUSH	AX
-	CALL	C_2674_012B
+	CALL	ReadFileByName
 	POP	BX
 	POP	CX
 	JNB	C_0521
@@ -773,7 +773,7 @@ C_052D:
 	MOV	BX,1
 	STC
 	RET
-C_2674_04D9	ENDP
+LoadFileWhole	ENDP
 
 CSegEnd	SEG_2674_TEXT
 

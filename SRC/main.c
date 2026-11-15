@@ -79,13 +79,13 @@ struct tRGB {
 	unsigned char content[3];
 };
 
-/*the graphic driver: D_BA6A's offset selects the entry*/
-#define GR_SHUTDOWN()             (D_BA6A.iii.ofs = 0x03, (*D_BA6A.f)())
-#define GR_INIT_PALETTE()         (D_BA6A.iii.ofs = 0x24, (*D_BA6A.f)())
-#define GR_CYCLE_PALETTE(a)       (D_BA6A.iii.ofs = 0x27, (*D_BA6A.f)(a))
-#define GR_INIT_MEMORY(seg,size)  (D_BA6A.iii.ofs = 0x2a, (*D_BA6A.f)(seg,size))
+/*the graphic driver: GrDriver's offset selects the entry*/
+#define GR_SHUTDOWN()             (GrDriver.iii.ofs = 0x03, (*GrDriver.f)())
+#define GR_INIT_PALETTE()         (GrDriver.iii.ofs = 0x24, (*GrDriver.f)())
+#define GR_CYCLE_PALETTE(a)       (GrDriver.iii.ofs = 0x27, (*GrDriver.f)(a))
+#define GR_INIT_MEMORY(seg,size)  (GrDriver.iii.ofs = 0x2a, (*GrDriver.f)(seg,size))
 /*0x30: draw a bitmap on a surface (surface, 0, 0, bitmap, 0)*/
-#define GR_DRAW_BITMAP(s,a,b,p,c) (D_BA6A.iii.ofs = 0x30, (*D_BA6A.f)(s,a,b,p,c))
+#define GR_DRAW_BITMAP(s,a,b,p,c) (GrDriver.iii.ofs = 0x30, (*GrDriver.f)(s,a,b,p,c))
 
 /*declared before its definition: main stores its segment as a relocated
   immediate (mov [x+2],seg), not from CS*/
@@ -129,7 +129,7 @@ extern MUS_InitDriver();
 extern MUS_PlaySong(int16);
 extern MUS_PlayAreaSong();
 extern InitGraphicsDriver(int16);
-extern C_0E1A_17C3();
+extern AllocPaperDoll();
 extern DISK_init();
 extern DISK_full();
 
@@ -150,46 +150,46 @@ extern int32 PtrToLinear(void far *);
 extern void far *LinearToPtr(int32);
 
 /*uninitialised data*/
-extern struct tSurface D_3232;/*Screen*/
-extern unsigned char D_3240[0x20];/*AnimFrameMask*/
-extern int16 D_3260;/*free memory for the driver, in KB*/
+/*3232*/extern struct tSurface Screen;/*the screen's surface (scanline table ScreenScanlines), for the mouse code*/
+/*3240*/extern unsigned char AnimFrameMask[0x20];/*animdata: the frame mask of each animated tile*/
+/*3260*/extern int16 GrMemoryKB;/*memory given to the graphic driver for the tiles, in KB*/
 extern char far *D_3262;/*0x100 bytes*/
-extern struct tMouse D_3E66;/*Mouse*/
-extern char far *D_3E80;/*work area of the .lzc loader (0x3500 bytes)*/
+/*3E66*/extern struct tMouse Mouse;/*the mouse state*/
+/*3E80*/extern char far *LzcWorkBuf;/*work area of the .lzc loader (0x3500 bytes)*/
 extern char far *SchedIndex;/*0x100 bytes*/
 extern char far *PathData;/*0x100 bytes*/
 extern char far *NPCFlag;/*0x100 bytes*/
 extern char far *NPCMode;/*0x100 bytes*/
-extern uint16 D_4D14[200];/*ScreenScanlines*/
+/*4D14*/extern uint16 ScreenScanlines[200];
 extern char far *Level;/*0x100 bytes*/
 extern char far *Schedule;/*3000 bytes*/
 extern char far *ScratchBuf;/*0x7900 bytes, also the map view back buffer*/
-extern uint16 D_50C4;/*GrMemorySeg*/
-extern char far *D_50C6;/*PointerShapes*/
+/*50C4*/extern uint16 GrMemorySeg;/*segment of the graphic driver's memory*/
+/*50C6*/extern char far *PointerShapes;/*the mouse pointer shapes (mdcursor.ptr)*/
 extern char far *Leader;/*0x100 bytes*/
 extern char far *NPCComMode;/*0x100 bytes*/
-extern char far *D_54B2;/*ScratchBuf + 0x36b0*/
-extern uint32 D_54B6;/*memory given to the graphic driver*/
-extern char far *D_6DBA;/*TileFlag*/
-extern char far *D_6EBE;/*BaseTile*/
-extern char far *D_6EC2;/*ScratchBuf, again*/
-extern char far *D_7606;/*TypeWeight*/
-extern char far *D_760A;/*TileFlag2*/
-extern int16 D_770E[0x20];/*AnimFirstFrame*/
-extern uint16 D_774E[176];/*MapScanlines*/
-extern struct tSurface D_9CAE;/*MapSurface*/
-extern void huge *D_9CBC;/*GrMemory*/
-extern int16 D_9CC2;/*NumAnimData*/
-extern char far *D_B4C4;/*TerrainType*/
-extern int16 D_B4C8[0x20];/*AnimTile*/
+/*54B2*/extern char far *ScratchBufHigh;/*ScratchBuf + 0x36b0 (after the room of a conversation script): pictures, look.lzc*/
+/*54B6*/extern uint32 GrMemorySize;/*memory given to the graphic driver*/
+/*6DBA*/extern char far *TileFlag;/*tileflag: 0x03 light, 0x04 opaque, 0x08 window, 0x10 drawn over sprites, 0x40 double height, 0x80 double width*/
+/*6EBE*/extern char far *BaseTile;/*the first tile of each object type*/
+/*6EC2*/extern char far *TalkBuf;/*ScratchBuf again: the conversation script, books*/
+/*7606*/extern char far *TypeWeight;/*tileflag: the weight of each object type*/
+/*760A*/extern char far *TileFlag2;/*tileflag: the second flags of each tile*/
+/*770E*/extern int16 AnimFirstFrame[0x20];/*animdata: the first frame of each animated tile*/
+/*774E*/extern uint16 MapScanlines[176];/*the map view buffer's scanline offsets*/
+/*9CAE*/extern struct tSurface MapSurface;/*the map view buffer's surface (scanline table MapScanlines)*/
+/*9CBC*/extern void huge *GrMemory;/*the graphic driver's memory*/
+/*9CC2*/extern int16 NumAnimData;/*animdata: the number of animated tiles*/
+/*B4C4*/extern char far *TerrainType;/*tileflag: the terrain of each tile (bits 4-7 movement cost, 8 damaging)*/
+/*B4C8*/extern int16 AnimTile[0x20];/*animdata: the tile of each animated tile*/
 extern int16 far *OrigShapeType;/*0x100 words*/
-extern unsigned char D_B50C[0x20];/*AnimFrameShift*/
-extern struct tRGB far *D_B52C;/*VGAPalette*/
-extern struct tGr far *D_BA66;/*GrInfo*/
-extern union tHandler D_BA6A;/*GrDriver*/
-extern void far *D_BA7E;/*mdscreen.lzc entry 2*/
+/*B50C*/extern unsigned char AnimFrameShift[0x20];/*animdata: the frame shift of each animated tile*/
+/*B52C*/extern struct tRGB far *VGAPalette;/*mdpal*/
+extern struct tGr far *GrInfo;
+extern union tHandler GrDriver;
+/*BA7E*/extern void far *ScreenParts;/*mdscreen.lzc entry 2: drawn in modes 0/1 (the command and combat marks) and 2/3 (the sky)*/
 extern char far *ChunkIndexBuf;/*0x600 bytes*/
-extern struct tClipInfo D_EBD0[4];/*TextWindows*/
+/*EBD0*/extern struct tClipInfo TextWindows[4];/*[0] whole screen, [1] status panel, [2] over the map view, [3] message area*/
 
 /*====---- ----====*/
 /*00A8*/int16 Unused00A8 = 0x2000;
@@ -301,7 +301,7 @@ extern struct tClipInfo D_EBD0[4];/*TextWindows*/
 		OSI_read(fileHandle, 0, OSI_fileSize(fileHandle), pBuffer);
 		OSI_close(fileHandle);
 	} else {
-		LZC_loadType(fname, 0, pBuffer, 0, D_3E80);
+		LZC_loadType(fname, 0, pBuffer, 0, LzcWorkBuf);
 	}
 	return 0;
 }
@@ -326,7 +326,7 @@ extern struct tClipInfo D_EBD0[4];/*TextWindows*/
 		return;
 	if(ConsoleReady) {
 		savedClip = CurClip;
-		CON_setClip(&(D_EBD0[3]));
+		CON_setClip(&(TextWindows[3]));
 		if(OSI_ErrorCode == -1 && OSI_ErrorFunc == 6/*OSI_write*/) {
 			DISK_full();
 		} else {
@@ -353,55 +353,55 @@ extern struct tClipInfo D_EBD0[4];/*TextWindows*/
 	void far *pBlock;
 	int16 animFile, flagFile;
 
-	D_54B6 = MEM_largestFree(0) - 0x10;
-	pBlock = MEM_alloc(D_54B6, 2);
+	GrMemorySize = MEM_largestFree(0) - 0x10;
+	pBlock = MEM_alloc(GrMemorySize, 2);
 	linearAddr = ((uint32)FP_SEG(pBlock) << 4) + FP_OFF(pBlock);
 	if(linearAddr & 0xf) {
-		D_54B6 -= 0x10 - (linearAddr & 0xf);
+		GrMemorySize -= 0x10 - (linearAddr & 0xf);
 		linearAddr = (linearAddr & ~0xf) + 0x10;
 		memBP.iii.seg = linearAddr >> 4;
 		memBP.iii.ofs = linearAddr & 0xf;
 	}
 	aSegment = linearAddr >> 4;
-	GR_INIT_MEMORY(aSegment, (uint16)(D_54B6 >> 4));
-	D_3260 = D_54B6 >> 10;
-	D_9CBC = D_BA66->pDriverMem;
-	if(D_9CBC == 0)
+	GR_INIT_MEMORY(aSegment, (uint16)(GrMemorySize >> 4));
+	GrMemoryKB = GrMemorySize >> 10;
+	GrMemory = GrInfo->pDriverMem;
+	if(GrMemory == 0)
 		InitError();
-	D_50C4 = ((int32)D_9CBC >> 16) + (((int32)D_9CBC & 0xffff) >> 4);
+	GrMemorySeg = ((int32)GrMemory >> 16) + (((int32)GrMemory & 0xffff) >> 4);
 
 	/*animated tiles: count, tile number, first frame, frame mask, shift*/
 	animFile = OSI_open("animdata");
-	OSI_read(animFile, 0, 2, &D_9CC2);
-	OSI_read(animFile, -1, 0x20 * sizeof(int16), D_B4C8);
-	OSI_read(animFile, -1, 0x20 * sizeof(int16), D_770E);
-	OSI_read(animFile, -1, 0x20, D_3240);
-	OSI_read(animFile, -1, 0x20, D_B50C);
+	OSI_read(animFile, 0, 2, &NumAnimData);
+	OSI_read(animFile, -1, 0x20 * sizeof(int16), AnimTile);
+	OSI_read(animFile, -1, 0x20 * sizeof(int16), AnimFirstFrame);
+	OSI_read(animFile, -1, 0x20, AnimFrameMask);
+	OSI_read(animFile, -1, 0x20, AnimFrameShift);
 	OSI_close(animFile);
 
 	/*0x800 tiles terrain flags, 0x800 tiles flags, 0x400 types weight,
 	  0x800 tiles flags #2*/
 	flagFile = OSI_open("tileflag");
-	OSI_read(flagFile, 0, 0x800, D_B4C4);
-	OSI_read(flagFile, -1, 0x800, D_6DBA);
-	OSI_read(flagFile, -1, 0x400, D_7606);
-	OSI_read(flagFile, -1, 0x800, D_760A);
+	OSI_read(flagFile, 0, 0x800, TerrainType);
+	OSI_read(flagFile, -1, 0x800, TileFlag);
+	OSI_read(flagFile, -1, 0x400, TypeWeight);
+	OSI_read(flagFile, -1, 0x800, TileFlag2);
 	OSI_close(flagFile);
 }
 
 /*display the main screen background (mdscreen.lzc entry 0, in a temporary
-  block), then load its entry 2 (D_BA7E)*/
+  block), then load its entry 2 (ScreenParts)*/
 /*C_02CD_0509*/ShowMainScreen() {
 	void far *pixmap;
 
 	pixmap = MEM_alloc(LIB_entrySize("mdscreen.lzc", 0), 0);
 	if(pixmap == 0)
 		InitError();
-	if(LZC_loadType("mdscreen.lzc", 0, pixmap, 0, D_3E80) == 0)
+	if(LZC_loadType("mdscreen.lzc", 0, pixmap, 0, LzcWorkBuf) == 0)
 		InitError();
-	GR_DRAW_BITMAP(&D_3232, 0, 0, pixmap, 0);
+	GR_DRAW_BITMAP(&Screen, 0, 0, pixmap, 0);
 	MEM_free(pixmap);
-	D_BA7E = LZC_loadType("mdscreen.lzc", 2, 0L, 0, D_3E80);
+	ScreenParts = LZC_loadType("mdscreen.lzc", 2, 0L, 0, LzcWorkBuf);
 }
 
 /*VGA only: send the whole 256 colors palette VGAPalette to the DAC
@@ -415,9 +415,9 @@ extern struct tClipInfo D_EBD0[4];/*TextWindows*/
 	regs.x.ax = 0x1012;
 	regs.x.bx = 0;
 	regs.x.cx = 0x100;
-	regs.x.dx = FP_OFF(D_B52C);
+	regs.x.dx = FP_OFF(VGAPalette);
 	segread(&sregs);
-	sregs.es = FP_SEG(D_B52C);
+	sregs.es = FP_SEG(VGAPalette);
 	int86x(0x10, &regs, &regs, &sregs);
 }
 
@@ -426,9 +426,9 @@ extern struct tClipInfo D_EBD0[4];/*TextWindows*/
 	int16 fileHandle;
 
 	if(GrAdapter == 0) {
-		__MemAlloc(&D_B52C, 0x100 * 3);
+		__MemAlloc(&VGAPalette, 0x100 * 3);
 		fileHandle = OSI_open("mdpal");
-		OSI_read(fileHandle, 0, 0x100 * 3, D_B52C);
+		OSI_read(fileHandle, 0, 0x100 * 3, VGAPalette);
 		OSI_close(fileHandle);
 		SetVGAPalette();
 	} else {
@@ -463,24 +463,24 @@ extern struct tClipInfo D_EBD0[4];/*TextWindows*/
 		for(step = 0; step < 8; step ++) {
 			outportb(0x3c8, ((PaletteCycle - step) & 7) + 0xe0);
 			for(rgb = 0; rgb < 3; rgb ++)
-				outportb(0x3c9, D_B52C[0xe7 - step].content[rgb]);
+				outportb(0x3c9, VGAPalette[0xe7 - step].content[rgb]);
 
 			outportb(0x3c8, ((PaletteCycle - step) & 7) + 0xe8);
 			for(rgb = 0; rgb < 3; rgb ++)
-				outportb(0x3c9, D_B52C[0xef - step].content[rgb]);
+				outportb(0x3c9, VGAPalette[0xef - step].content[rgb]);
 		}
 		for(step = 0; step < 4; step ++) {
 			outportb(0x3c8, (((PaletteCycle >> 1) - step) & 3) + 0xf0);
 			for(rgb = 0; rgb < 3; rgb ++)
-				outportb(0x3c9, D_B52C[0xf3 - step].content[rgb]);
+				outportb(0x3c9, VGAPalette[0xf3 - step].content[rgb]);
 
 			outportb(0x3c8, (((PaletteCycle >> 1) - step) & 3) + 0xf4);
 			for(rgb = 0; rgb < 3; rgb ++)
-				outportb(0x3c9, D_B52C[0xf7 - step].content[rgb]);
+				outportb(0x3c9, VGAPalette[0xf7 - step].content[rgb]);
 
 			outportb(0x3c8, (((PaletteCycle >> 1) - step) & 3) + 0xf8);
 			for(rgb = 0; rgb < 3; rgb ++)
-				outportb(0x3c9, D_B52C[0xfb - step].content[rgb]);
+				outportb(0x3c9, VGAPalette[0xfb - step].content[rgb]);
 		}
 	} else {
 		GR_CYCLE_PALETTE((unsigned char)(PaletteCycle ++));
@@ -542,10 +542,10 @@ extern struct tClipInfo D_EBD0[4];/*TextWindows*/
 	for(i = 1; i < argc; i ++)
 		cfg_parse(argv[i]);
 	/*the .lzc loader's work area*/
-	D_3E80 = MEM_alloc(0x3500, 2);
-	if(D_3E80 == 0)
+	LzcWorkBuf = MEM_alloc(0x3500, 2);
+	if(LzcWorkBuf == 0)
 		InitError();
-	lzcWorkArea = D_3E80;
+	lzcWorkArea = LzcWorkBuf;
 
 	DISK_init();
 	OSI_lowInit();
@@ -553,104 +553,104 @@ extern struct tClipInfo D_EBD0[4];/*TextWindows*/
 	OSI_ErrorHandler.f = FileErrorHandler;
 	/*the surfaces (scanline offset tables) are only used by the mouse code:
 	  Screen = the 320x200 screen, MapSurface = the map view*/
-	D_3232.pScanlines = D_4D14;
-	D_3232.left = 0;
-	D_3232.right = 319;
-	D_3232.top = 0;
-	D_3232.bottom = 199;
+	Screen.pScanlines = ScreenScanlines;
+	Screen.left = 0;
+	Screen.right = 319;
+	Screen.top = 0;
+	Screen.bottom = 199;
 
-	D_9CAE.pScanlines = D_774E;
-	D_9CAE.left = 8;
-	D_9CAE.right = 167;
-	D_9CAE.top = 16;
-	D_9CAE.bottom = 159;
+	MapSurface.pScanlines = MapScanlines;
+	MapSurface.left = 8;
+	MapSurface.right = 167;
+	MapSurface.top = 16;
+	MapSurface.bottom = 159;
 
 	if(GrAdapter == 0) {/*VGA*/
-		D_3232.segment = 0xa000;
-		D_4D14[0] = 0;
+		Screen.segment = 0xa000;
+		ScreenScanlines[0] = 0;
 		for(i = 1; i < 200; i++)
-			D_4D14[i] = D_4D14[i - 1] + 0x140;
+			ScreenScanlines[i] = ScreenScanlines[i - 1] + 0x140;
 	} else
 	if(GrAdapter == 1) {/*EGA*/
-		D_3232.segment = 0xa000;
-		D_4D14[0] = 0;
+		Screen.segment = 0xa000;
+		ScreenScanlines[0] = 0;
 		for(i = 1; i < 200; i++)
-			D_4D14[i] = D_4D14[i - 1] + 40;
-		D_3232.pScanlines = D_4D14;
-		D_774E[0] = 0;
+			ScreenScanlines[i] = ScreenScanlines[i - 1] + 40;
+		Screen.pScanlines = ScreenScanlines;
+		MapScanlines[0] = 0;
 		for(i = 1; i < 176; i++)
-			D_774E[i] = D_774E[i - 1] + 40;
-		D_9CAE.segment = 0xa200;
+			MapScanlines[i] = MapScanlines[i - 1] + 40;
+		MapSurface.segment = 0xa200;
 	} else
 	if(GrAdapter == 2) {/*TANDY*/
-		D_3232.segment = 0xb800;
-		D_4D14[0] = 0;
-		D_4D14[1] = 0x2000;
-		D_4D14[2] = 0x4000;
-		D_4D14[3] = 0x6000;
+		Screen.segment = 0xb800;
+		ScreenScanlines[0] = 0;
+		ScreenScanlines[1] = 0x2000;
+		ScreenScanlines[2] = 0x4000;
+		ScreenScanlines[3] = 0x6000;
 		for(i = 4; i < 200; i++)
-			D_4D14[i] = D_4D14[i - 4] + 0xa0;
-		D_3232.pScanlines = D_4D14;
+			ScreenScanlines[i] = ScreenScanlines[i - 4] + 0xa0;
+		Screen.pScanlines = ScreenScanlines;
 	} else
 	if(GrAdapter == 3) {/*CGA*/
-		D_3232.segment = 0xb800;
-		D_4D14[0] = 0;
-		D_4D14[1] = 0x2000;
+		Screen.segment = 0xb800;
+		ScreenScanlines[0] = 0;
+		ScreenScanlines[1] = 0x2000;
 		for(i = 2; i < 200; i++)
-			D_4D14[i] = D_4D14[i - 2] + 80;
-		D_3232.pScanlines = D_4D14;
+			ScreenScanlines[i] = ScreenScanlines[i - 2] + 80;
+		Screen.pScanlines = ScreenScanlines;
 	} else
 	if(GrAdapter == 4) {/*HERCULES*/
-		D_3232.segment = 0xb000;
+		Screen.segment = 0xb000;
 		/*200 lines stretched to 300 (x1.5), 4 interleaved banks
 		  of 90 bytes per line*/
 		for(i = 0; i < 200; i++) {
 			hercRow = (i * 3 >> 1) + 0xf;
-			D_4D14[i] = ((hercRow & 3) << 13) + (hercRow >> 2) * 90 + 5;
+			ScreenScanlines[i] = ((hercRow & 3) << 13) + (hercRow >> 2) * 90 + 5;
 		}
-		D_3232.pScanlines = D_4D14;
+		Screen.pScanlines = ScreenScanlines;
 	}
 	if(MouseOn) {
 		/*background save area and pointer shapes*/
-		__MemAlloc(&D_3E66.saveBuf, 0x400);
-		__MemAlloc(&D_50C6, 0x800);
-		LZC_loadType("mdcursor.ptr", 0, D_50C6, 0, D_3E80);
+		__MemAlloc(&Mouse.saveBuf, 0x400);
+		__MemAlloc(&PointerShapes, 0x800);
+		LZC_loadType("mdcursor.ptr", 0, PointerShapes, 0, LzcWorkBuf);
 		if(osiError)
 			InitError();
-		D_3E66.shapes = D_50C6;
-		D_3E66.surface = &D_3232;
-		MOUSE_INIT(&D_3E66);
-		D_3E66.onMove = CON_UpdateMousePointer;
-		MOUSE_POINTER(D_50C6, 0);
+		Mouse.shapes = PointerShapes;
+		Mouse.surface = &Screen;
+		MOUSE_INIT(&Mouse);
+		Mouse.onMove = CON_UpdateMousePointer;
+		MOUSE_POINTER(PointerShapes, 0);
 	}
 	InitGraphicsDriver(GrAdapter);/*init gr*/
 	LoadPalette();
 	/*font*/
 	__MemAlloc(&pFont, LIB_entrySize("system.lzc", 3));
-	D_BA66->font = LZC_loadType("system.lzc", 3, pFont, 0, D_3E80);
+	GrInfo->font = LZC_loadType("system.lzc", 3, pFont, 0, LzcWorkBuf);
 	ConsoleReady = 1;
 	/*text windows: [0] whole screen, [1] status area, [3] message area*/
-	CON_createClip(&(D_EBD0[0]), 0, 0, 39, 24);
-	CON_setClip(&(D_EBD0[0]));
+	CON_createClip(&(TextWindows[0]), 0, 0, 39, 24);
+	CON_setClip(&(TextWindows[0]));
 	CurClip->attrFlags |= 1;
 	CurClip->attrFlags |= 0x20;
 	CurClip->attrFlags |= 4;
 	ShowMainScreen();
-	CON_createClip(&(D_EBD0[1]), 23, 1, 38, 13);
-	CON_createClip(&(D_EBD0[3]), 23, 16, 38, 23);
-	CON_createClip(&(D_EBD0[2]), 2, 3, 19, 18);
-	CON_setClip(&(D_EBD0[3]));
+	CON_createClip(&(TextWindows[1]), 23, 1, 38, 13);
+	CON_createClip(&(TextWindows[3]), 23, 16, 38, 23);
+	CON_createClip(&(TextWindows[2]), 2, 3, 19, 18);
+	CON_setClip(&(TextWindows[3]));
 	/*message area: word wrap, scroll, capitalize*/
 	CurClip->attrFlags |= 1;
 	CurClip->attrFlags |= 0x20;
 	CurClip->attrFlags |= 4;
 	MUS_InitDriver();
 
-	__MemAlloc(&D_B4C4, 0x800);
-	__MemAlloc(&D_6DBA, 0x800);
-	__MemAlloc(&D_6EBE, 0x800);
-	__MemAlloc(&D_7606, 0x400);
-	__MemAlloc(&D_760A, 0x800);
+	__MemAlloc(&TerrainType, 0x800);
+	__MemAlloc(&TileFlag, 0x800);
+	__MemAlloc(&BaseTile, 0x800);
+	__MemAlloc(&TypeWeight, 0x400);
+	__MemAlloc(&TileFlag2, 0x800);
 	__MemAlloc(&Schedule, 3000);
 	__MemAlloc(&NPCMode, 0x100);
 	__MemAlloc(&D_3262, 0x100);
@@ -666,30 +666,30 @@ extern struct tClipInfo D_EBD0[4];/*TextWindows*/
 	/*ScratchBuf is also the 176x176 (0x7900 bytes) map view back buffer:
 	  MapScanlines gives the offsets of its inner part (8 pixels border)*/
 	__MemAlloc(&ScratchBuf, 0x7900);
-	D_6EC2 = D_BA66->pWorkBuf = ScratchBuf;
+	TalkBuf = GrInfo->pWorkBuf = ScratchBuf;
 	linearAddr = PtrToLinear(ScratchBuf);
-	D_54B2 = LinearToPtr(linearAddr + 0x36b0);
+	ScratchBufHigh = LinearToPtr(linearAddr + 0x36b0);
 	if(GrAdapter == 0) {/*VGA*/
-		D_9CAE.segment = FP_SEG(ScratchBuf);
-		D_774E[0] = FP_OFF(ScratchBuf);
+		MapSurface.segment = FP_SEG(ScratchBuf);
+		MapScanlines[0] = FP_OFF(ScratchBuf);
 		for(i = 1; i < 0xa0; i++)
-			D_774E[i] = D_774E[i - 1] + 0xb0;
+			MapScanlines[i] = MapScanlines[i - 1] + 0xb0;
 	} else
 	if(GrAdapter == 2) {/*TANDY*/
-		D_9CAE.segment = FP_SEG(ScratchBuf);
-		D_774E[0] = FP_OFF(ScratchBuf);
+		MapSurface.segment = FP_SEG(ScratchBuf);
+		MapScanlines[0] = FP_OFF(ScratchBuf);
 		for(i = 1; i < 0xa0; i++)
-			D_774E[i] = D_774E[i - 1] + 0x80;
+			MapScanlines[i] = MapScanlines[i - 1] + 0x80;
 	} else
 	if(GrAdapter == 3 || GrAdapter == 4) {/*CGA/HERCULES*/
-		D_9CAE.segment = FP_SEG(ScratchBuf);
-		D_774E[0] = FP_OFF(ScratchBuf);
+		MapSurface.segment = FP_SEG(ScratchBuf);
+		MapScanlines[0] = FP_OFF(ScratchBuf);
 		for(i = 1; i < 0xa0; i++)
-			D_774E[i] = D_774E[i - 1] + 0x50;
+			MapScanlines[i] = MapScanlines[i - 1] + 0x50;
 	}
 
 	OBJ_InitLists();
-	C_0E1A_17C3();
+	AllocPaperDoll();
 
 	InitGraphicsData();
 

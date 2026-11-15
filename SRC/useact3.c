@@ -27,7 +27,7 @@ extern C_2F63_0A13(int16);
 extern C_2F75_032D(int16);/*a map of MDMAP.LZC*/
 extern C_2F5F_0AC1(int16);
 extern DreamWakeUp();
-extern C_1FA9_0BE4();
+extern MUS_SplashSfx();
 extern MUS_PlaySfx(int16);
 extern TALK_talkTo(int16, int16, int16);
 extern STAT_Ready();
@@ -72,7 +72,7 @@ extern signed char DirIncrX[8], DirIncrY[8];
 extern char *DirNames[];
 extern int16 ScreenFade;
 extern int16 XRayView;
-extern unsigned char D_0F12;/*StatusDirty*/
+extern unsigned char StatusDirty;
 extern int16 VisibilityDirty;
 extern unsigned char Time_H;
 extern unsigned char Date_D, Date_M;
@@ -90,22 +90,18 @@ extern int16 StatusDisplay;
 extern unsigned char ObjStatus[];
 extern unsigned char Party[];
 extern unsigned char far *Level;
-extern char D_50CE[][14];/*Names*/
+extern char Names[][14];
 extern int16 Amount[];/*quantity (low byte), quality (high byte)*/
 extern unsigned char NPCStatus[];
-extern unsigned char D_6EC6[];/*TalkFlags*/
+extern unsigned char TalkFlags[];
 extern struct coord ObjPos[];
 extern uint16 ObjShapeType[];
-extern unsigned char far *D_B4C4;/*TerrainType*/
-extern int16 D_EB04[8];/*Equipment*/
-extern int16 D_EB72;/*AdvanceDir*/
-extern int16 D_EBCE;/*Selection.obj*/
-extern int16 D_EBF6, D_EBF8;/*Selection.x, Selection.y*/
+extern unsigned char far *TerrainType;
+extern int16 Equipment[8];
+extern int16 AdvanceDir;
+extern int16 SelectionObj;
+extern int16 SelectionX, SelectionY;
 
-#define Names D_50CE
-#define TalkFlags D_6EC6
-#define TerrainType D_B4C4
-#define Equipment D_EB04
 
 #define GetType(i) (ObjShapeType[i] & 0x3ff)
 #define GetFrame(i) (ObjShapeType[i] >> 10)
@@ -118,66 +114,66 @@ extern int16 D_EBF6, D_EBF8;/*Selection.x, Selection.y*/
 #define GetAssoc(i) (*(int16 *)&(ObjPos[i]))
 
 /*messages (segment 2BB4)*/
-extern char far C_2BB4_01B4[];/*"Direction-\n"*/
-extern char far C_2BB4_01FD[];/*"It's already lit.\n"*/
-extern char far C_2BB4_0230[];/*"Blocked!\n"*/
-extern char far C_2BB4_0295[];/*"It is locked.\n"*/
-extern char far C_2BB4_02A4[];/*"It has no effect.\n"*/
-extern char far C_2BB4_02CF[];/*"No.\n"*/
-extern char far C_2BB4_02EB[];/*"Not at night!\n"*/
-extern char far C_2BB4_032E[];/*"Not now.\n"*/
-extern char far C_2BB4_0364[];/*"Not while underground.\n"*/
-extern char far C_2BB4_037C[];/*"That would be a waste outside of combat.\n"*/
-extern char far C_2BB4_03F8[];/*"nowhere.\n"*/
-extern char far C_2BB4_0415[];/*"\nNothing to light the %s with.\n"*/
-extern char far C_2BB4_0435[];/*"\nThere is no fuel.\n"*/
-extern char far C_2BB4_0449[];/*"\nYour hands are full.\n"*/
-extern char far C_2BB4_0460[];/*"The %s is extinguished.\n"*/
-extern char far C_2BB4_0479[];/*"\nYou incinerated the %s.\n"*/
-extern char far C_2BB4_0493[];/*"\nIt's already full.\n"*/
-extern char far C_2BB4_069A[];/*"There is nothing in the bucket.\n"*/
-extern char far C_2BB4_06BB[];/*"You pour the water onto the ground.\n"*/
-extern char far C_2BB4_06E0[];/*"You pour the water onto the seed.\n"*/
-extern char far C_2BB4_0703[];/*"%s is all wet.\n"*/
-extern char far C_2BB4_0713[];/*"The %s is all wet.\n"*/
-extern char far C_2BB4_0727[];/*"You pour the nitrogen compound onto the mound.\n"*/
-extern char far C_2BB4_0757[];/*"You pour the phosphorous solution onto the mound.\n"*/
-extern char far C_2BB4_078A[];/*"You pour the potash mixture onto the mound.\n"*/
-extern char far C_2BB4_07B7[];/*"The seed is destroyed by acid.\n"*/
-extern char far C_2BB4_07D7[];/*"The seed is poisoned by oil.\n"*/
-extern char far C_2BB4_07F5[];/*"There is nothing to drill into.\n"*/
-extern char far C_2BB4_0816[];/*"There is no room left for the ore.\n"*/
-extern char far C_2BB4_085B[];/*"You eat a Martian berry. You feel %s strange "*/
-extern char far C_2BB4_0889[];/*"relationship with things around you.\n"*/
-extern char far C_2BB4_08AF[];/*"sensitivity to the feelings of objects around you.\n"*/
-extern char far C_2BB4_08E3[];/*"sense of your spatial location.\n"*/
-extern char far C_2BB4_0904[];/*"feelings, like the berries were really odd.\n"*/
-extern char far C_2BB4_0931[];/*"%s enters a battle frenzy!\n"*/
-extern char far C_2BB4_0C32[];/*"It turns loosely.\n"*/
-extern char far C_2BB4_0E6B[];/*"The sprayer system now has rubber.\n"*/
-extern char far C_2BB4_0E8F[];/*"The sprayer system now has dye.\n"*/
-extern char far C_2BB4_104B[];/*"This door is not rusted.\n"*/
-extern char far C_2BB4_1065[];/*"The door is unstuck.\n"*/
-extern char far C_2BB4_1171[];/*"`(using %s)"*/
-extern char far C_2BB4_117D[];/*"`You fill the bucket with water.\n"*/
-extern char far C_2BB4_119F[];/*"`Dump out the ice? "*/
-extern char far C_2BB4_11F4[];/*"`It is automatic and can't be opened by hand.\n"*/
-extern char far C_2BB4_1223[];/*"It is apparently rusted shut.\n"*/
-extern char far C_2BB4_1242[];/*"It is apparently locked.\n"*/
-extern char far C_2BB4_125C[];/*"It has no power.\n"*/
-extern char far C_2BB4_1325[];/*"Wheeeeze\n"*/
-extern char far C_2BB4_132F[];/*"Ching!\n"*/
-extern char far C_2BB4_1337[];/*"Thump! Thump!\n"*/
-extern char far C_2BB4_1346[];/*"Shing!\n"*/
-extern char far C_2BB4_137F[];/*"A torch burns out.\n"*/
-extern char far C_2BB4_1BE8[];/*"The %s is broken.\n"*/
-extern char far C_2BB4_1BFB[];/*"You cannot install it there.\n"*/
-extern char far C_2BB4_1C54[];/*"It is nailed shut.\n"*/
-extern char far C_2BB4_1ECD[];/*"\n\nAn item can't be placed inside itself!\n"*/
-extern char far C_2BB4_1F26[];/*"A mechanical person can't eat berries!\n"*/
-extern char far C_2BB4_1FA6[];/*"There is already something in the bucket.\n"*/
-extern char far C_2BB4_2138[];/*"sudden flush, dizziness, and nausea.\n"*/
-extern char far C_2BB4_2261[];/*"There are too many moving trees nearby.\n"*/
+extern char far DirectionMsg[];/*"Direction-\n"*/
+extern char far AlreadyLitMsg[];/*"It's already lit.\n"*/
+extern char far BlockedMsg[];/*"Blocked!\n"*/
+extern char far LockedMsg[];/*"It is locked.\n"*/
+extern char far NoEffectMsg[];/*"It has no effect.\n"*/
+extern char far NoMsg[];/*"No.\n"*/
+extern char far NotAtNightMsg[];/*"Not at night!\n"*/
+extern char far NotNowMsg[];/*"Not now.\n"*/
+extern char far NotUndergroundMsg[];/*"Not while underground.\n"*/
+extern char far WasteOutOfCombatMsg[];/*"That would be a waste outside of combat.\n"*/
+extern char far NowhereMsg[];/*"nowhere.\n"*/
+extern char far NothingToLightWithMsg[];/*"\nNothing to light the %s with.\n"*/
+extern char far NoFuelMsg[];/*"\nThere is no fuel.\n"*/
+extern char far HandsFullMsg[];/*"\nYour hands are full.\n"*/
+extern char far ExtinguishedMsg[];/*"The %s is extinguished.\n"*/
+extern char far IncineratedMsg[];/*"\nYou incinerated the %s.\n"*/
+extern char far AlreadyFullMsg[];/*"\nIt's already full.\n"*/
+extern char far BucketEmptyMsg[];/*"There is nothing in the bucket.\n"*/
+extern char far PourWaterOnGroundMsg[];/*"You pour the water onto the ground.\n"*/
+extern char far PourWaterOnSeedMsg[];/*"You pour the water onto the seed.\n"*/
+extern char far NPCAllWetMsg[];/*"%s is all wet.\n"*/
+extern char far AllWetMsg[];/*"The %s is all wet.\n"*/
+extern char far PourNitrogenMsg[];/*"You pour the nitrogen compound onto the mound.\n"*/
+extern char far PourPhosphorousMsg[];/*"You pour the phosphorous solution onto the mound.\n"*/
+extern char far PourPotashMsg[];/*"You pour the potash mixture onto the mound.\n"*/
+extern char far SeedAcidMsg[];/*"The seed is destroyed by acid.\n"*/
+extern char far SeedOilMsg[];/*"The seed is poisoned by oil.\n"*/
+extern char far NothingToDrillMsg[];/*"There is nothing to drill into.\n"*/
+extern char far NoRoomForOreMsg[];/*"There is no room left for the ore.\n"*/
+extern char far EatBerryMsg[];/*"You eat a Martian berry. You feel %s strange "*/
+extern char far BerryRelationshipMsg[];/*"relationship with things around you.\n"*/
+extern char far BerrySensitivityMsg[];/*"sensitivity to the feelings of objects around you.\n"*/
+extern char far BerrySpatialMsg[];/*"sense of your spatial location.\n"*/
+extern char far BerryOddMsg[];/*"feelings, like the berries were really odd.\n"*/
+extern char far BattleFrenzyMsg[];/*"%s enters a battle frenzy!\n"*/
+extern char far TurnsLooselyMsg[];/*"It turns loosely.\n"*/
+extern char far SprayerRubberMsg[];/*"The sprayer system now has rubber.\n"*/
+extern char far SprayerDyeMsg[];/*"The sprayer system now has dye.\n"*/
+extern char far DoorNotRustedMsg[];/*"This door is not rusted.\n"*/
+extern char far DoorUnstuckMsg[];/*"The door is unstuck.\n"*/
+extern char far UsingMsg[];/*"`(using %s)"*/
+extern char far FillBucketMsg[];/*"`You fill the bucket with water.\n"*/
+extern char far DumpIceMsg[];/*"`Dump out the ice? "*/
+extern char far AutomaticDoorMsg[];/*"`It is automatic and can't be opened by hand.\n"*/
+extern char far RustedShutMsg[];/*"It is apparently rusted shut.\n"*/
+extern char far ApparentlyLockedMsg[];/*"It is apparently locked.\n"*/
+extern char far NoPowerMsg[];/*"It has no power.\n"*/
+extern char far WheezeMsg[];/*"Wheeeeze\n"*/
+extern char far ChingMsg[];/*"Ching!\n"*/
+extern char far ThumpMsg[];/*"Thump! Thump!\n"*/
+extern char far ShingMsg[];/*"Shing!\n"*/
+extern char far BurnOutMsg[];/*"A torch burns out.\n"*/
+extern char far BrokenMsg[];/*"The %s is broken.\n"*/
+extern char far CantInstallThereMsg[];/*"You cannot install it there.\n"*/
+extern char far NailedShutMsg[];/*"It is nailed shut.\n"*/
+extern char far InsideItselfMsg[];/*"\n\nAn item can't be placed inside itself!\n"*/
+extern char far RobotCantEatMsg[];/*"A mechanical person can't eat berries!\n"*/
+extern char far BucketNotEmptyMsg[];/*"There is already something in the bucket.\n"*/
+extern char far BerryNauseaMsg[];/*"sudden flush, dizziness, and nausea.\n"*/
+extern char far TooManyTreesMsg[];/*"There are too many moving trees nearby.\n"*/
 
 /*
  * action 63 (a lit light source on itself): put it out (the lit type
@@ -190,10 +186,10 @@ extern char far C_2BB4_2261[];/*"There are too many moving trees nearby.\n"*/
 	if(obj == on) {
 		if(GetType(obj) == 0x6e) {
 			if((ObjStatus[obj] & 0x18) == 0x18) {
-				CON_printf(C_2BB4_02CF);
+				CON_printf(NoMsg);
 			} else {
 				DeleteObj(obj);
-				CON_printf(C_2BB4_137F);
+				CON_printf(BurnOutMsg);
 			}
 		} else {
 			switch(GetType(on)) {
@@ -204,10 +200,10 @@ extern char far C_2BB4_2261[];/*"There are too many moving trees nearby.\n"*/
 				default: t = GetType(on);
 			}
 			ObjShapeType[on] = (ObjShapeType[on] & 0xfc00) + t;
-			CON_printf(C_2BB4_0460, GetObjectString(on));
+			CON_printf(ExtinguishedMsg, GetObjectString(on));
 		}
 	} else {
-		CON_printf(C_2BB4_01FD);
+		CON_printf(AlreadyLitMsg);
 	}
 	if(StatusDisplay == 0x92)
 		STAT_DrawInventory();
@@ -224,11 +220,11 @@ extern char far C_2BB4_2261[];/*"There are too many moving trees nearby.\n"*/
 	if((t = GetType(on)) == 0x84) {
 		C_2F63_0A13(on);
 	} else if(IsBurnableType(t)) {
-		CON_printf(C_2BB4_0479, GetObjectString(on));
+		CON_printf(IncineratedMsg, GetObjectString(on));
 		MUS_PlaySfx(9);
 		DeleteObj(on);
 	} else {
-		CON_printf(C_2BB4_02A4);
+		CON_printf(NoEffectMsg);
 		MUS_PlaySfx(5);
 	}
 	if(StatusDisplay == 0x92)
@@ -254,7 +250,7 @@ extern char far C_2BB4_2261[];/*"There are too many moving trees nearby.\n"*/
 				n = GetQuan(on);
 				old = on;
 				if((on = AddInvObj(0x6d, 0x18, 1, Party[StatusMember])) < 0) {
-					CON_printf(C_2BB4_0449);
+					CON_printf(HandsFullMsg);
 					MUS_PlaySfx(5);
 					return;
 				}
@@ -263,10 +259,10 @@ extern char far C_2BB4_2261[];/*"There are too many moving trees nearby.\n"*/
 				else
 					DeleteObj(old);
 			} else {
-				D_EBCE = on;
+				SelectionObj = on;
 				STAT_Ready();
 				if(Equipment[2] != on && Equipment[5] != on) {
-					CON_printf(C_2BB4_0449);
+					CON_printf(HandsFullMsg);
 					MUS_PlaySfx(5);
 					return;
 				}
@@ -276,7 +272,7 @@ extern char far C_2BB4_2261[];/*"There are too many moving trees nearby.\n"*/
 	} else {
 		p = Party[Active];
 	}
-	CON_printf(C_2BB4_1171, GetType(obj) != 0x6b ? GetObjectString(obj) : "a match");
+	CON_printf(UsingMsg, GetType(obj) != 0x6b ? GetObjectString(obj) : "a match");
 	if(IsUnlitLightType(t)) {
 		switch(GetType(on)) {
 			case 0x6d: nt = 0x6e; break;
@@ -289,7 +285,7 @@ extern char far C_2BB4_2261[];/*"There are too many moving trees nearby.\n"*/
 		if(GetQual(on) == 0) {
 			if(t == 0x73 || t == 0x75) {
 				if((fuel = FindInvOfType(p, 0x7c)) == -1) {
-					CON_printf(C_2BB4_0435);
+					CON_printf(NoFuelMsg);
 					MUS_PlaySfx(5);
 					return;
 				}
@@ -341,7 +337,7 @@ extern char far C_2BB4_2261[];/*"There are too many moving trees nearby.\n"*/
 	if(m == -1)
 		m = FindInvOfType(p, 0x6b);
 	if(m == -1) {
-		CON_printf(C_2BB4_0415, GetObjectString(obj));
+		CON_printf(NothingToLightWithMsg, GetObjectString(obj));
 		MUS_PlaySfx(5);
 	} else {
 		C_2FA1_017E(m, obj, -1);
@@ -359,7 +355,7 @@ extern char far C_2BB4_2261[];/*"There are too many moving trees nearby.\n"*/
 	t = GetType(on);
 	q = GetQual(on);
 	if((t == 0x75 || t == 0x76) && q >= 0x7e || (t == 0x73 || t == 0x74) && q >= 0xb2) {
-		CON_printf(C_2BB4_0493);
+		CON_printf(AlreadyFullMsg);
 		MUS_PlaySfx(5);
 		return;
 	}
@@ -396,7 +392,7 @@ extern char far C_2BB4_2261[];/*"There are too many moving trees nearby.\n"*/
 			b = o;
 	}
 	if(a == -1) {
-		CON_printf(C_2BB4_02A4);
+		CON_printf(NoEffectMsg);
 		MUS_PlaySfx(5);
 		return;
 	}
@@ -408,7 +404,7 @@ extern char far C_2BB4_2261[];/*"There are too many moving trees nearby.\n"*/
 			ObjShapeType[b] = GetType(b) + ((f % 2 ? f - 1 : f + 1) << 10);
 		}
 	} else {
-		CON_printf(C_2BB4_0C32);
+		CON_printf(TurnsLooselyMsg);
 	}
 }
 
@@ -446,7 +442,7 @@ extern char far C_2BB4_2261[];/*"There are too many moving trees nearby.\n"*/
 				__DoHit(Party[Active], o, 0x28, 0);
 				return;
 			}
-			CON_printf(C_2BB4_07F5);
+			CON_printf(NothingToDrillMsg);
 			MUS_PlaySfx(5);
 			return;
 		}
@@ -478,11 +474,11 @@ extern char far C_2BB4_2261[];/*"There are too many moving trees nearby.\n"*/
 				break;
 		}
 		if(k == 8) {
-			CON_printf(C_2BB4_0816);
+			CON_printf(NoRoomForOreMsg);
 			return;
 		}
 		if((m = AddMapObj(nt, 0, 1, x, y, MapZ)) == -1) {
-			CON_printf(C_2BB4_032E);
+			CON_printf(NotNowMsg);
 			return;
 		}
 		ObjStatus[m] &= ~0x20;
@@ -507,16 +503,16 @@ extern char far C_2BB4_2261[];/*"There are too many moving trees nearby.\n"*/
 	int16 sx, sy, tile = 0, xr;
 
 	if(MapZ != 0 && MapZ != 2 && MapZ != 3) {
-		CON_printf(C_2BB4_0364);
+		CON_printf(NotUndergroundMsg);
 		return;
 	}
 	if(MapZ == 0 && (Time_H < 5 || Time_H > 17)) {
-		CON_printf(C_2BB4_02EB);
+		CON_printf(NotAtNightMsg);
 		return;
 	}
 	for(o = SearchArea((MapX - 6) & 0x3ff, (MapY - 5) & 0x3ff, (MapX + 7) & 0x3ff, (MapY + 5) & 0x3ff); o >= 0; o = NextArea()) {
 		if(GetType(o) == 0x198 && (ObjStatus[o] & 0x20)) {
-			CON_printf(C_2BB4_2261);
+			CON_printf(TooManyTreesMsg);
 			return;
 		}
 	}
@@ -535,21 +531,21 @@ extern char far C_2BB4_2261[];/*"There are too many moving trees nearby.\n"*/
 	MAP_LoadAround();
 	ShowObjects();
 	DisplayTick();
-	CON_printf(C_2BB4_01B4);
+	CON_printf(DirectionMsg);
 	MouseMode = 0;
 	if(CON_getch() != 0x80) {
-		CON_printf(C_2BB4_03F8);
+		CON_printf(NowhereMsg);
 		return;
 	}
-	CON_printf("%s.\n", DirNames[D_EB72]);
+	CON_printf("%s.\n", DirNames[AdvanceDir]);
 	XRayView = 1;
 	ScreenFade = 1;
 	MAP_LoadAround();
 	ShowObjects();
 	DisplayTick();
 	while(n >= 0 && tile < 0xff) {
-		MapX = (MapX + DirIncrX[D_EB72]) & 0x3ff;
-		MapY = (MapY + DirIncrY[D_EB72]) & 0x3ff;
+		MapX = (MapX + DirIncrX[AdvanceDir]) & 0x3ff;
+		MapY = (MapY + DirIncrY[AdvanceDir]) & 0x3ff;
 		MAP_LoadAround();
 		ShowObjects();
 		DisplayTick();
@@ -561,7 +557,7 @@ extern char far C_2BB4_2261[];/*"There are too many moving trees nearby.\n"*/
 	MapY = sy;
 	MAP_LoadAround();
 	ShowObjects();
-	D_0F12 = 1;
+	StatusDirty = 1;
 	RefreshStatus();
 	ScreenFade = 1;
 	DisplayTick();
@@ -579,73 +575,73 @@ extern char far C_2BB4_2261[];/*"There are too many moving trees nearby.\n"*/
 
 	f = GetFrame(obj);
 	if(ObjStatus[obj] & 0x18)
-		D_0F12 = 1;
+		StatusDirty = 1;
 	if(f == 2) {
-		CON_printf(C_2BB4_119F);
+		CON_printf(DumpIceMsg);
 		if((k = CON_getch()) == 'y' || k == 'Y')
 			ObjShapeType[obj] = GetType(obj);
 		return;
 	}
-	if(on == -1 && (TalkFlags[0x76] & 0x20) && (GetTileAtXYZ(D_EBF6, D_EBF8, MapZ) >= 1 && GetTileAtXYZ(D_EBF6, D_EBF8, MapZ) <= 4 || (TalkFlags[0x76] & 0x40) && IsWaterTile(GetTileAtXYZ(D_EBF6, D_EBF8, MapZ)))) {
-		CON_printf(C_2BB4_117D);
+	if(on == -1 && (TalkFlags[0x76] & 0x20) && (GetTileAtXYZ(SelectionX, SelectionY, MapZ) >= 1 && GetTileAtXYZ(SelectionX, SelectionY, MapZ) <= 4 || (TalkFlags[0x76] & 0x40) && IsWaterTile(GetTileAtXYZ(SelectionX, SelectionY, MapZ)))) {
+		CON_printf(FillBucketMsg);
 		ObjShapeType[obj] = GetType(obj) + 0x400;
 		return;
 	}
 	if(f == 0) {
-		CON_printf(C_2BB4_069A);
+		CON_printf(BucketEmptyMsg);
 		MUS_PlaySfx(5);
 		return;
 	}
 	if(on == -1) {
-		CON_printf(C_2BB4_0713, GetTileString(GetTileAtXYZ(D_EBF6, D_EBF8, MapZ)));
-		C_1FA9_0BE4();
+		CON_printf(AllWetMsg, GetTileString(GetTileAtXYZ(SelectionX, SelectionY, MapZ)));
+		MUS_SplashSfx();
 		if((GameFlags & 0x10) == 0)
 			ObjShapeType[obj] = GetType(obj);
 	}
 	if((t = GetType(on)) == 0xfb) {
-		if((seed = OBJ_FindTypeAt(0xfc, D_EBF6, D_EBF8)) < 0 && (hole = OBJ_FindTypeAt(0x101, D_EBF6, D_EBF8)) >= 0)
+		if((seed = OBJ_FindTypeAt(0xfc, SelectionX, SelectionY)) < 0 && (hole = OBJ_FindTypeAt(0x101, SelectionX, SelectionY)) >= 0)
 			seed = FindInvType(hole, 0xfc, -1);
 		if(seed == -1) {
-			CON_printf(C_2BB4_06BB);
-			C_1FA9_0BE4();
+			CON_printf(PourWaterOnGroundMsg);
+			MUS_SplashSfx();
 		} else {
 			q = GetQual(on);
 			SetQual(on, q |= 8);
 			MUS_PlaySfx(4);
-			CON_printf(C_2BB4_06E0);
+			CON_printf(PourWaterOnSeedMsg);
 			if(q == 0xf && GetFrame(seed) == 0) {
 				SetQual(seed, Date_D);
 				SetQuan(seed, Date_M);
 			}
 		}
 	} else if(t == 0x9e) {
-		if((ObjStatus[D_EBCE] & 0x18) == 0 && GetDigClass(GetTileAtXYZ(D_EBF6, D_EBF8, MapZ))) {
+		if((ObjStatus[SelectionObj] & 0x18) == 0 && GetDigClass(GetTileAtXYZ(SelectionX, SelectionY, MapZ))) {
 			MUS_PlaySfx(4);
 			ObjShapeType[on] = 0x9d;
 			SetQual(on, OSI_rand(10, 15));
 			ShowObjects();
 		} else {
-			CON_printf(C_2BB4_02A4);
+			CON_printf(NoEffectMsg);
 		}
 	} else if(t == 0x9d) {
-		if(GetFrame(D_EBCE) == 0) {
+		if(GetFrame(SelectionObj) == 0) {
 			MUS_PlaySfx(4);
 			ObjShapeType[on] = GetType(on) + 0x400;
 			SetQual(on, OSI_rand(10, 15));
 			ShowObjects();
 		} else {
-			CON_printf(C_2BB4_02A4);
+			CON_printf(NoEffectMsg);
 		}
 	} else if(t == 0x112) {
-		CON_printf(C_2BB4_117D);
+		CON_printf(FillBucketMsg);
 		ObjShapeType[obj] = GetType(obj) + 0x400;
 		return;
 	} else {
 		if(on < 0x100 && on >= 0)
-			CON_printf(C_2BB4_0703, GetObjectString(on));
+			CON_printf(NPCAllWetMsg, GetObjectString(on));
 		else
-			CON_printf(C_2BB4_0713, GetObjectString(on));
-		C_1FA9_0BE4();
+			CON_printf(AllWetMsg, GetObjectString(on));
+		MUS_SplashSfx();
 	}
 	if((GameFlags & 0x10) == 0)
 		ObjShapeType[obj] = GetType(obj);
@@ -666,46 +662,46 @@ extern char far C_2BB4_2261[];/*"There are too many moving trees nearby.\n"*/
 		seed = FindInvType(hole, 0xfc, -1);
 	if(seed == -1) {
 		DeleteObj(obj);
-		CON_printf(C_2BB4_02A4);
+		CON_printf(NoEffectMsg);
 		return;
 	}
 	q = GetQual(on);
 	switch(f) {
 		case 3:
 			if(!(q & 1)) {
-				CON_printf(C_2BB4_0727);
+				CON_printf(PourNitrogenMsg);
 				q |= 1;
 			} else {
-				CON_printf(C_2BB4_02A4);
+				CON_printf(NoEffectMsg);
 			}
 			break;
 		case 1:
 			if(!(q & 2)) {
-				CON_printf(C_2BB4_0757);
+				CON_printf(PourPhosphorousMsg);
 				q |= 2;
 			} else {
-				CON_printf(C_2BB4_02A4);
+				CON_printf(NoEffectMsg);
 			}
 			break;
 		case 0:
 			if(!(q & 4)) {
-				CON_printf(C_2BB4_078A);
+				CON_printf(PourPotashMsg);
 				q |= 4;
 			} else {
-				CON_printf(C_2BB4_02A4);
+				CON_printf(NoEffectMsg);
 			}
 			break;
 		case 2:
 		case 4:
 			if(f == 2 && seed != -1) {
-				CON_printf(C_2BB4_07B7);
+				CON_printf(SeedAcidMsg);
 				MUS_PlaySfx(5);
 				DeleteObj(seed);
 				ObjShapeType[on] = (ObjShapeType[on] & 0xfc00) + 0x102;
 				SetQual(seed, 0);
 				SetQuan(seed, 0);
 			} else if(seed != -1) {
-				CON_printf(C_2BB4_07D7);
+				CON_printf(SeedOilMsg);
 				MUS_PlaySfx(5);
 				ObjShapeType[seed] = GetType(seed) + 0x400;
 				SetQual(seed, 0);
@@ -714,7 +710,7 @@ extern char far C_2BB4_2261[];/*"There are too many moving trees nearby.\n"*/
 			q = 0;
 			break;
 		default:
-			CON_printf(C_2BB4_02A4);
+			CON_printf(NoEffectMsg);
 	}
 	SetQual(on, q);
 	DeleteObj(obj);
@@ -734,18 +730,18 @@ extern char far C_2BB4_2261[];/*"There are too many moving trees nearby.\n"*/
 
 	if(GetType(obj) != 0xeb || GetFrame(obj) == 4) {
 		if(on == -1) {
-			if(GetTileAtXYZ(D_EBF6, D_EBF8, MapZ) == 8) {
+			if(GetTileAtXYZ(SelectionX, SelectionY, MapZ) == 8) {
 				TalkFlags[0x51] |= 0x40;
 				TALK_talkTo(1, 0x51, 0);
 				C_2F5F_0AC1(0x51);
 				DreamWakeUp();
 			} else {
-				CON_printf(C_2BB4_02A4);
+				CON_printf(NoEffectMsg);
 			}
 		} else if((t = GetType(on)) == 0xb3 || t == 0xe3 || t == 0x1a5 || t == 0x98 || t == 0xdb || t == 0xde) {
 			if((q = GetQual(on)) - 0x80 >= 0x40) {
 				SetQual(on, q - 0x80);
-				CON_printf(C_2BB4_1065);
+				CON_printf(DoorUnstuckMsg);
 				MUS_PlaySfx(4);
 				if(QuanType(obj)) {
 					if((n = GetQuan(obj)) > 1)
@@ -756,14 +752,14 @@ extern char far C_2BB4_2261[];/*"There are too many moving trees nearby.\n"*/
 					DeleteObj(obj);
 				}
 			} else {
-				CON_printf(C_2BB4_104B);
+				CON_printf(DoorNotRustedMsg);
 			}
 		} else {
 			goto fail;
 		}
 	} else {
 fail:
-		CON_printf(C_2BB4_02A4);
+		CON_printf(NoEffectMsg);
 	}
 }
 
@@ -777,18 +773,18 @@ fail:
 	int16 t, f, k;
 
 	if(GetQual(obj) & 2) {
-		CON_printf(C_2BB4_1BE8, GetObjectString(obj));
+		CON_printf(BrokenMsg, GetObjectString(obj));
 		return;
 	}
 	if(GetType(obj) == 0xce) {
 		if(TalkFlags[0x2e] & 0x80) {
-			CON_printf(C_2BB4_02A4);
+			CON_printf(NoEffectMsg);
 			return;
 		}
 		k = 0;
 	} else {
 		if(TalkFlags[0x39] & 0x80) {
-			CON_printf(C_2BB4_02A4);
+			CON_printf(NoEffectMsg);
 			return;
 		}
 		k = 1;
@@ -807,7 +803,7 @@ fail:
 			}
 		}
 		if(on == -1) {
-			CON_printf(C_2BB4_1BFB);
+			CON_printf(CantInstallThereMsg);
 			return;
 		}
 	}
@@ -830,7 +826,7 @@ fail:
 	k = GetType(obj) - 0x49;
 	inv = ObjStatus[obj] & 0x18 ? 1 : 0;
 	if(Party[Active] == 6) {
-		CON_printf(C_2BB4_1F26);
+		CON_printf(RobotCantEatMsg);
 		return;
 	}
 	MUS_PlaySfx(0x32);
@@ -841,32 +837,32 @@ fail:
 		case 3: v = 0; break;
 		default: v = 0;
 	}
-	CON_printf(C_2BB4_085B, v ? "an increase in the" : "a");
+	CON_printf(EatBerryMsg, v ? "an increase in the" : "a");
 	switch(k) {
 		case 0:
-			CON_printf(C_2BB4_0889);
+			CON_printf(BerryRelationshipMsg);
 			v = ++Talents[Party[Active]].a;
 			break;
 		case 1:
-			CON_printf(C_2BB4_08AF);
+			CON_printf(BerrySensitivityMsg);
 			if(v == 0)
 				VisibilityDirty = 1;
 			v = ++Talents[Party[Active]].psychic;
 			break;
 		case 2:
-			CON_printf(C_2BB4_08E3);
+			CON_printf(BerrySpatialMsg);
 			if(v == 0)
 				VisibilityDirty = 1;
 			v = ++Talents[Party[Active]].c;
 			break;
 		case 3:
-			CON_printf(C_2BB4_2138);
+			CON_printf(BerryNauseaMsg);
 			LoseHP(Party[Active], OSI_rand(5, 20) + OSI_rand(5, 20), 2);
 			DrunkCounter += OSI_rand(1, 2);
 			NPCStatus[Party[Active]] = NPCStatus[Party[Active]] & ~8;
 			break;
 		default:
-			CON_printf(C_2BB4_0904);
+			CON_printf(BerryOddMsg);
 			return;
 	}
 	if(GetQuan(obj) > 1)
@@ -888,13 +884,13 @@ fail:
 
 	inv = ObjStatus[obj] & 0x18 ? 1 : 0;
 	if(!InCombat) {
-		CON_printf(C_2BB4_037C);
+		CON_printf(WasteOutOfCombatMsg);
 		MUS_PlaySfx(5);
 		return;
 	}
 	p = Party[Active];
 	if(!(ObjStatus[p] & 0x80)) {
-		CON_printf(C_2BB4_0931, Names[Active]);
+		CON_printf(BattleFrenzyMsg, Names[Active]);
 		MUS_PlaySfx(0x32);
 	}
 	ObjStatus[p] |= 0x80;
@@ -945,7 +941,7 @@ fail:
 	x = GetX(obj);
 	y = GetY(obj);
 	if(GetQual(obj) & 0x80) {
-		CON_printf(C_2BB4_1242);
+		CON_printf(ApparentlyLockedMsg);
 		return;
 	}
 	switch(GetFrame(obj)) {
@@ -979,9 +975,9 @@ fail:
 	t = GetType(obj);
 	if((f = GetFrame(obj)) == 2) {
 		if(t == 0x56 || t == 0x11c)
-			CON_printf(C_2BB4_1C54);
+			CON_printf(NailedShutMsg);
 		else
-			CON_printf(C_2BB4_0295);
+			CON_printf(LockedMsg);
 	} else if(f == 1) {
 		ObjShapeType[obj] = GetType(obj);
 		SearchObj(obj);
@@ -989,7 +985,7 @@ fail:
 		ObjShapeType[obj] = GetType(obj) + 0x400;
 	}
 	if(ObjStatus[obj] & 0x18)
-		D_0F12 = 1;
+		StatusDirty = 1;
 }
 
 /*
@@ -1005,11 +1001,11 @@ fail:
  */
 /*C_2FA1_1B18*/C_2FA1_1B18(register int16 obj, int16 on, int16 to) {
 	if(GetQual(obj) & 0x80) {
-		CON_printf(C_2BB4_0295);
+		CON_printf(LockedMsg);
 		return;
 	}
 	if(OBJ_FindNPCAt(0, GetX(obj), GetY(obj)) >= 0) {
-		CON_printf(C_2BB4_0230);
+		CON_printf(BlockedMsg);
 		MUS_PlaySfx(5);
 		return;
 	}
@@ -1026,11 +1022,11 @@ fail:
 	if((t = GetType(obj)) == 0x14c) {
 		DeleteObj(obj);
 		SetQual(on, GetQual(on) | 1);
-		CON_printf(C_2BB4_0E6B);
+		CON_printf(SprayerRubberMsg);
 	} else if(t == 0x7b) {
 		DeleteObj(obj);
 		SetQual(on, GetQual(on) | 2);
-		CON_printf(C_2BB4_0E8F);
+		CON_printf(SprayerDyeMsg);
 	}
 }
 
@@ -1041,13 +1037,13 @@ fail:
 	register int16 t;
 
 	t = GetType(obj);
-	CON_printf(C_2BB4_11F4);
+	CON_printf(AutomaticDoorMsg);
 	if((GetQual(obj) & 0xc0) == 0xc0)
-		CON_printf(C_2BB4_1223);
+		CON_printf(RustedShutMsg);
 	else if(GetQual(obj) & 0x80)
-		CON_printf(C_2BB4_1242);
+		CON_printf(ApparentlyLockedMsg);
 	else if(t == 0xe3 && !(TalkFlags[0x73] & 4) || t == 0xb3 && !(TalkFlags[0x73] & 0x10))
-		CON_printf(C_2BB4_125C);
+		CON_printf(NoPowerMsg);
 }
 
 /*
@@ -1064,21 +1060,21 @@ fail:
 	}
 	switch(GetType(obj)) {
 		case 0x11a:
-			CON_printf(C_2BB4_1337);
+			CON_printf(ThumpMsg);
 			MUS_PlaySfx(0x34);
 			TimerDelay(476600L);
 			MUS_PlaySfx(0x34);
 			break;
 		case 0x118:
-			CON_printf(C_2BB4_132F);
+			CON_printf(ChingMsg);
 			MUS_PlaySfx(0x36);
 			break;
 		case 0x119:
-			CON_printf(C_2BB4_1346);
+			CON_printf(ShingMsg);
 			MUS_PlaySfx(0x35);
 			break;
 		case 0x11b:
-			CON_printf(C_2BB4_1325);
+			CON_printf(WheezeMsg);
 			MUS_PlaySfx(0x37);
 			break;
 		case 0x12a:
@@ -1100,7 +1096,7 @@ fail:
 	fo = GetFrame(obj);
 	fn = GetFrame(on);
 	if(obj == on) {
-		CON_printf(C_2BB4_1ECD);
+		CON_printf(InsideItselfMsg);
 		MUS_PlaySfx(5);
 		return;
 	}
@@ -1113,19 +1109,19 @@ fail:
 		fo = tmp;
 	}
 	if(fn > 0) {
-		CON_printf(C_2BB4_1FA6);
+		CON_printf(BucketNotEmptyMsg);
 		MUS_PlaySfx(5);
 		return;
 	}
 	if(fo == 0) {
-		CON_printf(C_2BB4_069A);
+		CON_printf(BucketEmptyMsg);
 		MUS_PlaySfx(5);
 		return;
 	}
 	ObjShapeType[on] = GetType(on) + (fo << 10);
 	ObjShapeType[obj] = GetType(obj);
 	if((ObjStatus[on] & 0x18) || (ObjStatus[obj] & 0x18))
-		D_0F12 = 1;
+		StatusDirty = 1;
 	if((ObjStatus[on] & 0x18) == 0 || (ObjStatus[obj] & 0x18) == 0)
 		ShowObjects();
 }

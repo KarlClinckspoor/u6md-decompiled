@@ -24,12 +24,10 @@ extern int16 OSI_rand(int16, int16);/*OSI_rand(lo, hi)*/
 
 extern char DirIncrX[8], DirIncrY[8];
 extern int16 Amount[];/*quantity (low byte), quality (high byte)*/
-extern unsigned char D_6EC6[];/*TalkFlags*/
+extern unsigned char TalkFlags[];
 extern struct coord ObjPos[];
 extern uint16 ObjShapeType[];
-extern int16 D_B9D6[0x40];/*MissileHitList: what the last missile hit (-1 ends)*/
-#define TalkFlags D_6EC6
-#define MissileHitList D_B9D6
+extern int16 MissileHitList[0x40];/*what the last missile hit (-1 ends)*/
 
 #define GetType(i) (ObjShapeType[i] & 0x3ff)
 #define GetQuan(i) (((unsigned char *)(Amount + (i)))[0])

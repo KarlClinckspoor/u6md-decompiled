@@ -1,5 +1,5 @@
 ;----------------------------------------
-;EMS memory: the block after a block of the EMS heap (Martian Dreams only;
+;EMS memory: the block after a block of the EMS heap (GAME.EXE 291E; Martian Dreams only;
 ;Savage Empire's EMS heap has no such routine). See EMSINIT.ASM and
 ;EMSALLOC.ASM for the heap's layout.
 ;----------------------------------------

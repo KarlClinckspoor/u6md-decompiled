@@ -17,9 +17,8 @@ extern void (*DriveErrorCallback)();/*DriveErrorCallback (LOW.ASM): called by OS
 extern int16 CON_getch();
 extern cdecl CON_printf(char far *, ...);
 
-extern int16 D_0F18;/*MapAnimEnabled*/
+extern int16 MapAnimEnabled;
 extern unsigned char D_EC5A, D_EC5B;/*DosVerMajor, DosVerMinor*/
-#define MapAnimEnabled D_0F18
 
 static DISK_NullCallback();
 

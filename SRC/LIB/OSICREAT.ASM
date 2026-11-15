@@ -1,5 +1,5 @@
 ;----------------------------------------
-;OSI library: creating a file (pascal). New in Martian Dreams, in the manner of
+;OSI library: creating a file (pascal; GAME.EXE 2A5B). New in Martian Dreams, in the manner of
 ;OSIOPEN.ASM's DOS_open: on a DOS error the code goes to osiError and
 ;osiErrorHandler is called; if it clears osiError, the call is retried.
 ;----------------------------------------

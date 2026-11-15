@@ -1,5 +1,5 @@
 ;----------------------------------------
-;OSI library: moving a file's pointer (pascal) (GAME.EXE 2E89)
+;OSI library: moving a file's pointer (pascal) (GAME.EXE 2A6D; SE's GAME.EXE 2E89)
 ;----------------------------------------
 
 DGROUP	GROUP _DATA

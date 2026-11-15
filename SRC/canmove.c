@@ -29,14 +29,14 @@ extern unsigned char ObjStatus[];
 extern unsigned char far *NPCFlag;
 extern unsigned char Party[];
 extern unsigned char NPCStatus[];
-extern unsigned char far *D_6DBA;/*TileFlag*/
-extern unsigned char D_6EC6[];/*TalkFlags*/
-extern int16 far *D_6EBE;/*BaseTile*/
-extern unsigned char far *D_760A;/*TileFlag2*/
+extern unsigned char far *TileFlag;
+extern unsigned char TalkFlags[];
+extern int16 far *BaseTile;
+extern unsigned char far *TileFlag2;
 extern struct coord ObjPos[];
 extern uint16 ObjShapeType[];
-extern unsigned char far *D_B4C4;/*TerrainType*/
-extern char far C_2BB4_0210[];
+extern unsigned char far *TerrainType;
+extern char far WontGoThatWayMsg[];
 
 extern int16 PushObj(int16, int16, int16, int16);/*push obj from (x, y) in dir: 0 moved, 2 message*/
 extern int16 IsPushableType(int16);
@@ -55,11 +55,6 @@ extern int16 GetDigClass(int16);
 extern cdecl CON_printf(char far *, ...);
 extern void cdecl TimerDelay(int32);
 
-#define TileFlag D_6DBA
-#define TalkFlags D_6EC6
-#define BaseTile D_6EBE
-#define TileFlag2 D_760A
-#define TerrainType D_B4C4
 
 
 #define GetType(i) (ObjShapeType[i] & 0x3ff)
@@ -382,7 +377,7 @@ CanStandAt(int16, int16, int16);
 					continue;
 				}
 				if(pushResult == 2)
-					CON_printf(C_2BB4_0210);
+					CON_printf(WontGoThatWayMsg);
 				okTo = 0;
 				break;
 			} else if(TileFlag2[dtile] & 4) {

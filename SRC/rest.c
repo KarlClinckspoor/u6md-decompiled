@@ -17,7 +17,7 @@
  * go up a level through a dream of three obelisks (REST_LevelUp: the sword
  * raises strength, the heart dexterity, the book intelligence, up to 30,
  * and 30 hit points come back). Poison may wear off (2-16 >= 15) or costs
- * hit points. At the end the morning song plays (C_1FA9_02CE) and the tent
+ * hit points. At the end the morning song plays (MUS_MorningSong) and the tent
  * is taken down.
  * MD changes from SE: no food (IsEdible, TryEat... are gone), no
  * gathering around the leader (CampOfsX/CampOfsY/CampFacing are still
@@ -64,7 +64,7 @@ extern int16 AddMapObj(int16, int16, int16, int16, int16, int16);/*AddMapObj(typ
 extern DeleteObj(int16);
 extern ShowObjects();
 extern char *GetObjectString(int16);
-extern C_1FA9_02CE(int16);/*the morning song*/
+extern MUS_MorningSong(int16);/*the morning song*/
 extern MUS_PlaySfx(int16);
 extern int16 CON_mouseOffAt(int16, int16, int16, int16);
 extern CON_mouseOn(int16);
@@ -74,15 +74,15 @@ extern CON_setClip(struct tClipInfo *);
 extern CON_gotoxy(int16, int16);
 extern cdecl CON_printf(char far *, ...);
 extern char *TALK_GetCharName(int16);
-extern char far C_2BB4_02FA[];/*NotInCombatMsg*/
-extern char far C_2BB4_0315[];/*NotInSoloMsg*/
+extern char far NotInCombatMsg[];
+extern char far NotInSoloMsg[];
 
 extern unsigned char MouseOn;
 extern int16 ScreenFade;
 extern int16 ColorText;
-extern int16 D_0826;/*text color of the dream's question*/
-extern char D_0F12;/*StatusDirty*/
-extern int16 D_0F16;/*IdleAnimTick*/
+extern int16 ColorDarkBlue;/*text color of the dream's question*/
+extern char StatusDirty;
+extern int16 IdleAnimTick;
 extern unsigned char NextSleep;
 extern unsigned char Time_H;
 extern unsigned char Active;
@@ -101,7 +101,7 @@ extern char IsInConversation;
 extern unsigned char DEXTE[];
 extern unsigned char Party[];
 extern unsigned char far *Level;
-extern char D_50CE[][14];/*Names*/
+extern char Names[][14];
 extern uint16 ExpPoints[];
 extern unsigned char STREN[];
 extern unsigned char NPCStatus[];
@@ -110,17 +110,10 @@ extern unsigned char INTEL[];
 extern struct coord ObjPos[];
 extern unsigned char PartySize;
 extern uint16 ObjShapeType[];
-extern struct tClipInfo D_EBD0[4];/*TextWindows*/
-extern int16 D_EC42;/*LinesBeforeMore*/
+extern struct tClipInfo TextWindows[4];
+extern int16 LinesBeforeMore;
 
-#define StatusDirty D_0F12
-#define IdleAnimTick D_0F16
-#define Names D_50CE
-#define TextWindows D_EBD0
-#define LinesBeforeMore D_EC42
 
-#define NotInCombatMsg C_2BB4_02FA
-#define NotInSoloMsg C_2BB4_0315
 
 #define GetType(i) (ObjShapeType[i] & 0x3ff)
 #define GetX(i) ((*(int16 *)&(ObjPos[i].raw[0]))&0x3ff)
@@ -215,7 +208,7 @@ extern int16 D_EC42;/*LinesBeforeMore*/
 	CON_printf("%s feels drawn to one of the obelisks.\n\n", pronoun);
 	CON_printf("Does %s touch the obelisk with the @book, the @heart, ", name);
 	CON_printf("or the @sword?\n");
-	CurClip->fgColor = D_0826;
+	CurClip->fgColor = ColorDarkBlue;
 	CON_printf("Which (B H S):\n");
 	while(!done) {
 		while((key = CON_prompt()) == 0);
@@ -442,7 +435,7 @@ wakeUp:
 	ShowObjects();
 	DisplayTick();
 	if(SoundFlag && soundCard != 3)
-		C_1FA9_02CE(0);
+		MUS_MorningSong(0);
 	else
 		TimerDelay(0xe8b70L);
 	PartyExit(x, y, MapZ, 1);

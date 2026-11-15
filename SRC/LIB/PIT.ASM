@@ -1,5 +1,5 @@
 ;----------------------------------------
-;SAVAGE.EXE (and GAME.EXE 2F0D): the timer chip's rate, interrupt vectors taken over and
+;GAME.EXE segment 26D3 (Savage Empire's, SAVAGE.EXE and SE's GAME.EXE 2F0D): the timer chip's rate, interrupt vectors taken over and
 ;given back, a delay counted on the timer chip
 ;----------------------------------------
 

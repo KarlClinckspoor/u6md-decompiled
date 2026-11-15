@@ -1,5 +1,5 @@
 ;----------------------------------------
-;SAVAGE.EXE (and GAME.EXE 2F2D): normalise a far pointer
+;GAME.EXE segment 0E17 (Savage Empire's, SAVAGE.EXE and SE's GAME.EXE 2F2D): normalise a far pointer
 ;----------------------------------------
 
 PTRNORM_TEXT	SEGMENT PUBLIC WORD 'CODE'

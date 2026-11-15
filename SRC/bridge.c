@@ -31,7 +31,7 @@ extern cdecl CON_printf(char far *, ...);
 extern int16 MapZ;
 extern unsigned char ObjStatus[];
 extern int16 Amount[];/*quantity (low byte), quality (high byte)*/
-extern unsigned char D_6EC6[];/*TalkFlags (per NPC)*/
+extern unsigned char TalkFlags[];/*per NPC*/
 extern struct coord ObjPos[];
 extern uint16 ObjShapeType[];
 extern int16 D_EC4C;/*BridgeNum: the bridge's number*/
@@ -40,7 +40,6 @@ extern int16 D_EC52;/*BridgeLen*/
 extern int16 D_EC54, D_EC56;/*BridgeX2, BridgeY2*/
 extern int16 D_EC58;/*BridgeNS: 0x80 when the bridge runs north-south*/
 
-#define TalkFlags D_6EC6
 #define BridgeNum D_EC4C
 #define BridgeX1 D_EC4E
 #define BridgeY1 D_EC50

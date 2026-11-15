@@ -72,9 +72,9 @@ extern void far *LZC_loadType(char far *name, int16 index, void far *out, int16 
 /*other game modules*/
 extern char DirIncrX[];
 extern char DirIncrY[];
-extern unsigned char D_0F12;/*StatusDirty*/
-extern int16 D_0F18;/*MapAnimEnabled*/
-extern int16 D_0F1A;/*Erupting*/
+extern unsigned char StatusDirty;
+extern int16 MapAnimEnabled;
+extern int16 Erupting;
 extern int16 StatusMember;
 extern int16 StatusDisplay;/*0x92 when the equipment view is shown*/
 extern int16 MapCoordMask;
@@ -83,24 +83,24 @@ extern int16 VisibilityDirty;
 extern int16 MapX, MapY, MapZ;
 extern int16 DiskFullChoice;
 /*3266*/extern unsigned char ObjStatus[];
-extern char far *D_3E80;/*the .lzc loader's work area*/
+extern char far *LzcWorkBuf;/*the .lzc loader's work area*/
 extern unsigned char AreaFlags[AREA_H][AREA_W];
 extern unsigned char far *NPCFlag;
 extern unsigned char far *NPCMode;
 extern unsigned char Party[];
 extern unsigned char far *ScratchBuf;
-extern char D_50CE[][14];/*Names*/
-extern char far *D_54B2;/*ScratchBuf + 0x36b0*/
+extern char Names[][14];
+extern char far *ScratchBufHigh;/*ScratchBuf + 0x36b0*/
 /*54BA*/extern int16 Amount[];
 extern unsigned char NPCStatus[];
-extern unsigned char far *D_6DBA;/*TileFlag*/
-extern int16 far *D_6EBE;/*BaseTile*/
+extern unsigned char far *TileFlag;
+extern int16 far *BaseTile;
 extern unsigned char AreaLight[AREA_H][AREA_W];
-extern unsigned char far *D_760A;/*TileFlag2*/
+extern unsigned char far *TileFlag2;
 /*78AE*/extern struct coord ObjPos[];
 extern unsigned char PartySize;
 /*9CC4*/extern uint16 ObjShapeType[];
-extern unsigned char far *D_B4C4;/*TerrainType*/
+extern unsigned char far *TerrainType;
 extern int16 far *OrigShapeType;
 extern int16 AreaX, AreaY;
 /*the display stacks ShowObjects builds: the first display node of each
@@ -133,9 +133,9 @@ extern int16 AreaFirstCol, AreaFirstRow, AreaLastCol, AreaLastRow;/*the loaded a
 /*DDB2*/extern int16 MapObjPtr[AREA_H][AREA_W];
 /*GetTileString's buffer*/
 /*EA32*/extern char TileStringBuf[];
-extern int16 D_EB16;/*WeightEquip*/
-extern int16 D_EB1A;/*WeightInven*/
-extern int16 D_EC4A;/*an NPC charmed (gameloop.c)*/
+extern int16 WeightEquip;
+extern int16 WeightInven;
+extern int16 CharmedNPC;/*an NPC charmed (gameloop.c)*/
 
 extern ApplyTerrainEffects(int16, int16, int16);
 extern cdecl CON_printf(char far *, ...);
@@ -146,16 +146,6 @@ extern STAT_RefreshInventory(int16);
 extern SubMov(int16, int16);/*SubMov(npc, points)*/
 extern int16 IsContainerType(int16);
 
-#define StatusDirty D_0F12
-#define MapAnimEnabled D_0F18
-#define Erupting D_0F1A
-#define Names D_50CE
-#define TileFlag D_6DBA
-#define BaseTile D_6EBE
-#define TileFlag2 D_760A
-#define TerrainType D_B4C4
-#define WeightEquip D_EB16
-#define WeightInven D_EB1A
 
 
 /*this module*/
@@ -183,18 +173,17 @@ extern int16 IsWaterTile(int16);
 extern int16 GetStr(int16);
 extern DisplayTick();
 extern void cdecl TimerDelay(int32);/*wait (2383 per millisecond)*/
-extern C_1FA9_09A5(int16);/*start a looping sound effect (-1 stops)*/
-extern C_1FA9_0A8A();/*a sweep sound*/
-extern C_1FA9_0AFD();/*machinery sound*/
-extern C_1FA9_0BE4();/*sound effect 35*/
+extern MUS_PlayLoopSfx(int16);/*start a looping sound effect (-1 stops)*/
+extern MUS_SweepSfx();/*a sweep sound*/
+extern MUS_MachinerySfx();/*machinery sound*/
+extern MUS_SplashSfx();/*sound effect 35*/
 extern unsigned char Time_H;
 extern unsigned char Active;
 extern int32 GameFlags;/*0x10: in a dream*/
 #define IN_DREAM (GameFlags & 0x10)
 extern struct { unsigned a:4, psychic:4, c:4, d:4; } Talents[];
 extern int16 DreamStage;
-extern unsigned char D_6EC6[];/*TalkFlags*/
-#define TalkFlags D_6EC6
+extern unsigned char TalkFlags[];
 /*when set, GiveObj refuses instead of dropping what does not fit*/
 /*EBC0*/extern int16 GiveObjRefuses;
 
@@ -1151,8 +1140,8 @@ extern unsigned char D_6EC6[];/*TalkFlags*/
 			if((IsLocal(obj) && objTyp != 0x1cd) || ObjShapeType[obj] == 0) {
 				if(objTyp == 0x173 && (owner = GetQual(obj)) && ObjShapeType[owner] == 0x174)
 					continue;
-				if(obj == D_EC4A)
-					D_EC4A = 0;
+				if(obj == CharmedNPC)
+					CharmedNPC = 0;
 				DeleteObj(obj);
 				if(LastSpilledObj >= 0)
 					next = LastSpilledObj;
@@ -1346,7 +1335,7 @@ extern unsigned char D_6EC6[];/*TalkFlags*/
 				DisplayTick();
 				TimerDelay(0x5744aL);
 				if(!(TalkFlags[0x76] & 0x20) || !(TalkFlags[0x76] & 0x40)) {
-					C_1FA9_0A8A();
+					MUS_SweepSfx();
 					switch(GetTileAtXYZ(x, y, z)) {
 						case 0x10: case 0x12:
 							x = (x + 1) & 0x3ff;
@@ -1374,7 +1363,7 @@ extern unsigned char D_6EC6[];/*TalkFlags*/
 						AddMapObj(0x1a0, 0, 1, oldX, oldY, z);
 					CON_printf(/*1623*/"Crash!!\n");
 				} else {
-					C_1FA9_0BE4();
+					MUS_SplashSfx();
 					CON_printf(/*162C*/"Splash!!\n");
 				}
 				DeleteObj(objNum);
@@ -2296,7 +2285,7 @@ extern unsigned char D_6EC6[];/*TalkFlags*/
 				dir = k & 2;
 				if((npc = OBJ_FindNPCAt(0, GetX(objNum), GetY(objNum))) >= 0) {
 					if(dir + 9 != k && OBJ_IsOnScreen(objNum))
-						C_1FA9_0AFD();
+						MUS_MachinerySfx();
 					ObjShapeType[objNum] = GetType(objNum) + ((dir + 9) << 10);
 				} else {
 					blocked = OBJ_FindNPCAt(0, (GetX(objNum) + DirIncrX[dir]) & 0x3ff, (GetY(objNum) + DirIncrY[dir]) & 0x3ff) >= 0;
@@ -2304,17 +2293,17 @@ extern unsigned char D_6EC6[];/*TalkFlags*/
 						blocked = OBJ_FindNPCAt(0, (GetX(objNum) + DirIncrX[dir + 4]) & 0x3ff, (GetY(objNum) + DirIncrY[dir + 4]) & 0x3ff) >= 0;
 					if(k < 4) {
 						if(blocked && OBJ_IsOnScreen(objNum)) {
-							C_1FA9_0AFD();
+							MUS_MachinerySfx();
 							ObjShapeType[objNum] = GetType(objNum) + ((dir + 5) << 10);
 						}
 					} else if(k < 8) {
 						if(!blocked && OBJ_IsOnScreen(objNum)) {
-							C_1FA9_0AFD();
+							MUS_MachinerySfx();
 							ObjShapeType[objNum] = GetType(objNum) + ((dir + 1) << 10);
 						}
 					} else {
 						if(!blocked && OBJ_IsOnScreen(objNum)) {
-							C_1FA9_0AFD();
+							MUS_MachinerySfx();
 							ObjShapeType[objNum] = GetType(objNum) + ((dir + 5) << 10);
 						}
 					}
@@ -2379,7 +2368,7 @@ extern unsigned char D_6EC6[];/*TalkFlags*/
 	if(Erupting == 1)
 		Erupting = 0;
 	if(sfx != MachineLoopSfx) {
-		C_1FA9_09A5(sfx);
+		MUS_PlayLoopSfx(sfx);
 		MachineLoopSfx = sfx;
 	}
 }
@@ -2440,7 +2429,7 @@ extern unsigned char D_6EC6[];/*TalkFlags*/
 	register int16 tileNum;
 	int16 far *src;
 
-	src = LZC_loadType(/*1659*/"look.lzc", 0, D_54B2, 0, D_3E80);
+	src = LZC_loadType(/*1659*/"look.lzc", 0, ScratchBufHigh, 0, LzcWorkBuf);
 	tileNum = *(src++);
 	while(tileNum < numTile) {
 		while(*CHARPTR_POSTINC(src));

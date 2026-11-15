@@ -1,7 +1,7 @@
 ;----------------------------------------
 ;OSI library: writing a file (pascal) from memory that may be EMS (a far
 ;pointer with segment C000h-FFFFh is mapped in first, EMS_map).
-;Savage Empire's OSIWRITE.ASM (SAVAGE.EXE), changed: it saves BX, CX and DX.
+;Savage Empire's OSIWRITE.ASM (SAVAGE.EXE; here GAME.EXE 2669), changed: it saves BX, CX and DX.
 ;----------------------------------------
 
 DGROUP	GROUP _DATA

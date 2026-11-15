@@ -24,17 +24,13 @@ extern int16 VisibilityDirty;
 extern unsigned char Time_H;
 extern int16 MapZ;
 extern unsigned char ObjStatus[];
-extern int16 far *D_6EBE;/*BaseTile*/
+extern int16 far *BaseTile;
 extern struct coord ObjPos[];
-extern int16 D_9CC2;/*NumAnimData*/
+extern int16 NumAnimData;
 extern uint16 ObjShapeType[];
-extern int16 D_B4C8[];/*AnimTiles: the animated tiles*/
-extern unsigned char D_BC8E[];/*StateAnimData*/
+extern int16 AnimTile[];/*the animated tiles*/
+extern unsigned char StateAnimData[];
 
-#define BaseTile D_6EBE
-#define NumAnimData D_9CC2
-#define AnimTiles D_B4C8
-#define StateAnimData D_BC8E
 
 #define GetType(i) (ObjShapeType[i] & 0x3ff)
 #define GetFrame(i) (ObjShapeType[i] >> 10)
@@ -42,10 +38,10 @@ extern unsigned char D_BC8E[];/*StateAnimData*/
 #define GetY(i) (((*(int16 *)&(ObjPos[i].raw[1]))>>2)&0x3ff)
 /*is animated tile i one of the machinery's?*/
 #define IS_MACHINE_TILE(i) (\
-	(AnimTiles[i] >= BaseTile[0xbc] && AnimTiles[i] < BaseTile[0xbd]) ||\
-	(AnimTiles[i] >= BaseTile[0xbf] && AnimTiles[i] < BaseTile[0xc0]) ||\
-	(AnimTiles[i] >= BaseTile[0x1b0] && AnimTiles[i] < BaseTile[0x1b1]) ||\
-	(AnimTiles[i] >= BaseTile[0x1b3] && AnimTiles[i] < BaseTile[0x1b4]))
+	(AnimTile[i] >= BaseTile[0xbc] && AnimTile[i] < BaseTile[0xbd]) ||\
+	(AnimTile[i] >= BaseTile[0xbf] && AnimTile[i] < BaseTile[0xc0]) ||\
+	(AnimTile[i] >= BaseTile[0x1b0] && AnimTile[i] < BaseTile[0x1b1]) ||\
+	(AnimTile[i] >= BaseTile[0x1b3] && AnimTile[i] < BaseTile[0x1b4]))
 
 /*the power goes on*/
 /*C_2F72_0000*/MachineryOn() {

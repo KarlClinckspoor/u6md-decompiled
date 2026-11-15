@@ -49,13 +49,13 @@ extern struct { unsigned a:4, psychic:4, c:4, d:4; } Talents[];
 extern unsigned char AreaTiles[AREA_H][AREA_W];/*the ground tiles of the area*/
 extern unsigned char Party[];
 extern int16 Amount[];/*quantity (low byte), quality (high byte)*/
-extern unsigned char far *D_6DBA;/*TileFlag: 0x03 light, 0x04 opaque, 0x08 window, 0x40 double height, 0x80 double width*/
-extern int16 far *D_6EBE;/*BaseTile: first tile of each object type*/
+extern unsigned char far *TileFlag;/*0x03 light, 0x04 opaque, 0x08 window, 0x40 double height, 0x80 double width*/
+extern int16 far *BaseTile;/*first tile of each object type*/
 /*6FC6*/extern unsigned char AreaLight[AREA_H][AREA_W];
-extern unsigned char far *D_760A;/*TileFlag2: 0x20 background*/
+extern unsigned char far *TileFlag2;/*0x20 background*/
 extern struct coord ObjPos[];
 extern uint16 ObjShapeType[];
-extern unsigned char far *D_B4C4;/*TerrainType: 0x0f kind (0x04 wall), 0x10 W, 0x20 S, 0x40 E, 0x80 N*/
+extern unsigned char far *TerrainType;/*0x0f kind (0x04 wall), 0x10 W, 0x20 S, 0x40 E, 0x80 N*/
 /*BA82*/extern int16 AreaOffset;
 /*BA84*/extern unsigned char VisQueueX[256];/*flood fill ring-buffer queue, x*/
 /*BB84*/extern unsigned char VisQueueY[256];/*flood fill ring-buffer queue, y*/
@@ -68,15 +68,12 @@ extern int16 NextArea(void);/*next object of SearchArea*/
 extern ShowObjects(void);/*draw the map window*/
 extern int16 OSI_rand(int16, int16);/*OSI_rand(lo, hi)*/
 
-#define TileFlag D_6DBA
-#define TileFlag2 D_760A
-#define TerrainType D_B4C4
 #define GetType(i) (ObjShapeType[i] & 0x3ff)
 #define GetFrame(i) (ObjShapeType[i] >> 10)
 #define GetQual(i) (((unsigned char *)(Amount + (i)))[1])
 #define GetX(i) ((*(int16 *)&(ObjPos[i].raw[0]))&0x3ff)
 #define GetY(i) (((*(int16 *)&(ObjPos[i].raw[1]))>>2)&0x3ff)
-#define TILE_FRAME(i) (D_6EBE[GetType(i)] + GetFrame(i))
+#define TILE_FRAME(i) (BaseTile[GetType(i)] + GetFrame(i))
 
 /*0EA0*/int16 ViewX = 12;/*the 11x11 view's corner in the area*/
 /*0EA2*/int16 ViewY = 12;

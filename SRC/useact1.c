@@ -80,83 +80,83 @@ extern REST_Command(int16, int16);
 extern TALK_talkTo(int16, int16, int16);
 extern int16 IsNpcOnScreen(int16);
 
-extern char far C_2BB4_01CE[];/*"\nPress any key..."*/
-extern char far C_2BB4_01E0[];/*"You can't sleep in a dream.\n"*/
-extern char far C_2BB4_023A[];/*"You can't read it.\n"*/
-extern char far C_2BB4_024E[];/*"You are carrying too much already.\n"*/
-extern char far C_2BB4_027B[];/*"The %s is fully charged.\n"*/
-extern char far C_2BB4_02A4[];/*"It has no effect.\n"*/
-extern char far C_2BB4_0315[];/*"Not while in solo mode!\n"*/
-extern char far C_2BB4_034D[];/*"That is not possible.\n"*/
-extern char far C_2BB4_05AA[];/*"--Affidavit--\n\n"*/
-extern char far C_2BB4_05BA[];/*"The undersigned do hereby vouch for the "*/
-extern char far C_2BB4_05E3[];/*"trust-\nworthiness of $P, who bears "*/
-extern char far C_2BB4_0607[];/*"this chit, commending same to the members "*/
-extern char far C_2BB4_0632[];/*"of the Olympus Mons outpost."*/
-extern char far C_2BB4_064F[];/*"\n\n*Signed:\n"*/
-extern char far C_2BB4_065B[];/*" Richard Sherman\n"*/
-extern char far C_2BB4_066D[];/*" Capt. Gregory Duprey\n"*/
-extern char far C_2BB4_0684[];/*" Doctor David Yellin\n"*/
-extern char far C_2BB4_083A[];/*"The drill's power is connected.\n"*/
-extern char far C_2BB4_094D[];/*"This switch cannot be fixed.\n"*/
-extern char far C_2BB4_096B[];/*"The switch is fastened.\n"*/
-extern char far C_2BB4_0984[];/*"The switch is loose.\n"*/
-extern char far C_2BB4_099A[];/*"It must be repaired first.\n"*/
-extern char far C_2BB4_09B6[];/*"The panel is fastened.\n"*/
-extern char far C_2BB4_09CE[];/*"The panel is loose.\n"*/
-extern char far C_2BB4_0A16[];/*"Panels are only installed onto cabinets.\n"*/
-extern char far C_2BB4_0A40[];/*"This cabinet requires a different type of panel.\n"*/
-extern char far C_2BB4_0A72[];/*"There is nothing to unload.\n"*/
-extern char far C_2BB4_0A8F[];/*"There is no more room.\n"*/
-extern char far C_2BB4_0AA7[];/*"You put the %s into the wheelbarrow.\n"*/
-extern char far C_2BB4_0ACD[];/*"You can't mix different things in the same load!\n"*/
-extern char far C_2BB4_0AFF[];/*"You put the %s into the rail car.\n"*/
-extern char far C_2BB4_0B22[];/*"You can't bury anything here.\n"*/
-extern char far C_2BB4_0B41[];/*"You planted the Martian seed.\n"*/
-extern char far C_2BB4_0B60[];/*"You filled in the hole.\n"*/
-extern char far C_2BB4_0B79[];/*"You can't dig here.\n"*/
-extern char far C_2BB4_0B8E[];/*"You uprooted the pod plant.\n"*/
-extern char far C_2BB4_0BAB[];/*"An unconscious Martian falls out of the pod.\n"*/
-extern char far C_2BB4_0BD9[];/*"You pried the nails out of the crate.\n"*/
-extern char far C_2BB4_0C00[];/*"It is not fully grown.\n"*/
-extern char far C_2BB4_0C45[];/*"  New setting (R%/S%/C)?\n"*/
-extern char far C_2BB4_0D06[];/*"Which section of rail needs fixing -\n"*/
-extern char far C_2BB4_0D2C[];/*"Radium has already been installed.\n"*/
-extern char far C_2BB4_0D50[];/*"OUCH. It is very hot.\n"*/
-extern char far C_2BB4_0D67[];/*"The %s only needed %d radium blocks.\n"*/
-extern char far C_2BB4_0DB5[];/*"The radium has been installed.\n"*/
-extern char far C_2BB4_11D7[];/*"`Don't bury people on Mars!\n"*/
-extern char far C_2BB4_126E[];/*"The work is too precise to perform telekinetically.\n"*/
-extern char far C_2BB4_12A3[];/*"You can't pile any more dirt there.\n"*/
-extern char far C_2BB4_17D5[];/*"The ground is not flat enough.\n"*/
-extern char far C_2BB4_17F5[];/*"The %s is in the way.\n"*/
-extern char far C_2BB4_180C[];/*"The drill must be installed onto a drill cart.\n"*/
-extern char far C_2BB4_183C[];/*"%s is not strong enough.\n"*/
-extern char far C_2BB4_1856[];/*"The robot already has a heartstone.\n"*/
-extern char far C_2BB4_187B[];/*"The heartstone is installed.\n"*/
-extern char far C_2BB4_1899[];/*"The pod is already open.\n"*/
-extern char far C_2BB4_18B3[];/*"You can't dig any deeper.\n"*/
-extern char far C_2BB4_18CE[];/*"It is stuck.\n"*/
-extern char far C_2BB4_18DC[];/*"The control panel operates the dream machine.\n"*/
-extern char far C_2BB4_190B[];/*"You need to use pliers to attach the cable.\n"*/
-extern char far C_2BB4_1938[];/*"You will chew it instinctively.\n"*/
-extern char far C_2BB4_1959[];/*"The ground is not clear for digging.\n"*/
-extern char far C_2BB4_197F[];/*"You must bury the %s in a hole.\n"*/
-extern char far C_2BB4_19A0[];/*"It is covered with dirt.\n"*/
-extern char far C_2BB4_19BA[];/*"They have been covered with dirt.\n"*/
-extern char far C_2BB4_1F4E[];/*"The plate in the camera has already been exposed.\n"*/
-extern char far C_2BB4_1F81[];/*"You must use a shovel to move that.\n"*/
-extern char far C_2BB4_1FD1[];/*"You can't determine how to read the time.\n"*/
-extern char far C_2BB4_1FFC[];/*"You nail the crate shut.\n"*/
-extern char far C_2BB4_20EA[];/*"You can't bury something using itself!\n"*/
-extern char far C_2BB4_2112[];/*"The cable does not need replacement.\n"*/
-extern char far C_2BB4_2244[];/*"The berries are not edible.\n"*/
-extern char far C_2BB4_22D3[];/*"You don't know how it works.\n"*/
-extern char far C_2BB4_22F1[];/*"Aargh!\n"*/
+extern char far PressAnyKeyMsg[];/*"\nPress any key..."*/
+extern char far NoSleepInDreamMsg[];/*"You can't sleep in a dream.\n"*/
+extern char far CantReadMsg[];/*"You can't read it.\n"*/
+extern char far TooMuchMsg[];/*"You are carrying too much already.\n"*/
+extern char far FullyChargedMsg[];/*"The %s is fully charged.\n"*/
+extern char far NoEffectMsg[];/*"It has no effect.\n"*/
+extern char far NotInSoloMsg[];/*"Not while in solo mode!\n"*/
+extern char far NotPossibleMsg[];/*"That is not possible.\n"*/
+extern char far AffidavitMsg[];/*"--Affidavit--\n\n"*/
+extern char far AffidavitText1Msg[];/*"The undersigned do hereby vouch for the "*/
+extern char far AffidavitText2Msg[];/*"trust-\nworthiness of $P, who bears "*/
+extern char far AffidavitText3Msg[];/*"this chit, commending same to the members "*/
+extern char far AffidavitText4Msg[];/*"of the Olympus Mons outpost."*/
+extern char far SignedMsg[];/*"\n\n*Signed:\n"*/
+extern char far ShermanMsg[];/*" Richard Sherman\n"*/
+extern char far DupreyMsg[];/*" Capt. Gregory Duprey\n"*/
+extern char far YellinMsg[];/*" Doctor David Yellin\n"*/
+extern char far DrillPowerMsg[];/*"The drill's power is connected.\n"*/
+extern char far SwitchUnfixableMsg[];/*"This switch cannot be fixed.\n"*/
+extern char far SwitchFastenedMsg[];/*"The switch is fastened.\n"*/
+extern char far SwitchLooseMsg[];/*"The switch is loose.\n"*/
+extern char far RepairFirstMsg[];/*"It must be repaired first.\n"*/
+extern char far PanelFastenedMsg[];/*"The panel is fastened.\n"*/
+extern char far PanelLooseMsg[];/*"The panel is loose.\n"*/
+extern char far PanelsOnCabinetsMsg[];/*"Panels are only installed onto cabinets.\n"*/
+extern char far WrongPanelMsg[];/*"This cabinet requires a different type of panel.\n"*/
+extern char far NothingToUnloadMsg[];/*"There is nothing to unload.\n"*/
+extern char far NoMoreRoomMsg[];/*"There is no more room.\n"*/
+extern char far IntoWheelbarrowMsg[];/*"You put the %s into the wheelbarrow.\n"*/
+extern char far CantMixLoadMsg[];/*"You can't mix different things in the same load!\n"*/
+extern char far IntoRailCarMsg[];/*"You put the %s into the rail car.\n"*/
+extern char far CantBuryHereMsg[];/*"You can't bury anything here.\n"*/
+extern char far PlantedSeedMsg[];/*"You planted the Martian seed.\n"*/
+extern char far FilledHoleMsg[];/*"You filled in the hole.\n"*/
+extern char far CantDigHereMsg[];/*"You can't dig here.\n"*/
+extern char far UprootedPodMsg[];/*"You uprooted the pod plant.\n"*/
+extern char far MartianFallsOutMsg[];/*"An unconscious Martian falls out of the pod.\n"*/
+extern char far PriedNailsMsg[];/*"You pried the nails out of the crate.\n"*/
+extern char far NotFullyGrownMsg[];/*"It is not fully grown.\n"*/
+extern char far NewSettingMsg[];/*"  New setting (R%/S%/C)?\n"*/
+extern char far WhichRailMsg[];/*"Which section of rail needs fixing -\n"*/
+extern char far RadiumAlreadyMsg[];/*"Radium has already been installed.\n"*/
+extern char far VeryHotMsg[];/*"OUCH. It is very hot.\n"*/
+extern char far RadiumBlocksMsg[];/*"The %s only needed %d radium blocks.\n"*/
+extern char far RadiumInstalledMsg[];/*"The radium has been installed.\n"*/
+extern char far DontBuryPeopleMsg[];/*"`Don't bury people on Mars!\n"*/
+extern char far TooPreciseMsg[];/*"The work is too precise to perform telekinetically.\n"*/
+extern char far NoMoreDirtMsg[];/*"You can't pile any more dirt there.\n"*/
+extern char far GroundNotFlatMsg[];/*"The ground is not flat enough.\n"*/
+extern char far InTheWayMsg[];/*"The %s is in the way.\n"*/
+extern char far DrillOnCartMsg[];/*"The drill must be installed onto a drill cart.\n"*/
+extern char far NotStrongEnoughMsg[];/*"%s is not strong enough.\n"*/
+extern char far HasHeartstoneAlreadyMsg[];/*"The robot already has a heartstone.\n"*/
+extern char far HeartstoneInstalledMsg[];/*"The heartstone is installed.\n"*/
+extern char far PodAlreadyOpenMsg[];/*"The pod is already open.\n"*/
+extern char far CantDigDeeperMsg[];/*"You can't dig any deeper.\n"*/
+extern char far StuckMsg[];/*"It is stuck.\n"*/
+extern char far PanelOperatesDreamMachineMsg[];/*"The control panel operates the dream machine.\n"*/
+extern char far NeedPliersMsg[];/*"You need to use pliers to attach the cable.\n"*/
+extern char far ChewInstinctivelyMsg[];/*"You will chew it instinctively.\n"*/
+extern char far GroundNotClearMsg[];/*"The ground is not clear for digging.\n"*/
+extern char far BuryInHoleMsg[];/*"You must bury the %s in a hole.\n"*/
+extern char far CoveredWithDirtMsg[];/*"It is covered with dirt.\n"*/
+extern char far TheyCoveredWithDirtMsg[];/*"They have been covered with dirt.\n"*/
+extern char far PlateExposedMsg[];/*"The plate in the camera has already been exposed.\n"*/
+extern char far NeedShovelMsg[];/*"You must use a shovel to move that.\n"*/
+extern char far CantReadTimeMsg[];/*"You can't determine how to read the time.\n"*/
+extern char far NailCrateMsg[];/*"You nail the crate shut.\n"*/
+extern char far CantBuryWithItselfMsg[];/*"You can't bury something using itself!\n"*/
+extern char far CableFineMsg[];/*"The cable does not need replacement.\n"*/
+extern char far BerriesNotEdibleMsg[];/*"The berries are not edible.\n"*/
+extern char far DontKnowHowMsg[];/*"You don't know how it works.\n"*/
+extern char far AarghMsg[];/*"Aargh!\n"*/
 extern signed char DirIncrX[8], DirIncrY[8];
 extern int16 ScreenFade;
-extern unsigned char D_0F12;/*StatusDirty*/
-extern int16 D_0F18;/*MapAnimEnabled*/
+extern unsigned char StatusDirty;
+extern int16 MapAnimEnabled;
 extern unsigned char Active;
 extern int16 MapX, MapY, MapZ;
 extern char SoloMember;
@@ -170,41 +170,31 @@ extern int16 StatusDisplay;
 extern int16 PromptCh;
 extern struct tClipInfo *CurClip;
 extern unsigned char ObjStatus[];
-extern char far *D_3E80;/*work area of the .lzc loader*/
+extern char far *LzcWorkBuf;/*work area of the .lzc loader*/
 extern unsigned char Party[];
 extern unsigned char far *Level;
-extern char D_50CE[][14];/*Names*/
+extern char Names[][14];
 extern int16 Amount[];/*quantity (low byte), quality (high byte)*/
 extern unsigned char NPCStatus[];
-extern int16 far *D_6EBE;/*BaseTile*/
-extern char far *D_6EC2;/*TalkBuf*/
-extern unsigned char D_6EC6[];/*TalkFlags*/
-extern unsigned char far *D_760A;/*TileFlag2*/
+extern int16 far *BaseTile;
+extern char far *TalkBuf;
+extern unsigned char TalkFlags[];
+extern unsigned char far *TileFlag2;
 extern struct coord ObjPos[];
 extern unsigned char PartySize;
 extern uint16 ObjShapeType[];
-extern unsigned char far *D_B4C4;/*TerrainType*/
+extern unsigned char far *TerrainType;
 extern int16 Link[];
-extern int16 D_EB18;/*InvenOwner*/
-extern int16 D_EBCE;/*Selection.obj*/
-extern struct tClipInfo D_EBD0[4];/*TextWindows*/
-extern int16 D_EBF6, D_EBF8;/*Selection.x, Selection.y*/
+extern int16 InvenOwner;
+extern int16 SelectionObj;
+extern struct tClipInfo TextWindows[4];
+extern int16 SelectionX, SelectionY;
 extern char *D_EC2C;/*the name "$P" stands for*/
-extern int16 D_EC42;/*LinesBeforeMore*/
+extern int16 LinesBeforeMore;
 extern int16 TargetDist;/*distance of the last target (use.c)*/
 extern int16 D_F0CA;/*set when a dirt action failed (the load is not used up)*/
 
-#define MapAnimEnabled D_0F18
-#define Names D_50CE
-#define BaseTile D_6EBE
-#define TalkBuf D_6EC2
-#define TalkFlags D_6EC6
-#define TileFlag2 D_760A
-#define TerrainType D_B4C4
-#define Selection D_EBCE
-#define TextWindows D_EBD0
 #define PlayerNamePtr D_EC2C
-#define LinesBeforeMore D_EC42
 
 #define GetType(i) (ObjShapeType[i] & 0x3ff)
 #define GetFrame(i) (ObjShapeType[i] >> 10)
@@ -228,12 +218,12 @@ extern int16 D_F0CA;/*set when a dirt action failed (the load is not used up)*/
 
 	found = 0;
 	if(SoloMember != -1) {
-		CON_printf(C_2BB4_0315);
+		CON_printf(NotInSoloMsg);
 		MUS_PlaySfx(5);
 		return;
 	}
 	if(Active == PartySize) {
-		CON_printf(C_2BB4_01E0);
+		CON_printf(NoSleepInDreamMsg);
 		MUS_PlaySfx(5);
 		return;
 	}
@@ -269,9 +259,9 @@ extern int16 D_F0CA;/*set when a dirt action failed (the load is not used up)*/
 	}
 	if(found) {
 		if(o == -1)
-			CON_printf(C_2BB4_17D5);
+			CON_printf(GroundNotFlatMsg);
 		else
-			CON_printf(C_2BB4_17F5, GetObjectString(o));
+			CON_printf(InTheWayMsg, GetObjectString(o));
 		MUS_PlaySfx(5);
 	} else
 		REST_Command(x, y);
@@ -298,27 +288,27 @@ extern int16 D_F0CA;/*set when a dirt action failed (the load is not used up)*/
 	if((book = GetQual(obj)) == 0) {
 		PlayerNamePtr = Names[0];
 		MapAnimEnabled = 0;
-		CON_printf(C_2BB4_05AA);
-		CON_printf(C_2BB4_05BA);
-		CON_printf(C_2BB4_05E3);
-		CON_printf(C_2BB4_0607);
-		CON_printf(C_2BB4_0632);
-		CON_printf(C_2BB4_064F);
+		CON_printf(AffidavitMsg);
+		CON_printf(AffidavitText1Msg);
+		CON_printf(AffidavitText2Msg);
+		CON_printf(AffidavitText3Msg);
+		CON_printf(AffidavitText4Msg);
+		CON_printf(SignedMsg);
 		if(TalkFlags[5] & 8)
-			CON_printf(C_2BB4_065B);
+			CON_printf(ShermanMsg);
 		else
 			CON_printf("\n");
 		if(TalkFlags[0x19] & 8)
-			CON_printf(C_2BB4_066D);
+			CON_printf(DupreyMsg);
 		else
 			CON_printf("\n");
 		if(TalkFlags[0x1a] & 8)
-			CON_printf(C_2BB4_0684);
+			CON_printf(YellinMsg);
 		else
 			CON_printf("\n");
 		CON_printf("\n*");
 		MapAnimEnabled = 1;
-	} else if(LZC_loadType(D_28F0, book - 1, TalkBuf, 0, D_3E80) != 0) {
+	} else if(LZC_loadType(D_28F0, book - 1, TalkBuf, 0, LzcWorkBuf) != 0) {
 		done = 0;
 		pos = 0;
 		while(!done) {
@@ -339,8 +329,8 @@ extern int16 D_F0CA;/*set when a dirt action failed (the load is not used up)*/
 			} while(!done);
 		}
 	} else
-		CON_printf(C_2BB4_023A);
-	CON_printf(C_2BB4_01CE);
+		CON_printf(CantReadMsg);
+	CON_printf(PressAnyKeyMsg);
 	SelectMode = 0;
 	PromptCh = 1;
 	MapAnimEnabled = 0;
@@ -398,12 +388,12 @@ extern int16 D_F0CA;/*set when a dirt action failed (the load is not used up)*/
  */
 /*C_2F8D_0476*/C_2F8D_0476(register int16 obj, int16 on, int16 to) {
 	if((ObjStatus[obj] & 0x18) == 0 && InsertObj(obj, Party[Active], 0x10) == -1) {
-		CON_printf(C_2BB4_024E);
+		CON_printf(TooMuchMsg);
 		MUS_PlaySfx(5);
 		return;
 	}
 	if((ObjStatus[obj] & 0x18) != 0x18) {
-		Selection = obj;
+		SelectionObj = obj;
 		STAT_Ready();
 	}
 	if(StatusDisplay == 0x92)
@@ -423,18 +413,18 @@ extern int16 D_F0CA;/*set when a dirt action failed (the load is not used up)*/
 		y = (GetY(sw) - 1) & 0x3ff;
 		o = -1;
 		if((o = OBJ_FindTypeAt(0x19d, x, y)) == -1) {
-			CON_printf(C_2BB4_094D);
+			CON_printf(SwitchUnfixableMsg);
 			MUS_PlaySfx(5);
 		} else {
 			ObjShapeType[sw] = GetType(sw) + (GetFrame(o) << 10);
 			SetQual(sw, 0);
 			MUS_PlaySfx(0x1f);
-			CON_printf(C_2BB4_096B);
+			CON_printf(SwitchFastenedMsg);
 		}
 	} else {
 		SetQual(sw, 1);
 		MUS_PlaySfx(0x1f);
-		CON_printf(C_2BB4_0984);
+		CON_printf(SwitchLooseMsg);
 	}
 	if(StatusDisplay == 0x92)
 		STAT_DrawInventory();
@@ -448,16 +438,16 @@ extern int16 D_F0CA;/*set when a dirt action failed (the load is not used up)*/
 	register int16 n;
 
 	if((cart = OBJ_FindTypeAt(0x1b7, GetX(drill), GetY(drill))) == -1)
-		CON_printf(C_2BB4_180C);
+		CON_printf(DrillOnCartMsg);
 	else if((n = AddMapObj(0x1b9, 0, 1, GetX(drill), GetY(drill), MapZ)) == -1)
-		CON_printf(C_2BB4_22F1);
+		CON_printf(AarghMsg);
 	else {
 		ObjStatus[n] &= 0xdf;
 		ObjShapeType[n] = GetType(n) + 0x400;
 		DeleteObj(drill);
 		DeleteObj(cart);
 		MUS_PlaySfx(0x1f);
-		CON_printf(C_2BB4_083A);
+		CON_printf(DrillPowerMsg);
 	}
 }
 
@@ -470,40 +460,40 @@ extern int16 D_F0CA;/*set when a dirt action failed (the load is not used up)*/
 	register int16 n;
 
 	if(ObjStatus[panel] & 0x18) {
-		CON_printf(C_2BB4_02A4);
+		CON_printf(NoEffectMsg);
 		return;
 	}
 	q = GetQual(panel);
 	n = GetQuan(panel);
 	if(q != 0) {
 		if(q & 2) {
-			CON_printf(C_2BB4_099A);
+			CON_printf(RepairFirstMsg);
 			MUS_PlaySfx(5);
 		} else if((cab = OBJ_FindTypeAt(0x1c9, GetX(panel), GetY(panel))) == -1) {
-			CON_printf(C_2BB4_0A16);
+			CON_printf(PanelsOnCabinetsMsg);
 			MUS_PlaySfx(5);
 		} else {
 			if((q = GetQual(cab)) == 0) {
 				if(n != 0) {
-					CON_printf(C_2BB4_0A40);
+					CON_printf(WrongPanelMsg);
 					MUS_PlaySfx(5);
 					return;
 				}
 			} else if(q <= 3 && n == 0) {
 				if(GetFrame(panel) != q - 1) {
-					CON_printf(C_2BB4_0A40);
+					CON_printf(WrongPanelMsg);
 					MUS_PlaySfx(5);
 					return;
 				}
 			} else if(q != n) {
-				CON_printf(C_2BB4_0A40);
+				CON_printf(WrongPanelMsg);
 				MUS_PlaySfx(5);
 				return;
 			}
 			q = GetQual(panel);
 			SetQual(panel, q - 1);
 			MUS_PlaySfx(0x1f);
-			CON_printf(C_2BB4_09B6);
+			CON_printf(PanelFastenedMsg);
 			if(q == 4) {
 				TalkFlags[0x74] |= 8;
 				if(TalkFlags[0x74] & 1)
@@ -513,7 +503,7 @@ extern int16 D_F0CA;/*set when a dirt action failed (the load is not used up)*/
 	} else {
 		SetQual(panel, q | 1);
 		MUS_PlaySfx(0x1f);
-		CON_printf(C_2BB4_09CE);
+		CON_printf(PanelLooseMsg);
 	}
 	if(StatusDisplay == 0x92)
 		STAT_DrawInventory();
@@ -524,7 +514,7 @@ extern int16 D_F0CA;/*set when a dirt action failed (the load is not used up)*/
  */
 /*C_2F8D_0849*/C_2F8D_0849(int16 obj, int16 on, int16 to) {
 	MUS_PlaySfx(0x20);
-	CON_printf(C_2BB4_0D06);
+	CON_printf(WhichRailMsg);
 	DeleteObj(on);
 	ObjShapeType[to] = (ObjShapeType[to] & 0xfc00) + 0x19e;
 	if(StatusDisplay == 0x92)
@@ -540,11 +530,11 @@ extern int16 D_F0CA;/*set when a dirt action failed (the load is not used up)*/
 	register int16 npc, o;
 
 	if(TargetDist > 1) {
-		CON_printf(C_2BB4_126E);
+		CON_printf(TooPreciseMsg);
 		return;
 	}
 	if(!(TalkFlags[0x73] & 4) || (TalkFlags[0x71] & 8)) {
-		CON_printf(C_2BB4_2112);
+		CON_printf(CableFineMsg);
 		return;
 	}
 	if((npc = Party[Active]) != 1) {
@@ -584,13 +574,13 @@ extern int16 D_F0CA;/*set when a dirt action failed (the load is not used up)*/
 	if(GetFrame(crate) == 2) {
 		ObjShapeType[crate] = GetType(crate) + 0x400;
 		MUS_PlaySfx(0x1f);
-		CON_printf(C_2BB4_0BD9);
+		CON_printf(PriedNailsMsg);
 	} else if(GetFrame(crate) == 1 && GetType(obj) == 0x111) {
 		ObjShapeType[crate] = GetType(crate) + 0x800;
 		MUS_PlaySfx(0x20);
-		CON_printf(C_2BB4_1FFC);
+		CON_printf(NailCrateMsg);
 	} else
-		CON_printf(C_2BB4_02A4);
+		CON_printf(NoEffectMsg);
 }
 
 /*
@@ -600,7 +590,7 @@ extern int16 D_F0CA;/*set when a dirt action failed (the load is not used up)*/
 	register int16 npc;
 
 	if((npc = Party[Active]) != 1) {
-		CON_printf(C_2BB4_183C, GetObjectString(npc));
+		CON_printf(NotStrongEnoughMsg, GetObjectString(npc));
 		return;
 	}
 	if(!(TalkFlags[0x10] & 0x10)) {
@@ -623,12 +613,12 @@ extern int16 D_F0CA;/*set when a dirt action failed (the load is not used up)*/
  */
 /*C_2F8D_0B57*/C_2F8D_0B57(int16 obj, int16 robot, int16 to) {
 	if(GetQual(robot) & 1)
-		CON_printf(C_2BB4_1856);
+		CON_printf(HasHeartstoneAlreadyMsg);
 	else {
 		SetQual(robot, 1);
 		MUS_PlaySfx(0x1f);
 		DeleteObj(obj);
-		CON_printf(C_2BB4_187B);
+		CON_printf(HeartstoneInstalledMsg);
 	}
 }
 
@@ -652,7 +642,7 @@ extern int16 D_F0CA;/*set when a dirt action failed (the load is not used up)*/
 			DreamWakeUp();
 		} else {
 			o = AddMapObj(0x123, 0, 1, GetX(pod), GetY(pod), MapZ);
-			CON_printf(C_2BB4_0BAB);
+			CON_printf(MartianFallsOutMsg);
 			ObjStatus[o] &= 0xdf;
 			ObjStatus[pod] |= 0x20;
 			TalkFlags[0x61] |= 8;
@@ -661,9 +651,9 @@ extern int16 D_F0CA;/*set when a dirt action failed (the load is not used up)*/
 		MapAnimEnabled = 1;
 		DisplayTick();
 	} else if(GetFrame(pod) < 3)
-		CON_printf(C_2BB4_0C00);
+		CON_printf(NotFullyGrownMsg);
 	else
-		CON_printf(C_2BB4_1899);
+		CON_printf(PodAlreadyOpenMsg);
 }
 
 /*
@@ -680,7 +670,7 @@ extern int16 D_F0CA;/*set when a dirt action failed (the load is not used up)*/
 		else
 			n = AddInvObj(0x83, ObjStatus[o] & 0x18, OSI_rand(1, 0x32) + OSI_rand(1, 0x32), *(int16 *)&ObjPos[o]);
 	} else
-		CON_printf(C_2BB4_02A4);
+		CON_printf(NoEffectMsg);
 }
 
 /*
@@ -689,37 +679,37 @@ extern int16 D_F0CA;/*set when a dirt action failed (the load is not used up)*/
 /*C_2F8D_0DFE*/C_2F8D_0DFE(int16 obj, int16 on, int16 to) {
 	switch(GetType(obj)) {
 	case 0x41: case 0x42: case 0x43: case 0x107: case 0x10b: case 0x147:
-		CON_printf(C_2BB4_18B3);
+		CON_printf(CantDigDeeperMsg);
 		break;
 	case 0x1ab:
-		CON_printf(C_2BB4_18CE);
+		CON_printf(StuckMsg);
 		break;
 	case 0x120:
-		CON_printf(C_2BB4_18DC);
+		CON_printf(PanelOperatesDreamMachineMsg);
 		break;
 	case 0xc7:
-		CON_printf(C_2BB4_190B);
+		CON_printf(NeedPliersMsg);
 		break;
 	case 0x83:
-		CON_printf(C_2BB4_1938);
+		CON_printf(ChewInstinctivelyMsg);
 		break;
 	case 0xb8:
-		CON_printf(C_2BB4_1F4E);
+		CON_printf(PlateExposedMsg);
 		break;
 	case 0x1ba: case 0x1bb: case 0x1bc:
-		CON_printf(C_2BB4_1F81);
+		CON_printf(NeedShovelMsg);
 		break;
 	case 0x125:
-		CON_printf(C_2BB4_1FD1);
+		CON_printf(CantReadTimeMsg);
 		break;
 	case 0x4d: case 0x4e:
-		CON_printf(C_2BB4_2244);
+		CON_printf(BerriesNotEdibleMsg);
 		break;
 	case 0x143:
-		CON_printf(C_2BB4_22D3);
+		CON_printf(DontKnowHowMsg);
 		break;
 	default:
-		CON_printf(C_2BB4_02A4);
+		CON_printf(NoEffectMsg);
 		break;
 	}
 }
@@ -752,13 +742,13 @@ extern int16 D_F0CA;/*set when a dirt action failed (the load is not used up)*/
 			break;
 	}
 	if(d == 8 || (hole = AddMapObj(0x102, 0, 1, (GetX(npc) + DirIncrX[d]) & 0x3ff, (GetY(npc) + DirIncrY[d]) & 0x3ff, MapZ)) == -1) {
-		CON_printf(C_2BB4_0B79);
+		CON_printf(CantDigHereMsg);
 		return;
 	}
 	ObjStatus[hole] &= 0xdf;
 	pile = -1;
 	if((pile = OBJ_FindTypeAt(0x101, GetX(plant), GetY(plant))) == -1) {
-		CON_printf(C_2BB4_02A4);
+		CON_printf(NoEffectMsg);
 		return;
 	}
 	if((o = FindInv(pile)) != -1 && GetType(o) == 0xfc) {
@@ -769,7 +759,7 @@ extern int16 D_F0CA;/*set when a dirt action failed (the load is not used up)*/
 	while((o = NextInv()) != -1)
 		DeleteObj(o);
 	if(GetFrame(plant) > 0)
-		CON_printf(C_2BB4_0B8E);
+		CON_printf(UprootedPodMsg);
 	MUS_PlaySfx(0x1b);
 	DeleteObj(plant);
 }
@@ -782,18 +772,18 @@ extern int16 D_F0CA;/*set when a dirt action failed (the load is not used up)*/
 	register int16 d, hole;
 
 	if(on != -1 && !(TileFlag2[BaseTile[GetType(on)] + GetFrame(on)] & 0x10)) {
-		CON_printf(C_2BB4_1959);
+		CON_printf(GroundNotClearMsg);
 		return;
 	}
 	npc = Party[Active];
-	if((cls = GetDigClass(GetTileAtXYZ(D_EBF6, D_EBF8, MapZ))) != 0) {
+	if((cls = GetDigClass(GetTileAtXYZ(SelectionX, SelectionY, MapZ))) != 0) {
 		if(cls == 0x102)
 			shape = 0x101;
 		else if(cls == 0x100)
 			shape = 0xff;
 		else
 			shape = 0x102;
-		if((hole = AddMapObj(shape, 0, 1, D_EBF6, D_EBF8, MapZ)) >= 0)
+		if((hole = AddMapObj(shape, 0, 1, SelectionX, SelectionY, MapZ)) >= 0)
 			ObjStatus[hole] &= 0xdf;
 		pile = -1;
 		for(d = 0; d < 8; d++) {
@@ -803,7 +793,7 @@ extern int16 D_F0CA;/*set when a dirt action failed (the load is not used up)*/
 				break;
 		}
 		if(d == 8 || (pile = AddMapObj(cls, 0, 1, (GetX(npc) + DirIncrX[d]) & 0x3ff, (GetY(npc) + DirIncrY[d]) & 0x3ff, MapZ)) == -1) {
-			CON_printf(C_2BB4_0B79);
+			CON_printf(CantDigHereMsg);
 			DeleteObj(hole);
 			hole = -1;
 		} else {
@@ -811,7 +801,7 @@ extern int16 D_F0CA;/*set when a dirt action failed (the load is not used up)*/
 			ObjStatus[pile] &= 0xdf;
 		}
 	} else
-		CON_printf(C_2BB4_02A4);
+		CON_printf(NoEffectMsg);
 }
 
 /*
@@ -826,23 +816,23 @@ extern int16 D_F0CA;/*set when a dirt action failed (the load is not used up)*/
 	D_F0CA = 0;
 	if(ct == 0x10c) {
 		if(GetQuan(cart) == 1) {
-			CON_printf(C_2BB4_0A8F);
+			CON_printf(NoMoreRoomMsg);
 			MUS_PlaySfx(5);
 			D_F0CA = 1;
 		} else {
 			MUS_PlaySfx(0x1b);
 			SetQuan(cart, 1);
 			SetQual(cart, C_2F8D_03FC(t));
-			CON_printf(C_2BB4_0AA7, GetObjectString(on));
+			CON_printf(IntoWheelbarrowMsg, GetObjectString(on));
 			DeleteObj(on);
 		}
 	} else if(ct == 0x19a) {
 		if((n = GetQuan(cart)) == 7) {
-			CON_printf(C_2BB4_0A8F);
+			CON_printf(NoMoreRoomMsg);
 			MUS_PlaySfx(5);
 			D_F0CA = 1;
 		} else if(n != 0 && C_2F8D_03FC(t) != GetQual(cart)) {
-			CON_printf(C_2BB4_0ACD);
+			CON_printf(CantMixLoadMsg);
 			MUS_PlaySfx(5);
 			D_F0CA = 1;
 		} else {
@@ -854,7 +844,7 @@ extern int16 D_F0CA;/*set when a dirt action failed (the load is not used up)*/
 				ObjShapeType[cart] = GetType(cart) + (((GetFrame(cart) & 1) + 2) << 10);
 			SetQuan(cart, n);
 			MUS_PlaySfx(0x1b);
-			CON_printf(C_2BB4_0AFF, GetObjectString(on));
+			CON_printf(IntoRailCarMsg, GetObjectString(on));
 			DeleteObj(on);
 		}
 	}
@@ -877,7 +867,7 @@ extern int16 D_F0CA;/*set when a dirt action failed (the load is not used up)*/
 	DeleteObj(pile);
 	MUS_PlaySfx(0x1b);
 	MUS_PlaySfx(0x1b);
-	CON_printf(C_2BB4_0B60);
+	CON_printf(FilledHoleMsg);
 }
 
 /*
@@ -887,13 +877,13 @@ extern int16 D_F0CA;/*set when a dirt action failed (the load is not used up)*/
 	int16 x, y, tx;
 	register int16 ty;
 
-	tx = D_EBF6;
-	ty = D_EBF8;
+	tx = SelectionX;
+	ty = SelectionY;
 	x = GetX(dirt);
 	y = GetY(dirt);
 	D_F0CA = 0;
 	if(TerrainType[GetTileAtXYZ(tx, ty, MapZ)] & 2) {
-		CON_printf(C_2BB4_034D);
+		CON_printf(NotPossibleMsg);
 		MUS_PlaySfx(5);
 		D_F0CA = -1;
 	} else if(OBJ_MapObjAt(tx, ty) != -1) {
@@ -927,13 +917,13 @@ extern int16 D_F0CA;/*set when a dirt action failed (the load is not used up)*/
 	}
 	if(target < 0x100 && target >= 0) {
 		MUS_PlaySfx(5);
-		CON_printf(C_2BB4_11D7);
+		CON_printf(DontBuryPeopleMsg);
 		D_F0CA = 1;
 		return;
 	}
 	if(obj == target) {
 		MUS_PlaySfx(5);
-		CON_printf(C_2BB4_20EA);
+		CON_printf(CantBuryWithItselfMsg);
 		D_F0CA = 1;
 		return;
 	}
@@ -943,12 +933,12 @@ extern int16 D_F0CA;/*set when a dirt action failed (the load is not used up)*/
 		o = OBJ_FindTypeAt(0xfb, tx, ty);
 	if(o != -1) {
 		MUS_PlaySfx(5);
-		CON_printf(C_2BB4_12A3);
+		CON_printf(NoMoreDirtMsg);
 		D_F0CA = 1;
 		return;
 	}
 	if((hole = OBJ_FindTypeAt(0x101, tx, ty)) == -1) {
-		CON_printf(C_2BB4_197F, GetObjectString(target));
+		CON_printf(BuryInHoleMsg, GetObjectString(target));
 		D_F0CA = 1;
 		return;
 	}
@@ -958,13 +948,13 @@ extern int16 D_F0CA;/*set when a dirt action failed (the load is not used up)*/
 	for(o = FindLoc(tx, ty, MapZ); o != -1 && GetType(o) != 0x101; o = NextLoc()) {
 		count++;
 		if(o < 0x100 && o >= 0) {
-			CON_printf(C_2BB4_11D7);
+			CON_printf(DontBuryPeopleMsg);
 			fail = 1;
 			break;
 		}
 		if((t = GetType(o)) == 0xfc) {
 			if(seed != -1) {
-				CON_printf(C_2BB4_0B22);
+				CON_printf(CantBuryHereMsg);
 				fail = 1;
 				break;
 			}
@@ -979,7 +969,7 @@ extern int16 D_F0CA;/*set when a dirt action failed (the load is not used up)*/
 	}
 	for(o = FindLoc(tx, ty, MapZ); o != -1 && GetType(o) != 0x101; o = NextLoc()) {
 		if(!(TileFlag2[BaseTile[GetType(o)] + GetFrame(o)] & 0x10) && InsertObj(o, hole, 8) == -1) {
-			CON_printf(C_2BB4_22F1);
+			CON_printf(AarghMsg);
 			SearchObj(hole);
 			D_F0CA = 1;
 			return;
@@ -992,11 +982,11 @@ extern int16 D_F0CA;/*set when a dirt action failed (the load is not used up)*/
 	MUS_PlaySfx(0x1b);
 	if(shape == 0xfb) {
 		ObjShapeType[dirt] = (ObjShapeType[dirt] & 0xfc00) + 0xfb;
-		CON_printf(C_2BB4_0B41);
+		CON_printf(PlantedSeedMsg);
 	} else if(count == 1)
-		CON_printf(C_2BB4_19A0);
+		CON_printf(CoveredWithDirtMsg);
 	else
-		CON_printf(C_2BB4_19BA);
+		CON_printf(TheyCoveredWithDirtMsg);
 	C_2F8D_0EDB(x, y);
 }
 
@@ -1011,7 +1001,7 @@ extern int16 D_F0CA;/*set when a dirt action failed (the load is not used up)*/
 	MUS_PlaySfx(0x1b);
 	DeleteObj(dirt);
 	if(t != 0x1bc)
-		CON_printf(C_2BB4_02A4);
+		CON_printf(NoEffectMsg);
 	else if(f < 4)
 		BeltStart();
 }
@@ -1025,13 +1015,13 @@ extern int16 D_F0CA;/*set when a dirt action failed (the load is not used up)*/
 
 	D_F0CA = 0;
 	if(GetQuan(cart) == 0) {
-		CON_printf(C_2BB4_0A72);
+		CON_printf(NothingToUnloadMsg);
 		MUS_PlaySfx(5);
 		return;
 	}
 	shape = C_2F8D_043F(GetQual(cart));
 	if((dirt = AddMapObj(shape, 0, 1, GetX(cart), GetY(cart), MapZ)) == -1) {
-		CON_printf(C_2BB4_22F1);
+		CON_printf(AarghMsg);
 		MUS_PlaySfx(5);
 		return;
 	}
@@ -1078,7 +1068,7 @@ extern int16 D_F0CA;/*set when a dirt action failed (the load is not used up)*/
 	CON_printf("It is set to \"%s\".", (q = GetQual(gun)) != 0 ? (q > 1 ? "Shotgun" : "Rifle") : "Combination");
 	if(GetType(gun) != 0x2d)
 		CON_printf("  It has %d charges left.", GetQuan(gun));
-	CON_printf(C_2BB4_0C45);
+	CON_printf(NewSettingMsg);
 	do
 		ch = toupper(CON_prompt());
 	while(ch != 'S' && ch != 'R' && ch != 'C' && ch != '\n' && ch != '\r');
@@ -1108,18 +1098,18 @@ extern int16 D_F0CA;/*set when a dirt action failed (the load is not used up)*/
 	npc = Party[Active];
 	ot = GetType(on);
 	if(ObjStatus[rad] & 0x18)
-		D_0F12 = 1;
+		StatusDirty = 1;
 	if(on == rad && ot == 0x1c0) {
 		if((ObjStatus[on] & 0x18) == 0) {
 			owner = Link[on];
 			if((ObjStatus[owner] & 0x18) || GetX(owner) != GetX(on) || GetY(owner) != GetY(on) || GetZ(owner) != MapZ) {
-				CON_printf(C_2BB4_02A4);
+				CON_printf(NoEffectMsg);
 				return;
 			}
 			on = owner;
 			ot = GetType(on);
 		} else {
-			CON_printf(C_2BB4_02A4);
+			CON_printf(NoEffectMsg);
 			return;
 		}
 	}
@@ -1128,49 +1118,49 @@ extern int16 D_F0CA;/*set when a dirt action failed (the load is not used up)*/
 	if(!(Talents[Party[Active]].a ? Level[Party[Active]] : 0) && glove == -1 && npc != 6) {
 		COMBAT_showHit(Party[Active]);
 		NPCStatus[Party[Active]] |= 8;
-		CON_printf(C_2BB4_0D50);
+		CON_printf(VeryHotMsg);
 	}
 	CON_printf("\n");
 	if(GetType(rad) == 0x1c0) {
 		if(ot == 0x122) {
 			if(installed == 1)
-				CON_printf(C_2BB4_0D2C);
+				CON_printf(RadiumAlreadyMsg);
 			else {
 				DeleteObj(rad);
 				MUS_PlaySfx(4);
-				CON_printf(C_2BB4_0DB5);
+				CON_printf(RadiumInstalledMsg);
 				ObjShapeType[on] = GetType(on) + 0x400;
 				TalkFlags[0x74] |= 4;
 				if(TalkFlags[0x74] & 1)
 					TalkFlags[0x60] |= 4;
 			}
 		} else
-			CON_printf(C_2BB4_02A4);
+			CON_printf(NoEffectMsg);
 	} else if(GetType(rad) == 0x1c1) {
 		if((charge = GetQuan(on)) > 0xd2)
-			CON_printf(C_2BB4_027B, GetObjectString(on));
+			CON_printf(FullyChargedMsg, GetObjectString(on));
 		else {
 			n = 0;
 			if((n = AskHowMany(rad)) == 0)
 				return;
 			if(charge + n * 0x1e > 0xf0) {
 				n = (0xf0 - charge) / 0x1e;
-				CON_printf(C_2BB4_0D67, GetObjectString(on), n);
-				CON_printf(C_2BB4_027B, GetObjectString(on));
+				CON_printf(RadiumBlocksMsg, GetObjectString(on), n);
+				CON_printf(FullyChargedMsg, GetObjectString(on));
 			}
 			charge += n * 0x1e;
 			SetQuan(on, charge);
 			if((ObjStatus[rad] & 0x18) == 0)
 				MapAnimEnabled = 1;
-			else if(StatusDisplay == 0x92 && *(int16 *)&ObjPos[rad] == D_EB18)
-				D_0F12 = 1;
+			else if(StatusDisplay == 0x92 && *(int16 *)&ObjPos[rad] == InvenOwner)
+				StatusDirty = 1;
 			if(GetQuan(rad) == n)
 				DeleteObj(rad);
 			else
 				SetQuan(rad, GetQuan(rad) - n);
 		}
 	} else
-		CON_printf(C_2BB4_02A4);
+		CON_printf(NoEffectMsg);
 }
 
 /*
@@ -1180,7 +1170,7 @@ extern int16 D_F0CA;/*set when a dirt action failed (the load is not used up)*/
 	int16 n;
 
 	if(ObjStatus[rad] & 0x18)
-		D_0F12 = 1;
+		StatusDirty = 1;
 	if(man != 0x75) {
 		CON_printf("This mechanical man already has radium.\n");
 		return;

@@ -56,7 +56,7 @@ extern int16 OBJ_FindNPCAt(int16, int16, int16);/*OBJ_FindNPCAt(startNum, x, y)*
 extern int16 KBD_GetKey(int16);
 extern MUS_PlaySong(int16);
 extern MUS_PlayAreaSong();
-extern C_1FA9_0C15();
+extern MUS_PlayMelody();
 extern int16 MaxHP(int16);
 extern COMBAT_showHit(int16);
 extern int16 LoseHP(int16, int16, int16);
@@ -99,8 +99,8 @@ extern DrawSlotCursor(int16);
 extern far CON_UpdateMousePointer();
 
 extern signed char DirIncrX[8], DirIncrY[8];
-extern unsigned char D_0F12;/*StatusDirty*/
-extern int16 D_0F18;/*MapAnimEnabled*/
+extern unsigned char StatusDirty;
+extern int16 MapAnimEnabled;
 extern unsigned char Active;
 extern int16 MapX, MapY, MapZ;
 extern char SoloMember;
@@ -112,33 +112,30 @@ extern unsigned char far *NPCMode;
 extern unsigned char far *NPCComMode;
 extern int16 far *OrigShapeType;
 extern int16 ColorText;
-extern int16 D_0826;/*color of the player's input*/
+extern int16 ColorDarkBlue;/*color of the player's input*/
 extern unsigned char Time_M, Time_H;
 extern int16 MouseMode;
 extern unsigned char DirOriginX, DirOriginY;/*screen position of the party*/
 extern char *DirNames[];
-extern int16 D_EB72;/*AdvanceDir*/
+extern int16 AdvanceDir;
 extern unsigned char HitPoints[];
-extern int16 D_EBCE;/*Selection.obj*/
+extern int16 SelectionObj;
 extern struct { unsigned a:4, psychic:4, c:4, d:4; } Talents[];
 extern char SelectMode;
 extern char AimX, AimY;
-extern int16 D_EBF6, D_EBF8;/*Selection.x, Selection.y*/
+extern int16 SelectionX, SelectionY;
 extern unsigned char IsResting;
 extern struct tClipInfo *CurClip;
 extern unsigned char ObjStatus[];
 extern unsigned char Party[];
 extern int16 Amount[];/*quantity (low byte), quality (high byte)*/
 extern unsigned char NPCStatus[];
-extern int16 far *D_6EBE;/*BaseTile*/
-extern unsigned char D_6EC6[];/*TalkFlags*/
+extern int16 far *BaseTile;
+extern unsigned char TalkFlags[];
 extern struct coord ObjPos[];
 extern unsigned char PartySize;
 extern uint16 ObjShapeType[];
 
-#define MapAnimEnabled D_0F18
-#define BaseTile D_6EBE
-#define TalkFlags D_6EC6
 
 #define GetType(i) (ObjShapeType[i] & 0x3ff)
 #define GetFrame(i) (ObjShapeType[i] >> 10)
@@ -152,75 +149,75 @@ extern uint16 ObjShapeType[];
 #define GetAssoc(i) (*(int16 *)&(ObjPos[i]))
 
 /*messages (segment 2BB4)*/
-extern char far C_2BB4_0230[];/*"Blocked!\n"*/
-extern char far C_2BB4_024E[];/*"You are carrying too much already.\n"*/
-extern char far C_2BB4_02A4[];/*"It has no effect.\n"*/
-extern char far C_2BB4_032E[];/*"Not now.\n"*/
-extern char far C_2BB4_0364[];/*"Not while underground.\n"*/
-extern char far C_2BB4_03F8[];/*"nowhere.\n"*/
-extern char far C_2BB4_0402[];/*"nothing!\n"*/
-extern char far C_2BB4_04D3[];/*"\nFire!\n"*/
-extern char far C_2BB4_04DB[];/*"Splat! There is no effect.\n"*/
-extern char far C_2BB4_04F7[];/*"Kaboom! You blew the door down!\n"*/
-extern char far C_2BB4_0518[];/*"It already has steel cannon balls.\n"*/
-extern char far C_2BB4_053C[];/*"The cannon will fire steel cannon balls.\n"*/
-extern char far C_2BB4_0566[];/*"Press keys 1-0 to play -"*/
-extern char far C_2BB4_057F[];/*"Tocatta and Fugue in D minor (J.S. Bach).\n"*/
-extern char far C_2BB4_09E3[];/*"The panel is broken.\n"*/
-extern char far C_2BB4_09F9[];/*"The panel is not installed.\n"*/
-extern char far C_2BB4_0A16[];/*"Panels are only installed onto cabinets.\n"*/
-extern char far C_2BB4_0C5F[];/*"the lever seems stuck.\n"*/
-extern char far C_2BB4_0C77[];/*"Push lever to "*/
-extern char far C_2BB4_0C86[];/*"You are somewhere near \nLat:%d %c\nLong:%d %c\n"*/
-extern char far C_2BB4_0CB4[];/*"You need a cue stick in your hands.\n"*/
-extern char far C_2BB4_0CD9[];/*"Organ music must be played on a pipe organ.\n"*/
-extern char far C_2BB4_0DD5[];/*"The headgear is installed.\n"*/
-extern char far C_2BB4_0DF1[];/*"The machine does not work.\n"*/
-extern char far C_2BB4_0E0D[];/*"There is nobody sitting in the machine.\n"*/
-extern char far C_2BB4_0E36[];/*"The dream machines seem to have ceased functioning.\n"*/
-extern char far C_2BB4_0EB0[];/*"Nobody is standing under the sprayer.\n"*/
-extern char far C_2BB4_0ED7[];/*"You don't think it would be safe to coat an animal or plant with rubber.\n"*/
-extern char far C_2BB4_0F21[];/*"Chsheket has already been treated.\n"*/
-extern char far C_2BB4_0F45[];/*"There is no rubber in the sprayer system.\n"*/
-extern char far C_2BB4_0F70[];/*"The rubber in the sprayer system is not flesh-colored.\n"*/
-extern char far C_2BB4_0FC7[];/*"You killed the plant.\n"*/
-extern char far C_2BB4_0FDE[];/*"`%s becomes visible!\n"*/
-extern char far C_2BB4_0FF4[];/*"Ooops. These rollers can never be fixed!\n"*/
-extern char far C_2BB4_101E[];/*"You get two handfuls of oxium from the bin.\n"*/
-extern char far C_2BB4_107B[];/*"You imagine "*/
-extern char far C_2BB4_1088[];/*"You pull some of the dreamstuff from the hoard.\n"*/
-extern char far C_2BB4_10B9[];/*"You lack the mental power to affect the dreamstuff hoard.\n"*/
-extern char far C_2BB4_10F4[];/*"Some of the lenses are not responding.\n"*/
-extern char far C_2BB4_111C[];/*"There is no water pressure in the valve system.\n"*/
-extern char far C_2BB4_12C8[];/*"The canals are already working.\n"*/
-extern char far C_2BB4_12E9[];/*"The ruby lenses are already aligned.\n"*/
-extern char far C_2BB4_130F[];/*"Good shot, old bean!\n"*/
-extern char far C_2BB4_13A1[];/*"\n%s is healed.\n"*/
-extern char far C_2BB4_166B[];/*"You actuate the mechanism to no apparent effect.\n"*/
-extern char far C_2BB4_169D[];/*"Status lights change but you see no other effect.\n"*/
-extern char far C_2BB4_16D0[];/*"Lights flash and change color but nothing else happens.\n"*/
-extern char far C_2BB4_1709[];/*"You are completely unsure what you just did.\n"*/
-extern char far C_2BB4_19DD[];/*"Funny, no sprayer near sprayer controls!\n"*/
-extern char far C_2BB4_1A07[];/*"Alignment coordinate:\n"*/
-extern char far C_2BB4_1A1E[];/*"You wait until dawn...*\n"*/
-extern char far C_2BB4_1A37[];/*"No seed to harvest yet.\n"*/
-extern char far C_2BB4_1A50[];/*"Location: "*/
-extern char far C_2BB4_1A5B[];/*"Won't grow there!\n"*/
-extern char far C_2BB4_1A6E[];/*"Now it just needs watering.\n"*/
-extern char far C_2BB4_1A8B[];/*"Your mouth is too dry.\n"*/
-extern char far C_2BB4_1AA3[];/*"You spit into the spittoon.\n"*/
-extern char far C_2BB4_1AC0[];/*"Click.\n"*/
-extern char far C_2BB4_1AC8[];/*"You may use the ruby slippers to go home. If you choose to, you may now view the Grand Finale.\n\n*"*/
-extern char far C_2BB4_1B2A[];/*"Afterwards, you will exit to DOS. You will be able to resume play from your last saved game.\n\n*"*/
-extern char far C_2BB4_1B8A[];/*"Would you like to see the Grand Finale now? If so, press Y. To resume play now, hit N: (Y N)\n"*/
-extern char far C_2BB4_2016[];/*"The spray gun has 10 more charges.\n"*/
-extern char far C_2BB4_203A[];/*"The spray gun now contains 20 charges of green paint.\n"*/
-extern char far C_2BB4_2071[];/*"The spray gun now contains 10 charges of weed killer.\n"*/
-extern char far C_2BB4_20A8[];/*"There is nothing in the gun.\n"*/
-extern char far C_2BB4_228A[];/*"The %s doesn't need oxygenated air.\n"*/
-extern char far C_2BB4_22AF[];/*"%s is beyond help.\n"*/
-extern char far C_2BB4_22C3[];/*"%s is revived!\n"*/
-extern char far C_2BB4_22F1[];/*"Aargh!\n"*/
+extern char far BlockedMsg[];/*"Blocked!\n"*/
+extern char far TooMuchMsg[];/*"You are carrying too much already.\n"*/
+extern char far NoEffectMsg[];/*"It has no effect.\n"*/
+extern char far NotNowMsg[];/*"Not now.\n"*/
+extern char far NotUndergroundMsg[];/*"Not while underground.\n"*/
+extern char far NowhereMsg[];/*"nowhere.\n"*/
+extern char far NothingMsg[];/*"nothing!\n"*/
+extern char far FireMsg[];/*"\nFire!\n"*/
+extern char far SplatMsg[];/*"Splat! There is no effect.\n"*/
+extern char far KaboomMsg[];/*"Kaboom! You blew the door down!\n"*/
+extern char far HasSteelBallsMsg[];/*"It already has steel cannon balls.\n"*/
+extern char far SteelBallsMsg[];/*"The cannon will fire steel cannon balls.\n"*/
+extern char far PressKeysToPlayMsg[];/*"Press keys 1-0 to play -"*/
+extern char far ToccataMsg[];/*"Tocatta and Fugue in D minor (J.S. Bach).\n"*/
+extern char far PanelBrokenMsg[];/*"The panel is broken.\n"*/
+extern char far PanelNotInstalledMsg[];/*"The panel is not installed.\n"*/
+extern char far PanelsOnCabinetsMsg[];/*"Panels are only installed onto cabinets.\n"*/
+extern char far LeverStuckMsg[];/*"the lever seems stuck.\n"*/
+extern char far PushLeverMsg[];/*"Push lever to "*/
+extern char far LatLongMsg[];/*"You are somewhere near \nLat:%d %c\nLong:%d %c\n"*/
+extern char far NeedCueStickMsg[];/*"You need a cue stick in your hands.\n"*/
+extern char far NeedPipeOrganMsg[];/*"Organ music must be played on a pipe organ.\n"*/
+extern char far HeadgearInstalledMsg[];/*"The headgear is installed.\n"*/
+extern char far MachineDoesNotWorkMsg[];/*"The machine does not work.\n"*/
+extern char far NobodyInMachineMsg[];/*"There is nobody sitting in the machine.\n"*/
+extern char far DreamMachinesCeasedMsg[];/*"The dream machines seem to have ceased functioning.\n"*/
+extern char far NobodyUnderSprayerMsg[];/*"Nobody is standing under the sprayer.\n"*/
+extern char far NoRubberCoatMsg[];/*"You don't think it would be safe to coat an animal or plant with rubber.\n"*/
+extern char far ChsheketTreatedMsg[];/*"Chsheket has already been treated.\n"*/
+extern char far NoRubberMsg[];/*"There is no rubber in the sprayer system.\n"*/
+extern char far RubberNotFleshMsg[];/*"The rubber in the sprayer system is not flesh-colored.\n"*/
+extern char far KilledPlantMsg[];/*"You killed the plant.\n"*/
+extern char far BecomesVisibleMsg[];/*"`%s becomes visible!\n"*/
+extern char far RollersUnfixableMsg[];/*"Ooops. These rollers can never be fixed!\n"*/
+extern char far OxiumFromBinMsg[];/*"You get two handfuls of oxium from the bin.\n"*/
+extern char far ImagineMsg[];/*"You imagine "*/
+extern char far PullDreamstuffMsg[];/*"You pull some of the dreamstuff from the hoard.\n"*/
+extern char far LackMentalPowerMsg[];/*"You lack the mental power to affect the dreamstuff hoard.\n"*/
+extern char far LensesNotRespondingMsg[];/*"Some of the lenses are not responding.\n"*/
+extern char far NoWaterPressureMsg[];/*"There is no water pressure in the valve system.\n"*/
+extern char far CanalsWorkingMsg[];/*"The canals are already working.\n"*/
+extern char far LensesAlignedMsg[];/*"The ruby lenses are already aligned.\n"*/
+extern char far GoodShotMsg[];/*"Good shot, old bean!\n"*/
+extern char far HealedMsg[];/*"\n%s is healed.\n"*/
+extern char far NoApparentEffectMsg[];/*"You actuate the mechanism to no apparent effect.\n"*/
+extern char far StatusLightsChangeMsg[];/*"Status lights change but you see no other effect.\n"*/
+extern char far LightsFlashMsg[];/*"Lights flash and change color but nothing else happens.\n"*/
+extern char far UnsureWhatYouDidMsg[];/*"You are completely unsure what you just did.\n"*/
+extern char far NoSprayerNearMsg[];/*"Funny, no sprayer near sprayer controls!\n"*/
+extern char far AlignmentMsg[];/*"Alignment coordinate:\n"*/
+extern char far WaitUntilDawnMsg[];/*"You wait until dawn...*\n"*/
+extern char far NoSeedYetMsg[];/*"No seed to harvest yet.\n"*/
+extern char far LocationMsg[];/*"Location: "*/
+extern char far WontGrowMsg[];/*"Won't grow there!\n"*/
+extern char far NeedsWateringMsg[];/*"Now it just needs watering.\n"*/
+extern char far MouthTooDryMsg[];/*"Your mouth is too dry.\n"*/
+extern char far SpitMsg[];/*"You spit into the spittoon.\n"*/
+extern char far ClickMsg[];/*"Click.\n"*/
+extern char far RubySlippersMsg[];/*"You may use the ruby slippers to go home. If you choose to, you may now view the Grand Finale.\n\n*"*/
+extern char far FinaleExitMsg[];/*"Afterwards, you will exit to DOS. You will be able to resume play from your last saved game.\n\n*"*/
+extern char far SeeFinaleMsg[];/*"Would you like to see the Grand Finale now? If so, press Y. To resume play now, hit N: (Y N)\n"*/
+extern char far SprayGunRefillMsg[];/*"The spray gun has 10 more charges.\n"*/
+extern char far SprayGunPaintMsg[];/*"The spray gun now contains 20 charges of green paint.\n"*/
+extern char far SprayGunWeedKillerMsg[];/*"The spray gun now contains 10 charges of weed killer.\n"*/
+extern char far SprayGunEmptyMsg[];/*"There is nothing in the gun.\n"*/
+extern char far NoAirNeededMsg[];/*"The %s doesn't need oxygenated air.\n"*/
+extern char far BeyondHelpMsg[];/*"%s is beyond help.\n"*/
+extern char far RevivedMsg[];/*"%s is revived!\n"*/
+extern char far AarghMsg[];/*"Aargh!\n"*/
 
 /*
  * action 35 (0x18f): billiards; needs a readied cue stick 0x191; the balls
@@ -236,7 +233,7 @@ extern char far C_2BB4_22F1[];/*"Aargh!\n"*/
 	for(x = FindInvType(Party[Active], 0x191, -1); x != -1 && (ObjStatus[x] & 0x18) != 0x18; x = NextInvType())
 		;
 	if(x == -1) {
-		CON_printf(C_2BB4_0CB4);
+		CON_printf(NeedCueStickMsg);
 		return;
 	}
 	x = GetX(obj);
@@ -244,13 +241,13 @@ extern char far C_2BB4_22F1[];/*"Aargh!\n"*/
 	if((b1 = OBJ_FindTypeAt(0x190, (x - 1) & 0x3ff, y)) < 0)
 		b1 = AddMapObj(0x190 | (OSI_rand(0, frames) << 10), 0, 0, (x - 1) & 0x3ff, y, MapZ);
 	if(b1 < 0) {
-		CON_printf(C_2BB4_22F1);
+		CON_printf(AarghMsg);
 		return;
 	}
 	if((b2 = OBJ_FindTypeAt(0x190, x, y)) < 0)
 		b2 = AddMapObj(0x190 | (OSI_rand(0, frames) << 10), 0, 0, x, y, MapZ);
 	if(b2 < 0) {
-		CON_printf(C_2BB4_22F1);
+		CON_printf(AarghMsg);
 		return;
 	}
 	i = 0;
@@ -268,12 +265,12 @@ extern char far C_2BB4_22F1[];/*"Aargh!\n"*/
 		i++;
 	} while(OSI_rand(0, 40) < GetDex(Party[Active]));
 	if(OSI_rand(0, 40) < GetDex(Party[Active]))
-		CON_printf(C_2BB4_130F);
+		CON_printf(GoodShotMsg);
 }
 
 /*
  * action 36 (pipe organ 0xa5, its seat 0x199): with the seat left of it,
- * Bach (C_1FA9_0C15); else keys 1-0 play sfx key - 10
+ * Bach (MUS_PlayMelody); else keys 1-0 play sfx key - 10
  */
 /*C_2F98_0267*/C_2F98_0267(register int16 obj, int16 on, int16 to) {
 	register int16 seat = -1;
@@ -283,12 +280,12 @@ extern char far C_2BB4_22F1[];/*"Aargh!\n"*/
 		if((ObjStatus[obj] & 0x18) == 0) {
 			seat = obj;
 			if((o = OBJ_FindTypeAt(0xa5, (GetX(obj) + 1) & 0x3ff, GetY(obj))) < 0) {
-				CON_printf(C_2BB4_0CD9);
+				CON_printf(NeedPipeOrganMsg);
 				return;
 			}
 			obj = o;
 		} else {
-			CON_printf(C_2BB4_0CD9);
+			CON_printf(NeedPipeOrganMsg);
 			return;
 		}
 	}
@@ -297,11 +294,11 @@ extern char far C_2BB4_22F1[];/*"Aargh!\n"*/
 			;
 	}
 	if(seat >= 0) {
-		CON_printf(C_2BB4_057F);
-		C_1FA9_0C15();
+		CON_printf(ToccataMsg);
+		MUS_PlayMelody();
 	} else {
 		MUS_PlaySong(-1);
-		CON_printf(C_2BB4_0566);
+		CON_printf(PressKeysToPlayMsg);
 		done = 0;
 		while(!done) {
 			while((key = KBD_GetKey(1)) == 0)
@@ -329,7 +326,7 @@ extern char far C_2BB4_22F1[];/*"Aargh!\n"*/
 	for(o = on; GetFrame(o) != 0 && o != -1 && GetType(o) == 0xc0; o = OBJ_FindTypeAt(0xc0, x, y))
 		x = (GetX(o) - 1) & 0x3ff;
 	if(o == -1 || GetType(o) != 0xc0) {
-		CON_printf(C_2BB4_0FF4);
+		CON_printf(RollersUnfixableMsg);
 		return;
 	}
 	for(r = o, cnt = 4; r >= 0; r = OBJ_FindTypeAt(0xc0, x, y)) {
@@ -339,7 +336,7 @@ extern char far C_2BB4_22F1[];/*"Aargh!\n"*/
 			if((n = AddMapObj(0xbd, 1, 0, x, y, MapZ)) >= 0)
 				ObjStatus[n] &= ~0x20;
 			else
-				CON_printf(C_2BB4_22F1);
+				CON_printf(AarghMsg);
 		}
 		cnt--;
 		x = (x + 1) & 0x3ff;
@@ -363,7 +360,7 @@ extern char far C_2BB4_22F1[];/*"Aargh!\n"*/
 	int16 typ, res, frame;
 
 	res = 0;
-	CON_printf(C_2BB4_04D3);
+	CON_printf(FireMsg);
 	MUS_PlaySfx(0x30);
 	dir = GetFrame(obj) << 1;
 	x = (GetX(obj) + DirIncrX[dir]) & 0x3ff;
@@ -399,10 +396,10 @@ extern char far C_2BB4_22F1[];/*"Aargh!\n"*/
 	}
 	if(res != 0) {
 		if(res > 0) {
-			CON_printf(C_2BB4_04DB);
+			CON_printf(SplatMsg);
 			MUS_PlaySfx(5);
 		} else {
-			CON_printf(C_2BB4_04F7);
+			CON_printf(KaboomMsg);
 			MUS_PlaySfx(4);
 			TalkFlags[0x41] |= 4;
 		}
@@ -416,10 +413,10 @@ extern char far C_2BB4_22F1[];/*"Aargh!\n"*/
 	register int16 q;
 
 	if((q = GetQual(on)) != 0) {
-		CON_printf(C_2BB4_0518);
+		CON_printf(HasSteelBallsMsg);
 	} else {
 		SetQual(on, 1);
-		CON_printf(C_2BB4_053C);
+		CON_printf(SteelBallsMsg);
 		DeleteObj(obj);
 	}
 }
@@ -435,7 +432,7 @@ extern char far C_2BB4_22F1[];/*"Aargh!\n"*/
 	int16 q = -1, solo = -1;
 
 	if(TalkFlags[0x46] & 8) {
-		CON_printf(C_2BB4_0E36);
+		CON_printf(DreamMachinesCeasedMsg);
 		return;
 	}
 	for(o = SearchArea((GetX(panel) - 5) & 0x3ff, (GetY(panel) - 5) & 0x3ff, (GetX(panel) + 5) & 0x3ff, (GetY(panel) + 5) & 0x3ff); o != -1; o = NextArea()) {
@@ -455,17 +452,17 @@ extern char far C_2BB4_22F1[];/*"Aargh!\n"*/
 	}
 	npc = OBJ_FindNPCAt(1, x, y);
 	if(chair == -1 || q == -1) {
-		CON_printf(C_2BB4_0DF1);
+		CON_printf(MachineDoesNotWorkMsg);
 		return;
 	}
 	if(c == -1) {
-		CON_printf(C_2BB4_0DF1);
+		CON_printf(MachineDoesNotWorkMsg);
 		return;
 	}
 	if((mach = OBJ_FindTypeAt(0x123, x, y)) >= 0) {
 		npc = 0x21;
 		if(TalkFlags[0x21] & 4 || !(TalkFlags[0x61] & 0x10)) {
-			CON_printf(C_2BB4_02A4);
+			CON_printf(NoEffectMsg);
 		} else {
 			C_2F75_07AA();
 			TALK_talkTo(1, 0x21, 0);
@@ -481,7 +478,7 @@ extern char far C_2BB4_22F1[];/*"Aargh!\n"*/
 	}
 	if((mach = OBJ_FindTypeAt(0x11f, x, y)) >= 0) {
 		if(!GetQual(mach)) {
-			CON_printf(C_2BB4_02A4);
+			CON_printf(NoEffectMsg);
 			return;
 		}
 		npc = 6;
@@ -509,7 +506,7 @@ extern char far C_2BB4_22F1[];/*"Aargh!\n"*/
 		return;
 	}
 	if(npc == -1) {
-		CON_printf(C_2BB4_0E0D);
+		CON_printf(NobodyInMachineMsg);
 		return;
 	}
 	if(MapZ != 0) {
@@ -526,7 +523,7 @@ extern char far C_2BB4_22F1[];/*"Aargh!\n"*/
 		DreamEnter();
 		return;
 	}
-	CON_printf(C_2BB4_0DF1);
+	CON_printf(MachineDoesNotWorkMsg);
 }
 
 /*
@@ -542,16 +539,16 @@ extern char far C_2BB4_22F1[];/*"Aargh!\n"*/
 		if(GetType(o) == 0x114)
 			spr = o;
 	if(spr == -1) {
-		CON_printf(C_2BB4_19DD);
+		CON_printf(NoSprayerNearMsg);
 		return;
 	}
 	if(!((q = GetQual(spr)) & 1)) {
-		CON_printf(C_2BB4_0F45);
+		CON_printf(NoRubberMsg);
 		return;
 	}
 	if(!(q & 2)) {
 		if(TalkFlags[0x3e] & 0x10) {
-			CON_printf(C_2BB4_0F70);
+			CON_printf(RubberNotFleshMsg);
 			return;
 		}
 		TalkFlags[6] |= 4;
@@ -559,15 +556,15 @@ extern char far C_2BB4_22F1[];/*"Aargh!\n"*/
 		return;
 	}
 	if((npc = OBJ_FindNPCAt(0, GetX(spr), GetY(spr))) < 0) {
-		CON_printf(C_2BB4_0EB0);
+		CON_printf(NobodyUnderSprayerMsg);
 		return;
 	}
 	if(npc != 6) {
-		CON_printf(C_2BB4_0ED7);
+		CON_printf(NoRubberCoatMsg);
 		return;
 	}
 	if(GetType(npc) != 0x165) {
-		CON_printf(C_2BB4_0F21);
+		CON_printf(ChsheketTreatedMsg);
 		return;
 	}
 	ObjShapeType[npc] = (ObjShapeType[npc] & 0xfc00) + 0x162;
@@ -588,16 +585,16 @@ extern char far C_2BB4_22F1[];/*"Aargh!\n"*/
 	char buf[10];
 
 	if(TalkFlags[0x76] & 0x20) {
-		CON_printf(C_2BB4_12E9);
+		CON_printf(LensesAlignedMsg);
 	} else if(TalkFlags[0x2e] & 0x80 && TalkFlags[0x39] & 0x80 && TalkFlags[0x30] & 0x80) {
-		CON_printf(C_2BB4_1A07);
-		CurClip->fgColor = D_0826;
+		CON_printf(AlignmentMsg);
+		CurClip->fgColor = ColorDarkBlue;
 		CON_gets(buf, 10);
 		n = ParseNumberInput(buf, 0);
 		CurClip->fgColor = ColorText;
 		if((t = Time_H * 100 + Time_M) - 5 < n && t + 5 > n) {
 			if(Time_H >= 18 || Time_H <= 5) {
-				CON_printf(C_2BB4_1A1E);
+				CON_printf(WaitUntilDawnMsg);
 				IsResting = 1;
 				PassTime((28 - Time_H) * 60 + (60 - Time_M));
 				IsResting = 0;
@@ -612,10 +609,10 @@ extern char far C_2BB4_22F1[];/*"Aargh!\n"*/
 			TALK_talkTo(1, 5, 0);
 			TalkFlags[5] &= ~0x10;
 		} else {
-			CON_printf(C_2BB4_02A4);
+			CON_printf(NoEffectMsg);
 		}
 	} else {
-		CON_printf(C_2BB4_10F4);
+		CON_printf(LensesNotRespondingMsg);
 	}
 }
 
@@ -627,30 +624,30 @@ extern char far C_2BB4_22F1[];/*"Aargh!\n"*/
 	register int16 q;
 
 	if((q = GetQual(obj)) & 2) {
-		CON_printf(C_2BB4_09E3);
+		CON_printf(PanelBrokenMsg);
 		return;
 	}
 	if(q & 1) {
-		CON_printf(C_2BB4_09F9);
+		CON_printf(PanelNotInstalledMsg);
 		return;
 	}
 	if((cab = OBJ_FindTypeAt(0x1c9, GetX(obj), GetY(obj))) == -1) {
-		CON_printf(C_2BB4_0A16);
+		CON_printf(PanelsOnCabinetsMsg);
 		return;
 	}
 	q = GetQual(cab);
 	switch(q) {
 	case 0:
-		CON_printf(C_2BB4_1709);
+		CON_printf(UnsureWhatYouDidMsg);
 		break;
 	case 1:
-		CON_printf(C_2BB4_166B);
+		CON_printf(NoApparentEffectMsg);
 		break;
 	case 2:
-		CON_printf(C_2BB4_169D);
+		CON_printf(StatusLightsChangeMsg);
 		break;
 	case 3:
-		CON_printf(C_2BB4_16D0);
+		CON_printf(LightsFlashMsg);
 		break;
 	case 4:
 		C_2F98_07C3(obj, cab);
@@ -663,17 +660,17 @@ extern char far C_2BB4_22F1[];/*"Aargh!\n"*/
 		break;
 	case 7:
 		if(TalkFlags[0x76] & 0x40) {
-			CON_printf(C_2BB4_12C8);
+			CON_printf(CanalsWorkingMsg);
 		} else if(TalkFlags[0x76] & 0x20) {
 			TalkFlags[0x76] |= 0x40;
 			BargePumps(0);
 			C_2F75_0951();
 		} else {
-			CON_printf(C_2BB4_111C);
+			CON_printf(NoWaterPressureMsg);
 		}
 		break;
 	default:
-		CON_printf(C_2BB4_02A4);
+		CON_printf(NoEffectMsg);
 	}
 }
 
@@ -691,11 +688,11 @@ extern char far C_2BB4_22F1[];/*"Aargh!\n"*/
 	quan = GetQuan(on);
 	qual = GetQual(on);
 	if(t == 0x77 && qual == 0) {
-		CON_printf(C_2BB4_203A);
+		CON_printf(SprayGunPaintMsg);
 		SetQuan(on, 20);
 		SetQual(on, 1);
 	} else if(t == 0x80 && qual != 0) {
-		CON_printf(C_2BB4_2071);
+		CON_printf(SprayGunWeedKillerMsg);
 		SetQuan(on, 10);
 		SetQual(on, 0);
 	} else {
@@ -703,7 +700,7 @@ extern char far C_2BB4_22F1[];/*"Aargh!\n"*/
 		if(quan > 30)
 			quan = 30;
 		SetQuan(on, quan);
-		CON_printf(C_2BB4_2016);
+		CON_printf(SprayGunRefillMsg);
 	}
 	DeleteObj(obj);
 }
@@ -719,7 +716,7 @@ extern char far C_2BB4_22F1[];/*"Aargh!\n"*/
 	quan = GetQuan(obj);
 	qual = GetQual(obj);
 	if(quan == 0) {
-		CON_printf(C_2BB4_20A8);
+		CON_printf(SprayGunEmptyMsg);
 		return;
 	}
 	t = GetType(on);
@@ -727,12 +724,12 @@ extern char far C_2BB4_22F1[];/*"Aargh!\n"*/
 		SetQuan(obj, quan - 1);
 		if(on < 0x100 && on >= 0 && t == 0x91) {
 			ObjShapeType[on] = (ObjShapeType[on] & 0xfc00) + 0x16c;
-			CON_printf(C_2BB4_0FDE, GetObjectString(on));
+			CON_printf(BecomesVisibleMsg, GetObjectString(on));
 		} else if(ObjStatus[on] & 2) {
 			ObjStatus[on] &= ~2;
-			CON_printf(C_2BB4_0FDE, GetObjectString(on));
+			CON_printf(BecomesVisibleMsg, GetObjectString(on));
 		} else {
-			CON_printf(C_2BB4_02A4);
+			CON_printf(NoEffectMsg);
 		}
 	} else {
 		if(on < 0x100 && on >= 0) {
@@ -740,7 +737,7 @@ extern char far C_2BB4_22F1[];/*"Aargh!\n"*/
 		} else if(IsPlantType(t)) {
 			SetQuan(obj, quan - 1);
 			COMBAT_showHit(on);
-			CON_printf(C_2BB4_0FC7);
+			CON_printf(KilledPlantMsg);
 			if(t == 0xcd) {
 				TalkFlags[0x30] |= 0x80;
 				DeleteObj(on);
@@ -751,7 +748,7 @@ extern char far C_2BB4_22F1[];/*"Aargh!\n"*/
 			}
 		} else {
 			SetQuan(obj, quan - 1);
-			CON_printf(C_2BB4_02A4);
+			CON_printf(NoEffectMsg);
 		}
 	}
 }
@@ -765,19 +762,19 @@ extern char far C_2BB4_22F1[];/*"Aargh!\n"*/
 
 	if(GetType(on) == 0x121) {
 		if((o = OBJ_FindTypeAt(0x120, GetX(on), GetY(on))) == -1) {
-			CON_printf(C_2BB4_02A4);
+			CON_printf(NoEffectMsg);
 			return;
 		}
 		on = o;
 	}
 	if((o = AddMapObj(0x64, 1, 0, GetX(on), GetY(on), MapZ)) == -1) {
-		CON_printf(C_2BB4_032E);
+		CON_printf(NotNowMsg);
 		return;
 	}
 	ObjStatus[o] &= ~0x20;
 	DeleteObj(obj);
 	ObjShapeType[o] = GetType(o) + 0x400;
-	CON_printf(C_2BB4_0DD5);
+	CON_printf(HeadgearInstalledMsg);
 	if((TalkFlags[0x74] |= 0x10) & 1)
 		TalkFlags[0x60] |= 4;
 }
@@ -790,13 +787,13 @@ extern char far C_2BB4_22F1[];/*"Aargh!\n"*/
 	register int16 key;
 
 	if((!(TalkFlags[0x76] & 0x20) || !(TalkFlags[0x76] & 0x40)) && !(GameFlags & 0x10)) {
-		CON_printf(C_2BB4_0C5F);
+		CON_printf(LeverStuckMsg);
 		return;
 	}
 	MouseMode = 0;
 	DirOriginX = (WrapDelta(GetX(obj) - MapX) << 4) + 0x58;
 	DirOriginY = (WrapDelta(GetY(obj) - MapY) << 4) + 0x58;
-	CON_printf(C_2BB4_0C77);
+	CON_printf(PushLeverMsg);
 	key = CON_getch();
 	MUS_PlaySfx(0x11);
 	DirOriginX = 0x58;
@@ -806,8 +803,8 @@ extern char far C_2BB4_22F1[];/*"Aargh!\n"*/
 		CON_printf("center.\n");
 		ObjShapeType[obj] = GetType(obj) + 0x1000;
 	} else {
-		CON_printf("%s.\n", DirNames[D_EB72]);
-		ObjShapeType[obj] = GetType(obj) + (D_EB72 >> 1 << 10);
+		CON_printf("%s.\n", DirNames[AdvanceDir]);
+		ObjShapeType[obj] = GetType(obj) + (AdvanceDir >> 1 << 10);
 	}
 }
 
@@ -820,7 +817,7 @@ extern char far C_2BB4_22F1[];/*"Aargh!\n"*/
 	int16 p;
 
 	if(MapZ != 0) {
-		CON_printf(C_2BB4_0364);
+		CON_printf(NotUndergroundMsg);
 		return;
 	}
 	ns = 'N';
@@ -839,7 +836,7 @@ extern char far C_2BB4_22F1[];/*"Aargh!\n"*/
 	lon = 0xb4 - (abs)(lon);
 	lat = (abs)(lat);
 	MUS_PlaySfx(4);
-	CON_printf(C_2BB4_0C86, lat, ns, lon, ew);
+	CON_printf(LatLongMsg, lat, ns, lon, ew);
 }
 
 /*
@@ -853,16 +850,16 @@ extern char far C_2BB4_22F1[];/*"Aargh!\n"*/
 	x = GetX(obj);
 	y = GetY(obj);
 	if((d = COMBAT_range(x, y, GetX(p), GetY(p))) > 1 && COMBAT_Missile(p, &x, &y, 9, 0) == 0) {
-		CON_printf(C_2BB4_0230);
+		CON_printf(BlockedMsg);
 		return;
 	}
 	if(AddInvObj(0x83, 0x10, 0x14, p) == -1) {
-		CON_printf(C_2BB4_024E);
+		CON_printf(TooMuchMsg);
 		return;
 	}
 	if(d > 1)
 		COMBAT_Missile(p, &x, &y, 9, BaseTile[0x83]);
-	CON_printf(C_2BB4_101E);
+	CON_printf(OxiumFromBinMsg);
 	TalkFlags[0x12] |= 0x10;
 }
 
@@ -878,15 +875,15 @@ extern char far C_2BB4_22F1[];/*"Aargh!\n"*/
 	x = GetX(obj);
 	y = GetY(obj);
 	if((d = COMBAT_range(x, y, GetX(p), GetY(p))) > 1 && COMBAT_Missile(p, &x, &y, 9, 0) == 0) {
-		CON_printf(C_2BB4_0230);
+		CON_printf(BlockedMsg);
 		return;
 	}
 	if(GetFrame(obj) < 1) {
-		CON_printf(C_2BB4_1A37);
+		CON_printf(NoSeedYetMsg);
 		return;
 	}
 	if((o = AddInvObj(0x9e, 0x10, 1, p)) < 0) {
-		CON_printf(C_2BB4_024E);
+		CON_printf(TooMuchMsg);
 		return;
 	}
 	if(d > 1)
@@ -895,7 +892,7 @@ extern char far C_2BB4_22F1[];/*"Aargh!\n"*/
 	SetQual(obj, OSI_rand(0xa, 0xf));
 	ShowObjects();
 	if(StatusDisplay == 0x92)
-		D_0F12 = 1;
+		StatusDirty = 1;
 	MapAnimEnabled = 1;
 }
 
@@ -907,44 +904,44 @@ extern char far C_2BB4_22F1[];/*"Aargh!\n"*/
 	int16 key, x, y, d;
 
 	p = Party[Active];
-	CON_printf(C_2BB4_1A50);
+	CON_printf(LocationMsg);
 	MouseMode = 1;
 	if(SelectMode) {
 		DrawSlotCursor(0);
 		SelectMode = 1;
 		AimX = AimY = 5;
 	}
-	if((key = CON_getch()) != 0x8e || D_EBF6 < 0 || D_EBF8 < 0) {
-		CON_printf(C_2BB4_03F8);
+	if((key = CON_getch()) != 0x8e || SelectionX < 0 || SelectionY < 0) {
+		CON_printf(NowhereMsg);
 		return;
 	}
 	CON_putch('\n');
-	x = D_EBF6;
-	y = D_EBF8;
+	x = SelectionX;
+	y = SelectionY;
 	if((d = COMBAT_range(x, y, GetX(p), GetY(p))) > 1 && COMBAT_Missile(p, &x, &y, 9, 0) == 0) {
-		CON_printf(C_2BB4_0230);
+		CON_printf(BlockedMsg);
 		MUS_PlaySfx(5);
 		return;
 	}
 	if(!GetDigClass(GetTileAtXYZ(x, y, MapZ))) {
-		CON_printf(C_2BB4_1A5B);
+		CON_printf(WontGrowMsg);
 		MUS_PlaySfx(5);
 		return;
 	}
 	if(d > 1)
 		COMBAT_Missile(p, &x, &y, 9, BaseTile[0x9e]);
 	if(ObjStatus[obj] & 0x18)
-		D_0F12 = 1;
+		StatusDirty = 1;
 	if(GetQuan(obj) > 1) {
 		SetQuan(obj, GetQuan(obj) - 1);
 		if((obj = AddMapObj(0x9e, 0, 1, x, y, MapZ)) < 0)
-			CON_printf(C_2BB4_22F1);
+			CON_printf(AarghMsg);
 	} else {
 		MoveObj(obj, x, y, MapZ);
 	}
 	ShowObjects();
 	MapAnimEnabled = 1;
-	CON_printf(C_2BB4_1A6E);
+	CON_printf(NeedsWateringMsg);
 }
 
 /*
@@ -952,9 +949,9 @@ extern char far C_2BB4_22F1[];/*"Aargh!\n"*/
  */
 /*C_2F98_1988*/C_2F98_1988(int16 obj, int16 on, int16 to) {
 	if(ObjStatus[Party[Active]] & 0x40)
-		CON_printf(C_2BB4_1A8B);
+		CON_printf(MouthTooDryMsg);
 	else
-		CON_printf(C_2BB4_1AA3);
+		CON_printf(SpitMsg);
 }
 
 /*
@@ -971,12 +968,12 @@ extern char far C_2BB4_22F1[];/*"Aargh!\n"*/
 	}
 	if((q = GetQual(obj)) < 2) {
 		SetQual(obj, q + 1);
-		CON_printf(C_2BB4_1AC0);
+		CON_printf(ClickMsg);
 		return;
 	}
-	CON_printf(C_2BB4_1AC8);
-	CON_printf(C_2BB4_1B2A);
-	CON_printf(C_2BB4_1B8A);
+	CON_printf(RubySlippersMsg);
+	CON_printf(FinaleExitMsg);
+	CON_printf(SeeFinaleMsg);
 	for(ch = 0; ch != 'Y' && ch != 'N'; ch = toupper(CON_prompt()))
 		;
 	if(ch == 'N')
@@ -994,25 +991,25 @@ extern char far C_2BB4_22F1[];/*"Aargh!\n"*/
 	int16 o;
 
 	if(!Talents[Party[Active]].psychic) {
-		CON_printf(C_2BB4_10B9);
+		CON_printf(LackMentalPowerMsg);
 		return;
 	}
 	p = Party[Active];
-	if((d = COMBAT_range(D_EBF6, D_EBF8, GetX(p), GetY(p))) > 1 && COMBAT_Missile(p, &D_EBF6, &D_EBF8, 9, 0) == 0) {
-		CON_printf(C_2BB4_0230);
+	if((d = COMBAT_range(SelectionX, SelectionY, GetX(p), GetY(p))) > 1 && COMBAT_Missile(p, &SelectionX, &SelectionY, 9, 0) == 0) {
+		CON_printf(BlockedMsg);
 		return;
 	}
 	if((o = AddInvObj(0x14b, 0x10, 0, p)) == -1) {
-		CON_printf(C_2BB4_024E);
+		CON_printf(TooMuchMsg);
 		return;
 	}
 	if(d > 1)
-		COMBAT_Missile(p, &D_EBF6, &D_EBF8, 9, BaseTile[0x14b]);
-	CON_printf(C_2BB4_1088);
+		COMBAT_Missile(p, &SelectionX, &SelectionY, 9, BaseTile[0x14b]);
+	CON_printf(PullDreamstuffMsg);
 	if(AddInvObj(GetQual(obj) ? 0x139 : OSI_rand(0x31, 0x38), 8, 0, o) >= 0)
 		SetQual(obj, 0);
 	else
-		CON_printf(C_2BB4_22F1);
+		CON_printf(AarghMsg);
 }
 
 /*
@@ -1024,9 +1021,9 @@ extern char far C_2BB4_22F1[];/*"Aargh!\n"*/
 	int16 t, i, x, y;
 
 	MUS_PlaySfx(0x32);
-	CON_printf(C_2BB4_107B);
+	CON_printf(ImagineMsg);
 	if((inner = FindInv(obj)) < 0) {
-		CON_printf(C_2BB4_0402);
+		CON_printf(NothingMsg);
 		return;
 	}
 	if((t = GetType(inner)) < 0x156) {
@@ -1040,7 +1037,7 @@ extern char far C_2BB4_22F1[];/*"Aargh!\n"*/
 		return;
 	} else {
 		if((npc = EGG_generate(t, MapX, MapY, MapZ)) < 0) {
-			CON_printf(C_2BB4_0402);
+			CON_printf(NothingMsg);
 			return;
 		}
 		ObjShapeType[npc] = GetType(npc) + (GetFrame(inner) << 10);
@@ -1055,7 +1052,7 @@ extern char far C_2BB4_22F1[];/*"Aargh!\n"*/
 			}
 		}
 		if(i > 7 && !COMBAT_TryTeleport(npc, 0)) {
-			CON_printf(C_2BB4_0402);
+			CON_printf(NothingMsg);
 			DeleteObj(npc);
 			return;
 		}
@@ -1088,14 +1085,14 @@ extern char far C_2BB4_22F1[];/*"Aargh!\n"*/
  * MaxHP and name, NPC 0's HitPoints, as the original)
  */
 /*C_2F98_1E08*/C_2F98_1E08(int16 obj, int16 on, int16 to) {
-	if(D_EBCE == 0x68) {
+	if(SelectionObj == 0x68) {
 		TalkFlags[0x68] |= 0x40;
 		TALK_talkTo(Active, 0x68, 0);
-	} else if(D_EBCE == 0 && MaxHP(1) > HitPoints[0]) {
-		CON_printf(C_2BB4_13A1, GetObjectString(1));
+	} else if(SelectionObj == 0 && MaxHP(1) > HitPoints[0]) {
+		CON_printf(HealedMsg, GetObjectString(1));
 		HitPoints[0] = MaxHP(1);
 	} else {
-		CON_printf(C_2BB4_02A4);
+		CON_printf(NoEffectMsg);
 	}
 }
 
@@ -1104,13 +1101,13 @@ extern char far C_2BB4_22F1[];/*"Aargh!\n"*/
  */
 /*C_2F98_1E83*/C_2F98_1E83(int16 obj, int16 on, int16 to) {
 	if(TalkFlags[0x76] & 0x40) {
-		CON_printf(C_2BB4_12C8);
+		CON_printf(CanalsWorkingMsg);
 	} else if(TalkFlags[0x76] & 0x20) {
 		TalkFlags[0x76] |= 0x40;
 		BargePumps(0);
 		C_2F75_0951();
 	} else {
-		CON_printf(C_2BB4_111C);
+		CON_printf(NoWaterPressureMsg);
 	}
 }
 
@@ -1123,30 +1120,30 @@ extern char far C_2BB4_22F1[];/*"Aargh!\n"*/
 	int16 t;
 
 	if((t = GetType(on)) != 0x155 && (on >= 0x100 || on < 0 || !(NPCStatus[on] & 0x80))) {
-		CON_printf(C_2BB4_228A, GetObjectString(on));
+		CON_printf(NoAirNeededMsg, GetObjectString(on));
 		MUS_PlaySfx(5);
 		return;
 	}
 	if(t == 0x155) {
 		if(n < 0x10) {
 			if((n = SPELL_ReviveNPC(on)) < 0) {
-				CON_printf(C_2BB4_22AF, GetObjectString(on));
+				CON_printf(BeyondHelpMsg, GetObjectString(on));
 				MUS_PlaySfx(5);
 			} else {
-				CON_printf(C_2BB4_22C3, GetObjectString(n));
+				CON_printf(RevivedMsg, GetObjectString(n));
 				MUS_PlaySfx(4);
 			}
 		} else {
-			CON_printf(C_2BB4_22AF, GetObjectString(on));
+			CON_printf(BeyondHelpMsg, GetObjectString(on));
 			MUS_PlaySfx(5);
 		}
 	} else {
-		CON_printf(C_2BB4_22C3, GetObjectString(on));
+		CON_printf(RevivedMsg, GetObjectString(on));
 		MUS_PlaySfx(4);
 		HitPoints[on] = MaxHP(on);
 	}
 	if(StatusDisplay == 0x91 || StatusDisplay == 0x90 && Party[StatusMember] == on)
-		D_0F12 = 1;
+		StatusDirty = 1;
 	if(GetQuan(obj) == 1) {
 		DeleteObj(obj);
 		return;

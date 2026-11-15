@@ -4,7 +4,7 @@
  * Martian Dreams - GAME.EXE overlay 2F88: the conversation engine
  * (Ultima VI's talkdr.c, by way of Savage Empire's: SE GAME.EXE 0F8D).
  *
- * Interpreter for the NPC conversation scripts, loaded into TalkBuf (D_6EC2)
+ * Interpreter for the NPC conversation scripts, loaded into TalkBuf
  * by LoadConversation (LoadConversation). A script is a byte stream: bytes < 0x80
  * are text that is printed as is, bytes >= 0x80 are opcodes (OP_xxx below).
  * Script layout:
@@ -17,7 +17,7 @@
  * longs. Numeric constants are prefixed by OP_BYTE / OP_WORD / OP_ADDRESS.
  * Variables: VarInt[] (#0..#9, #A..#Z) and VarStr[] ($0..$9, $A..$Z); a letter
  * variable 'X' lives at index 'X' - 0x37. Flags: 16 per NPC, bits 0-7 in
- * TalkFlags[npc] (D_6EC6), bits 8-15 in D_3262[npc] (OP_SET/OP_CLR/OP_TST).
+ * TalkFlags[npc] (TalkFlags), bits 8-15 in D_3262[npc] (OP_SET/OP_CLR/OP_TST).
  * TalkNpcs[0] is the NPC being talked to (the OP_NPC pseudo-number),
  * TalkNpcs[1] the party member talking. TalkDriver() is the entry point.
  *
@@ -191,7 +191,6 @@ extern LoadConversation(int16, unsigned char far *);/*LoadConversation(npc, buff
 extern int16 HasConversation(int16);/*has the npc a conversation script?*/
 extern ClearMapWindow(int16);
 extern int16 OSI_rand(int16, int16);/*OSI_rand(lo, hi)*/
-#define StatusDirty D_0F12
 /*overlay 2F83 (talk.c's code in Savage Empire's talkdr.c)*/
 extern char *TALK_GetCharName(int16);
 extern int16 IsNpcOnScreen(int16);
@@ -199,12 +198,10 @@ extern int16 JoinParty(int16);
 extern int16 LeaveParty(int16);
 extern int16 FindPartyMemberWithObj(int16, int16);
 extern TALK_Event(int16);/*scripted events (OP_EVENT)*/
-extern char far C_2BB4_0315[];/*NotInSoloMsg (far messages)*/
-extern char far C_2BB4_02B7[];/*NoResponseMsg (far messages)*/
-#define NotInSoloMsg C_2BB4_0315
-#define NoResponseMsg C_2BB4_02B7
+extern char far NotInSoloMsg[];/*far messages*/
+extern char far NoResponseMsg[];/*far messages*/
 
-extern unsigned char D_0F12;/*StatusDirty*/
+extern unsigned char StatusDirty;
 extern char AnimateAtPrompt;
 extern int16 EndPagingAtPrompt;
 extern int16 StatusMember;
@@ -214,7 +211,7 @@ extern struct tClipInfo *CurClip;
 extern int16 ScreenFade;
 extern int32 GameFlags;/*0x10: in a dream*/
 extern int16 ColorText;
-extern int16 D_0826;/*color of the player's input*/
+extern int16 ColorDarkBlue;/*color of the player's input*/
 extern unsigned char Active;
 extern unsigned char InCombat;
 extern char SoloMember;
@@ -229,20 +226,20 @@ extern uint16 ExpPoints[];
 extern unsigned char STREN[];
 extern unsigned char NPCStatus[];
 extern unsigned char HitPoints[];
-extern unsigned char far *D_6EC2;/*TalkBuf*/
-extern unsigned char D_6EC6[];/*TalkFlags*/
-extern unsigned char far *D_7606;/*TypeWeight*/
+extern unsigned char far *TalkBuf;
+extern unsigned char TalkFlags[];
+extern unsigned char far *TypeWeight;
 extern unsigned char INTEL[];
 extern struct coord ObjPos[];
 extern unsigned char PartySize;
 extern uint16 ObjShapeType[];
-extern int16 D_EB74, D_EB76;/*PointerX, PointerY*/
-extern int16 D_EB86[10+26];/*VarInt*/
-extern struct tClipInfo D_EBD0[4];/*TextWindows*/
-extern char *D_EBFA[10+26];/*VarStr*/
-extern int16 D_EC42;
-extern int16 D_EB16;/*WeightEquip*/
-extern int16 D_EB1A;/*WeightInven*/
+extern int16 PointerX, PointerY;
+extern int16 VarInt[10+26];
+extern struct tClipInfo TextWindows[4];
+extern char *VarStr[10+26];
+extern int16 LinesBeforeMore;
+extern int16 WeightEquip;
+extern int16 WeightInven;
 extern unsigned char D_EC8E[];/*TalkKeyword*/
 extern int32 D_EC9A;/*TalkDescPC*/
 extern int16 D_ECA0;/*TalkBase*/
@@ -251,22 +248,17 @@ extern char D_ECA8[];/*TalkInput*/
 extern unsigned char D_ECDA;/*TalkAnswered*/
 extern int16 D_ECDC;/*Talk_PC*/
 extern int32 D_ECDE;/*TalkSavedPC*/
-extern union tHandler D_BA6A;/*GrDriver*/
-extern int16 D_0F18;/*MapAnimEnabled*/
-extern struct tSurface D_3232;/*Screen*/
-extern void far *D_BA7E;/*mdscreen.lzc entry 2: default command mark*/
+extern union tHandler GrDriver;
+extern int16 MapAnimEnabled;
+extern struct tSurface Screen;
+extern void far *ScreenParts;/*mdscreen.lzc entry 2: default command mark*/
 
-#define GR_DRAW_BITMAP(s,x,y,p,m)    (D_BA6A.iii.ofs = 0x30, (*D_BA6A.f)(s,x,y,p,m))
+#define GR_DRAW_BITMAP(s,x,y,p,m)    (GrDriver.iii.ofs = 0x30, (*GrDriver.f)(s,x,y,p,m))
 
-#define MapAnimEnabled D_0F18
-#define TalkBuf D_6EC2
 #define Talk_PC D_ECDC
 #define TalkBase D_ECA0
 #define TalkSavedPC D_ECDE
 #define TalkNpcs D_ECA4
-#define TalkFlags D_6EC6
-#define VarInt D_EB86
-#define VarStr D_EBFA
 #define TalkInput D_ECA8
 #define TalkKeyword D_EC8E
 #define TalkAnswered D_ECDA
@@ -399,7 +391,7 @@ lstack and leaves its result in the lowest operand's slot.*/
 				case OP_WEIGHT:/*(object type, quantity): weight in 1/10 units*/
 					iparam0 = lstack[sidx - 1];/*quantity*/
 					iparam1 = lstack[sidx - 2];/*object type*/
-					iparam2 = D_7606[iparam1];
+					iparam2 = TypeWeight[iparam1];
 					if(IsWeightPer10Type(iparam1))
 						lstack[sidx - 2] = iparam0 * iparam2;
 					else
@@ -415,7 +407,7 @@ lstack and leaves its result in the lowest operand's slot.*/
 					iparam0 = mk_npcnum(lstack[sidx - 1]);
 					STAT_ComputeEquipment(iparam0);
 					iparam1 = GetStr(iparam0) * 200;
-					iparam2 = (D_EB16 + D_EB1A) * 10;
+					iparam2 = (WeightEquip + WeightInven) * 10;
 					if(iparam1 > iparam2)
 						lstack[sidx - 1] = iparam1 - iparam2;
 					else
@@ -1097,7 +1089,7 @@ until OP_LEAVE/OP_SCRIPT_MARK*/
 	}
 
 	/*face the npc*/
-	dir = MkDirection(D_EB74, D_EB76);
+	dir = MkDirection(PointerX, PointerY);
 	if(dir != -1) {
 		UpdateTurnFrame(Party[Active], dir);
 		VIS_UpdateView();
@@ -1123,14 +1115,14 @@ until OP_LEAVE/OP_SCRIPT_MARK*/
 	savedMember = StatusMember;
 	ShowPortrait(npcObj);/*display character's portrait*/
 	StatusDisplay = 0x9e;
-	savedB6B6 = D_EC42;
+	savedB6B6 = LinesBeforeMore;
 	savedClip = CurClip;
 	/*the conversation window*/
-	CON_setClip(&D_EBD0[2]);
+	CON_setClip(&TextWindows[2]);
 	CurClip->attrFlags |= 0x20;
 	CurClip->attrFlags |= 0x10;
 	CON_gotoxy(0, 0);
-	D_EC42 = CurClip->rows;
+	LinesBeforeMore = CurClip->rows;
 	if(ObjStatus[npcObj] & 1)
 		CON_printf("You sense ");
 	else
@@ -1155,7 +1147,7 @@ until OP_LEAVE/OP_SCRIPT_MARK*/
 		TalkSavedPC = Talk_PC;
 		opcode = PARSE_U8;
 		if(opcode == OP_ASKTOP) {
-			CurClip->fgColor = D_0826;
+			CurClip->fgColor = ColorDarkBlue;
 			CON_printf("\nYou say:");
 			MapAnimEnabled = 0;
 			CON_gets(TalkInput, 50);
@@ -1164,7 +1156,7 @@ until OP_LEAVE/OP_SCRIPT_MARK*/
 			TalkAnswered = 0;
 			CurClip->fgColor = ColorText;
 		} else if(opcode == OP_GETSTR) {/*<index> OP_VARSTR*/
-			CurClip->fgColor = D_0826;
+			CurClip->fgColor = ColorDarkBlue;
 			MapAnimEnabled = 0;
 			CON_gets(TalkInput, 50);
 			MapAnimEnabled = 1;
@@ -1176,7 +1168,7 @@ until OP_LEAVE/OP_SCRIPT_MARK*/
 			CurClip->fgColor = ColorText;
 			TalkAnswered = 0;
 		} else if(opcode == OP_GETINT) {/*<index> OP_VARINT*/
-			CurClip->fgColor = D_0826;
+			CurClip->fgColor = ColorDarkBlue;
 			MapAnimEnabled = 0;
 			CON_gets(TalkInput, 50);
 			MapAnimEnabled = 1;
@@ -1189,7 +1181,7 @@ until OP_LEAVE/OP_SCRIPT_MARK*/
 			CurClip->fgColor = ColorText;
 			TalkAnswered = 0;
 		} else if(opcode == OP_GETDIGIT) {/*<index> OP_VARINT*/
-			CurClip->fgColor = D_0826;
+			CurClip->fgColor = ColorDarkBlue;
 			do {
 				MapAnimEnabled = 0;
 				TalkInput[0] = CON_getch();
@@ -1207,7 +1199,7 @@ until OP_LEAVE/OP_SCRIPT_MARK*/
 			CurClip->fgColor = ColorText;
 			TalkAnswered = 0;
 		} else if(opcode == OP_GETCHR) {
-			CurClip->fgColor = D_0826;
+			CurClip->fgColor = ColorDarkBlue;
 			MapAnimEnabled = 0;
 			TalkInput[0] = CON_getch();
 			MapAnimEnabled = 1;
@@ -1220,7 +1212,7 @@ until OP_LEAVE/OP_SCRIPT_MARK*/
 			CON_getch();
 			MapAnimEnabled = 1;
 		} else if(opcode == OP_GET) {/*OP_GET c0 .. cn OP_KEY -- GET [...]*/
-			CurClip->fgColor = D_0826;
+			CurClip->fgColor = ColorDarkBlue;
 			/*wait for one of the allowed keys*/
 			for(idx = 0; (opcode = PARSE_U8) != OP_KEY; idx ++)
 				TalkKeyword[idx] = opcode;
@@ -1272,12 +1264,12 @@ until OP_LEAVE/OP_SCRIPT_MARK*/
 	/*back to the normal display*/
 	CON_setClip(savedClip);
 	EndPagingAtPrompt = 1;
-	D_EC42 = savedB6B6;
+	LinesBeforeMore = savedB6B6;
 	AnimateAtPrompt = 1;
 	if(InCombat)
-		GR_DRAW_BITMAP(&D_3232, 0x93, 0xa9, D_BA7E, 0);
+		GR_DRAW_BITMAP(&Screen, 0x93, 0xa9, ScreenParts, 0);
 	else
-		GR_DRAW_BITMAP(&D_3232, 0x93, 0xa9, D_BA7E, 1);
+		GR_DRAW_BITMAP(&Screen, 0x93, 0xa9, ScreenParts, 1);
 	VIS_UpdateView();
 	ScreenFade = 1;
 	DrawMapWindow(0);

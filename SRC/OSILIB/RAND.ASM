@@ -1,32 +1,32 @@
 INCLUDE OSI.INC
 
 DSegStart
-D_2B1A	dw 1	;random seed 1
-D_2B1C	dw 0	;random seed 2
+randSeed1	dw 1	;D_2B1A random seed 1
+randSeed2	dw 0	;D_2B1C random seed 2
 DSegEnd
 
 CSegStart	SEG_2B57_TEXT
 	
-C_26CE_000A	PROC FAR
-	MOV	CX,D_2B1A
+RandNext	PROC FAR
+	MOV	CX,randSeed1
 	MOV	BX,CX
-	MOV	AX,D_2B1C
+	MOV	AX,randSeed2
 	ADD	CX,CX
 	RCL	AX,1
 	ADD	CX,BX
-	ADC	AX,D_2B1C
+	ADC	AX,randSeed2
 	ADD	AX,BX
-	MOV	D_2B1A,CX
-	MOV	D_2B1C,AX
+	MOV	randSeed1,CX
+	MOV	randSeed2,AX
 	RET
-C_26CE_000A	ENDP
+RandNext	ENDP
 
 PUBLIC OSI_rand
 OSI_rand	PROC FAR	;26CE:0027
 	PUSH	BP
 	MOV	BP,SP
 	;--
-	CALL	C_26CE_000A
+	CALL	RandNext
 	;--
 	MOV	BX,[BP+06]
 	MOV	CX,[BP+08]
@@ -53,7 +53,7 @@ OSI_randomize	PROC FAR	;26CE:004C
 	;--
 	MOV	AX,[BP+06]
 	OR	AX,1
-	MOV	D_2B1A,AX
+	MOV	randSeed1,AX
 	;--
 	POP	BP
 	RET	2

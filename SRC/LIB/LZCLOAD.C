@@ -1,8 +1,8 @@
 /* flags: -mm -c -O -G */
 /* compiler: Turbo C++ 1.01 */
 /* OSI library: loading a library entry, LZW compressed (type 1, LZC.C) or
-   not: LZC_load of Savage Empire's LZC.C (GAME.EXE 2EC5), a module of its
-   own in Martian Dreams (see LZC.C). */
+   not: LZC_load of Savage Empire's LZC.C (SE's GAME.EXE 2EC5), a module of its
+   own in Martian Dreams (GAME.EXE 2AC0; see LZC.C). */
 
 #include <dos.h>
 

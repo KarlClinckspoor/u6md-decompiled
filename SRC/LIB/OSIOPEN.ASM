@@ -1,6 +1,6 @@
 ;----------------------------------------
 ;OSI library: opening and closing a file (pascal), and the file error handler
-;(GAME.EXE 2E79). On a DOS error the routines put the error code in
+;(GAME.EXE 2A56; SE's GAME.EXE 2E79). On a DOS error the routines put the error code in
 ;osiError and call osiErrorHandler: if it clears osiError, the
 ;call is retried; otherwise they return -1 (open) with CF set.
 ;----------------------------------------

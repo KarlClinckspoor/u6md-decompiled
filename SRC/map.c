@@ -43,7 +43,7 @@ extern void cdecl TimerDelay(int32);/*wait (2383 per millisecond)*/
 extern int16 CombatOutcome;
 extern int16 ScreenFade;
 extern int16 ViewX, ViewY;
-extern char D_0F12;/*StatusDirty*/
+extern char StatusDirty;
 extern int16 ForceHatching;
 extern int16 VisibilityDirty;
 extern int16 LocPartOffset;
@@ -71,11 +71,11 @@ extern uint16 ExpPoints[];
 extern int16 Amount[];/*quantity (low byte), quality (high byte)*/
 extern unsigned char NPCStatus[];
 extern unsigned char HitPoints[];
-extern unsigned char D_6EC6[];/*TalkFlags (per NPC)*/
+extern unsigned char TalkFlags[];/*per NPC*/
 extern struct coord ObjPos[];
 extern unsigned char PartySize;
 extern uint16 ObjShapeType[];
-extern int16 D_B9D6[0x40];/*MissileHitList*/
+extern int16 MissileHitList[0x40];
 extern int16 far *OrigShapeType;
 /*BCAE*/extern int16 ChunkCacheAge[16];
 /*BCCE*/extern int16 AreaFirstCol;/*the area's first column in map order (where x wraps to 0)*/
@@ -89,7 +89,7 @@ extern int16 far *OrigShapeType;
 /*C0FC*/extern int16 AreaY;
 extern int16 Link[];
 extern int16 MapObjPtr[AREA_H][AREA_W];
-extern int16 D_EBCE;/*Selection.obj*/
+extern int16 SelectionObj;
 
 extern DrawSkyBar();
 extern int16 COMBAT_TileDistance(int16, int16, int16);/*COMBAT_TileDistance(objNum, x, y)*/
@@ -117,21 +117,17 @@ extern ShowObjects();
 extern MUS_PlaySong(int16);
 extern MUS_PlayAreaSong();
 extern MUS_PlaySfx(int16);/*play a sound effect?*/
-extern C_1FA9_0CD2();
+extern MUS_StopSfx();
 extern STAT_ShowParty(int16);
 extern int16 CON_mouseOffAt(int16, int16, int16, int16);
 extern CON_mouseOn(int16);
 extern cdecl CON_printf(char far *, ...);
 extern SPELL_ReviveNPC(int16);
 extern TALK_talkTo(int16, int16, int16);
-extern char far C_2BB4_219B[];/*far messages*/
-extern char far C_2BB4_21CD[];
-extern char far C_2BB4_22F1[];
+extern char far AlienDeviceMsg[];/*far messages*/
+extern char far NothingHappensMsg[];
+extern char far AarghMsg[];
 
-#define StatusDirty D_0F12
-#define TalkFlags D_6EC6
-#define MissileHitList D_B9D6
-#define Selection D_EBCE
 
 
 #define GetType(i) (ObjShapeType[i] & 0x3ff)
@@ -514,15 +510,15 @@ static /*C_1534_0000*/cacheChunk(int16 chunkIdx) {
 	qual = GetQual(objNum);
 	if(type == 0xc5) {
 		if(!(TalkFlags[0x73] & 0x10)) {
-			CON_printf(C_2BB4_219B);
+			CON_printf(AlienDeviceMsg);
 			return;
 		}
 		if(qual == 0) {
-			CON_printf(C_2BB4_21CD);
+			CON_printf(NothingHappensMsg);
 			return;
 		}
 		if(qual > 4) {
-			CON_printf(C_2BB4_22F1);
+			CON_printf(AarghMsg);
 			return;
 		}
 		x = ChamberDests[qual - 1][0];
@@ -530,7 +526,7 @@ static /*C_1534_0000*/cacheChunk(int16 chunkIdx) {
 		z = 0;
 	} else {
 		if(qual < 1 || qual > 24) {
-			CON_printf(C_2BB4_22F1);
+			CON_printf(AarghMsg);
 			return;
 		}
 		x = Entrances[qual - 1][0];
@@ -544,7 +540,7 @@ static /*C_1534_0000*/cacheChunk(int16 chunkIdx) {
 	MAP_LoadAround();
 	MUS_PlaySong(-1);
 	PartyEnter((type == 0xa3)?0:((type == 0xc5)?2:1));
-	C_1FA9_0CD2();
+	MUS_StopSfx();
 	if(type == 0xaf || type == 0xd2) {
 		for(obj = FindLoc(MapX, (MapY - 1) & 0x3ff, MapZ); obj >= 0; obj = NextLoc()) {
 			if(LocPartOffset)
@@ -560,7 +556,7 @@ static /*C_1534_0000*/cacheChunk(int16 chunkIdx) {
 			MoveObj(obj, x, (y + 2) & 0x3ff, z);
 		}
 	} else if(type != 0xb2 && type != 0xb4 && type != 0xc5) {
-		CON_printf(C_2BB4_22F1);
+		CON_printf(AarghMsg);
 		x = GetX(objNum);
 		y = GetY(objNum);
 		z = MapZ;
@@ -602,7 +598,7 @@ static /*C_1534_0000*/cacheChunk(int16 chunkIdx) {
 			for(bodyObj = Link[0x100]; bodyObj >= 0; bodyObj = next) {
 				next = Link[bodyObj];
 				if(GetType(bodyObj) == 0x155 && GetQual(bodyObj) == i) {
-					Selection = bodyObj;
+					SelectionObj = bodyObj;
 					if(i == 1) {
 						OBJ_ReviveFromBody(bodyObj);
 						NPCStatus[1] &= ~0x10;

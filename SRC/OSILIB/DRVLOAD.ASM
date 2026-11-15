@@ -3,36 +3,36 @@
 ;driver's far entry point and parameter block (the block's address goes to the
 ;driver in BX, module 264A). New in Martian Dreams; it took the place of
 ;Savage Empire's OSI_selectDrive (LOW.ASM's first code segment) and reports
-;an error the same way (D_2A84, DriveErrorCallback).
+;an error the same way (CriticalError, DriveErrorCallback).
 ;----------------------------------------
 INCLUDE OSI.INC
 
 EXTRN _drvName:WORD	;the drivers' file names (near pointers) by driver type (data-only module)
-EXTRN D_2A84:WORD,DriveErrorCallback:DWORD	;LOW.ASM
-EXTRN my_alloc:FAR,C_2674_04D9:FAR	;LOW.ASM: allocate BX paragraphs; load a file whole
+EXTRN CriticalError:WORD,DriveErrorCallback:DWORD	;LOW.ASM
+EXTRN my_alloc:FAR,LoadFileWhole:FAR	;LOW.ASM: allocate BX paragraphs; load a file whole
 
 DSegStart
 
-PUBLIC D_2A28,D_2A2A,D_2A2C,D_2A3A,D_2A42,D_2A44,D_2A46,D_2A48
-D_2A28	dw 0	;the driver's entry: offset (the function number, set before a call)
-D_2A2A	dw 0	;and segment: where the driver was loaded
+PUBLIC GrDrvEntryOfs,GrDrvEntrySeg,GrDrvParams,GrDrvType,GrClipLeft,GrClipRight,GrClipTop,GrClipBottom
+GrDrvEntryOfs	dw 0	;D_2A28 the driver's entry: offset (the function number, set before a call)
+GrDrvEntrySeg	dw 0	;D_2A2A and segment: where the driver was loaded
 ;the driver's parameter block (2A2C-2A6C)
-D_2A2C	dw 0	;CGA wanted
+GrDrvParams	dw 0	;D_2A2C CGA wanted
 	dw 8,8,10h,10h,0,0
-D_2A3A	dw 0	;the driver type: 0 CGA, 1 EGA, 2 Tandy 1000, 3 Hercules, 5 MCGA; -1 none
+GrDrvType	dw 0	;D_2A3A the driver type: 0 CGA, 1 EGA, 2 Tandy 1000, 3 Hercules, 5 MCGA; -1 none
 	dw 0,0,0
-D_2A42	dw 0	;the clipping rectangle: left
-D_2A44	dw 13Fh	;right
-D_2A46	dw 0	;top
-D_2A48	dw 0C7h	;bottom
+GrClipLeft	dw 0	;D_2A42 the clipping rectangle: left
+GrClipRight	dw 13Fh	;D_2A44 right
+GrClipTop	dw 0	;D_2A46 top
+GrClipBottom	dw 0C7h	;D_2A48 bottom
 	dw 0,0,0
 	db 0,1,2,3,4,5,6,7,38h,39h,3Ah,3Bh,3Ch,3Dh,3Eh,3Fh	;D_2A50 EGA palette registers
 	db 0
-D_2A61	dw 0	;EGA wanted
-D_2A63	dw 0	;Tandy 1000 wanted
-D_2A65	dw 0	;Hercules wanted
+GrWantEGA	dw 0	;D_2A61 EGA wanted
+GrWantTandy	dw 0	;D_2A63 Tandy 1000 wanted
+GrWantHercules	dw 0	;D_2A65 Hercules wanted
 	dw 0
-D_2A69	dw 0	;MCGA wanted
+GrWantMCGA	dw 0	;D_2A69 MCGA wanted
 	db 90h
 
 DSegEnd
@@ -45,36 +45,36 @@ CSegStart	SEG_263D_TEXT
 ;load its file and keep the segment; returns 0 after DriveErrorCallback on an
 ;error, -1 when the loader returned no error code
 ProcStart	OSI_loadDriver	;263D:000E
-	CMP	D_2A3A,-1
+	CMP	GrDrvType,-1
 	JNZ	C_001E
 	JMP	C_00CA
 C_001E:
-	CMP	D_2A2C,0
+	CMP	GrDrvParams,0
 	JZ	C_002D
-	MOV	D_2A3A,0
+	MOV	GrDrvType,0
 	JMP	SHORT C_0069
 C_002D:
-	CMP	D_2A61,0
+	CMP	GrWantEGA,0
 	JZ	C_003C
-	MOV	D_2A3A,1
+	MOV	GrDrvType,1
 	JMP	SHORT C_0069
 C_003C:
-	CMP	D_2A65,0
+	CMP	GrWantHercules,0
 	JZ	C_004B
-	MOV	D_2A3A,3
+	MOV	GrDrvType,3
 	JMP	SHORT C_0069
 C_004B:
-	CMP	D_2A63,0
+	CMP	GrWantTandy,0
 	JZ	C_005A
-	MOV	D_2A3A,2
+	MOV	GrDrvType,2
 	JMP	SHORT C_0069
 C_005A:
-	CMP	D_2A69,0
+	CMP	GrWantMCGA,0
 	JZ	C_0069
-	MOV	D_2A3A,5
+	MOV	GrDrvType,5
 	JMP	SHORT C_0069
 C_0069:
-	MOV	BX,D_2A3A
+	MOV	BX,GrDrvType
 	CMP	BX,2
 	JNZ	C_00A5
 	;-- Tandy 1000
@@ -102,14 +102,14 @@ C_0097:
 C_00A5:
 	SHL	BX,1
 	MOV	DX,_drvName[BX]
-	CALL	C_2674_04D9	;load the driver
+	CALL	LoadFileWhole	;load the driver
 	JB	C_00B8
-	MOV	D_2A2A,BX
+	MOV	GrDrvEntrySeg,BX
 	JNB	C_00CA
 C_00B8:
 	OR	BX,BX
 	JZ	C_00C7
-	MOV	D_2A84,AX
+	MOV	CriticalError,AX
 	CALL	DriveErrorCallback
 	XOR	AX,AX
 	JMP	SHORT C_00CA

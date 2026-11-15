@@ -1,7 +1,7 @@
 ;----------------------------------------
 ;OSI library: the graphics driver's mode call (saving the BIOS video mode that
 ;OSILIB/VIDRESET.ASM restores) and line clipping against the driver's
-;clipping rectangle (DRVLOAD.ASM's D_2A42-D_2A48), Cohen-Sutherland outcodes
+;clipping rectangle (DRVLOAD.ASM's GrClipLeft-GrClipBottom), Cohen-Sutherland outcodes
 ;with midpoint subdivision. New in Martian Dreams; nothing in GAME.EXE calls
 ;these routines directly (no relocation points at segment 264A).
 ;The helpers are labels inside FAR PROCs: their RET assembles to RETF even
@@ -9,19 +9,19 @@
 ;----------------------------------------
 INCLUDE OSI.INC
 
-EXTRN D_2A28:WORD,D_2A2A:WORD,D_2A2C:WORD	;DRVLOAD.ASM: the driver's entry and parameter block
-EXTRN D_2A42:WORD,D_2A44:WORD,D_2A46:WORD,D_2A48:WORD	;DRVLOAD.ASM: clipping rectangle left, right, top, bottom
-EXTRN D_2A7A:WORD	;VIDRESET.ASM: the video mode at the start (-1: not saved yet)
+EXTRN GrDrvEntryOfs:WORD,GrDrvEntrySeg:WORD,GrDrvParams:WORD	;DRVLOAD.ASM: the driver's entry and parameter block
+EXTRN GrClipLeft:WORD,GrClipRight:WORD,GrClipTop:WORD,GrClipBottom:WORD	;DRVLOAD.ASM: clipping rectangle left, right, top, bottom
+EXTRN StartVideoMode:WORD	;VIDRESET.ASM: the video mode at the start (-1: not saved yet)
 
 DSegStart
 
-D_2A6C	dw 0	;midpoint subdivision: x step
-D_2A6E	dw 0	;y step
-D_2A70	dw 0	;the line: x1
-D_2A72	dw 0	;y1
-D_2A74	dw 0	;x2
-D_2A76	dw 0	;y2
-D_2A78	dw 0	;not used
+clipStepX	dw 0	;D_2A6C midpoint subdivision: x step
+clipStepY	dw 0	;D_2A6E y step
+clipX1	dw 0	;D_2A70 the line: x1
+clipY1	dw 0	;D_2A72 y1
+clipX2	dw 0	;D_2A74 x2
+clipY2	dw 0	;D_2A76 y2
+clipUnused	dw 0	;D_2A78 not used
 
 DSegEnd
 
@@ -29,38 +29,38 @@ CSegStart	SEG_264A_TEXT
 
 ;void C_264A_0000(int mode) (pascal): if a driver is loaded, call its
 ;function 3 with AX = mode and BX = the parameter block; the first time with a
-;mode other than 0 the BIOS video mode is saved first (D_2A7A)
+;mode other than 0 the BIOS video mode is saved first (StartVideoMode)
 ProcStart	C_264A_0000	;264A:0000
-	CMP	D_2A2A,0
+	CMP	GrDrvEntrySeg,0
 	JZ	C_0033
 	MOV	AX,[BP+6]
 	OR	AX,AX
 	JZ	C_0026
-	CMP	D_2A7A,-1
+	CMP	StartVideoMode,-1
 	JNZ	C_0026
 	PUSH	AX
 	MOV	AH,0Fh		;get video mode
 	INT	10h
 	XOR	AH,AH
-	MOV	D_2A7A,AX
+	MOV	StartVideoMode,AX
 	POP	AX
 C_0026:
-	MOV	BX,OFFSET DGROUP:D_2A2C
-	MOV	D_2A28,3
-	CALL	DWORD PTR D_2A28
+	MOV	BX,OFFSET DGROUP:GrDrvParams
+	MOV	GrDrvEntryOfs,3
+	CALL	DWORD PTR GrDrvEntryOfs
 C_0033:
 ProcEndN	C_264A_0000,2
 
 ;(AX, BX) = point: CF clear if it is inside the clipping rectangle
 PUBLIC C_264A_003A
 C_264A_003A	PROC FAR	;264A:003A
-	CMP	AX,D_2A42
+	CMP	AX,GrClipLeft
 	JL	C_0054
-	CMP	AX,D_2A44
+	CMP	AX,GrClipRight
 	JG	C_0054
-	CMP	BX,D_2A46
+	CMP	BX,GrClipTop
 	JL	C_0054
-	CMP	BX,D_2A48
+	CMP	BX,GrClipBottom
 	JG	C_0054
 	CLC
 	RET
@@ -133,32 +133,32 @@ C_00B2:
 	STC			;both ends outside on the same side
 	RET
 C_00B8:
-	MOV	D_2A70,AX
-	MOV	D_2A72,BX
-	MOV	D_2A74,CX
-	MOV	D_2A76,DX
+	MOV	clipX1,AX
+	MOV	clipY1,BX
+	MOV	clipX2,CX
+	MOV	clipY2,DX
 	PUSH	DI
 	OR	SI,SI
 	JZ	C_00E1
 	XCHG	CX,AX		;the first end is outside: move it in
 	XCHG	BX,DX
 	CALL	C_0101
-	MOV	D_2A70,AX
-	MOV	D_2A72,BX
-	MOV	CX,D_2A74
-	MOV	DX,D_2A76
+	MOV	clipX1,AX
+	MOV	clipY1,BX
+	MOV	CX,clipX2
+	MOV	DX,clipY2
 C_00E1:
 	POP	DI
 	OR	DI,DI
 	JZ	C_00F0
 	CALL	C_0101		;the second end is outside: move it in
-	MOV	D_2A74,AX
-	MOV	D_2A76,BX
+	MOV	clipX2,AX
+	MOV	clipY2,BX
 C_00F0:
-	MOV	AX,D_2A70
-	MOV	BX,D_2A72
-	MOV	CX,D_2A74
-	MOV	DX,D_2A76
+	MOV	AX,clipX1
+	MOV	BX,clipY1
+	MOV	CX,clipX2
+	MOV	DX,clipY2
 	CLC
 	RET
 
@@ -199,29 +199,29 @@ C_0126:
 C_0132:
 	SUB	SI,AX
 	SUB	DI,BX
-	MOV	D_2A6C,SI
-	MOV	D_2A6E,DI
+	MOV	clipStepX,SI
+	MOV	clipStepY,DI
 	CALL	C_0192
 	OR	SI,SI
 	JZ	C_0153
 	MOV	CX,AX		;the midpoint is outside: go on from it
 	MOV	DX,BX
-	ADD	AX,D_2A6C
-	ADD	BX,D_2A6E
+	ADD	AX,clipStepX
+	ADD	BX,clipStepY
 	JMP	C_0101
 C_0153:
-	CMP	AX,D_2A42
+	CMP	AX,GrClipLeft
 	JZ	C_015F
-	CMP	AX,D_2A44
+	CMP	AX,GrClipRight
 	JNZ	C_016B
 C_015F:
-	CMP	BX,D_2A46
+	CMP	BX,GrClipTop
 	JZ	C_0191
-	CMP	BX,D_2A48
+	CMP	BX,GrClipBottom
 	JZ	C_0191
 C_016B:
-	MOV	SI,D_2A6C
-	MOV	DI,D_2A6E
+	MOV	SI,clipStepX
+	MOV	DI,clipStepY
 	TEST	SI,8000h
 	JNS	C_017B
 	NEG	SI
@@ -245,35 +245,35 @@ C_0191:
 C_0192:
 	XOR	SI,SI
 	MOV	DI,SI
-	CMP	AX,D_2A42
+	CMP	AX,GrClipLeft
 	JGE	C_019F
 	db	83h,0CEh,01h	;OR SI,1 (TASM's sign-extended imm8; MASM 3.0 writes 81h)
 C_019F:
-	CMP	CX,D_2A42
+	CMP	CX,GrClipLeft
 	JGE	C_01A8
 	db	83h,0CFh,01h	;OR DI,1 (TASM's sign-extended imm8; MASM 3.0 writes 81h)
 C_01A8:
-	CMP	AX,D_2A44
+	CMP	AX,GrClipRight
 	JLE	C_01B1
 	db	83h,0CEh,02h	;OR SI,2 (TASM's sign-extended imm8; MASM 3.0 writes 81h)
 C_01B1:
-	CMP	CX,D_2A44
+	CMP	CX,GrClipRight
 	JLE	C_01BA
 	db	83h,0CFh,02h	;OR DI,2 (TASM's sign-extended imm8; MASM 3.0 writes 81h)
 C_01BA:
-	CMP	BX,D_2A48
+	CMP	BX,GrClipBottom
 	JLE	C_01C3
 	db	83h,0CEh,04h	;OR SI,4 (TASM's sign-extended imm8; MASM 3.0 writes 81h)
 C_01C3:
-	CMP	DX,D_2A48
+	CMP	DX,GrClipBottom
 	JLE	C_01CC
 	db	83h,0CFh,04h	;OR DI,4 (TASM's sign-extended imm8; MASM 3.0 writes 81h)
 C_01CC:
-	CMP	BX,D_2A46
+	CMP	BX,GrClipTop
 	JGE	C_01D5
 	db	83h,0CEh,08h	;OR SI,8 (TASM's sign-extended imm8; MASM 3.0 writes 81h)
 C_01D5:
-	CMP	DX,D_2A46
+	CMP	DX,GrClipTop
 	JGE	C_01DE
 	db	83h,0CFh,08h	;OR DI,8 (TASM's sign-extended imm8; MASM 3.0 writes 81h)
 C_01DE:

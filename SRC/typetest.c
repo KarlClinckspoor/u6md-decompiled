@@ -3,7 +3,7 @@
  * Martian Dreams - GAME.EXE segment 222C: four small tests of a map tile
  * against fixed lists (the names are LOOK.LZC's). New in MD (no Savage
  * Empire counterpart). IsWaterTile is also used by console.c on the
- * animated tiles (D_B4C8).
+ * animated tiles (AnimTile).
  */
 #include "se.h"
 

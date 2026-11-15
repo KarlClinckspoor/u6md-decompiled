@@ -3,7 +3,8 @@
  * Martian Dreams - GAME.EXE segment 1FA9: the game's music and sound
  * effects. Savage Empire's GAME.EXE music.c (Ultima VI's), reworked.
  *
- * The music and sound library is SRC/music.c (2710, MARTIAN.EXE's). This
+ * The music and sound library is SRC/music.c (segment 2710, MARTIAN.EXE's
+ * source). This
  * module is the game's side: MUS_InitDriver() loads the 16 songs of
  * music.lzc into (expanded) memory (Songs, each with its volume in
  * SongVolume) and starts the sound driver with md.tim; MUS_PlaySong()
@@ -11,10 +12,13 @@
  * area's song: 3 on levels 2 and 3, 2 underground, 8 in combat, 0 by day
  * (6-17 h), else 1. Jingles start with PlaySong and queue the next song
  * with SetNextSong (no waiting for the music's marker as in SE).
- * MUS_PlaySfx() plays one of the 56 sound effects of Sfx; C_1FA9_09A5
+ * MUS_PlaySfx() plays one of the 56 sound effects of Sfx; MUS_PlayLoopSfx
  * keeps one of them looping (LoopSfx, LoopVoice); a few functions play
- * their own sequences (a sweep, five beeps, a melody).
- * C_1FA9_0603 is SE's "party knocked out" (C_2701_0556): in the dream the
+ * their own sequences (MUS_SweepSfx, MUS_MachinerySfx, MUS_PlayMelody).
+ * The combat music: MUS_CombatSong / MUS_AttackedSong at its start,
+ * MUS_CombatOutcomeSong when a member falls or a foe dies, MUS_CombatEndSong.
+ * MUS_MorningSong after a rest, MUS_EventJingle for story events.
+ * PartyUnconscious is SE's "party knocked out" (C_2701_0556): in the dream the
  * dreamer wakes up (back to WakeX/WakeY, conversation 0x66) or, without
  * a place to go back to, shakes itself awake from the nightmare; out of it
  * the party wakes in the Olympus mine or the space capsule, unless the
@@ -44,15 +48,15 @@ struct tSfxStep {
 	unsigned char pad;/*_07*/
 };
 
-/*the graphic driver: D_BA6A's offset selects the entry*/
-#define GR_SHUTDOWN()             (D_BA6A.iii.ofs = 0x03, (*D_BA6A.f)())
-#define GR_DRAW_BITMAP(s,a,b,p,c) (D_BA6A.iii.ofs = 0x30, (*D_BA6A.f)(s,a,b,p,c))
+/*the graphic driver: GrDriver's offset selects the entry*/
+#define GR_SHUTDOWN()             (GrDriver.iii.ofs = 0x03, (*GrDriver.f)())
+#define GR_DRAW_BITMAP(s,a,b,p,c) (GrDriver.iii.ofs = 0x30, (*GrDriver.f)(s,a,b,p,c))
 
 /*other game modules*/
 extern int16 MusicAdapter;/*1: AdLib or Roland, 0: none*/
 extern int16 CombatOutcome;
-extern char D_0F12;/*StatusDirty*/
-extern int16 D_0F18;/*MapAnimEnabled*/
+extern char StatusDirty;
+extern int16 MapAnimEnabled;
 extern unsigned char Time_H;
 extern unsigned char Active;
 extern int16 MapX, MapY, MapZ;
@@ -69,7 +73,7 @@ extern unsigned char ObjStatus[];
 extern unsigned char far *NPCMode;
 extern unsigned char NPCStatus[];
 extern unsigned char HitPoints[];
-extern unsigned char D_6EC6[];/*TalkFlags (per NPC)*/
+extern unsigned char TalkFlags[];/*per NPC*/
 extern uint16 ObjShapeType[];
 extern COMBAT_breakOff();
 extern int16 MaxHP(int16);
@@ -88,9 +92,9 @@ extern CON_putch0(int16);
 extern cdecl CON_printf(char far *, ...);
 extern DreamWakeUp();
 extern TALK_talkTo(int16, int16, int16);
-extern char far C_2BB4_006E[];/*UnconsciousMsg*/
-extern char far C_2BB4_00A4[];/*"... wake up in %s"*/
-extern char far C_2BB4_215E[];/*no EMS, no music*/
+extern char far UnconsciousMsg[];
+extern char far AwakenAtMsg[];/*"... wake up in %s"*/
+extern char far NoEmsMsg[];/*no EMS, no music*/
 
 /*library (cdecl)*/
 extern int16 cdecl soundCard;
@@ -115,21 +119,15 @@ extern int32 LIB_entrySize(char far *name, int16 index);
 extern void far *LZC_loadType(char far *name, int16 index, void far *out, int16 memflags, char far *work);
 
 /*uninitialised data*/
-extern char far *D_3E80;/*work area of the .lzc loader*/
-extern struct tSurface D_3232;/*Screen*/
-extern union tHandler D_BA6A;/*GrDriver*/
-extern void far *D_BA7E;/*mdscreen.lzc entry 2*/
-extern void far *D_EA76;/*LoopVoice: the looping sound effect's voice*/
-extern void far *D_EA90[16];/*Songs: the songs of music.lzc*/
+extern char far *LzcWorkBuf;/*work area of the .lzc loader*/
+extern struct tSurface Screen;
+extern union tHandler GrDriver;
+extern void far *ScreenParts;/*mdscreen.lzc entry 2*/
+/*EA76*/extern void far *LoopVoice;/*the looping sound effect's voice*/
+/*EA90*/extern void far *Songs[16];/*the songs of music.lzc*/
 
-#define StatusDirty D_0F12
-#define MapAnimEnabled D_0F18
 #define IN_DREAM (GameFlags & 0x10)
-#define TalkFlags D_6EC6
-#define LoopVoice D_EA76
-#define Songs D_EA90
 
-#define UnconsciousMsg C_2BB4_006E
 
 #define GetType(i) (ObjShapeType[i] & 0x3ff)
 
@@ -194,12 +192,12 @@ extern void far *D_EA90[16];/*Songs: the songs of music.lzc*/
 	{0, 0x50, 0x30, 0x60, 0x1E, 0, 0},
 	{0, 0x58, 0x30, 0x60, 0x1E, 0, 0}
 };
-/*189C*/int16 LoopSfx = -1;/*the looping sound effect (C_1FA9_09A5), -1: none*/
+/*189C*/int16 LoopSfx = -1;/*the looping sound effect (MUS_PlayLoopSfx), -1: none*/
 /*189E*/unsigned char SongVolume[16] = {
 	0xD7, 0xD7, 0xE1, 0xE1, 0xE6, 0xA5, 0xA5, 0xA5,
 	0xA5, 0xA5, 0xA5, 0xA5, 0xA5, 0, 0, 0
 };
-/*the melody of C_1FA9_0C15: (note, duration) pairs, note 0 a rest*/
+/*the melody of MUS_PlayMelody: (note, duration) pairs, note 0 a rest*/
 /*18AE*/unsigned char Melody[46] = {
 	0x1C, 0x0C, 0x1A, 0x0C, 0x1C, 0x18, 0x00, 0x0C,
 	0x1C, 0x0C, 0x1A, 0x0C, 0x18, 0x0C, 0x17, 0x0C,
@@ -220,7 +218,7 @@ extern int16 MUS_LoadSongs();
 		if(soundCard == 2 || soundCard == 1) {
 			if(emsInUse == 0) {
 				MusicAdapter = 0;
-				CON_printf(C_2BB4_215E);
+				CON_printf(NoEmsMsg);
 			} else if(MUS_LoadSongs() == 0) {
 				MusicAdapter = 0;
 				SoundFlag = 0;
@@ -261,7 +259,7 @@ extern int16 MUS_LoadSongs();
 			Songs[i] = 0;
 			continue;
 		}
-		LZC_loadType("music.lzc", i, Songs[i], 0, D_3E80);
+		LZC_loadType("music.lzc", i, Songs[i], 0, LzcWorkBuf);
 		if(osiError) {
 			CON_printf("Music error: readpacket, song %d, fe %d\n", i, osiError);
 			failed = 1;
@@ -324,7 +322,7 @@ extern int16 MUS_LoadSongs();
 
 /*the morning song (4), then song 0: always with <force>, else on the
   surface between 5 and 11 o'clock*/
-/*C_1FA9_02CE*/C_1FA9_02CE(int16 force) {
+/*C_1FA9_02CE*/MUS_MorningSong(int16 force) {
 	if(MusicAdapter && (force || (Time_H <= 11 && Time_H >= 5 && MapZ == 0))) {
 		SetMusicVolume(SongVolume[4]);
 		PlaySong(Songs[4]);
@@ -335,7 +333,7 @@ extern int16 MUS_LoadSongs();
 
 /*jingle 7 then song 8 on the surface; song 14 (area 2) or 13 (area 3)
   underground*/
-/*C_1FA9_032B*/C_1FA9_032B() {
+/*C_1FA9_032B*/MUS_AttackedSong() {
 	int16 area;
 	register int16 jingle, song;
 
@@ -365,7 +363,7 @@ extern int16 MUS_LoadSongs();
 
 /*end of a battle: underground the area song; on the surface <how> < 0
   plays jingle 11, > 0 jingle 12, then the area song; 0 fades to it*/
-/*C_1FA9_03DA*/C_1FA9_03DA(int16 how) {
+/*C_1FA9_03DA*/MUS_CombatEndSong(int16 how) {
 	register int16 jingle, song;
 
 	if(MusicAdapter) {
@@ -393,7 +391,7 @@ extern int16 MUS_LoadSongs();
 
 /*doubles CombatOutcome; on the surface plays song 9 or 10 by its sign,
   then song 8*/
-/*C_1FA9_047E*/C_1FA9_047E() {
+/*C_1FA9_047E*/MUS_CombatOutcomeSong() {
 	CombatOutcome *= 2;
 	if(MapZ != 0 || !MusicAdapter)
 		return;
@@ -409,7 +407,7 @@ extern int16 MUS_LoadSongs();
 }
 
 /*out of combat: song 5 (surface) or 15, then the area song*/
-/*C_1FA9_04ED*/C_1FA9_04ED() {
+/*C_1FA9_04ED*/MUS_EventJingle() {
 	register int16 song;
 
 	if(MusicAdapter && InCombat != 1) {
@@ -426,7 +424,7 @@ extern int16 MUS_LoadSongs();
 
 /*jingle 6 then song 8 on the surface; song 14 (area 2) or 13 (area 3)
   underground*/
-/*C_1FA9_0555*/C_1FA9_0555() {
+/*C_1FA9_0555*/MUS_CombatSong() {
 	int16 area;
 	register int16 jingle, song;
 
@@ -455,7 +453,7 @@ extern int16 MUS_LoadSongs();
 }
 
 /*the party is knocked out (see the header)*/
-/*C_1FA9_0603*/C_1FA9_0603() {
+/*C_1FA9_0603*/PartyUnconscious() {
 	int16 song;
 	char *msg;
 	int16 mouseState;
@@ -502,7 +500,7 @@ extern int16 MUS_LoadSongs();
 		}
 		if(InCombat) {
 			mouseState = CON_mouseOffAt(0x8d, 0xa3, 0x9e, 0xc4);
-			GR_DRAW_BITMAP(&D_3232, 0x93, 0xa9, D_BA7E, 1);
+			GR_DRAW_BITMAP(&Screen, 0x93, 0xa9, ScreenParts, 1);
 			CON_mouseOn(mouseState);
 		}
 		InCombat = 0;
@@ -546,7 +544,7 @@ extern int16 MUS_LoadSongs();
 		}
 		exit(4);
 	}
-	CON_printf(C_2BB4_00A4, (TalkFlags[0x46] & 8)?"the Olympus mine":"the space capsule");
+	CON_printf(AwakenAtMsg, (TalkFlags[0x46] & 8)?"the Olympus mine":"the space capsule");
 	ResurrectParty();
 	EndPagingAtPrompt = 1;
 	AnimateAtPrompt = 1;
@@ -562,13 +560,13 @@ extern int16 MUS_LoadSongs();
 			PlaySound(&(Sfx[sfx]), 0, 0xff, 0x3f, 1, 0xc);
 		}
 		if(LoopSfx != -1)
-			C_1FA9_09A5(-2);
+			MUS_PlayLoopSfx(-2);
 	}
 }
 
 /*keeps sound effect <sfx> looping (flag 8): -1 stops it, -2 starts the
   current one again*/
-/*C_1FA9_09A5*/C_1FA9_09A5(register int16 sfx) {
+/*C_1FA9_09A5*/MUS_PlayLoopSfx(register int16 sfx) {
 	struct tSfxStep step;
 
 	if(SoundFlag && sfx < 56) {
@@ -594,7 +592,7 @@ extern int16 MUS_LoadSongs();
 
 /*a rising sweep of sound effect 14 (notes 0x2f-0x60, panned along), then
   sound effect 11*/
-/*C_1FA9_0A8A*/C_1FA9_0A8A() {
+/*C_1FA9_0A8A*/MUS_SweepSfx() {
 	int16 note;
 
 	if(SoundFlag) {
@@ -608,7 +606,7 @@ extern int16 MUS_LoadSongs();
 }
 
 /*five times sound effect 19 (machinery)*/
-/*C_1FA9_0AFD*/C_1FA9_0AFD() {
+/*C_1FA9_0AFD*/MUS_MachinerySfx() {
 	if(SoundFlag) {
 		PlaySound(&(Sfx[19]), 0, 0xff, 0x3f, 1, 0xc);
 		TimerDelay(0xba2cL);
@@ -623,7 +621,7 @@ extern int16 MUS_LoadSongs();
 }
 
 /*sound effect 35 at note 0x30*/
-/*C_1FA9_0BE4*/C_1FA9_0BE4() {
+/*C_1FA9_0BE4*/MUS_SplashSfx() {
 	if(SoundFlag) {
 		Sfx[35].note = 0x30;
 		PlaySound(&(Sfx[35]), 0, 0xff, 0x3f, 1, 0xc);
@@ -632,7 +630,7 @@ extern int16 MUS_LoadSongs();
 
 /*plays Melody with sound effect 38's instrument (the music is faded out
   first, the area song comes back after)*/
-/*C_1FA9_0C15*/C_1FA9_0C15() {
+/*C_1FA9_0C15*/MUS_PlayMelody() {
 	struct tSfxStep step;
 	register int16 i;
 
@@ -661,7 +659,7 @@ extern int16 MUS_LoadSongs();
 }
 
 /*stops the sound effects*/
-/*C_1FA9_0CD2*/C_1FA9_0CD2() {
+/*C_1FA9_0CD2*/MUS_StopSfx() {
 	if(soundCard)
 		StopAllSounds();
 }

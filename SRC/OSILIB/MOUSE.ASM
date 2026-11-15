@@ -33,16 +33,15 @@ ENDM
 
 DSegStart
 
-EXTRN D_BA6A:DWORD	;the graphic driver's entry point (uninitialised data, BSS.ASM)
-GrDriver	EQU	D_BA6A
+EXTRN GrDriver:DWORD	;the graphic driver's entry point (uninitialised data, BSS.ASM)
 
 _pMouse	dw 0	;D_1412
 _nMouseSem	dw 0	;D_1414
 __2FB8	db 0,0	;??
-D_1418	dw 0	;pos x
-D_141A	dw 0	;pos y
-D_141C	dw 0	;L button
-D_141E	dw 0	;R button
+mousePosX	dw 0	;D_1418 pos x
+mousePosY	dw 0	;D_141A pos y
+mouseButtonL	dw 0	;D_141C L button
+mouseButtonR	dw 0	;D_141E R button
 
 DSegEnd
 
@@ -129,20 +128,20 @@ ProcStart _MOUSE_SERVE	;16D7:00A9
 	INT	33h
 	SHR	CX,1	;horizontal pos / 2
 	;--
-	MOV	AX,D_141C
+	MOV	AX,mouseButtonL
 	XOR	AL,BL
 	AND	AL,1
 	JNZ	C_00D9
 	;--
-	MOV	AX,D_141E
+	MOV	AX,mouseButtonR
 	XOR	AL,BL
 	AND	AL,2
 	JNZ	C_00D9
 	;--
-	CMP	D_1418,CX
+	CMP	mousePosX,CX
 	JNZ	C_00D9
 	;--
-	CMP	D_141A,DX
+	CMP	mousePosY,DX
 	JNZ	C_00D9
 C_00D4:	;-- mouse state didn't change
 	MOV	AX,0
@@ -167,15 +166,15 @@ endif
 	POP	CX
 	POP	BX
 	;--
-	MOV	D_1418,CX	;store pos x
-	MOV	D_141A,DX	;store pos y
-	MOV	D_141C,BX
+	MOV	mousePosX,CX	;store pos x
+	MOV	mousePosY,DX	;store pos y
+	MOV	mouseButtonL,BX
 	db	83h,26h	;AND D_141C,1 (TASM's sign-extended imm8; MASM 3.0 writes 81h)
-	dw	OFFSET DGROUP:D_141C
+	dw	OFFSET DGROUP:mouseButtonL
 	db	1	;store L button status
-	MOV	D_141E,BX
+	MOV	mouseButtonR,BX
 	db	83h,26h	;AND D_141E,2 (TASM's sign-extended imm8; MASM 3.0 writes 81h)
-	dw	OFFSET DGROUP:D_141E
+	dw	OFFSET DGROUP:mouseButtonR
 	db	2	;store R button status
 	;--
 	MOV	SI,_pMouse
@@ -203,7 +202,7 @@ ProcEnd	_MOUSE_SERVE
 
 ;force next refresh/reset refresh
 ProcStart	_MOUSE_0124	;16D7:012E
-	MOV	D_1418,8001h
+	MOV	mousePosX,8001h
 ProcEnd	_MOUSE_0124
 ;----------------------------------------
 ;

@@ -8,8 +8,8 @@ INCLUDE OSI.INC
 
 DSegStart
 
-PUBLIC D_2A7A
-D_2A7A	dw -1	;the video mode at the start (-1: not saved yet)
+PUBLIC StartVideoMode
+StartVideoMode	dw -1	;D_2A7A the video mode at the start (-1: not saved yet)
 
 DSegEnd
 
@@ -17,7 +17,7 @@ CSegStart	SEG_2668_TEXT
 
 ;void OSI_resetVideo(void): set the saved video mode, if one was saved
 ProcStart	OSI_resetVideo	;2668:0000
-	MOV	BX,D_2A7A
+	MOV	BX,StartVideoMode
 	CMP	BX,-1
 	JZ	C_0015
 	MOV	AH,0		;set video mode

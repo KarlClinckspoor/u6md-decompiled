@@ -1,5 +1,5 @@
 ;----------------------------------------
-;EMS memory: how much of the EMS heap is free (GAME.EXE 2D5A)
+;EMS memory: how much of the EMS heap is free (GAME.EXE 2908; SE's GAME.EXE 2D5A)
 ;----------------------------------------
 
 DGROUP	GROUP _DATA

@@ -6,14 +6,14 @@
  *
  * - InitGraphicsDriver loads the graphic driver (an entry of system.lzc) and
  *   gives it its callbacks. The driver is called through the GR_xx macros:
- *   D_BA6A holds its far address, the offset part being set to the entry
- *   number before each call; D_BA66 is the driver's state block (tGr).
+ *   GrDriver holds its far address, the offset part being set to the entry
+ *   number before each call; GrInfo is the driver's state block (tGr).
  * - Missiles: up to 16 sprites moving with a Bresenham line from one tile to
  *   several destination tiles, with rotation, collision with walls/objects
- *   and a list of the NPCs crossed (MissileHitList D_B9D6). Explosion and
- *   C_0E1A_1003 build on it. The animation is drawn in the offscreen map
- *   buffer; a "dirty rectangle" (D_BA6E left, D_BA70 top, D_BA74 right,
- *   D_BA76 bottom) is accumulated and copied to screen. The map window is
+ *   and a list of the NPCs crossed (MissileHitList). Explosion and
+ *   MissileSpray build on it. The animation is drawn in the offscreen map
+ *   buffer; a "dirty rectangle" (DirtyLeft, DirtyTop, DirtyRight,
+ *   DirtyBottom) is accumulated and copied to screen. The map window is
  *   x 8..167, y 16..159 of the buffer.
  * - the sky bar, the portraits (mdfaces.lzc over a background of
  *   mdback.lzc chosen by NPC), the dream pictures (mdream.lzc), the
@@ -23,11 +23,11 @@
  * Differences from Savage Empire's: there is no DISK_confirm (the driver's
  * disk callback is the empty DiskConfirm), no MagicalHalo, MagicWind,
  * AnimHailStorm, PortraitBg, ShowMidgame; the missile tables have 23 tiles;
- * coordinates wrap at 0x400; C_0E1A_1003 (a spray of 12 missiles in one of
+ * coordinates wrap at 0x400; MissileSpray (a spray of 12 missiles in one of
  * eight directions) replaces AnimWebs; the sky bar is a strip of mdscreen.lzc
  * scrolled by the time of day, and it also sets the clocks' frames; the
- * portrait background comes from a table by NPC (C_0E1A_135B); the faces
- * and conversations share one NPC -> number choice (C_0E1A_16AA); scripts of
+ * portrait background comes from a table by NPC (PortraitBackground); the faces
+ * and conversations share one NPC -> number choice (ConversationNum); scripts of
  * 0x36b0 bytes or more are refused; the paper doll is a picture of mdinv.lzc
  * by the NPC's type over four frame tiles that follow ColorPaper.
  */
@@ -73,26 +73,26 @@ struct tGr {
 	void (*pfnClose)();/*_30*/
 };
 
-/*the graphic driver: D_BA6A's offset selects the entry*/
-#define GR_INIT(a)                         (D_BA6A.iii.ofs = 0x00, (struct tGr far *)(*D_BA6A.f)(a))
-#define GR_SHUTDOWN()                      (D_BA6A.iii.ofs = 0x03, (*D_BA6A.f)())
-#define GR_SET_COLOR(c)                    (D_BA6A.iii.ofs = 0x06, (*D_BA6A.f)(c))
-#define GR_PUT_PIXEL(x,y)                  (D_BA6A.iii.ofs = 0x09, (*D_BA6A.f)(x,y))
-#define GR_FILL_RECT(x0,y0,x1,y1)          (D_BA6A.iii.ofs = 0x12, (*D_BA6A.f)(x0,y0,x1,y1))
-#define GR_PUT_TILE_SCREEN(tile,x,y)       (D_BA6A.iii.ofs = 0x2d, (*D_BA6A.f)(tile,x,y))
+/*the graphic driver: GrDriver's offset selects the entry*/
+#define GR_INIT(a)                         (GrDriver.iii.ofs = 0x00, (struct tGr far *)(*GrDriver.f)(a))
+#define GR_SHUTDOWN()                      (GrDriver.iii.ofs = 0x03, (*GrDriver.f)())
+#define GR_SET_COLOR(c)                    (GrDriver.iii.ofs = 0x06, (*GrDriver.f)(c))
+#define GR_PUT_PIXEL(x,y)                  (GrDriver.iii.ofs = 0x09, (*GrDriver.f)(x,y))
+#define GR_FILL_RECT(x0,y0,x1,y1)          (GrDriver.iii.ofs = 0x12, (*GrDriver.f)(x0,y0,x1,y1))
+#define GR_PUT_TILE_SCREEN(tile,x,y)       (GrDriver.iii.ofs = 0x2d, (*GrDriver.f)(tile,x,y))
 /*draw a bitmap on a surface (surface, x, y, bitmap, mode)*/
-#define GR_DRAW_BITMAP(s,x,y,p,c)          (D_BA6A.iii.ofs = 0x30, (*D_BA6A.f)(s,x,y,p,c))
+#define GR_DRAW_BITMAP(s,x,y,p,c)          (GrDriver.iii.ofs = 0x30, (*GrDriver.f)(s,x,y,p,c))
 /*(slot, tile, rotation, pivotX, pivotY) build a rotated sprite*/
-#define GR_DEFINE_SPRITE(i,a,b,c,d)        (D_BA6A.iii.ofs = 0x33, (*D_BA6A.f)(i,a,b,c,d))
+#define GR_DEFINE_SPRITE(i,a,b,c,d)        (GrDriver.iii.ofs = 0x33, (*GrDriver.f)(i,a,b,c,d))
 /*draw sprite slot at x,y in the back buffer (also puts a saved background back)*/
-#define GR_DRAW_SPRITE(i,x,y)              (D_BA6A.iii.ofs = 0x36, (*D_BA6A.f)(i,x,y))
+#define GR_DRAW_SPRITE(i,x,y)              (GrDriver.iii.ofs = 0x36, (*GrDriver.f)(i,x,y))
 /*save the back buffer under x,y into a sprite slot*/
-#define GR_SAVE_SPRITE_BG(i,x,y)           (D_BA6A.iii.ofs = 0x39, (*D_BA6A.f)(i,x,y))
-#define GR_PUT_TILE(tile,x,y)              (D_BA6A.iii.ofs = 0x42, (*D_BA6A.f)(tile,x,y))
+#define GR_SAVE_SPRITE_BG(i,x,y)           (GrDriver.iii.ofs = 0x39, (*GrDriver.f)(i,x,y))
+#define GR_PUT_TILE(tile,x,y)              (GrDriver.iii.ofs = 0x42, (*GrDriver.f)(tile,x,y))
 /*copy back buffer rect x0,y0,x1,y1 to screen at x,y*/
-#define GR_COPY_TO_SCREEN(x0,y0,x1,y1,x,y) (D_BA6A.iii.ofs = 0x45, (*D_BA6A.f)(x0,y0,x1,y1,x,y))
+#define GR_COPY_TO_SCREEN(x0,y0,x1,y1,x,y) (GrDriver.iii.ofs = 0x45, (*GrDriver.f)(x0,y0,x1,y1,x,y))
 /*same with a fade-in effect*/
-#define GR_FADE_TO_SCREEN(x0,y0,x1,y1,x,y) (D_BA6A.iii.ofs = 0x48, (*D_BA6A.f)(x0,y0,x1,y1,x,y))
+#define GR_FADE_TO_SCREEN(x0,y0,x1,y1,x,y) (GrDriver.iii.ofs = 0x48, (*GrDriver.f)(x0,y0,x1,y1,x,y))
 
 /*OSI*/
 extern int16 OSI_open(char *);
@@ -129,7 +129,7 @@ extern int16 CON_mouseOffAt(int16, int16, int16, int16);
 extern CON_mouseOn(int16);
 extern CON_WaitKeyOrClick();
 extern cdecl CON_printf(char far *, ...);
-extern char far C_2BB4_22F1[];
+extern char far AarghMsg[];
 
 
 /*library*/
@@ -142,7 +142,7 @@ extern void cdecl StopAllSounds(void);
 extern void cdecl ShutdownSound(void);
 extern void cdecl TimerDelay(int32);
 
-extern int16 D_0F18;/*MapAnimEnabled*/
+extern int16 MapAnimEnabled;
 extern int16 VisibilityDirty;
 extern int16 LocPartOffset;
 extern unsigned char Time_M;
@@ -159,33 +159,36 @@ extern int16 ViewX, ViewY;
 extern unsigned char AnimateAtPrompt;
 
 /*uninitialised data*/
-extern struct tSurface D_3232;/*Screen*/
+extern struct tSurface Screen;
 extern unsigned char ObjStatus[];
-extern char far *D_3E80;/*work area of the .lzc loader*/
+extern char far *LzcWorkBuf;/*work area of the .lzc loader*/
 extern unsigned char AreaFlags[AREA_H][AREA_W];
 extern unsigned char AreaTiles[AREA_H][AREA_W];
-extern char far *D_54B2;/*ScratchBuf + 0x36b0*/
+extern char far *ScratchBufHigh;/*the pictures are loaded there*/
 extern int16 Amount[];/*quantity (low byte), quality (high byte)*/
 extern unsigned char NPCStatus[];
-extern unsigned char far *D_6DBA;/*TileFlag*/
-extern int16 far *D_6EBE;/*BaseTile*/
-extern unsigned char D_6EC6[];/*TalkFlags*/
+extern unsigned char far *TileFlag;
+extern int16 far *BaseTile;
+extern unsigned char TalkFlags[];
 extern unsigned char AreaLight[AREA_H][AREA_W];
-extern int16 D_770E[];/*AnimFirstFrame*/
+extern int16 AnimFirstFrame[];
 extern struct coord ObjPos[];
-extern struct tSurface D_9CAE;/*MapSurface*/
-extern int16 D_9CC2;/*NumAnimData*/
+extern struct tSurface MapSurface;
+extern int16 NumAnimData;
 extern uint16 ObjShapeType[];
-extern unsigned char far *D_B4C4;/*TerrainType*/
-extern int16 D_B4C8[];/*AnimTile*/
-extern int16 D_B9D6[];/*MissileHitList*/
-extern struct tGr far *D_BA66;/*GrInfo*/
-extern union tHandler D_BA6A;/*GrDriver*/
-extern int16 D_BA6E, D_BA70, D_BA74, D_BA76;/*DirtyRect: left, top, right, bottom*/
-extern int16 D_BA72;/*width - 1 of the shaken rectangle*/
-extern void far *D_BA78;/*the paper doll picture (mdinv.lzc)*/
-extern int16 D_BA7C;/*its entry, -1: none*/
-extern void far *D_BA7E;/*mdscreen.lzc entry 2: the sky*/
+extern unsigned char far *TerrainType;
+extern int16 AnimTile[];
+/*B9D6*/extern int16 MissileHitList[];/*the NPCs and objects a missile or an explosion hit, -1 terminated*/
+/*BA66*/extern struct tGr far *GrInfo;/*the graphic driver's state block*/
+/*BA6A*/extern union tHandler GrDriver;/*the graphic driver (its offset selects the entry)*/
+/*BA6E*/extern int16 DirtyLeft;/*the dirty rectangle of the missiles' animation*/
+/*BA70*/extern int16 DirtyTop;
+/*BA74*/extern int16 DirtyRight;
+/*BA76*/extern int16 DirtyBottom;
+/*BA72*/extern int16 ShakeWidth;/*width - 1 of the rectangle ShakeScreen copies*/
+/*BA78*/extern void far *PaperDollPic;/*the paper doll picture (mdinv.lzc)*/
+/*BA7C*/extern int16 PaperDollEntry;/*its entry, -1: none*/
+extern void far *ScreenParts;/*mdscreen.lzc entry 2: frames 2/3 the sky*/
 extern int16 AreaX;
 extern int16 AreaY;
 extern unsigned char Obj_11x11[11][11];/*first entry of each cell's object tiles*/
@@ -195,11 +198,6 @@ extern int16 Tile_11x11[11][11];
 extern int16 MissileHitObj;
 extern int16 MissileEnd[2];
 
-#define TileFlag D_6DBA
-#define BaseTile D_6EBE
-#define TalkFlags D_6EC6
-#define TerrainType D_B4C4
-#define MissileHitList D_B9D6
 #define GetType(i) (ObjShapeType[i] & 0x3ff)
 #define GetFrame(i) (ObjShapeType[i] >> 10)
 #define GetQuan(i) (((unsigned char *)(Amount + (i)))[0])
@@ -231,14 +229,14 @@ extern int16 MissileEnd[2];
 /*081A*/int16 ColorBlack = 0;
 /*081C*/int16 ColorPaper = 0xDC;/*background of the map window and the panels*/
 /*081E*/int16 ColorText = 0;/*normal text color*/
-/*0820*/int16 D_0820 = 0;
+/*0820*/int16 ColorBlack2 = 0;/*not used*/
 /*0822*/int16 ColorGray = 7;
 /*0824*/int16 ColorBrown = 6;
-/*0826*/int16 D_0826 = 1;
+/*0826*/int16 ColorDarkBlue = 1;/*the player's input; hit points and attributes of the members of ObjStatus 0x80*/
 /*0828*/int16 ColorLightGreen = 0xA;/*peer: impassable terrain*/
-/*082A*/int16 D_082A = 0xF;
-/*082C*/int16 D_082C = 0xC;
-/*082E*/int16 D_082E = 0xDC;
+/*082A*/int16 ColorWhite = 0xF;/*hit points of the freezing (NPCStatus 1)*/
+/*082C*/int16 ColorLightRed = 0xC;/*hit points under 10*/
+/*082E*/int16 ColorPaperDefault = 0xDC;/*ColorPaper out of the dream (yellow on adapters other than MCGA)*/
 
 /*the driver's disk request callback: nothing to do*/
 static DiskConfirm(int16);
@@ -256,27 +254,27 @@ static DiskConfirm(int16);
 
 	name = "system.lzc";
 	size = LIB_entrySize(name, adapter == 4?3:adapter) + 0x10;
-	D_BA6A.p = MEM_alloc(size, 2);
-	if(D_BA6A.p == 0) {
+	GrDriver.p = MEM_alloc(size, 2);
+	if(GrDriver.p == 0) {
 		GR_SHUTDOWN();
 		MEM_shutdown(8);
 		exit(1);
 	}
-	D_BA6A.p = LZC_loadType(name, adapter == 4?3:adapter, D_BA6A.p, 2, D_3E80);
-	D_BA66 = GR_INIT(GrDriverParam[adapter] + GrDriverOption);
-	D_BA66->pfnDiskConfirm = DiskConfirm;
-	D_BA66->pfnLoadFile = LoadFileGr;
-	D_BA66->pfnOpen = OSI_open;
-	D_BA66->pfnRead = OSI_read;
-	D_BA66->pfnClose = OSI_close;
+	GrDriver.p = LZC_loadType(name, adapter == 4?3:adapter, GrDriver.p, 2, LzcWorkBuf);
+	GrInfo = GR_INIT(GrDriverParam[adapter] + GrDriverOption);
+	GrInfo->pfnDiskConfirm = DiskConfirm;
+	GrInfo->pfnLoadFile = LoadFileGr;
+	GrInfo->pfnOpen = OSI_open;
+	GrInfo->pfnRead = OSI_read;
+	GrInfo->pfnClose = OSI_close;
 	if(adapter) {
 		if(adapter == 1)
-			D_BA72 = 0x8f;
+			ShakeWidth = 0x8f;
 		else
-			D_BA72 = 0x95;
-		D_082E = ColorPaper = ColorYellow;
+			ShakeWidth = 0x95;
+		ColorPaperDefault = ColorPaper = ColorYellow;
 	} else {
-		D_BA72 = 0x96;
+		ShakeWidth = 0x96;
 	}
 }
 
@@ -285,24 +283,24 @@ static DiskConfirm(int16);
   (map buffer coordinates), clamped to the map window (8..167, 16..159)*/
 /*C_0E1A_0135*/static ExtendDirtyRect(int16 x, int16 y) {
 	if(x < 16)
-		D_BA6E = 8;
-	else if(x - 8 < D_BA6E)
-		D_BA6E = x - 8;
+		DirtyLeft = 8;
+	else if(x - 8 < DirtyLeft)
+		DirtyLeft = x - 8;
 
 	if(y < 24)
-		D_BA70 = 16;
-	else if(y - 8 < D_BA70)
-		D_BA70 = y - 8;
+		DirtyTop = 16;
+	else if(y - 8 < DirtyTop)
+		DirtyTop = y - 8;
 
 	if(x > 159)
-		D_BA74 = 167;
-	else if(x + 8 > D_BA74)
-		D_BA74 = x + 8;
+		DirtyRight = 167;
+	else if(x + 8 > DirtyRight)
+		DirtyRight = x + 8;
 
 	if(y > 151)
-		D_BA76 = 159;
-	else if(y + 8 > D_BA76)
-		D_BA76 = y + 8;
+		DirtyBottom = 159;
+	else if(y + 8 > DirtyBottom)
+		DirtyBottom = y + 8;
 }
 
 /*redraw, over the sprites, what must stay in front of them in the
@@ -522,10 +520,10 @@ static DiskConfirm(int16);
 	for(i = 0; i < delta_max; i ++) {
 		mustDisplay = 0;
 		/*empty dirty rectangle*/
-		D_BA6E = 168;
-		D_BA70 = 160;
-		D_BA74 = 7;
-		D_BA76 = 15;
+		DirtyLeft = 168;
+		DirtyTop = 160;
+		DirtyRight = 7;
+		DirtyBottom = 15;
 		for(dst = 0; dst < num_dst; dst ++) {
 			if(delta_x[dst] <= i) {
 				/*arrived/stopped: its last place must still be refreshed*/
@@ -635,9 +633,9 @@ stop:
 			}
 		}
 		/*foreground + copy the dirty rectangle to screen*/
-		if(D_BA6E <= D_BA74 && D_BA70 <= D_BA76) {
-			RedrawForeground(D_BA6E, D_BA70, D_BA74, D_BA76);
-			GR_COPY_TO_SCREEN(D_BA6E, D_BA70, D_BA74, D_BA76, D_BA6E, D_BA70);
+		if(DirtyLeft <= DirtyRight && DirtyTop <= DirtyBottom) {
+			RedrawForeground(DirtyLeft, DirtyTop, DirtyRight, DirtyBottom);
+			GR_COPY_TO_SCREEN(DirtyLeft, DirtyTop, DirtyRight, DirtyBottom, DirtyLeft, DirtyTop);
 		}
 		/*restore the background in the offscreen buffer*/
 		if(!(attr & 2)) {
@@ -756,7 +754,7 @@ int16 far /*C_0E1A_0EEA*/*Explosion(int16 x, int16 y, int16 missileTile) {
 /*a spray of 12 missiles (tile missileTile, range 6) from x,y toward x2,y2:
   the destinations come from the direction (SprayDir, SprayDX/SprayDY).
   returns the list of NPCs hit (MissileHitList)*/
-int16 far /*C_0E1A_1003*/*C_0E1A_1003(int16 x, int16 y, int16 x2, int16 y2, int16 missileTile) {
+int16 far /*C_0E1A_1003*/*MissileSpray(int16 x, int16 y, int16 x2, int16 y2, int16 missileTile) {
 	int16 dx;
 	register int16 dy;
 	int16 dir;
@@ -794,7 +792,7 @@ int16 far /*C_0E1A_1003*/*C_0E1A_1003(int16 x, int16 y, int16 x2, int16 y2, int1
 		MUS_PlaySfx(0);
 		ofs_x = OSI_rand(8 - ampl, ampl + 8);
 		ofs_y = OSI_rand(16 - ampl, ampl + 16);
-		GR_COPY_TO_SCREEN(ofs_x, ofs_y, ofs_x + D_BA72, ofs_y + 0x8f, 8, 16);
+		GR_COPY_TO_SCREEN(ofs_x, ofs_y, ofs_x + ShakeWidth, ofs_y + 0x8f, 8, 16);
 		StopAllSounds();
 	}
 	DisplayTick();
@@ -840,22 +838,22 @@ int16 far /*C_0E1A_1003*/*C_0E1A_1003(int16 x, int16 y, int16 x2, int16 y2, int1
 	if(MapZ == 2 || MapZ == 3) {
 		GR_SET_COLOR(ColorGray);
 		GR_FILL_RECT(0x20, 2, 0x8f, 0xc);
-		D_0F18 = 1;
+		MapAnimEnabled = 1;
 	} else if(MapZ > 0) {
 		GR_SET_COLOR(ColorBlack);
 		GR_FILL_RECT(0x20, 2, 0x8f, 0xc);
-		D_0F18 = 1;
+		MapAnimEnabled = 1;
 	} else {
 		if(Time_H >= 12)
-			GR_DRAW_BITMAP(&D_9CAE, 8 - (((Time_H - 12) << 4) + (Time_M / 15 << 2)), 0x10, D_BA7E, 3);
+			GR_DRAW_BITMAP(&MapSurface, 8 - (((Time_H - 12) << 4) + (Time_M / 15 << 2)), 0x10, ScreenParts, 3);
 		else
-			GR_DRAW_BITMAP(&D_9CAE, 8 - ((Time_H << 4) + (Time_M / 15 << 2)), 0x10, D_BA7E, 2);
+			GR_DRAW_BITMAP(&MapSurface, 8 - ((Time_H << 4) + (Time_M / 15 << 2)), 0x10, ScreenParts, 2);
 		GR_COPY_TO_SCREEN(8, 0x10, 0x77, 0x1a, 0x20, 2);
 	}
 	CON_mouseOn(mouseState);
-	for(i = 0; i < D_9CC2; i ++) {
-		if(D_B4C8[i] == BaseTile[0x62])
-			D_770E[i] = Time_H % 12 + 0x1a0;
+	for(i = 0; i < NumAnimData; i ++) {
+		if(AnimTile[i] == BaseTile[0x62])
+			AnimFirstFrame[i] = Time_H % 12 + 0x1a0;
 	}
 	AnimateTiles();
 }
@@ -873,7 +871,7 @@ int16 far /*C_0E1A_1003*/*C_0E1A_1003(int16 x, int16 y, int16 x2, int16 y2, int1
 /*the portrait background (entry of mdback.lzc) of NPC npc: a 4-bit
   field of PortraitBgs (high nibble for even npc), random for NPCs above
   0x79, 0 in the dream*/
-/*C_0E1A_135B*/C_0E1A_135B(register int16 npc) {
+/*C_0E1A_135B*/PortraitBackground(register int16 npc) {
 	if(GameFlags & 0x10)
 		return 0;
 	if(npc > 0x79)
@@ -882,7 +880,7 @@ int16 far /*C_0E1A_1003*/*C_0E1A_1003(int16 x, int16 y, int16 x2, int16 y2, int1
 }
 
 /*draw the portrait of NPC objNum at screen x,y + 2: a face of mdfaces.lzc
-  over its background (C_0E1A_135B, mdback.lzc). NPCs 10-15 use 0x51's;
+  over its background (PortraitBackground, mdback.lzc). NPCs 10-15 use 0x51's;
   the avatar (0, 1) has face 1, or 0 for a woman (PlayerIsFemale); NPC 6 with
   TalkFlags[6] & 2 is 0x16; NPCs with ObjStatus & 1 are 0x72/0x73 (by
   PlayerIsFemale); NPC 0x21 without TalkFlags[0x21] & 4 is 0x61; then some NPCs
@@ -908,7 +906,7 @@ int16 far /*C_0E1A_1003*/*C_0E1A_1003(int16 x, int16 y, int16 x2, int16 y2, int1
 				objNum = 0x61;
 			else
 				objNum = objNum;/*(a statement the compiler drops: it leaves the jmp before it)*/
-			bg = C_0E1A_135B(objNum);
+			bg = PortraitBackground(objNum);
 			if(objNum == 0x15 || (objNum >= 0x47 && objNum <= 0x4a) || objNum == 0x4e)
 				objNum = 0x14;
 			else if(objNum >= 0x4b && objNum <= 0x4d)
@@ -941,23 +939,23 @@ int16 far /*C_0E1A_1003*/*C_0E1A_1003(int16 x, int16 y, int16 x2, int16 y2, int1
 				objNum = 0x19;
 			else if(objNum == 0x6d)
 				objNum = 2;
-			LZC_loadType(BkgrndFile, bg, D_54B2, 0, D_3E80);
-			GR_DRAW_BITMAP(&D_3232, x + 1, y + 2, D_54B2, 0);
-			LZC_loadType(FacesFile, objNum, D_54B2, 0, D_3E80);
-			GR_DRAW_BITMAP(&D_3232, x, y + 2, D_54B2, 0);
+			LZC_loadType(BkgrndFile, bg, ScratchBufHigh, 0, LzcWorkBuf);
+			GR_DRAW_BITMAP(&Screen, x + 1, y + 2, ScratchBufHigh, 0);
+			LZC_loadType(FacesFile, objNum, ScratchBufHigh, 0, LzcWorkBuf);
+			GR_DRAW_BITMAP(&Screen, x, y + 2, ScratchBufHigh, 0);
 		}
 	}
 }
 
 /*draw the status area background (mdscreen.lzc entry 1) at 184,2*/
-/*C_0E1A_158A*/C_0E1A_158A() {
-	LZC_loadType("mdscreen.lzc", 1, D_54B2, 0, D_3E80);
-	GR_DRAW_BITMAP(&D_3232, 0xb8, 2, D_54B2, 0);
+/*C_0E1A_158A*/DrawStatusBackground() {
+	LZC_loadType("mdscreen.lzc", 1, ScratchBufHigh, 0, LzcWorkBuf);
+	GR_DRAW_BITMAP(&Screen, 0xb8, 2, ScratchBufHigh, 0);
 }
 
 /*show picture n (1-) of mdream.lzc in the status area, over a
   ColorPaper background with its two corner tiles*/
-/*C_0E1A_15D1*/C_0E1A_15D1(unsigned char n) {
+/*C_0E1A_15D1*/ShowDreamPicture(unsigned char n) {
 	register int16 mouseState;
 
 	mouseState = CON_mouseOffAt(0xb8, 2, 0x137, 0x77);
@@ -965,15 +963,15 @@ int16 far /*C_0E1A_1003*/*C_0E1A_1003(int16 x, int16 y, int16 x2, int16 y2, int1
 	GR_FILL_RECT(0xb8, 2, 0x137, 0x77);
 	GR_PUT_TILE_SCREEN(ColorPaper == 7 ? 0x12d : 0x124, 0xb8, 0);
 	GR_PUT_TILE_SCREEN(ColorPaper == 7 ? 0x12e : 0x125, 0x128, 0);
-	if(LZC_loadType(DreamFile, n - 1, D_54B2, 0, D_3E80))
-		GR_DRAW_BITMAP(&D_3232, 0xb8, 2, D_54B2, 0);
+	if(LZC_loadType(DreamFile, n - 1, ScratchBufHigh, 0, LzcWorkBuf))
+		GR_DRAW_BITMAP(&Screen, 0xb8, 2, ScratchBufHigh, 0);
 	CON_mouseOn(mouseState);
 }
 
 /*the number of NPC objNum's face and conversation (entry + 1 of
   mdfaces.lzc, entry of talk.lzc): NPCs 10-15 use 0x51's, temporary NPCs
   (0xc0 and up) of type 0x179 0x1d; 0 if none (0xbf, other temporary NPCs)*/
-/*C_0E1A_16AA*/C_0E1A_16AA(register int16 objNum) {
+/*C_0E1A_16AA*/ConversationNum(register int16 objNum) {
 	register int16 objType;
 
 	if(objNum >= 10 && objNum <= 15)
@@ -992,18 +990,18 @@ int16 far /*C_0E1A_1003*/*C_0E1A_1003(int16 x, int16 y, int16 x2, int16 y2, int1
 
 /*load the conversation script of NPC objNum (an entry of talk.lzc) into
   dest. returns objNum, or 0 if the NPC has no conversation or the script
-  is too big (message C_2BB4_22F1)*/
+  is too big (message AarghMsg)*/
 /*C_0E1A_16F2*/LoadConversation(int16 objNum, void far *dest) {
 	/*0B53*/static char loadName[] = "talk.lzc";
 	register int16 convIndex;
 
-	if(!(convIndex = C_0E1A_16AA(objNum)))
+	if(!(convIndex = ConversationNum(objNum)))
 		return 0;
 	if(LIB_entrySize(loadName, convIndex) >= 0x36b0L) {
-		CON_printf(C_2BB4_22F1);
+		CON_printf(AarghMsg);
 		return 0;
 	}
-	LZC_loadType(loadName, convIndex, dest, 0, D_3E80);
+	LZC_loadType(loadName, convIndex, dest, 0, LzcWorkBuf);
 	if(osiError)
 		return 0;
 	return objNum;
@@ -1016,11 +1014,11 @@ int16 far /*C_0E1A_1003*/*C_0E1A_1003(int16 x, int16 y, int16 x2, int16 y2, int1
 	register int16 convIndex;
 	int32 size;
 
-	if(!(convIndex = C_0E1A_16AA(objNum)))
+	if(!(convIndex = ConversationNum(objNum)))
 		return 0;
 	size = LIB_entrySize(checkName, convIndex);
 	if(size >= 0x36b0L) {
-		CON_printf(C_2BB4_22F1);
+		CON_printf(AarghMsg);
 		return 0;
 	}
 	if(size <= 0 || osiError)
@@ -1028,9 +1026,9 @@ int16 far /*C_0E1A_1003*/*C_0E1A_1003(int16 x, int16 y, int16 x2, int16 y2, int1
 	return objNum;
 }
 
-/*allocate the paper doll buffer (D_BA78): the biggest of mdinv.lzc's
+/*allocate the paper doll buffer (PaperDollPic): the biggest of mdinv.lzc's
   entries 0-0x12; the game stops if there is not enough memory*/
-/*C_0E1A_17C3*/C_0E1A_17C3() {
+/*C_0E1A_17C3*/AllocPaperDoll() {
 	register int16 i;
 	int32 size, max;
 
@@ -1040,8 +1038,8 @@ int16 far /*C_0E1A_1003*/*C_0E1A_1003(int16 x, int16 y, int16 x2, int16 y2, int1
 		if(size > max)
 			max = size;
 	}
-	D_BA78 = MEM_alloc(max, 0);
-	if(D_BA78 == 0) {
+	PaperDollPic = MEM_alloc(max, 0);
+	if(PaperDollPic == 0) {
 		CON_printf("Insufficient memory.  See your Ref Card.\n");
 		CON_WaitKeyOrClick();
 		GR_SHUTDOWN();
@@ -1049,12 +1047,12 @@ int16 far /*C_0E1A_1003*/*C_0E1A_1003(int16 x, int16 y, int16 x2, int16 y2, int1
 		MEM_shutdown(8);
 		exit(1);
 	}
-	D_BA7C = -1;
+	PaperDollEntry = -1;
 }
 
 /*the paper doll at screen x,y: four frame tiles (following ColorPaper),
   then the picture of mdinv.lzc for NPC objNum's type (0x126: 1, 0x127: 2,
-  0x156-0x166: 0-0x10, else 0x11), loaded once in D_BA78*/
+  0x156-0x166: 0-0x10, else 0x11), loaded once in PaperDollPic*/
 /*C_0E1A_186B*/DrawPaperDoll(int16 x, register int16 y, int16 objNum) {
 	register int16 n;
 
@@ -1070,13 +1068,13 @@ int16 far /*C_0E1A_1003*/*C_0E1A_1003(int16 x, int16 y, int16 x2, int16 y2, int1
 		n = 0x11;
 	else
 		n = n - 0x156;
-	if(n != D_BA7C) {
-		D_BA7C = -1;
-		if(LZC_loadType("mdinv.lzc", n, D_BA78, 0, D_3E80))
-			D_BA7C = n;
+	if(n != PaperDollEntry) {
+		PaperDollEntry = -1;
+		if(LZC_loadType("mdinv.lzc", n, PaperDollPic, 0, LzcWorkBuf))
+			PaperDollEntry = n;
 	}
-	if(D_BA7C != -1)
-		GR_DRAW_BITMAP(&D_3232, x + 0xd, y + 2, D_BA78, 0);
+	if(PaperDollEntry != -1)
+		GR_DRAW_BITMAP(&Screen, x + 0xd, y + 2, PaperDollPic, 0);
 }
 
 /*peer: draw one map tile as a 4x4 dot at x,y:
@@ -1142,7 +1140,7 @@ int16 far /*C_0E1A_1003*/*C_0E1A_1003(int16 x, int16 y, int16 x2, int16 y2, int1
 	if(isUnderground) {
 		VIS_FloodFill(ViewX + 5, ViewY + 5, 40, 2);
 	}
-	D_BA66->toBackBuffer = 1;
+	GrInfo->toBackBuffer = 1;
 	GR_SET_COLOR(0);
 	GR_FILL_RECT(8, 16, 167, 159);
 	/*terrain*/
@@ -1183,7 +1181,7 @@ int16 far /*C_0E1A_1003*/*C_0E1A_1003(int16 x, int16 y, int16 x2, int16 y2, int1
 	GR_SET_COLOR(15);
 	GR_FILL_RECT((ViewX << 2) + 28, (ViewY << 2) + 28, (ViewX << 2) + 31, (ViewY << 2) + 31);
 	GR_SET_COLOR(0);
-	D_BA66->toBackBuffer = 0;
+	GrInfo->toBackBuffer = 0;
 	mouseState = CON_mouseOffAt(8, 16, 167, 159);
 	GR_FADE_TO_SCREEN(8, 16, 167, 159, 8, 16);
 	CON_mouseOn(mouseState);
@@ -1199,13 +1197,13 @@ int16 far /*C_0E1A_1003*/*C_0E1A_1003(int16 x, int16 y, int16 x2, int16 y2, int1
 	int16 mouseState;
 
 	mouseState = CON_mouseOffAt(8, 16, 167, 159);
-	D_BA66->toBackBuffer = 1;
+	GrInfo->toBackBuffer = 1;
 	GR_SET_COLOR(ColorPaper);
 	GR_FILL_RECT(8, 16, 167, 159);
 	if(fade)
 		GR_FADE_TO_SCREEN(8, 16, 167, 159, 8, 16);
 	else
 		GR_COPY_TO_SCREEN(8, 16, 167, 159, 8, 16);
-	D_BA66->toBackBuffer = 0;
+	GrInfo->toBackBuffer = 0;
 	CON_mouseOn(mouseState);
 }

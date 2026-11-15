@@ -31,9 +31,9 @@ extern MachineryOn();
 extern MachineryOff();
 extern int16 OSI_rand(int16, int16);/*OSI_rand(lo, hi)*/
 extern cdecl CON_printf(char far *, ...);
-extern char far C_2BB4_2203[];/*"The coal begins moving down the belt.\n"*/
-extern char far C_2BB4_222A[];/*"The conveyor belt stops.\n"*/
-extern char far C_2BB4_22F1[];/*"Aargh!\n"*/
+extern char far CoalMovingMsg[];/*"The coal begins moving down the belt.\n"*/
+extern char far BeltStopsMsg[];/*"The conveyor belt stops.\n"*/
+extern char far AarghMsg[];/*"Aargh!\n"*/
 
 extern int16 VisibilityDirty;
 extern unsigned char Active;
@@ -41,16 +41,14 @@ extern int16 MapX, MapY, MapZ;
 extern unsigned char ObjStatus[];
 extern unsigned char Party[];
 extern int16 Amount[];/*quantity (low byte), quality (high byte)*/
-extern unsigned char D_6EC6[];/*TalkFlags (per NPC)*/
-extern unsigned char far *D_7606;/*TypeWeight*/
+extern unsigned char TalkFlags[];/*per NPC*/
+extern unsigned char far *TypeWeight;
 extern struct coord ObjPos[];
 extern uint16 ObjShapeType[];
 extern int16 barge_scrap_count;/*barge.c*/
 extern int16 barge_scrap[0x200];/*barge.c*/
 extern int16 AreaX, AreaY;
 
-#define TalkFlags D_6EC6
-#define TypeWeight D_7606
 
 
 #define GetType(i) (ObjShapeType[i] & 0x3ff)
@@ -78,7 +76,7 @@ extern int16 AreaX, AreaY;
 			if(GetFrame(belt) == 2) {
 				if(!GetQuan(belt)) {
 					if((objNum = AddMapObj(0xbd, 0, 0, x, y, MapZ)) < 0)
-						CON_printf(C_2BB4_22F1);
+						CON_printf(AarghMsg);
 					else
 						ObjStatus[objNum] &= ~0x20;
 					GetQuan(belt) = 4;
@@ -125,7 +123,7 @@ extern int16 AreaX, AreaY;
 		if(GetFrame(belt) == 0) {
 			if(!GetQuan(belt)) {
 				if((objNum = AddMapObj(0xbd, 0, 0, x, y, MapZ)) < 0)
-					CON_printf(C_2BB4_22F1);
+					CON_printf(AarghMsg);
 				else
 					ObjStatus[objNum] &= ~0x20;
 				GetQuan(belt) = 4;
@@ -157,7 +155,7 @@ extern int16 AreaX, AreaY;
 			MoveObj(npc, (x + 1) & 0x3ff, y, MapZ);
 	}
 	if(mayStop && (TalkFlags[0x71] & 8) && !OSI_rand(0, 6)) {
-		CON_printf(C_2BB4_222A);
+		CON_printf(BeltStopsMsg);
 		TalkFlags[0x73] &= ~4;
 		TalkFlags[0x71] &= ~8;
 		MachineryOff();
@@ -167,7 +165,7 @@ extern int16 AreaX, AreaY;
 
 /*the belt is started*/
 /*C_2F52_0473*/BeltStart() {
-	CON_printf(C_2BB4_2203);
+	CON_printf(CoalMovingMsg);
 	TalkFlags[0x73] |= 4;
 	TalkFlags[0x71] |= 8;
 	MachineryOn();

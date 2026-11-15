@@ -59,43 +59,43 @@ extern unsigned char far MonsterHP[];
 extern int16 far MonsterFlags[];/*by GetMonsterClass*/
 
 /*far messages (segment 2BB4)*/
-extern char far C_2BB4_0000[];/*"critical!\n"*/
-extern char far C_2BB4_000B[];/*"heavily"*/
-extern char far C_2BB4_0013[];/*"lightly"*/
-extern char far C_2BB4_001B[];/*"barely"*/
-extern char far C_2BB4_0022[];/*" wounded.\n"*/
-extern char far C_2BB4_002D[];/*" damaged.\n"*/
-extern char far C_2BB4_0038[];/*"`%s grazed.\n"*/
-extern char far C_2BB4_0045[];/*"`%s killed!\n"*/
-extern char far C_2BB4_0052[];/*"`%s destroyed!\n"*/
-extern char far C_2BB4_0062[];/*"`%s falls!\n"*/
-extern char far C_2BB4_00EB[];/*"with bare hands-"*/
-extern char far C_2BB4_00FC[];/*"with %s-"*/
-extern char far C_2BB4_02A4[];/*"It has no effect.\n"*/
-extern char far C_2BB4_0FDE[];/*"`%s becomes visible!\n"*/
-extern char far C_2BB4_13B1[];/*"`%s paralyzed!\n"*/
-extern char far C_2BB4_1393[];/*"`%s attacks!\n"*/
-extern char far C_2BB4_174D[];/*"You have killed someone whose help you need to win the game!\n"*/
-extern char far C_2BB4_20C6[];/*"The ice thaws.\n"*/
-extern char far C_2BB4_20D6[];/*"The water freezes.\n"*/
-extern char far C_2BB4_22F1[];/*"Aargh!\n"*/
+extern char far CriticalMsg[];/*"critical!\n"*/
+extern char far HeavilyMsg[];/*"heavily"*/
+extern char far LightlyMsg[];/*"lightly"*/
+extern char far BarelyMsg[];/*"barely"*/
+extern char far WoundedMsg[];/*" wounded.\n"*/
+extern char far DamagedMsg[];/*" damaged.\n"*/
+extern char far GrazedMsg[];/*"`%s grazed.\n"*/
+extern char far KilledMsg[];/*"`%s killed!\n"*/
+extern char far DestroyedMsg[];/*"`%s destroyed!\n"*/
+extern char far FallsMsg[];/*"`%s falls!\n"*/
+extern char far BareHandsMsg[];/*"with bare hands-"*/
+extern char far WithMsg[];/*"with %s-"*/
+extern char far NoEffectMsg[];/*"It has no effect.\n"*/
+extern char far BecomesVisibleMsg[];/*"`%s becomes visible!\n"*/
+extern char far ParalyzedMsg[];/*"`%s paralyzed!\n"*/
+extern char far AttacksMsg[];/*"`%s attacks!\n"*/
+extern char far KilledHelperMsg[];/*"You have killed someone whose help you need to win the game!\n"*/
+extern char far IceThawsMsg[];/*"The ice thaws.\n"*/
+extern char far WaterFreezesMsg[];/*"The water freezes.\n"*/
+extern char far AarghMsg[];/*"Aargh!\n"*/
 
-extern char far C_2BB4_00D3[];
-extern char far C_2BB4_00E4[];
-extern char far C_2BB4_0105[];
-extern char far C_2BB4_0115[];
-extern char far C_2BB4_0129[];
-extern char far C_2BB4_034D[];
-extern char far C_2BB4_03A6[];
-extern char far C_2BB4_03F1[];
-extern char far C_2BB4_0402[];
+extern char far AttackWithMsg[];
+extern char far AttackMsg[];
+extern char far OutOfArrowsMsg[];
+extern char far OutOfAmmoMsg[];
+extern char far AttackSelfPassMsg[];
+extern char far NotPossibleMsg[];
+extern char far OutOfRangeMsg[];
+extern char far WhatMsg[];
+extern char far NothingMsg[];
 
 /*variables of other modules*/
 extern char DirIncrX[];
 extern char DirIncrY[];
-extern unsigned char D_0F12;/*StatusDirty*/
-extern unsigned char D_0F13;/*PromptFlag*/
-extern char D_0F15;/*IsArmageddon: 1 the game cannot be won any more, 2 (some NPCs)*/
+extern unsigned char StatusDirty;
+extern unsigned char PromptFlag;
+extern char IsArmageddon;/*1 the game cannot be won any more, 2 (some NPCs)*/
 extern int16 VisibilityDirty;
 extern int16 EnemyWarningGiven;
 extern unsigned char Active;
@@ -117,7 +117,7 @@ extern int16 LastAttackTarget;
 extern int16 StatusDisplay;/*0x92 when the equipment view is shown*/
 extern int16 StatusMember;
 extern unsigned char IsInConversation;
-extern struct tSurface D_3232;/*Screen*/
+extern struct tSurface Screen;
 extern unsigned char ObjStatus[];
 extern char MovePts[];
 extern unsigned char far *SchedIndex;
@@ -127,21 +127,21 @@ extern unsigned char far *NPCMode;
 extern unsigned char Party[];
 /*4EB6*/extern unsigned char far *Level;
 extern unsigned char far *Leader;
-extern char D_50CE[][14];/*Names*/
+extern char Names[][14];
 /*51AE*/extern uint16 ExpPoints[];
 extern unsigned char far *NPCComMode;
 /*53B2*/extern unsigned char STREN[];
 extern int16 Amount[];
 extern unsigned char NPCStatus[];
 /*6DBE*/extern unsigned char HitPoints[];
-extern int16 far *D_6EBE;/*BaseTile*/
-extern unsigned char D_6EC6[];/*TalkFlags*/
-extern unsigned char far *D_760A;/*TileFlag2*/
+extern int16 far *BaseTile;
+extern unsigned char TalkFlags[];
+extern unsigned char far *TileFlag2;
 /*760E*/extern unsigned char INTEL[];
 extern struct coord ObjPos[];
 extern unsigned char PartySize;
 extern uint16 ObjShapeType[];
-extern unsigned char far *D_B4C4;/*TerrainType*/
+extern unsigned char far *TerrainType;
 extern int16 far *OrigShapeType;
 /*set by Missiles (gfx.c): the object hit where missile #0 stopped (with
   MissileShooter set), and where it stopped*/
@@ -153,17 +153,17 @@ extern int16 far *OrigShapeType;
 /*B9D0*/extern int16 KillBody;
 /*the weapons of the attacker (COMBAT_InitWeaponList)*/
 /*BA56*/extern int16 EquipWeapons[8];
-extern union tHandler D_BA6A;/*GrDriver*/
-extern void far *D_BA7E;/*mdscreen.lzc entry 2: default command mark*/
-extern int16 D_EB04[8];/*Equipment*/
-extern int16 D_EBCE;/*Selection.obj*/
+extern union tHandler GrDriver;
+extern void far *ScreenParts;/*mdscreen.lzc entry 2: default command mark*/
+extern int16 Equipment[8];
+extern int16 SelectionObj;
 
 /*functions of other modules*/
 extern int16 OSI_rand(int16, int16);/*OSI_rand(lo, hi)*/
 extern AnimateTiles(void);
 extern DrawMapWindow(int16);
 extern DisplayTick(void);
-extern C_120E_024B(int16);
+extern RedrawMapWithObjects(int16);
 extern PassTime(int16);
 extern SetPartyMode(void);
 extern int16 CON_mouseOffAt(int16, int16, int16, int16);
@@ -233,11 +233,11 @@ extern STAT_ShowInventory(int16);
 extern CheckActiveMember(void);
 extern TALK_talkTo(int16, int16, int16);
 extern MUS_PlaySfx(int16);
-extern C_1FA9_0555(void);/*the combat music*/
-extern C_1FA9_032B(void);/*the music of a combat begun by the enemy*/
-extern C_1FA9_03DA(int16);/*the music at the end of a combat (CombatOutcome)*/
+extern MUS_CombatSong(void);/*the combat music*/
+extern MUS_AttackedSong(void);/*the music of a combat begun by the enemy*/
+extern MUS_CombatEndSong(int16);/*the music at the end of a combat (CombatOutcome)*/
 extern int16 Missiles(int16, int16, int16, int16 *, int16 *, int16, int16, int16);
-extern int16 far *C_0E1A_1003(int16, int16, int16, int16, int16);/*a spray of 12 missiles: the objects hit, -1 terminated*/
+extern int16 far *MissileSpray(int16, int16, int16, int16, int16);/*a spray of 12 missiles: the objects hit, -1 terminated*/
 extern C_2F63_0086(void);/*the dreamer passes out*/
 extern C_2F63_062F(int16);
 extern char *GetTileString(int16);
@@ -254,32 +254,13 @@ extern int16 MouseMode;
 extern int16 PendingCommand;
 extern int16 SkipNewlines;
 extern int16 LastNumberPlural;
-extern int16 D_0F18;/*MapAnimEnabled*/
-extern int16 D_EB74, D_EB76;/*PointerX, PointerY*/
-extern int16 D_EBF6, D_EBF8;/*Selection.x, Selection.y*/
-extern int16 D_EC44;/*SelectionIsDark*/
-extern unsigned char far *D_6DBA;/*TileFlag*/
+extern int16 MapAnimEnabled;
+extern int16 PointerX, PointerY;
+extern int16 SelectionX, SelectionY;
+extern int16 SelectionIsDark;
+extern unsigned char far *TileFlag;
 
-#define MapAnimEnabled D_0F18
-#define PointerX D_EB74
-#define PointerY D_EB76
-#define SelectionX D_EBF6
-#define SelectionY D_EBF8
-#define SelectionIsDark D_EC44
-#define TileFlag D_6DBA
 
-#define StatusDirty D_0F12
-#define PromptFlag D_0F13
-#define IsArmageddon D_0F15
-#define Screen D_3232
-#define Names D_50CE
-#define BaseTile D_6EBE
-#define TalkFlags D_6EC6
-#define TileFlag2 D_760A
-#define TerrainType D_B4C4
-#define GrDriver D_BA6A
-#define Equipment D_EB04
-#define SelectionObj D_EBCE
 
 #define GR_DRAW_BITMAP(s,x,y,p,m)    (GrDriver.iii.ofs = 0x30, (*GrDriver.f)(s,x,y,p,m))
 
@@ -345,7 +326,7 @@ extern int16 COMBAT_FireM60(int16, int16, int16, int16);
 /*object firing the current missile (-1: none); lets Missiles() find
   the object hit at the impact tile (COMBAT_GetTargetAt)*/
 /*06BC*/int16 MissileShooter = -1;
-/*how the current combat goes, for the music at its end (C_1FA9_03DA):
+/*how the current combat goes, for the music at its end (MUS_CombatEndSong):
   -1 a party member died, 1 an enemy died, 0 nothing yet*/
 /*06BE*/int16 CombatOutcome = 0;
 
@@ -471,9 +452,9 @@ extern int16 COMBAT_FireM60(int16, int16, int16, int16);
 	SavedNPCMode = NPCMode[Party[partyIdx]];
 	NPCMode[Party[partyIdx]] = 2;
 	mouseSave = CON_mouseOffAt(0x8e, 0xa3, 0xa0, 0xc3);
-	GR_DRAW_BITMAP(&Screen, 0x93, 0xa9, D_BA7E, 0);
+	GR_DRAW_BITMAP(&Screen, 0x93, 0xa9, ScreenParts, 0);
 	CON_mouseOn(mouseSave);
-	C_1FA9_0555();
+	MUS_CombatSong();
 }
 
 /*leave combat mode: party members follow again (or stay put in solo
@@ -505,9 +486,9 @@ extern int16 COMBAT_FireM60(int16, int16, int16, int16);
 	SavedNPCMode = NPCMode[Party[partyIdx]];
 	NPCMode[Party[partyIdx]] = 2;
 	mouseSave = CON_mouseOffAt(0x8d, 0xa3, 0x9e, 0xc4);
-	GR_DRAW_BITMAP(&Screen, 0x93, 0xa9, D_BA7E, 1);
+	GR_DRAW_BITMAP(&Screen, 0x93, 0xa9, ScreenParts, 1);
 	CON_mouseOn(mouseSave);
-	C_1FA9_03DA(CombatOutcome);
+	MUS_CombatEndSong(CombatOutcome);
 	CombatOutcome = 0;
 	PassTime(1);
 	if(StatusDisplay == 0x92) {
@@ -627,7 +608,7 @@ extern int16 COMBAT_FireM60(int16, int16, int16, int16);
 /*set to "unconscious" type: called when an actor falls asleep or dies.
   Bodies (0x155, 0x151-0x154, 0x9f) stay; 0x172 becomes 0x154; the
   creatures of a class with flag 0x800 or 0x1000 have no body (0x1000:
-  C_120E_024B(1) when near the party); 0x156-0x165 fall as 0x155 (asleep
+  RedrawMapWithObjects(1) when near the party); 0x156-0x165 fall as 0x155 (asleep
   on a 0x8d: 0x8e), 0x169-0x171 as 0x151, 0x167/0x168 as 0x152, 0x178 as
   0x153, 0x174 as 0x9f, 0x198 as 0xfd; class flag 0x2000 bleeds
   (COMBAT_Bleed, four squares for 0x175). returns 1 if the actor has a body
@@ -694,7 +675,7 @@ extern int16 COMBAT_FireM60(int16, int16, int16, int16);
 		if((MonsterFlags[objCls] & 0x800) || (MonsterFlags[objCls] & 0x1000)) {
 			ret = 0;
 			if((MonsterFlags[objCls] & 0x1000) && MapDistance(GetX(objNum), MapX) <= 5 && MapDistance(GetY(objNum), MapY) <= 5)
-				C_120E_024B(1);
+				RedrawMapWithObjects(1);
 		}
 	}
 	VisibilityDirty = 1;
@@ -779,7 +760,7 @@ extern int16 COMBAT_FireM60(int16, int16, int16, int16);
 }
 
 /*a spraying weapon of type weapType fired by attacker at (x, y)
-  (C_0E1A_1003: 12 missiles): every object hit is hurt
+  (MissileSpray: 12 missiles): every object hit is hurt
   (__DoHit(attacker, obj, SprayDamages, SprayKinds)), actors may dodge
   (OSI_rand(1, 60) against their dexterity); 0xf1 freezes the water
   (0xa0 frame 1 to frame 2) and paralyzes the actors of class flag 0x4000
@@ -795,22 +776,22 @@ extern int16 COMBAT_FireM60(int16, int16, int16, int16);
 		}
 	}
 	EndPagingAtPrompt = 1;
-	for(hits = C_0E1A_1003(GetX(attacker), GetY(attacker), x, y, SprayTiles[i]); *hits >= 0; hits ++) {
+	for(hits = MissileSpray(GetX(attacker), GetY(attacker), x, y, SprayTiles[i]); *hits >= 0; hits ++) {
 		if(weapType == 0xf1) {
 			if(ObjShapeType[*hits] == 0x4a0) {
 				SetFrame(*hits, 2);
-				CON_printf(C_2BB4_20D6);
+				CON_printf(WaterFreezesMsg);
 			} else if(IsNPC(*hits)) {
 				if(OSI_rand(1, 45) > GetDex(*hits)) {
 					if((objCls = GetMonsterClass(GetType(*hits))) >= 0 && ((MonsterFlags[objCls] & 0x4000) || (MonsterFlags[objCls] & 0x80))) {
 						NPCStatus[*hits] |= 2;
-						CON_printf(C_2BB4_13B1, GetObjectString(*hits));
+						CON_printf(ParalyzedMsg, GetObjectString(*hits));
 						if((MonsterFlags[objCls] & 0x80) && !(MonsterFlags[objCls] & 0x4000))
 							__DoHit(attacker, *hits, SprayDamages[i], 1);
 						else
 							COMBAT_showEffectHit(*hits);
 					} else {
-						CON_printf(C_2BB4_02A4);
+						CON_printf(NoEffectMsg);
 					}
 				} else {
 					CON_printf("%s dodges!\n", GetObjectString(*hits));
@@ -877,7 +858,7 @@ extern int16 COMBAT_FireM60(int16, int16, int16, int16);
 			else
 				DeleteObj(itemObj);
 			Equipment[slot] = AddInvObj(typ, 0x18, 1, att_objNum);
-			C_120E_024B(0);
+			RedrawMapWithObjects(0);
 		}
 	}
 	if(invChanged && StatusDisplay == 0x92 && Party[StatusMember] == att_objNum)
@@ -1066,12 +1047,12 @@ extern int16 COMBAT_FireM60(int16, int16, int16, int16);
 		}
 		if(MapZ == 3) {
 			if((i = OBJ_FindTypeAt(0x1d2, 0x87, 0x17)) < 0)
-				CON_printf(C_2BB4_22F1);
+				CON_printf(AarghMsg);
 			else
 				DeleteObj(i);
 			if((i = OBJ_FindTypeAt(0xe0, 0x7f, 0x18)) < 0) {
 				if((i = AddMapObj(0xce0, 0, 0, 0x7f, 0x18, MapZ)) < 0)
-					CON_printf(C_2BB4_22F1);
+					CON_printf(AarghMsg);
 				else
 					ObjStatus[i] &= ~0x20;
 			}
@@ -1118,7 +1099,7 @@ extern int16 COMBAT_FireM60(int16, int16, int16, int16);
 			}
 		} else if(objNum == 0x12 || objNum == 0x1a) {
 			IsArmageddon = 1;
-			CON_printf(C_2BB4_174D);
+			CON_printf(KilledHelperMsg);
 		} else if(objNum == 0x20) {
 			IsArmageddon = 1;
 		} else if(
@@ -1158,11 +1139,11 @@ extern int16 COMBAT_FireM60(int16, int16, int16, int16);
 		if(objType != 0x172 && !IsInConversation) {
 			if(objNum >= 0x10) {
 				if(!(MonsterFlags[objCls] & 0x4000) && !(MonsterFlags[objCls] & 0x80))
-					CON_printf(C_2BB4_0052, GetObjectString(objNum));
+					CON_printf(DestroyedMsg, GetObjectString(objNum));
 				else
-					CON_printf(C_2BB4_0045, GetObjectString(objNum));
+					CON_printf(KilledMsg, GetObjectString(objNum));
 			} else {
-				CON_printf(C_2BB4_0062, GetObjectString(objNum));
+				CON_printf(FallsMsg, GetObjectString(objNum));
 			}
 		}
 		noShape = !SetTypeUnconscious(objNum);
@@ -1240,28 +1221,28 @@ extern int16 COMBAT_FireM60(int16, int16, int16, int16);
 		if(IsInvulnerable(objNum)) {
 			if(objNum == 0x69) {
 				CON_printf("`%s ", GetObjectString(0x19));
-				CON_printf(C_2BB4_0000);
+				CON_printf(CriticalMsg);
 				PromptFlag = 1;
 			} else if(objNum == 0x3c) {
 				CON_printf("`%s ", GetObjectString(objNum));
-				CON_printf(C_2BB4_0000);
+				CON_printf(CriticalMsg);
 				PromptFlag = 1;
 			} else if(objNum == 0x52) {
 				CON_printf("`%s ", GetObjectString(0x52));
-				CON_printf(C_2BB4_000B);
-				CON_printf(C_2BB4_0022);
+				CON_printf(HeavilyMsg);
+				CON_printf(WoundedMsg);
 			} else if(objNum == 0x68) {
 				CON_printf("`%s ", GetObjectString(objNum));
 				if(TalkFlags[0x68] & 4) {
-					CON_printf(C_2BB4_0000);
+					CON_printf(CriticalMsg);
 				} else {
-					CON_printf(C_2BB4_000B);
-					CON_printf(C_2BB4_0022);
+					CON_printf(HeavilyMsg);
+					CON_printf(WoundedMsg);
 				}
 				TalkFlags[0x68] |= 0x20;
 				TALK_talkTo(Active, 0x68, 0);
 			} else {
-				CON_printf(C_2BB4_02A4);
+				CON_printf(NoEffectMsg);
 			}
 			HitPoints[objNum] = 0xff;
 			if(GetType(objNum) == 0x187) {
@@ -1280,7 +1261,7 @@ extern int16 COMBAT_FireM60(int16, int16, int16, int16);
 		}
 		if(kind == 3) {
 			if(MonsterFlags[objCls] & 8) {
-				CON_printf(C_2BB4_02A4);
+				CON_printf(NoEffectMsg);
 				return 0;
 			}
 			if(MonsterFlags[objCls] & 0x10)
@@ -1365,11 +1346,11 @@ extern int16 COMBAT_FireM60(int16, int16, int16, int16);
 		}
 	} else if(GetType(objNum) == 0xa0) {
 		if(kind == 3 && GetFrame(objNum) == 2) {
-			CON_printf(C_2BB4_20C6);
+			CON_printf(IceThawsMsg);
 			SetFrame(objNum, 1);
 			VisibilityDirty = 1;
 		} else if(kind == 1 && GetFrame(objNum) == 1) {
-			CON_printf(C_2BB4_20D6);
+			CON_printf(WaterFreezesMsg);
 			SetFrame(objNum, 2);
 			VisibilityDirty = 1;
 		}
@@ -1422,7 +1403,7 @@ extern int16 COMBAT_FireM60(int16, int16, int16, int16);
 		PromptFlag = 1;
 	}
 	if(severity == 0) {/*critical*/
-		CON_printf(C_2BB4_0000);
+		CON_printf(CriticalMsg);
 		if(InCombat && objType == 0x175)
 			CombatOutcome = 1;
 		if(NPCMode[objNum] == 0xd) {
@@ -1442,17 +1423,17 @@ extern int16 COMBAT_FireM60(int16, int16, int16, int16);
 			objType != 0x91
 		) NPCMode[objNum] = 7;
 	} else if(severity == 1) {/*heavily*/
-		CON_printf(C_2BB4_000B);
+		CON_printf(HeavilyMsg);
 	} else if(severity == 2) {/*lightly*/
-		CON_printf(C_2BB4_0013);
+		CON_printf(LightlyMsg);
 	} else if(severity == 3) {/*barely*/
-		CON_printf(C_2BB4_001B);
+		CON_printf(BarelyMsg);
 	}
 	if(severity != 0 && severity < 4) {
 		if(!(MonsterFlags[objCls] & 0x4000) && !(MonsterFlags[objCls] & 0x80))
-			CON_printf(C_2BB4_002D);
+			CON_printf(DamagedMsg);
 		else
-			CON_printf(C_2BB4_0022);
+			CON_printf(WoundedMsg);
 	}
 }
 
@@ -1471,7 +1452,7 @@ extern int16 COMBAT_FireM60(int16, int16, int16, int16);
 	if(!IsPlrControl(victim) && (NPCMode[victim] <= 0x10 || NPCMode[victim] >= 0x80)) {
 		objCls = GetMonsterClass(GetType(victim));
 		if(NPCMode[attacker] == 2 && objCls >= 0 && (MonsterFlags[objCls] & 0x4000) && !(MonsterFlags[objCls] & 0x80) && damage > 0) {
-			CON_printf(C_2BB4_1393, GetObjectString(victim));
+			CON_printf(AttacksMsg, GetObjectString(victim));
 			PromptFlag = 1;
 		}
 		if(victim < 0xc0 && NPCMode[victim] >= 0x80) {
@@ -1522,7 +1503,7 @@ extern int16 COMBAT_FireM60(int16, int16, int16, int16);
 			COMBAT_showEffectHit(defender);
 		else
 			COMBAT_showHit(defender);
-		CON_printf(C_2BB4_0038, pObjStr);
+		CON_printf(GrazedMsg, pObjStr);
 		PromptFlag = 1;
 	} else {
 		if(Is_ATKPLR(attacker) && IsNPC(defender) && IsPlrControl(defender) && !InCombat && SoloMember == -1)
@@ -1543,7 +1524,7 @@ extern int16 COMBAT_FireM60(int16, int16, int16, int16);
 		return;
 	}
 	if(IsNPC(defender) && (MonsterFlags[attCls] & 4) && OSI_rand(0, 3) == 0 && !IsInvulnerable(defender)) {
-		CON_printf(C_2BB4_13B1, pObjStr);
+		CON_printf(ParalyzedMsg, pObjStr);
 		PromptFlag = 1;
 		NPCStatus[defender] |= 2;
 		if(
@@ -1666,7 +1647,7 @@ extern int16 COMBAT_FireM60(int16, int16, int16, int16);
 		if(didHit && MissileHitObj >= 0 && opp_objNum != att_objNum) {
 			if(objTyp == 0xf1) {
 				if((tmp = GetType(opp_objNum)) == 0xa0 && GetFrame(opp_objNum) == 1) {
-					CON_printf(C_2BB4_20D6);
+					CON_printf(WaterFreezesMsg);
 					SetFrame(opp_objNum, 2);
 					VisibilityDirty = 1;
 				} else if(
@@ -1674,30 +1655,30 @@ extern int16 COMBAT_FireM60(int16, int16, int16, int16);
 					((MonsterFlags[tmp] & 0x4000) || (MonsterFlags[tmp] & 0x80))
 				) {
 					NPCStatus[opp_objNum] |= 2;
-					CON_printf(C_2BB4_13B1, GetObjectString(opp_objNum));
+					CON_printf(ParalyzedMsg, GetObjectString(opp_objNum));
 					if((MonsterFlags[tmp] & 0x80) && !(MonsterFlags[tmp] & 0x4000))
 						__DoHit(att_objNum, opp_objNum, damage, 1);
 					else
 						COMBAT_showEffectHit(opp_objNum);
 				} else {
-					CON_printf(C_2BB4_02A4);
+					CON_printf(NoEffectMsg);
 				}
 			} else if(objTyp == 0x81 || objTyp == 0x105) {
 				if(GetQual(weap_objNum)) {
 					if(IsNPC(opp_objNum) && GetType(opp_objNum) == 0x91) {
 						SetType(opp_objNum, 0x16c);
-						CON_printf(C_2BB4_0FDE, GetObjectString(opp_objNum));
+						CON_printf(BecomesVisibleMsg, GetObjectString(opp_objNum));
 						ShowObjects();
 					} else if(IsInvisible(opp_objNum)) {
 						ClrInvisible(opp_objNum);
-						CON_printf(C_2BB4_0FDE, GetObjectString(opp_objNum));
+						CON_printf(BecomesVisibleMsg, GetObjectString(opp_objNum));
 						ShowObjects();
 					} else {
-						CON_printf(C_2BB4_02A4);
+						CON_printf(NoEffectMsg);
 					}
 				} else {
 					if(!(tmp = GetMonsterClass(GetType(opp_objNum))) || (MonsterFlags[tmp] & 0x4000) || !(MonsterFlags[tmp] & 0x80))
-						CON_printf(C_2BB4_02A4);
+						CON_printf(NoEffectMsg);
 					else
 						__DoHit(att_objNum, opp_objNum, damage, 2);
 				}
@@ -1746,9 +1727,9 @@ extern int16 COMBAT_FireM60(int16, int16, int16, int16);
 		}
 	}
 	if(NumEquipWeapons == 0)
-		CON_printf(C_2BB4_00EB);
+		CON_printf(BareHandsMsg);
 	else
-		CON_printf(C_2BB4_00FC, GetObjectString(EquipWeapons[0]));
+		CON_printf(WithMsg, GetObjectString(EquipWeapons[0]));
 }
 
 /*next equiped weapon list: attack the selected target with the current
@@ -1767,40 +1748,40 @@ extern int16 COMBAT_FireM60(int16, int16, int16, int16);
 		weapObj = EquipWeapons[CurEquipWeapon];
 	weapTyp = GetType(weapObj);
 	if(weapTyp == 0x30 && FindInvOfType(attacker, 0x40) < 0) {
-		CON_printf(C_2BB4_0105);
+		CON_printf(OutOfArrowsMsg);
 		MUS_PlaySfx(5);
 	} else if(weapTyp == 0x2f && FindInvType(attacker, 0x3f, -1) < 0) {
-		CON_printf(C_2BB4_0115);
+		CON_printf(OutOfAmmoMsg);
 		MUS_PlaySfx(5);
 	} else if((weapTyp == 0x29 || weapTyp == 0x2a) && FindInvType(attacker, 0x39, -1) < 0) {
-		CON_printf(C_2BB4_0115);
+		CON_printf(OutOfAmmoMsg);
 		MUS_PlaySfx(5);
 	} else if(weapTyp == 0x2e && FindInvType(attacker, 0x3c, -1) < 0) {
-		CON_printf(C_2BB4_0115);
+		CON_printf(OutOfAmmoMsg);
 		MUS_PlaySfx(5);
 	} else if(weapTyp == 0x2c && FindInvType(attacker, 0x3b, -1) < 0) {
-		CON_printf(C_2BB4_0115);
+		CON_printf(OutOfAmmoMsg);
 		MUS_PlaySfx(5);
 	} else if(weapTyp == 0x2b && FindInvType(attacker, 0x3a, -1) < 0) {
-		CON_printf(C_2BB4_0115);
+		CON_printf(OutOfAmmoMsg);
 		MUS_PlaySfx(5);
 	} else if(weapTyp == 0x2d &&
 		(FindInvType(attacker, 0x3b, -1) < 0 || GetQual(weapObj) == 2) &&
 		(FindInvType(attacker, 0x3a, -1) < 0 || GetQual(weapObj) == 1)) {
-		CON_printf(C_2BB4_0115);
+		CON_printf(OutOfAmmoMsg);
 		MUS_PlaySfx(5);
 	} else if((weapTyp == 0x81 || weapTyp == 0x105) && !GetQuan(weapObj)) {
-		CON_printf(C_2BB4_0115);
+		CON_printf(OutOfAmmoMsg);
 		MUS_PlaySfx(5);
 	} else if((weapTyp == 0xf0 || weapTyp == 0xf1) &&
 		(GetQuan(weapObj) == 0 || (GetQual(weapObj) == 2 && GetQuan(weapObj) < 4))) {
-		CON_printf(C_2BB4_0115);
+		CON_printf(OutOfAmmoMsg);
 		MUS_PlaySfx(5);
 	} else {
 		hitResult = 0;
 		if(SelectionObj >= 0) {
 			if(SelectionObj == attacker) {
-				CON_printf(C_2BB4_0129);
+				CON_printf(AttackSelfPassMsg);
 			} else {
 				CON_printf("%s.\n", GetObjectString(SelectionObj));
 				dir = MkDirection(PointerX, PointerY);
@@ -1811,7 +1792,7 @@ extern int16 COMBAT_FireM60(int16, int16, int16, int16);
 			}
 		} else {
 			if(SelectionIsDark)
-				CON_printf(C_2BB4_0402);
+				CON_printf(NothingMsg);
 			else
 				CON_printf("%s.\n", GetTileString(GetTileAtXYZ(SelectionX, SelectionY, MapZ)));
 		}
@@ -1834,11 +1815,11 @@ extern int16 COMBAT_FireM60(int16, int16, int16, int16);
 				hitResult = __TryHit(attacker, SelectionX, SelectionY, weapObj);
 			}
 			if(hitResult == 2) {
-				CON_printf(C_2BB4_03A6);
+				CON_printf(OutOfRangeMsg);
 				LastAttackTarget = -1;
 				MUS_PlaySfx(5);
 			} else if(hitResult == 3) {
-				CON_printf(C_2BB4_034D);
+				CON_printf(NotPossibleMsg);
 				MUS_PlaySfx(5);
 				LastAttackTarget = -1;
 			}
@@ -1853,7 +1834,7 @@ extern int16 COMBAT_FireM60(int16, int16, int16, int16);
 			AimY = 5;
 		}
 		LastNumberPlural = 0;
-		CON_printf(C_2BB4_00D3, GetObjectString(EquipWeapons[CurEquipWeapon]));
+		CON_printf(AttackWithMsg, GetObjectString(EquipWeapons[CurEquipWeapon]));
 	} else {
 		MouseMode = 0;
 		SelectMode = 0;
@@ -1868,7 +1849,7 @@ extern int16 COMBAT_FireM60(int16, int16, int16, int16);
 	int16 ch, attacker;
 
 	attacker = Party[Active];
-	CON_printf(C_2BB4_00E4);
+	CON_printf(AttackMsg);
 	CON_printf(" ");
 	MouseMode = 1;
 	PendingCommand = 0x81;
@@ -1892,13 +1873,13 @@ extern int16 COMBAT_FireM60(int16, int16, int16, int16);
 				RefreshStatus();
 				ch = CON_getch();
 				if(ch != 0x8e) {
-					CON_printf(C_2BB4_03F1);
+					CON_printf(WhatMsg);
 					break;
 				}
 			}
 		} while(MouseMode == 1);
 	} else {
-		CON_printf(C_2BB4_03F1);
+		CON_printf(WhatMsg);
 	}
 	SubMov(Party[Active], 10);
 	MouseMode = 0;
@@ -1954,7 +1935,7 @@ extern int16 COMBAT_FireM60(int16, int16, int16, int16);
 /*C_07D1_3722*/COMBAT_NoPartyInLine(int16 objNum, int16 target) {
 	int16 far *hits;
 
-	for(hits = C_0E1A_1003(GetX(objNum), GetY(objNum), GetX(target), GetY(target), 0); *hits >= 0; hits ++)
+	for(hits = MissileSpray(GetX(objNum), GetY(objNum), GetX(target), GetY(target), 0); *hits >= 0; hits ++)
 		if(IsPlrControl(*hits))
 			return 0;
 	return 1;
@@ -2918,7 +2899,7 @@ extern int16 COMBAT_FireM60(int16, int16, int16, int16);
 		ObjShapeType[objNum] = 0x1a8;
 	case 0x1a8:
 		if((other = OBJ_FindTypeAt(0x198, x, y)) < 0 && (other = AddMapObj(0xd98, 0, 0, x, y, MapZ)) < 0)
-			CON_printf(C_2BB4_22F1);
+			CON_printf(AarghMsg);
 	}
 	TryStraightMove(objNum, OSI_rand(0, 7), 1);
 	if(other >= 0)
@@ -2927,7 +2908,7 @@ extern int16 COMBAT_FireM60(int16, int16, int16, int16);
 }
 
 /*enter combat mode when attacked: as COMBAT_begin, but CombatOutcome is
-  kept and the music is C_1FA9_032B*/
+  kept and the music is MUS_AttackedSong*/
 /*C_07D1_5CAF*/COMBAT_beginAttacked() {
 	int16 partyIdx, mouseSave;
 
@@ -2949,9 +2930,9 @@ extern int16 COMBAT_FireM60(int16, int16, int16, int16);
 	SavedNPCMode = NPCMode[Party[partyIdx]];
 	NPCMode[Party[partyIdx]] = 2;
 	mouseSave = CON_mouseOffAt(0x8e, 0xa3, 0xa0, 0xc3);
-	GR_DRAW_BITMAP(&Screen, 0x93, 0xa9, D_BA7E, 0);
+	GR_DRAW_BITMAP(&Screen, 0x93, 0xa9, ScreenParts, 0);
 	CON_mouseOn(mouseSave);
-	C_1FA9_032B();
+	MUS_AttackedSong();
 }
 
 /*the canal worm 0x17b swallows the body (KillBody) of the actor it killed: its

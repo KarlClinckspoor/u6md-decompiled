@@ -47,7 +47,7 @@ extern MoveObj(int16, int16, int16, int16);/*MoveObj(obj, x, y, z)*/
 extern ShowObjects();
 extern char *GetObjectString(int16);
 extern OBJ_DeleteContents(int16);
-extern C_1FA9_02CE(int16);/*the morning song*/
+extern MUS_MorningSong(int16);/*the morning song*/
 extern MUS_PlayAreaSong();
 extern STAT_ShowParty(int16);
 extern int16 CON_mouseOffAt(int16, int16, int16, int16);
@@ -68,15 +68,15 @@ extern C_2F68_1393();
 extern C_2F68_165C(int16, int16, int16);
 extern C_2F75_0757();
 extern C_2F75_157A();
-extern char far C_2BB4_22F1[];/*failure message*/
+extern char far AarghMsg[];/*failure message*/
 
 extern unsigned char MouseOn;
 extern int16 ScreenFade;
 extern int16 ColorPaper;
-extern int16 D_082E;/*default paper color*/
-extern char D_0F12;/*StatusDirty*/
-extern char D_0F13;/*PromptFlag*/
-extern int16 D_0F18;/*MapAnimEnabled*/
+extern int16 ColorPaperDefault;/*default paper color*/
+extern char StatusDirty;
+extern char PromptFlag;
+extern int16 MapAnimEnabled;
 extern int16 VisibilityDirty;
 extern unsigned char Time_M;
 extern unsigned char Time_H;
@@ -111,24 +111,17 @@ extern unsigned char far *NPCMode;
 extern unsigned char Party[];
 extern char far *Schedule;/*5 bytes each*/
 extern int16 SchedPointer[0x101];
-extern char D_50CE[][14];/*Names*/
+extern char Names[][14];
 extern int16 Amount[];/*quantity (low byte), quality (high byte)*/
 extern unsigned char NPCStatus[];
 extern unsigned char HitPoints[];
-extern unsigned char D_6EC6[];/*TalkFlags*/
+extern unsigned char TalkFlags[];
 extern struct coord ObjPos[];
 extern unsigned char PartySize;
 extern uint16 ObjShapeType[];
-extern union tHandler D_BA6A;/*GrDriver*/
-extern struct tClipInfo D_EBD0[4];/*TextWindows*/
+extern union tHandler GrDriver;
+extern struct tClipInfo TextWindows[4];
 
-#define StatusDirty D_0F12
-#define PromptFlag D_0F13
-#define MapAnimEnabled D_0F18
-#define Names D_50CE
-#define TalkFlags D_6EC6
-#define GrDriver D_BA6A
-#define TextWindows D_EBD0
 
 
 #define GR_SET_COLOR(c)              (GrDriver.iii.ofs = 0x06, (*GrDriver.f)(c))
@@ -235,7 +228,7 @@ DreamTrigger(int16);
 		}
 		IsResting = 0;
 		NPCStatus[npc] &= ~4;
-		C_1FA9_02CE(1);
+		MUS_MorningSong(1);
 	}
 }
 
@@ -331,15 +324,15 @@ DreamTrigger(int16);
 	MoveObj(0, MapX, MapY, 6);
 	PassTime(0);
 	DrawSkyBar();
-	ColorPaper = D_082E;
-	GR_SET_COLOR(D_082E);
+	ColorPaper = ColorPaperDefault;
+	GR_SET_COLOR(ColorPaperDefault);
 	mouse = CON_mouseOffAt(184, 128, 311, 195);
 	GR_FILL_RECT(184, 128, 311, 195);
 	CON_mouseOn(mouse);
 	savedClip = CurClip;
 	for(i = 0; i < 4; i ++) {
 		CON_setClip(&TextWindows[i]);
-		CurClip->bgColor = D_082E;
+		CurClip->bgColor = ColorPaperDefault;
 	}
 	CON_setClip(savedClip);
 	GameFlags &= ~0x10L;
@@ -357,7 +350,7 @@ DreamTrigger(int16);
 		COMBAT_breakOff();
 	CON_printf("You wake up.\n");
 	DisplayTick();
-	C_1FA9_02CE(1);
+	MUS_MorningSong(1);
 }
 
 /*the dreamer steps on a dream trigger (0: none, when waking up): its
@@ -517,11 +510,11 @@ DreamTrigger(int16);
 	y = ((*(int16 *)&pos.raw[1]) >> 2) & 0x3ff;
 	MoveObj(npc, x, y, MapZ);
 	if((obj = OBJ_FindTypeAt(0x1cd, x, y)) < 0)
-		CON_printf(C_2BB4_22F1);
+		CON_printf(AarghMsg);
 	else
 		DeleteObj(obj);
 	if((obj = OBJ_FindTypeAt(0x124, x, y - 1)) < 0)
-		CON_printf(C_2BB4_22F1);
+		CON_printf(AarghMsg);
 	else
 		DeleteObj(obj);
 	TalkFlags[npc] |= 0x80;

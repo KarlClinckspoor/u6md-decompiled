@@ -13,14 +13,14 @@
  * "Ready" / "Unready".
  *
  * Equipment slots: 0 head, 1 neck, 2 right hand, 3 right finger, 4 chest,
- * 5 left hand, 6 left finger, 7 feet; STAT_GetEquipSlot (STAT_GetEquipSlot) also
+ * 5 left hand, 6 left finger, 7 feet; STAT_GetEquipSlot (objtype.c) also
  * returns 8 for a two-handed weapon.
  * Object positions (ObjStatus & 0x18): 0x00 on the map, 0x08 contained,
  * 0x10 in an inventory, 0x18 equipped.
  *
  * Differences from Savage Empire's: the hit points' color has more cases
  * (STAT_PrintHP), the strength/dexterity/intelligence shown are computed
- * (GetStr/0576/05C0) and colored, the talents (Talents) are shown as
+ * (GetStr/GetDex/GetInt) and colored, the talents (Talents) are shown as
  * icons, the empty slot tiles follow the panel color, in the dream
  * (GameFlags & 0x10) only one inventory is shown, readying some objects has
  * side effects, unreadying may be refused, no "modern weapons" rule.
@@ -69,11 +69,10 @@ extern int16 STAT_GetEquipSlot(int16);
 extern DrawPortrait(int16, int16, int16);/*DrawPortrait(npcNum, x, y)*/
 extern DrawPaperDoll(int16, int16, int16);/*DrawPaperDoll(x, y, npcNum)*/
 extern C_2FA1_0000(int16, int16, int16);
-extern char far C_2BB4_0D8D[];
-extern char far C_2BB4_137F[];/*BurnOutMsg*/
-extern char far C_2BB4_22F1[];
+extern char far TongsProtectMsg[];
+extern char far BurnOutMsg[];
+extern char far AarghMsg[];
 
-#define BurnOutMsg C_2BB4_137F
 
 extern int16 LastNumberPlural;
 extern int16 StatusMember;/*party index shown in the portrait/equipment view*/
@@ -85,65 +84,45 @@ extern int16 ColorMagenta;
 extern int16 ColorBlack;/*color set before drawing a portrait*/
 extern int16 ColorPaper;
 extern int16 ColorText;
-extern int16 D_0826;
-extern int16 D_082A;
-extern int16 D_082C;
-extern char D_0F13;/*PromptFlag?*/
+extern int16 ColorDarkBlue;
+extern int16 ColorWhite;
+extern int16 ColorLightRed;
+extern char PromptFlag;
 extern int16 MapZ;
 extern int32 GameFlags;/*0x10: in a dream*/
 extern struct { unsigned a:4, psychic:4, c:4, d:4; } Talents[];/*talents (shown as tiles 0x120, 0x121, 0x122)*/
 extern unsigned char ObjStatus[];
 extern unsigned char Party[];
 extern unsigned char far *Level;
-extern char D_50CE[][14];/*Names*/
+extern char Names[][14];
 extern uint16 ExpPoints[];
 extern unsigned char far *NPCComMode;
 extern int16 Amount[];
 extern unsigned char NPCStatus[];/*0x08 poisoned*/
 extern unsigned char HitPoints[];
-extern int16 far *D_6EBE;/*BaseTile*/
-extern unsigned char far *D_7606;/*TypeWeight*/
+extern int16 far *BaseTile;
+extern unsigned char far *TypeWeight;
 extern struct coord ObjPos[];
 extern unsigned char PartySize;
 extern uint16 ObjShapeType[];
 extern int16 far *OrigShapeType;
-extern union tHandler D_BA6A;/*GrDriver*/
+extern union tHandler GrDriver;
 extern int16 Link[];
-extern int16 D_EAD8[16];/*InvenSlotObj*/
-extern unsigned char D_EAF8;/*InvenSize*/
-extern unsigned char D_EAF9[8];/*Party_2Handed*/
-extern int16 D_EB00;/*ShowNPCInven*/
-extern int16 D_EB02;/*NPC_2Handed*/
-extern int16 D_EB04[8];/*Equipment*/
-extern int16 D_EB16;/*WeightEquip*/
-extern int16 D_EB18;/*InvenOwner*/
-extern int16 D_EB1A;/*WeightInven*/
-extern int16 D_EB74, D_EB76;/*PointerX, PointerY*/
-extern int16 D_EBCE;/*Selection.obj*/
-extern struct tClipInfo D_EBD0[4];/*TextWindows*/
-extern int16 D_EBF6, D_EBF8;/*Selection.x, Selection.y*/
+/*EAD8*/extern int16 InvenSlotObj[16];/*the object shown in each inventory slot*/
+/*EAF8*/extern unsigned char InvenSize;/*the number of inventory objects*/
+/*EAF9*/extern unsigned char Party_2Handed[8];/*the member wields a two-handed weapon*/
+/*EB00*/extern int16 ShowNPCInven;/*NPC whose equipment is shown (0: a party member's)*/
+/*EB02*/extern int16 NPC_2Handed;/*that NPC wields a two-handed weapon*/
+/*EB04*/extern int16 Equipment[8];/*the object in each equipment slot (1 in the left hand: taken by a two-handed weapon)*/
+/*EB16*/extern int16 WeightEquip;/*weight equipped, in tenths*/
+/*EB18*/extern int16 InvenOwner;/*NPC or container whose inventory is shown*/
+/*EB1A*/extern int16 WeightInven;/*weight carried, in tenths*/
+extern int16 PointerX, PointerY;
+extern int16 SelectionObj;
+extern struct tClipInfo TextWindows[4];
+extern int16 SelectionX, SelectionY;
 extern int16 MapX, MapY;
 
-#define PromptFlag D_0F13
-#define Names D_50CE
-#define BaseTile D_6EBE
-#define TypeWeight D_7606
-#define GrDriver D_BA6A
-#define InvenSlotObj D_EAD8
-#define InvenSize D_EAF8
-#define Party_2Handed D_EAF9
-#define ShowNPCInven D_EB00
-#define NPC_2Handed D_EB02
-#define Equipment D_EB04
-#define WeightEquip D_EB16
-#define InvenOwner D_EB18
-#define WeightInven D_EB1A
-#define PointerX D_EB74
-#define PointerY D_EB76
-#define SelectionObj D_EBCE
-#define TextWindows D_EBD0
-#define SelectionX D_EBF6
-#define SelectionY D_EBF8
 
 #define GR_SET_COLOR(c)              (GrDriver.iii.ofs = 0x06, (*GrDriver.f)(c))
 #define GR_FILL_RECT(x0,y0,x1,y1)    (GrDriver.iii.ofs = 0x12, (*GrDriver.f)(x0,y0,x1,y1))
@@ -187,13 +166,13 @@ extern int16 MapX, MapY;
 	if(NPCStatus[objNum] & 8)
 		CurClip->fgColor = ColorRed;
 	else if(NPCStatus[objNum] & 1)
-		CurClip->fgColor = D_082A;
+		CurClip->fgColor = ColorWhite;
 	else if(HitPoints[objNum] < 10)
-		CurClip->fgColor = D_082C;
+		CurClip->fgColor = ColorLightRed;
 	else if(ObjStatus[objNum] & 0x40)
 		CurClip->fgColor = ColorBlue;
 	else if((ObjStatus[objNum] & 0x80) && objNum != 1)
-		CurClip->fgColor = D_0826;
+		CurClip->fgColor = ColorDarkBlue;
 	else
 		CurClip->fgColor = ColorText;
 	CON_printf(/*1AB4*/"%3d\n", HitPoints[objNum]);
@@ -290,13 +269,13 @@ extern int16 MapX, MapY;
 	if(objNum <= 15 && Talents[objNum].a)
 		CurClip->fgColor = ColorMagenta;
 	else if(ObjStatus[objNum] & 0x80)
-		CurClip->fgColor = D_0826;
+		CurClip->fgColor = ColorDarkBlue;
 	CON_printf(/*1ACF*/"%d\n", GetStr(objNum));
 	CON_gotoxy(14, 2);
 	if(ObjStatus[objNum] & 0x40)
 		CurClip->fgColor = ColorBlue;
 	else if(ObjStatus[objNum] & 0x80)
-		CurClip->fgColor = D_0826;
+		CurClip->fgColor = ColorDarkBlue;
 	else
 		CurClip->fgColor = ColorText;
 	CON_printf(/*1ACF*/"%d\n", GetDex(objNum));
@@ -778,11 +757,11 @@ extern int16 MapX, MapY;
 				if(Equipment[slot] >= 0) {
 					InvenSize --;
 					if(objTyp == 0x88) {
-						CON_printf(C_2BB4_0D8D);
+						CON_printf(TongsProtectMsg);
 					} else if(objTyp == 0xf && MapZ == 2) {
 						newObj = AddMapObj(0x92, 0, 0, 0xc9, 0x9b, MapZ);
 						if(newObj < 0)
-							CON_printf(C_2BB4_22F1);
+							CON_printf(AarghMsg);
 						else
 							ObjStatus[newObj] &= 0xdf;
 					}

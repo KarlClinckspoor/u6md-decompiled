@@ -1,6 +1,6 @@
 ;----------------------------------------
 ;EMS memory: mapping a virtual pointer to a real one; saving and restoring
-;the page map (Savage Empire's EMSMAP.ASM, GAME.EXE 2D49, unchanged)
+;the page map (Savage Empire's EMSMAP.ASM, SE's GAME.EXE 2D49, unchanged; here 28F7)
 ;----------------------------------------
 
 DGROUP	GROUP _DATA

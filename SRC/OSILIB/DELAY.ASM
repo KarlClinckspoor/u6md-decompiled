@@ -4,9 +4,9 @@ EXTRN CpuSpeed:WORD	;computer speed
 
 DSegStart	
 	
-D_2B12	dw 0
-D_2B14	dw 0
-D_2B16	dw 0,0	;original int 1Ch
+delayTicks	dw 0	;D_2B12
+delayWanted	dw 0	;D_2B14
+delayOldInt1C	dw 0,0	;D_2B16 original int 1Ch
 
 DSegEnd
 
@@ -15,13 +15,13 @@ CSegStart	_DELAY_TEXT
 
 ProcStart	OSI_delay	;26C7:0002
 	MOV	AX,[BP+06]
-	MOV	D_2B14,AX
+	MOV	delayWanted,AX
 C_000E:	;--
-	MOV	AX,D_2B12
-	CMP	AX,D_2B14
+	MOV	AX,delayTicks
+	CMP	AX,delayWanted
 	JB	C_000E
 	;--
-	MOV	D_2B12,0
+	MOV	delayTicks,0
 ProcEndN	OSI_delay,2
 
 
@@ -33,7 +33,7 @@ NEW_INT_1C:	;26C7:0024
 	;--
 	MOV	AX,DGROUP
 	MOV	DS,AX
-	MOV	SI,OFFSET DGROUP:D_2B12
+	MOV	SI,OFFSET DGROUP:delayTicks
 	INC	WORD PTR [SI]
 	;--
 	POP	SI
@@ -47,7 +47,7 @@ OSI_delay_init	PROC FAR
 	PUSH	DI
 	PUSH	DS
 	;--
-	MOV	D_2B12,0
+	MOV	delayTicks,0
 	;--
 	PUSH	ES
 	MOV	AL,1Ch
@@ -55,8 +55,8 @@ OSI_delay_init	PROC FAR
 	INT	21h
 	MOV	AX,ES
 	POP	ES
-	MOV	D_2B16,BX
-	MOV	D_2B16+2,AX
+	MOV	delayOldInt1C,BX
+	MOV	delayOldInt1C+2,AX
 	;--
 	PUSH	DS
 	PUSH	CS
@@ -79,8 +79,8 @@ OSI_delay_clean	PROC FAR
 	PUSH	DI
 	PUSH	DS
 	;--
-	MOV	AX,D_2B16+2
-	MOV	DX,D_2B16
+	MOV	AX,delayOldInt1C+2
+	MOV	DX,delayOldInt1C
 	PUSH	DS
 	MOV	DS,AX
 	MOV	AL,1Ch

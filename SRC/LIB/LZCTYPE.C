@@ -2,8 +2,8 @@
 /* compiler: Turbo C++ 1.01 */
 /* OSI library: loading a library entry by the type in its offset's high
    byte (see LIBSIZE.C): LZW compressed (LZC.C), stored, or through one of
-   two loaders set by the program. Martian Dreams' variant of Savage Empire's
-   LZC_load (LZCLOAD.C). */
+   two loaders set by the program (GAME.EXE 2AAA). Martian Dreams' variant of
+   Savage Empire's LZC_load (LZCLOAD.C). */
 
 #include <dos.h>
 

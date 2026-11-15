@@ -49,13 +49,13 @@ extern int16 CON_getch();
 extern CON_putch(int16);
 extern cdecl CON_printf(char far *, ...);
 
-extern char far C_2BB4_01C0[];/*"On - "*/
-extern char far C_2BB4_02A4[];/*"It has no effect.\n"*/
-extern char far C_2BB4_03A6[];/*"Out of range!\n"*/
-extern char far C_2BB4_0402[];/*"nothing!\n"*/
-extern char far C_2BB4_1C19[];/*"%s can't be used.\n"*/
-extern char far C_2BB4_1C2C[];/*"%s has no effect on "*/
-extern char far C_2BB4_1C41[];/*"%s has no effect.\n"*/
+extern char far OnMsg[];/*"On - "*/
+extern char far NoEffectMsg[];/*"It has no effect.\n"*/
+extern char far OutOfRangeMsg[];/*"Out of range!\n"*/
+extern char far NothingMsg[];/*"nothing!\n"*/
+extern char far CantBeUsedMsg[];/*"%s can't be used.\n"*/
+extern char far HasNoEffectOnMsg[];/*"%s has no effect on "*/
+extern char far HasNoEffectMsg[];/*"%s has no effect.\n"*/
 
 extern unsigned char Active;
 extern int16 MapZ;
@@ -68,27 +68,16 @@ extern struct { unsigned char originX, originY, cols, rows, curX, curY, fgColor,
 extern unsigned char ObjStatus[];
 extern unsigned char Party[];
 extern unsigned char far *Level;
-extern int16 far *D_6EBE;/*BaseTile*/
-extern unsigned char far *D_760A;/*TileFlag2: 0x10 ignored*/
+extern int16 far *BaseTile;
+extern unsigned char far *TileFlag2;/*0x10 ignored*/
 extern struct coord ObjPos[];
 extern uint16 ObjShapeType[];
-extern int16 D_EB74, D_EB76;/*PointerX, PointerY*/
-extern int16 D_EBCE;/*Selection.obj*/
-extern int16 D_EBF6, D_EBF8;/*Selection.x, Selection.y*/
+extern int16 PointerX, PointerY;
+extern int16 SelectionObj;
+extern int16 SelectionX, SelectionY;
 /*the distance of the last target (GetUseTarget)*/
 /*EC46*/extern int16 TargetDist;
 
-#define BaseTile D_6EBE
-#define TileFlag2 D_760A
-#define PointerX D_EB74
-#define PointerY D_EB76
-#define SelectionObj D_EBCE
-#define SelectionX D_EBF6
-#define SelectionY D_EBF8
-#define OnMsg C_2BB4_01C0
-#define NoEffectMsg C_2BB4_02A4
-#define OutOfRangeMsg C_2BB4_03A6
-#define NothingMsg C_2BB4_0402
 
 #define GetType(i) (ObjShapeType[i] & 0x3ff)
 #define GetFrame(i) (ObjShapeType[i] >> 10)
@@ -571,7 +560,7 @@ extern void C_2F98_1EC7(int16, int16, int16);
 	on = -1;
 	to = -1;
 	if(!GetUseActions(type, list)) {
-		CON_printf(C_2BB4_1C19, GetObjectString(objNum));
+		CON_printf(CantBeUsedMsg, GetObjectString(objNum));
 		return;
 	}
 	if(WantsTarget(1, list)) {
@@ -582,7 +571,7 @@ extern void C_2F98_1EC7(int16, int16, int16);
 		if(!FilterActions(onType, 1, list)) {
 			CON_printf("\n");
 			PrintTileArticle(TILE_FRAME(objNum));
-			CON_printf(C_2BB4_1C2C, GetObjectString(objNum));
+			CON_printf(HasNoEffectOnMsg, GetObjectString(objNum));
 			PrintTileArticle(TILE_FRAME(on));
 			CON_printf("%s.\n", GetObjectString(on));
 			return;
@@ -601,7 +590,7 @@ extern void C_2F98_1EC7(int16, int16, int16);
 				PrintTileArticle(TILE_FRAME(on));
 				CON_printf("%s to ", GetObjectString(on));
 				PrintTileArticle(TILE_FRAME(to));
-				CON_printf(C_2BB4_1C41, GetObjectString(to));
+				CON_printf(HasNoEffectMsg, GetObjectString(to));
 				return;
 			}
 			if(TargetDist > 1)

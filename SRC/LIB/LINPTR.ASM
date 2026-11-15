@@ -1,5 +1,5 @@
 ;----------------------------------------
-;SAVAGE.EXE (and GAME.EXE 2F29): a linear address to a normalised far pointer
+;GAME.EXE segment 26EF (Savage Empire's, SAVAGE.EXE and SE's GAME.EXE 2F29): a linear address to a normalised far pointer
 ;----------------------------------------
 
 LINPTR_TEXT	SEGMENT PUBLIC WORD 'CODE'

@@ -22,7 +22,7 @@
 extern BargePumps(int16);
 extern ShowObjects();
 extern MUS_PlaySfx(int16);
-extern C_1FA9_0AFD();/*five beeps (machinery)*/
+extern MUS_MachinerySfx();/*five beeps (machinery)*/
 extern BeltStart();
 extern Drawbridge(int16);
 extern DreamSleep(int16, int16);
@@ -39,11 +39,11 @@ extern C_2F75_0951();
 extern C_2F75_0A64();
 extern TALK_talkTo(int16, int16, int16);
 extern cdecl CON_printf(char far *, ...);
-extern char far C_2BB4_0C5F[];
-extern char far C_2BB4_0F21[];
-extern char far C_2BB4_111C[];
-extern char far C_2BB4_12C8[];
-extern char far C_2BB4_12E9[];
+extern char far LeverStuckMsg[];
+extern char far ChsheketTreatedMsg[];
+extern char far NoWaterPressureMsg[];
+extern char far CanalsWorkingMsg[];
+extern char far LensesAlignedMsg[];
 
 extern unsigned char Active;
 extern int16 MapZ;
@@ -52,12 +52,11 @@ extern int16 ViewRotation;/*rotation of the map view (eighths of a turn)?*/
 extern int16 DreamStage;
 extern unsigned char Party[];
 extern int16 Amount[];/*quantity (low byte), quality (high byte)*/
-extern unsigned char D_6EC6[];/*TalkFlags (per NPC)*/
+extern unsigned char TalkFlags[];/*per NPC*/
 extern struct coord ObjPos[];
 extern uint16 ObjShapeType[];
 
 #define IN_DREAM (GameFlags & 0x10)
-#define TalkFlags D_6EC6
 
 
 #define GetType(i) (ObjShapeType[i] & 0x3ff)
@@ -132,12 +131,12 @@ extern uint16 ObjShapeType[];
 	} else if(qual == 2) {
 		/*(type is the last object's of the loop)*/
 		if((type == 0xe3 && !(TalkFlags[0x73] & 4)) || (type == 0xb3 && !(TalkFlags[0x73] & 0x10))) {
-			CON_printf(C_2BB4_0C5F);
+			CON_printf(LeverStuckMsg);
 			return;
 		}
 		frame = GetFrame(found);
 		ObjShapeType[found] = GetType(found) + (((frame & 2) + 5) << 10);
-		C_1FA9_0AFD();
+		MUS_MachinerySfx();
 		ShowObjects();
 		if(frame < 4) {
 			ObjShapeType[found] = GetType(found) + (((frame & 2) + 9) << 10);
@@ -160,7 +159,7 @@ extern uint16 ObjShapeType[];
 				}
 			}
 		}
-		C_1FA9_0AFD();
+		MUS_MachinerySfx();
 	}
 	for(i = 0; i < n; i ++)
 		ObjShapeType[levers[i]] = GetType(levers[i]) + (state << 10);
@@ -211,7 +210,7 @@ extern uint16 ObjShapeType[];
 			break;
 		case 3:
 			if(TalkFlags[0x76] & 0x20) {
-				CON_printf(C_2BB4_12E9);
+				CON_printf(LensesAlignedMsg);
 				break;
 			}
 			TalkFlags[0x2e] |= 0x80;
@@ -223,11 +222,11 @@ extern uint16 ObjShapeType[];
 			break;
 		case 4:
 			if(TalkFlags[0x76] & 0x40) {
-				CON_printf(C_2BB4_12C8);
+				CON_printf(CanalsWorkingMsg);
 				break;
 			}
 			if(!(TalkFlags[0x76] & 0x20)) {
-				CON_printf(C_2BB4_111C);
+				CON_printf(NoWaterPressureMsg);
 				break;
 			}
 			TalkFlags[0x76] |= 0x40;
@@ -251,7 +250,7 @@ extern uint16 ObjShapeType[];
 			break;
 		case 6:
 			if(GetType(6) != 0x165) {
-				CON_printf(C_2BB4_0F21);
+				CON_printf(ChsheketTreatedMsg);
 				break;
 			}
 			ObjShapeType[6] = (ObjShapeType[6] & 0xfc00) + 0x162;

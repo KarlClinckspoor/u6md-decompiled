@@ -60,7 +60,7 @@ extern MoveObj(int16, int16, int16, int16);/*MoveObj(obj, x, y, z)*/
 extern ShowObjects();
 extern OBJ_DeleteContents(int16);
 extern char *GetObjectString(int16);
-extern C_1FA9_02CE(int16);/*the morning song*/
+extern MUS_MorningSong(int16);/*the morning song*/
 extern MUS_PlaySfx(int16);
 extern STAT_RefreshInventory(int16);
 extern STAT_ShowInventory(int16);
@@ -69,15 +69,15 @@ extern int16 CON_mouseOffAt(int16, int16, int16, int16);
 extern CON_mouseOn(int16);
 extern CON_setClip(struct tClipInfo *);
 extern cdecl CON_printf(char far *, ...);
-extern char far C_2BB4_04A8[];
-extern char far C_2BB4_11B3[];
-extern char far C_2BB4_22F1[];/*failure message*/
+extern char far MoneyPyreMsg[];
+extern char far WormEatsPodMsg[];
+extern char far AarghMsg[];/*failure message*/
 extern int16 far MonsterFlags[];/*by GetMonsterClass*/
 
 extern int16 MusicAdapter;/*1: AdLib or Roland, 0: none*/
 extern int16 ColorPaper;
-extern int16 D_082E;/*default paper color*/
-extern char D_0F13;/*PromptFlag*/
+extern int16 ColorPaperDefault;/*default paper color*/
+extern char PromptFlag;
 extern int16 VisibilityDirty;
 extern int16 AvoidHazards;/*TerrainType 8 blocks*/
 extern unsigned char Active;
@@ -89,26 +89,21 @@ extern unsigned char AnimateAtPrompt;
 extern int16 D_1E48;/*dream.c's: the AnimTile entry of tile 0x6f (-1: not looked up)*/
 extern int16 D_1E4A;/*dream.c's: how fast it animates (0-4)*/
 extern struct tClipInfo *CurClip;
-extern unsigned char D_3240[0x20];/*AnimFrameMask*/
+extern unsigned char AnimFrameMask[0x20];
 extern unsigned char ObjStatus[];
 extern unsigned char Party[];
 extern int16 Amount[];/*quantity (low byte), quality (high byte)*/
-extern unsigned char D_6EC6[];/*TalkFlags*/
+extern unsigned char TalkFlags[];
 extern struct coord ObjPos[];
 extern unsigned char PartySize;
 extern uint16 ObjShapeType[];
-extern unsigned char far *D_B4C4;/*TerrainType*/
+extern unsigned char far *TerrainType;
 extern int16 far *OrigShapeType;
-extern unsigned char D_B50C[0x20];/*AnimFrameShift*/
-extern union tHandler D_BA6A;/*GrDriver*/
-extern struct tClipInfo D_EBD0[4];/*TextWindows*/
+extern unsigned char AnimFrameShift[0x20];
+extern union tHandler GrDriver;
+extern struct tClipInfo TextWindows[4];
 extern char DirIncrX[8], DirIncrY[8];
 
-#define PromptFlag D_0F13
-#define TalkFlags D_6EC6
-#define TerrainType D_B4C4
-#define GrDriver D_BA6A
-#define TextWindows D_EBD0
 
 
 #define GR_SET_COLOR(c)              (GrDriver.iii.ofs = 0x06, (*GrDriver.f)(c))
@@ -127,7 +122,7 @@ extern char DirIncrX[8], DirIncrY[8];
 	register int16 obj;
 
 	if((obj = AddMapObj(type, status, amount, x, y, z)) < 0)
-		CON_printf(C_2BB4_22F1);
+		CON_printf(AarghMsg);
 	else
 		ObjStatus[obj] &= 0xdf;
 	return obj;
@@ -138,8 +133,8 @@ extern char DirIncrX[8], DirIncrY[8];
 	D_1E4A ++;
 	if(D_1E4A > 4)
 		D_1E4A = 4;
-	D_B50C[D_1E48] = 4 - D_1E4A;
-	D_3240[D_1E48] = 3 << D_B50C[D_1E48];
+	AnimFrameShift[D_1E48] = 4 - D_1E4A;
+	AnimFrameMask[D_1E48] = 3 << AnimFrameShift[D_1E48];
 	if(D_1E4A != 1)
 		CON_printf("...faster!\n");
 }
@@ -187,7 +182,7 @@ extern char DirIncrX[8], DirIncrY[8];
 			case 0x151:
 				if((obj = AddMapObj(0x155 | (((OrigShapeType[PartySize > 1 ? Party[k] : k] & 0x3ff) - 0x156) << 10),
 					0, 0, GetX(i) - 0x13, GetY(i) + 0x18, MapZ)) < 0)
-					CON_printf(C_2BB4_22F1);
+					CON_printf(AarghMsg);
 				else {
 					ObjStatus[obj] &= 0xdf;
 					for(amt = per + OSI_rand(0, 3); amt > 0xf0; amt -= 0xf0)
@@ -259,22 +254,22 @@ extern char DirIncrX[8], DirIncrY[8];
 	AnimateAtPrompt = 1;
 	VIS_UpdateView();
 	ShowObjects();
-	ColorPaper = D_082E;
-	GR_SET_COLOR(D_082E);
+	ColorPaper = ColorPaperDefault;
+	GR_SET_COLOR(ColorPaperDefault);
 	mouse = CON_mouseOffAt(184, 128, 311, 195);
 	GR_FILL_RECT(184, 128, 311, 195);
 	CON_mouseOn(mouse);
 	savedClip = CurClip;
 	for(slot = 0; slot < 4; slot ++) {
 		CON_setClip(&TextWindows[slot]);
-		CurClip->bgColor = D_082E;
+		CurClip->bgColor = ColorPaperDefault;
 	}
 	CON_setClip(savedClip);
 	STAT_RefreshInventory(0);
 	CON_printf("You wake up!\n");
 	STAT_ShowInventory(PartySize);
 	PromptFlag = 1;
-	C_1FA9_02CE(1);
+	MUS_MorningSong(1);
 	DreamStage = 0xa0;
 	CON_printf("All your friends have been killed!\n");
 }
@@ -287,14 +282,14 @@ extern char DirIncrX[8], DirIncrY[8];
 
 	if(type == 0x181) {
 		if((obj = OBJ_FindTypeAt(0x1d2, 0x6d, 0x16)) < 0)
-			CON_printf(C_2BB4_22F1);
+			CON_printf(AarghMsg);
 		else {
 			OBJ_DeleteContents(obj);
 			DeleteObj(obj);
 		}
 		if((obj = OBJ_FindTypeAt(0x1cd, 0x70, 0x17)) < 0) {
 			if((obj = AddMapObj(0x5cd, 0, 0x7317, 0x70, 0x17, MapZ)) < 0)
-				CON_printf(C_2BB4_22F1);
+				CON_printf(AarghMsg);
 			else
 				ObjStatus[obj] &= 0xdf;
 		}
@@ -302,7 +297,7 @@ extern char DirIncrX[8], DirIncrY[8];
 		TALK_talkTo(Active, 0x66, 0);
 	} else if(type == 0x16b) {
 		if((obj = OBJ_FindTypeAt(0x1d2, 0x73, 0xec)) < 0)
-			CON_printf(C_2BB4_22F1);
+			CON_printf(AarghMsg);
 		else {
 			OBJ_DeleteContents(obj);
 			DeleteObj(obj);
@@ -372,7 +367,7 @@ extern char DirIncrX[8], DirIncrY[8];
 		ty = MapY;
 	} else if(MapDistance(nx, tx) <= 1 && MapDistance(ny, ty) <= 1) {
 		MUS_PlaySfx(0x24);
-		CON_printf(C_2BB4_11B3);
+		CON_printf(WormEatsPodMsg);
 		MUS_PlaySfx(5);
 		if((obj = OBJ_FindTypeAt(0xfb, tx, ty)) >= 0)
 			DeleteObj(obj);
@@ -402,12 +397,12 @@ extern char DirIncrX[8], DirIncrY[8];
 	int16 newObj, x;
 	register int16 y;
 
-	CON_printf(C_2BB4_04A8);
+	CON_printf(MoneyPyreMsg);
 	if((ObjStatus[obj] & 0x18) == 0) {
 		x = GetX(obj);
 		y = GetY(obj);
 		if((newObj = AddMapObj(0x85, 0, 0, x, y, MapZ)) < 0)
-			CON_printf(C_2BB4_22F1);
+			CON_printf(AarghMsg);
 		else {
 			VisibilityDirty = 1;
 			DisplayTick();

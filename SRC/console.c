@@ -134,10 +134,10 @@ extern int16 GrAdapter;
 extern unsigned char MouseOn;
 /*other game modules*/
 extern BargeFindLeader(int16);
-extern DrawMapWindow(int16);/*DrawMapWindow?*/
+extern DrawMapWindow(int16);
 extern DisplayTick();
 extern PassTime(int16);
-extern RefreshStatus();/*RefreshStatus?*/
+extern RefreshStatus();
 extern MAP_LoadChunkIndexes(int16, int16, int16);
 extern MAP_InitChunkCache();
 extern MAP_LoadAround();
@@ -165,7 +165,7 @@ extern int16 COMBAT_TileDistance(int16, int16, int16);/*COMBAT_TileDistance(objN
 extern COMBAT_breakOff();
 extern int16 COMBAT_GetTargetAt(int16, int16, int16);/*COMBAT_GetTargetAt(objNum, x, y)*/
 extern MUS_PlayAreaSong();
-extern MUS_PlaySfx(int16);/*play a sound effect?*/
+extern MUS_PlaySfx(int16);
 extern int16 IsWaterTile(int16);
 
 
@@ -173,13 +173,13 @@ extern int16 ScreenFade;
 extern int16 ColorRed;
 extern int16 ColorPaper;
 extern int16 ColorText;
-extern int16 D_082E;/*default paper color*/
-extern char D_0F12;/*StatusDirty*/
-extern char D_0F13;/*PromptFlag?*/
-extern char D_0F15;/*IsArmageddon?*/
-extern int16 D_0F16;/*IdleAnimTick*/
-extern int16 D_0F18;/*MapAnimEnabled*/
-extern int16 BuiltAreaX, BuiltAreaY, BuiltAreaZ;/*BuiltAreaX, BuiltAreaY, BuiltAreaZ (map)*/
+extern int16 ColorPaperDefault;
+extern char StatusDirty;
+extern char PromptFlag;
+extern char IsArmageddon;
+extern int16 IdleAnimTick;
+extern int16 MapAnimEnabled;
+extern int16 BuiltAreaX, BuiltAreaY, BuiltAreaZ;
 extern int16 HatchingDisabled;
 extern int16 AdvanceBlocked;
 extern int16 ObjBlkTmpPending[0x45];
@@ -197,11 +197,11 @@ extern unsigned char InvenScroll;
 extern int16 DiskFullChoice;
 extern unsigned char IsInConversation;
 extern int16 TextIdle;
-extern char D_3240[];
-extern char D_3232;/*a drawing surface (main.c)*/
+extern char AnimFrameMask[];
+extern char Screen;/*a struct tSurface (main.c)*/
 extern char far *D_3262;/*0x100 bytes*/
 extern unsigned char ObjStatus[];
-extern struct tMouse D_3E66;/*Mouse*/
+extern struct tMouse Mouse;
 extern char MovePts[];
 extern char far *SchedIndex;/*0x100 bytes*/
 extern char far *PathData;/*0x100 bytes*/
@@ -212,85 +212,53 @@ extern unsigned char Party[];
 extern unsigned char far *Level;
 extern char far *Schedule;/*5 bytes each*/
 extern int16 SchedPointer[0x101];
-extern void far *D_50C6;/*PointerShapes*/
+extern void far *PointerShapes;
 extern char far *Leader;/*0x100 bytes*/
-extern char D_50CE[][14];/*Names*/
+/*50CE*/extern char Names[][14];/*the party members' names (saved in objlist)*/
 extern uint16 ExpPoints[];
 extern unsigned char far *NPCComMode;
 extern unsigned char STREN[];
 extern int16 Amount[];
 extern unsigned char NPCStatus[];
 extern unsigned char HitPoints[];
-extern int16 far *D_6EBE;/*BaseTile*/
-extern unsigned char D_6EC6[];/*TalkFlags*/
+extern int16 far *BaseTile;
+/*6EC6*/extern unsigned char TalkFlags[];/*the conversations' flags of each NPC (bit 0: met; [1] the story's), saved in objlist*/
 extern unsigned char INTEL[];
-extern int16 D_770E[];
+extern int16 AnimFirstFrame[];
 extern struct coord ObjPos[];
 extern unsigned char PartySize;
-extern int16 D_9CC2;/*NumAnimData*/
+extern int16 NumAnimData;
 extern uint16 ObjShapeType[];
-extern int16 D_B4C8[];
+extern int16 AnimTile[];
 extern int16 far *OrigShapeType;
-extern struct tGr far *D_BA66;/*GrInfo*/
-extern union tHandler D_BA6A;/*GrDriver*/
-extern void far *D_BA7E;/*mdscreen.lzc entry 2: default command mark*/
-extern unsigned char D_BC8E[];/*StateAnimData*/
+extern struct tGr far *GrInfo;
+extern union tHandler GrDriver;
+extern void far *ScreenParts;/*mdscreen.lzc entry 2: frames 0/1 mark/unmark a command icon*/
+extern unsigned char StateAnimData[];
 extern unsigned char Obj_11x11[11][11];/*objects shown in the map window*/
 extern int16 Tile_11x11[11][11];/*the tiles of the map window*/
-extern unsigned char D_EAF9[8];/*Party_2Handed*/
-extern int16 D_EB00;/*ShowNPCInven*/
-extern int16 D_EB02;/*NPC_2Handed*/
-extern int16 D_EB18;/*InvenOwner*/
-extern unsigned char D_EB1C;/*PromptCnt: animated cursor frame*/
-extern int16 D_EB1D;/*MouseHeldCmd: command of the mouse button held*/
-extern unsigned char D_EB1F[];/*LineBufChars*/
-extern unsigned char D_EB48[];/*LineBufColors*/
-extern int16 D_EB72;/*AdvanceDir*/
-extern int16 D_EB74, D_EB76;/*PointerX, PointerY*/
-extern struct tSurface D_EB78;/*MouseArea*/
-extern int16 D_EB86[10+26];/*VarInt*/
-extern int16 D_EBCE;/*Selection.obj*/
-extern struct tClipInfo D_EBD0[4];/*TextWindows*/
-extern int16 D_EBF4;/*MouseButtons: bit 0 left, bit 1 right*/
-extern int16 D_EBF6, D_EBF8;/*Selection.x, Selection.y*/
-extern char *D_EBFA[10+26];/*VarStr*/
-extern int16 D_EC42;/*LinesBeforeMore*/
-extern int16 D_EC44;/*SelectionIsDark*/
+extern unsigned char Party_2Handed[8];
+extern int16 ShowNPCInven;
+extern int16 NPC_2Handed;
+extern int16 InvenOwner;
+/*EB1C*/extern unsigned char PromptCnt;/*animated cursor frame*/
+/*EB1D*/extern int16 MouseHeldCmd;/*command of the mouse button held*/
+/*EB1F*/extern unsigned char LineBufChars[];
+/*EB48*/extern unsigned char LineBufColors[];
+/*EB72*/extern int16 AdvanceDir;/*direction of the walk command (0x80)*/
+/*EB74*/extern int16 PointerX;
+/*EB76*/extern int16 PointerY;
+/*EB78*/extern struct tSurface MouseArea;/*the map view's rectangle, for MOUSE_IN_AREA*/
+/*EB86*/extern int16 VarInt[10+26];/*conversation variables: integers (0-9, A-Z)*/
+/*EBCE*/extern int16 SelectionObj;/*the object selected (-1 none)*/
+extern struct tClipInfo TextWindows[4];
+/*EBF4*/extern int16 MouseButtons;/*bit 0 left, bit 1 right*/
+/*EBF6*/extern int16 SelectionX;
+/*EBF8*/extern int16 SelectionY;
+/*EBFA*/extern char *VarStr[10+26];/*conversation variables: strings (0-9, A-Z)*/
+/*EC42*/extern int16 LinesBeforeMore;
+/*EC44*/extern int16 SelectionIsDark;
 
-#define StatusDirty D_0F12
-#define PromptFlag D_0F13
-#define IsArmageddon D_0F15
-#define IdleAnimTick D_0F16
-#define MapAnimEnabled D_0F18
-#define Mouse D_3E66
-#define PointerShapes D_50C6
-#define BaseTile D_6EBE
-#define TalkFlags D_6EC6
-#define NumAnimData D_9CC2
-#define GrInfo D_BA66
-#define GrDriver D_BA6A
-#define StateAnimData D_BC8E
-#define Party_2Handed D_EAF9
-#define ShowNPCInven D_EB00
-#define NPC_2Handed D_EB02
-#define InvenOwner D_EB18
-#define PromptCnt D_EB1C
-#define MouseHeldCmd D_EB1D
-#define LineBufChars D_EB1F
-#define LineBufColors D_EB48
-#define AdvanceDir D_EB72
-#define PointerX D_EB74
-#define PointerY D_EB76
-#define MouseArea D_EB78
-#define VarInt D_EB86
-#define SelectionObj D_EBCE
-#define TextWindows D_EBD0
-#define MouseButtons D_EBF4
-#define SelectionX D_EBF6
-#define SelectionY D_EBF8
-#define VarStr D_EBFA
-#define LinesBeforeMore D_EC42
-#define SelectionIsDark D_EC44
 
 #define GR_SET_COLOR(c)              (GrDriver.iii.ofs = 0x06, (*GrDriver.f)(c))
 #define GR_PUT_PIXEL(x,y)            (GrDriver.iii.ofs = 0x09, (*GrDriver.f)(x,y))
@@ -634,12 +602,12 @@ the game's flags, and the status panel colors*/
 	if(TalkFlags[0x76] & 0x20) {
 		if(TalkFlags[0x76] & 0x40) {
 			for(i = 0; i < NumAnimData; i ++)
-				if(IsWaterTile(D_B4C8[i]))
-					D_770E[i] --;
+				if(IsWaterTile(AnimTile[i]))
+					AnimFirstFrame[i] --;
 		}
 		for(i = 0; i < NumAnimData; i ++)
-			if(D_B4C8[i] >= 1 && D_B4C8[i] <= 4)
-				D_770E[i] --;
+			if(AnimTile[i] >= 1 && AnimTile[i] <= 4)
+				AnimFirstFrame[i] --;
 		TalkFlags[0x76] &= ~0x20;
 	}
 
@@ -663,7 +631,7 @@ the game's flags, and the status panel colors*/
 	OSI_read(fd, -1, 0x100, INTEL);
 	OSI_read(fd, -1, 0x200, ExpPoints);
 	OSI_read(fd, -1, 0x100, HitPoints);
-	OSI_read(fd, -1, 16 * 14, D_50CE);
+	OSI_read(fd, -1, 16 * 14, Names);
 	OSI_read(fd, -1, 0x10, Party);
 	OSI_read(fd, -1, 1, &PartySize);
 	OSI_read(fd, -1, 0x100, Level);
@@ -694,22 +662,22 @@ the game's flags, and the status panel colors*/
 
 	for(i = 0; i < NumAnimData; i ++) {
 		if(!(TalkFlags[0x73] & 4) && (
-			(D_B4C8[i] >= BaseTile[0xbc] && D_B4C8[i] < BaseTile[0xbd]) ||
-			(D_B4C8[i] >= BaseTile[0xbf] && D_B4C8[i] < BaseTile[0xc0]) ||
-			(D_B4C8[i] >= BaseTile[0x1b0] && D_B4C8[i] < BaseTile[0x1b1]) ||
-			(D_B4C8[i] >= BaseTile[0x1b3] && D_B4C8[i] < BaseTile[0x1b4])
+			(AnimTile[i] >= BaseTile[0xbc] && AnimTile[i] < BaseTile[0xbd]) ||
+			(AnimTile[i] >= BaseTile[0xbf] && AnimTile[i] < BaseTile[0xc0]) ||
+			(AnimTile[i] >= BaseTile[0x1b0] && AnimTile[i] < BaseTile[0x1b1]) ||
+			(AnimTile[i] >= BaseTile[0x1b3] && AnimTile[i] < BaseTile[0x1b4])
 		)) {
 			StateAnimData[i] = 0;
-		} else if(IsWaterTile(D_B4C8[i])) {
-			D_3240[i] = 0;
+		} else if(IsWaterTile(AnimTile[i])) {
+			AnimFrameMask[i] = 0;
 			if((TalkFlags[0x76] & 0x20) && (TalkFlags[0x76] & 0x40))
-				D_770E[i] ++;
-		} else if(D_B4C8[i] >= 1 && D_B4C8[i] <= 4) {
-			D_3240[i] = 0;
+				AnimFirstFrame[i] ++;
+		} else if(AnimTile[i] >= 1 && AnimTile[i] <= 4) {
+			AnimFrameMask[i] = 0;
 			if(TalkFlags[0x76] & 0x20)
-				D_770E[i] ++;
-		} else if(D_B4C8[i] == BaseTile[0x62]) {
-			D_3240[i] = 0;
+				AnimFirstFrame[i] ++;
+		} else if(AnimTile[i] == BaseTile[0x62]) {
+			AnimFrameMask[i] = 0;
 		} else {
 			StateAnimData[i] = 1;
 		}
@@ -761,7 +729,7 @@ the game's flags, and the status panel colors*/
 		StatusDisplay = 0x92;
 		StatusMember = PartySize;
 	} else {
-		ColorPaper = D_082E;
+		ColorPaper = ColorPaperDefault;
 		StatusDisplay = 0x91;
 		StatusMember = 0;
 	}
@@ -786,12 +754,12 @@ the game's flags, and the status panel colors*/
 	if(TalkFlags[0x76] & 0x20) {
 		if(TalkFlags[0x76] & 0x40) {
 			for(i = 0; i < NumAnimData; i ++)
-				if(IsWaterTile(D_B4C8[i]))
-					D_770E[i] --;
+				if(IsWaterTile(AnimTile[i]))
+					AnimFirstFrame[i] --;
 		}
 		for(i = 0; i < NumAnimData; i ++)
-			if(D_B4C8[i] >= 1 && D_B4C8[i] <= 4)
-				D_770E[i] --;
+			if(AnimTile[i] >= 1 && AnimTile[i] <= 4)
+				AnimFirstFrame[i] --;
 	}
 	DiskFullChoice = ' ';
 	BuiltAreaX = BuiltAreaY = BuiltAreaZ = -1;
@@ -809,7 +777,7 @@ the game's flags, and the status panel colors*/
 	OSI_write(fd, -1, 0x100, INTEL);
 	OSI_write(fd, -1, 0x200, ExpPoints);
 	OSI_write(fd, -1, 0x100, HitPoints);
-	OSI_write(fd, -1, 16 * 14, D_50CE);
+	OSI_write(fd, -1, 16 * 14, Names);
 	OSI_write(fd, -1, 0x10, Party);
 	OSI_write(fd, -1, 1, &PartySize);
 	OSI_write(fd, -1, 0x100, Level);
@@ -1210,7 +1178,7 @@ static /*C_2238_17AC*/MouseInEquipView() {
 
 /*set the default command (0x81~0x89, or 0xff = none), executed by a
 right click; it is shown on its icon (icons are 18 pixels wide from x = 16)
-by drawing the bitmap D_BA7E (mdscreen.lzc entry 2) there: mode 1 erases
+by drawing the bitmap ScreenParts (mdscreen.lzc entry 2) there: mode 1 erases
 the mark of the previous one, mode 0 marks the new one*/
 static /*C_2238_1A2E*/setDefaultCommand(int16 cmd) {
 	int16 x;
@@ -1219,11 +1187,11 @@ static /*C_2238_1A2E*/setDefaultCommand(int16 cmd) {
 		MOUSE_HIDE();
 	if(DefaultCommand != 0xff) {
 		x = TIL2SCR(DefaultCommand - 0x81) + ((DefaultCommand - 0x81) << 1);
-		GR_DRAW_BITMAP(&D_3232, x + 21, 169, D_BA7E, 1);
+		GR_DRAW_BITMAP(&Screen, x + 21, 169, ScreenParts, 1);
 	}
 	if((DefaultCommand = cmd) != 0xff) {
 		x = TIL2SCR(DefaultCommand - 0x81) + ((DefaultCommand - 0x81) << 1);
-		GR_DRAW_BITMAP(&D_3232, x + 21, 169, D_BA7E, 0);
+		GR_DRAW_BITMAP(&Screen, x + 21, 169, ScreenParts, 0);
 	}
 	if(MouseOn)
 		MOUSE_SHOW();

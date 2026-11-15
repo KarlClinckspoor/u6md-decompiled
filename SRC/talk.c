@@ -46,7 +46,7 @@ extern PartyTeleport(int16, int16, int16, int16);
 extern int16 WrapDelta(int16);/*wraps a map distance*/
 extern int16 MapDistance(int16, int16);/*distance of two map coordinates (wrapping)*/
 extern int16 EGG_generate(int16, int16, int16, int16);/*EGG_generate(type, x, y, z)*/
-extern C_1FA9_04ED();
+extern MUS_EventJingle();
 extern MUS_PlaySfx(int16);
 extern int16 OBJ_FindInContainer(int16, int16, int16);/*OBJ_FindInContainer(npc, type, quality)*/
 extern int16 OBJ_IsOnScreen(int16);
@@ -72,16 +72,15 @@ extern DreamWakeUp();
 extern C_2F5F_0AC1(int16);
 extern C_2F75_1429();
 extern C_2F75_16A8();
-extern char far C_2BB4_0000[];
-extern char far C_2BB4_000B[];
-extern char far C_2BB4_0022[];
-extern char far C_2BB4_0045[];
-extern char far C_2BB4_0315[];/*NotInSoloMsg*/
-extern char far C_2BB4_114D[];
-extern char far C_2BB4_22F1[];
-#define NotInSoloMsg C_2BB4_0315
+extern char far CriticalMsg[];
+extern char far HeavilyMsg[];
+extern char far WoundedMsg[];
+extern char far KilledMsg[];
+extern char far NotInSoloMsg[];
+extern char far NoBacktalkMsg[];
+extern char far AarghMsg[];
 
-extern int16 D_0F18;/*MapAnimEnabled*/
+extern int16 MapAnimEnabled;
 extern int16 ForceHatching;
 extern int16 VisibilityDirty;
 extern unsigned char Time_H;
@@ -102,31 +101,25 @@ extern unsigned char far *D_3262;/*NPC flags: 0x80 ?, bits 0-7: talk flags 8-15*
 extern unsigned char ObjStatus[];
 extern unsigned char far *NPCMode;
 extern unsigned char Party[];
-extern char D_50CE[][14];/*Names*/
+extern char Names[][14];
 extern uint16 ExpPoints[];
 extern unsigned char far *NPCComMode;
-extern unsigned char far *D_54B2;/*ScratchBuf*/
+extern unsigned char far *ScratchBufHigh;
 extern int16 Amount[];/*quantity (low byte), quality (high byte)*/
 extern unsigned char NPCStatus[];
 extern unsigned char HitPoints[];
-extern unsigned char D_6EC6[];/*TalkFlags*/
+extern unsigned char TalkFlags[];
 extern struct coord ObjPos[];
 extern unsigned char PartySize;
 extern uint16 ObjShapeType[];
 extern int16 far *OrigShapeType;
 extern unsigned char Obj_11x11[11][11];
 extern int16 Tile_11x11[11][11];
-extern int16 D_EB86[10+26];/*VarInt*/
-extern char *D_EBFA[10+26];/*VarStr*/
+extern int16 VarInt[10+26];
+extern char *VarStr[10+26];
 extern unsigned char D_EC5C[];/*TalkNpcName*/
 extern char D_ECE2[10][100];/*TalkStrBuf: storage of the string variables $0-$9*/
 
-#define MapAnimEnabled D_0F18
-#define Names D_50CE
-#define ScratchBuf D_54B2
-#define TalkFlags D_6EC6
-#define VarInt D_EB86
-#define VarStr D_EBFA
 #define TalkNpcName D_EC5C
 #define TalkStrBuf D_ECE2
 
@@ -278,7 +271,7 @@ char *TALK_GetCharName(int16);
 			}
 		} else if(GetType(objNum) == 0x187) {
 			CON_printf("%s\n", GetObjectString(objNum));
-			CON_printf(C_2BB4_114D, PlayerIsFemale?"wo":"");
+			CON_printf(NoBacktalkMsg, PlayerIsFemale?"wo":"");
 			if(savedSolo >= 0)
 				SoloMember = savedSolo;
 			return;
@@ -309,7 +302,7 @@ char *TALK_GetCharName(int16);
 						k = AddMapObj(0xd24, 0, 0xe00, 0x34, 0x20, MapZ);
 						obj2 = AddMapObj(0x5cd, 0, 0x340b, 0x34, 0x21, MapZ);
 						if(k < 0 || obj2 < 0) {
-							CON_printf(C_2BB4_22F1);
+							CON_printf(AarghMsg);
 							return;
 						}
 						ObjStatus[obj2] = 0xc1;
@@ -325,7 +318,7 @@ char *TALK_GetCharName(int16);
 						k = AddMapObj(0xd24, 0, 0xf00, 0x12, 0x22, MapZ);
 						obj2 = AddMapObj(0x5cd, 0, 0x1b1a, 0x12, 0x23, MapZ);
 						if(k < 0 || obj2 < 0) {
-							CON_printf(C_2BB4_22F1);
+							CON_printf(AarghMsg);
 							return;
 						}
 						ObjStatus[obj2] = 0xc5;
@@ -372,15 +365,15 @@ char *TALK_GetCharName(int16);
 						MUS_PlaySfx(2);
 						CON_printf("`%s ", GetObjectString(0x68));
 						if(!(TalkFlags[0x68] & 8)) {
-							CON_printf(C_2BB4_000B);
-							CON_printf(C_2BB4_0022);
+							CON_printf(HeavilyMsg);
+							CON_printf(WoundedMsg);
 						} else {
-							CON_printf(C_2BB4_0000);
+							CON_printf(CriticalMsg);
 						}
 						MUS_PlaySfx(10);
 						COMBAT_Missile(0x68, &x, &y, 9, 0x16a);
 						MUS_PlaySfx(1);
-						CON_printf(C_2BB4_0045, GetObjectString(k));
+						CON_printf(KilledMsg, GetObjectString(k));
 						if(k == 1) {
 							SetTypeUnconscious(0);
 							SetTypeUnconscious(0x68);
@@ -394,18 +387,18 @@ char *TALK_GetCharName(int16);
 							if((obj2 = OBJ_FindTypeAt(0x189, x, y)) >= 0)
 								ObjShapeType[obj2] = 0x155 | ((GetType(k) - 0x156) << 10);
 							else
-								CON_printf(C_2BB4_22F1);
+								CON_printf(AarghMsg);
 							if((obj2 = OBJ_FindTypeAt(0xae, x, y)) >= 0)
 								MoveObj(obj2, x, y, MapZ);
 							else
-								CON_printf(C_2BB4_22F1);
+								CON_printf(AarghMsg);
 						}
 					break;
 					case 0x68:
 						k = AddMapObj(0xd24, 0, 0x1000, 0x6a, 0x2a, MapZ);
 						obj2 = AddMapObj(0x5cd, 0, 0x5328, 0x6a, 0x2b, MapZ);
 						if(k < 0 || obj2 < 0) {
-							CON_printf(C_2BB4_22F1);
+							CON_printf(AarghMsg);
 							return;
 						}
 						ObjStatus[obj2] = 0xe0;
@@ -440,11 +433,11 @@ returns TalkNpcName*/
 	i = 0;
 	j = 2;
 	if(HasConversation(objNum)) {
-		LoadConversation(objNum, ScratchBuf);
+		LoadConversation(objNum, ScratchBufHigh);
 		for(j = 2; i < 50; i ++, j ++)
-			TalkNpcName[i] = ScratchBuf[j];
+			TalkNpcName[i] = ScratchBufHigh[j];
 	} else {
-		CON_printf(C_2BB4_22F1);
+		CON_printf(AarghMsg);
 		strcpy(TalkNpcName, "NPC 0x");
 		CON_itoa(objNum, TalkNpcName + 6, 4, 16);
 		return TalkNpcName;
@@ -615,19 +608,19 @@ returns 0:ok, 1:party is in a vehicle, 2:not in party*/
 		break;
 		case 6:
 			if((k = OBJ_FindTypeAt(0xb5, 0x2c3, 0x1f3)) < 0) {
-				CON_printf(C_2BB4_22F1);
+				CON_printf(AarghMsg);
 			} else {
 				ObjShapeType[k] = GetType(k) + 0xc00;
 				MoveObj(k, 0x2c2, 0x1f3, 0);
 			}
 			if((k = OBJ_FindTypeAt(0xb5, 0x2c4, 0x1f3)) < 0)
-				CON_printf(C_2BB4_22F1);
+				CON_printf(AarghMsg);
 			else
 				ObjShapeType[k] = GetType(k) + 0x1c00;
 		break;
 		case 7:
 			if((k = OBJ_FindTypeAt(0x98, 0x2c7, 0x1dc)) < 0)
-				CON_printf(C_2BB4_22F1);
+				CON_printf(AarghMsg);
 			else
 				ObjShapeType[k] = GetType(k) + 0x1c00;
 		break;
@@ -647,7 +640,7 @@ returns 0:ok, 1:party is in a vehicle, 2:not in party*/
 		break;
 		case 0xb:
 			if((k = OBJ_FindTypeAt(0x98, 0x13f, 0x194)) < 0)
-				CON_printf(C_2BB4_22F1);
+				CON_printf(AarghMsg);
 			else {
 				GetQual(k) = 0;
 				ObjShapeType[k] = GetType(k) + 0x1c00;
@@ -655,7 +648,7 @@ returns 0:ok, 1:party is in a vehicle, 2:not in party*/
 		break;
 		case 0x33:
 			if((k = OBJ_FindTypeAt(0x4f, 9, 0x1f)) < 0)
-				CON_printf(C_2BB4_22F1);
+				CON_printf(AarghMsg);
 			else
 				ObjShapeType[k] = GetType(k) + 0x400;
 		break;
@@ -664,7 +657,7 @@ returns 0:ok, 1:party is in a vehicle, 2:not in party*/
 			TalkEvent = 0x34;
 		break;
 		case 0x35:
-			C_1FA9_04ED();
+			MUS_EventJingle();
 			DreamFoesLeft = 0;
 			for(k = 0; k < 6; k ++) {
 				if((npc = EGG_generate(0x91, MapX, MapY, MapZ)) >= 0) {
@@ -677,7 +670,7 @@ returns 0:ok, 1:party is in a vehicle, 2:not in party*/
 				}
 			}
 			if(!DreamFoesLeft)
-				CON_printf(C_2BB4_22F1);
+				CON_printf(AarghMsg);
 		break;
 		case 0x36:
 			C_2F5F_0AC1(0x52);
@@ -687,27 +680,27 @@ returns 0:ok, 1:party is in a vehicle, 2:not in party*/
 			MoveObj(0x56, 0x56, 0x56, 6);
 			OBJ_PurgeFarLocals(-1, -1, -1);
 			if((k = AddInvObj(0x9e, 0x10, 4, 0)) < 0) {
-				CON_printf(C_2BB4_22F1);
+				CON_printf(AarghMsg);
 				break;
 			}
 			if((k = AddInvObj(0xf2, 0x10, 0, 0)) < 0) {
-				CON_printf(C_2BB4_22F1);
+				CON_printf(AarghMsg);
 				break;
 			}
 			if((k = AddInvObj(0x4a0, 0x10, 0, 0)) < 0) {
-				CON_printf(C_2BB4_22F1);
+				CON_printf(AarghMsg);
 				break;
 			}
 			if((k = AddMapObj(0x101, 0, 0, 0x19, 0x6f, MapZ)) < 0) {
-				CON_printf(C_2BB4_22F1);
+				CON_printf(AarghMsg);
 				break;
 			}
 			if((npc = AddMapObj(0xfb, 0, 0xf00, 0x19, 0x6f, MapZ)) < 0) {
-				CON_printf(C_2BB4_22F1);
+				CON_printf(AarghMsg);
 				break;
 			}
 			if((npc = AddInvObj(0xfc, 8, 0, k)) < 0) {
-				CON_printf(C_2BB4_22F1);
+				CON_printf(AarghMsg);
 				break;
 			}
 			for(k = 0; k < 4; k ++) {
@@ -716,7 +709,7 @@ returns 0:ok, 1:party is in a vehicle, 2:not in party*/
 					if(!COMBAT_TryTeleport(npc, 1))
 						DeleteObj(npc);
 				} else {
-					CON_printf(C_2BB4_22F1);
+					CON_printf(AarghMsg);
 				}
 			}
 			for(k = 0; k < 4; k ++) {
@@ -725,7 +718,7 @@ returns 0:ok, 1:party is in a vehicle, 2:not in party*/
 					if(!COMBAT_TryTeleport(npc, 1))
 						DeleteObj(npc);
 				} else {
-					CON_printf(C_2BB4_22F1);
+					CON_printf(AarghMsg);
 				}
 			}
 			for(k = 0; k < 4; k ++) {
@@ -734,12 +727,12 @@ returns 0:ok, 1:party is in a vehicle, 2:not in party*/
 					if(!COMBAT_TryTeleport(npc, 1))
 						DeleteObj(npc);
 				} else {
-					CON_printf(C_2BB4_22F1);
+					CON_printf(AarghMsg);
 				}
 			}
 			VIS_UpdateView();
 			MapAnimEnabled = 1;
-			C_1FA9_04ED();
+			MUS_EventJingle();
 		break;
 		case 0x38:
 			TalkFlags[0x55] |= 0x18;
@@ -786,7 +779,7 @@ returns 0:ok, 1:party is in a vehicle, 2:not in party*/
 					break;
 			}
 			if(k < 0) {
-				CON_printf(C_2BB4_22F1);
+				CON_printf(AarghMsg);
 				break;
 			}
 			OBJ_ReviveFromBody(k);
@@ -798,31 +791,31 @@ returns 0:ok, 1:party is in a vehicle, 2:not in party*/
 			TalkFlags[0x5b] &= 0xef;
 		break;
 		case 0x65:
-			C_1FA9_04ED();
+			MUS_EventJingle();
 			TalkEvent = 0x65;
 		break;
 		case 0x66:
-			C_1FA9_04ED();
+			MUS_EventJingle();
 			TalkEvent = 0x66;
 		break;
 		case 0x67:
 			TalkEvent = 0x67;
 		break;
 		case 0x68:
-			C_1FA9_04ED();
+			MUS_EventJingle();
 			TalkEvent = 0x68;
 		break;
 		case 0x69:
 			MUS_PlaySfx(0x32);
 			if(GetX(0x67) == 0x2c) {
 				if((k = OBJ_FindTypeAt(0xdb, 0x3b, 0xc)) < 0) {
-					CON_printf(C_2BB4_22F1);
+					CON_printf(AarghMsg);
 					break;
 				}
 				ObjShapeType[k] = GetType(k) + 0xc00;
 			} else {
 				if((k = OBJ_FindTypeAt(0xdb, 0x2b, 0xf)) < 0) {
-					CON_printf(C_2BB4_22F1);
+					CON_printf(AarghMsg);
 					break;
 				}
 				ObjShapeType[k] = GetType(k) + 0x1c00;
@@ -853,7 +846,7 @@ returns 0:ok, 1:party is in a vehicle, 2:not in party*/
 			if((k = OBJ_FindTypeAt(0xe0, 0x75, 0x17)) >= 0)
 				break;
 			if((k = AddMapObj(0xce0, 0, 0, 0x75, 0x17, MapZ)) < 0)
-				CON_printf(C_2BB4_22F1);
+				CON_printf(AarghMsg);
 			else
 				ObjStatus[k] &= 0xdf;
 		break;
@@ -868,7 +861,7 @@ returns 0:ok, 1:party is in a vehicle, 2:not in party*/
 			if((k = OBJ_FindTypeAt(0xe0, 0x7a, 0x12)) >= 0)
 				break;
 			if((k = AddMapObj(0x1ce0, 0, 0, 0x7a, 0x12, MapZ)) < 0)
-				CON_printf(C_2BB4_22F1);
+				CON_printf(AarghMsg);
 			else
 				ObjStatus[k] &= 0xdf;
 		break;

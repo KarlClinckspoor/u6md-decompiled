@@ -2,7 +2,8 @@
 /*
  * EMS memory: merging free blocks of the EMS heap (a block: a 4-byte header, its length
  * as a long with bit 0 set while in use, then the data; see LIB/EMSALLOC.ASM). A library
- * module of MARTIAN.EXE's (not in SAVAGE.EXE), compiled with Turbo C++ 1.01.
+ * module of MARTIAN.EXE's and GAME.EXE's (segment 28D2; not in SAVAGE.EXE), compiled with
+ * Turbo C++ 1.01.
  * The original reads the header of q for `used` as a word (mov ax,es:[bx-4]; and ax,1;
  * mov [bp-11h],al); every C form tried gives a byte read (TC narrows the AND; a 1-bit
  * field gives mov al / and ax,1), so that statement is inline assembly.

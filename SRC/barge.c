@@ -33,16 +33,16 @@ extern int32 GameFlags;/*0x10: in a dream*/
 extern unsigned char Party[];
 extern int16 Amount[];/*quantity (low byte), quality (high byte)*/
 extern unsigned char NPCStatus[];
-extern unsigned char far *D_6DBA;/*TileFlag*/
-extern int16 far *D_6EBE;/*BaseTile*/
-extern unsigned char D_6EC6[];/*TalkFlags (per NPC)*/
-extern unsigned char far *D_760A;/*TileFlag2*/
-extern int16 D_770E[];/*AnimFirstFrame*/
+extern unsigned char far *TileFlag;
+extern int16 far *BaseTile;
+extern unsigned char TalkFlags[];/*per NPC*/
+extern unsigned char far *TileFlag2;
+extern int16 AnimFirstFrame[];
 extern struct coord ObjPos[];
 extern unsigned char PartySize;
-extern int16 D_9CC2;/*NumAnimData*/
+extern int16 NumAnimData;
 extern uint16 ObjShapeType[];
-extern int16 D_B4C8[];/*AnimTile*/
+extern int16 AnimTile[];
 /*B530*/extern int16 barge_scrap_count;/*the names are the dump's (BargeDump)*/
 /*B532*/extern int16 barge_piece_count;
 /*B534*/extern int16 controllers[0x10];/*the controllers found this turn (BargeAddController)*/
@@ -71,13 +71,6 @@ extern int16 IsWaterTile(int16);
 extern cdecl CON_printf(char far *, ...);
 
 #define IN_DREAM (GameFlags & 0x10)
-#define TileFlag D_6DBA
-#define BaseTile D_6EBE
-#define TalkFlags D_6EC6
-#define TileFlag2 D_760A
-#define AnimFirstFrame D_770E
-#define NumAnimData D_9CC2
-#define AnimTile D_B4C8
 
 
 #define GetType(i) (ObjShapeType[i] & 0x3ff)

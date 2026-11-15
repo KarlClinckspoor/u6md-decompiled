@@ -63,16 +63,16 @@ extern CON_gotoxy(int16, int16);
 extern int16 CON_getch();
 extern CON_WaitKeyOrClick();
 extern cdecl CON_printf(char far *, ...);
-extern char far C_2BB4_22F1[];/*failure message*/
+extern char far AarghMsg[];/*failure message*/
 
 extern unsigned char MouseOn;
 extern int16 ScreenFade;
 extern int16 ColorPaper;
 extern int16 ColorText;
-extern int16 D_0826;
-extern char D_0F12;/*StatusDirty*/
-extern char D_0F13;/*PromptFlag*/
-extern int16 D_0F18;/*MapAnimEnabled*/
+extern int16 ColorDarkBlue;
+extern char StatusDirty;
+extern char PromptFlag;
+extern int16 MapAnimEnabled;
 extern int16 MapX, MapY, MapZ;
 extern unsigned char PlayerIsFemale;
 extern char SelectMode;
@@ -81,33 +81,25 @@ extern int16 EndPagingAtPrompt;
 extern int16 StatusDisplay;
 extern struct tClipInfo *CurClip;
 extern unsigned char IsInConversation;
-extern char D_3232;/*a drawing surface (main.c)*/
+extern char Screen;/*a drawing surface (main.c)*/
 extern unsigned char far *D_3262;/*talk flags 8-15*/
 extern unsigned char ObjStatus[];
-extern char far *D_3E80;/*work area of the .lzc loader*/
+extern char far *LzcWorkBuf;/*work area of the .lzc loader*/
 extern unsigned char far *SchedIndex;/*0x100 bytes*/
 extern unsigned char far *NPCMode;
 extern char far *Schedule;/*5 bytes each*/
 extern int16 SchedPointer[0x101];
 extern char far *ScratchBuf;
 extern unsigned char NPCStatus[];
-extern char far *D_6EC2;/*TalkBuf*/
+extern char far *TalkBuf;
 extern struct coord ObjPos[];
 extern uint16 ObjShapeType[];
-extern struct tGr far *D_BA66;/*GrInfo*/
-extern union tHandler D_BA6A;/*GrDriver*/
+extern struct tGr far *GrInfo;
+extern union tHandler GrDriver;
 extern int16 AreaX, AreaY;
-extern struct tClipInfo D_EBD0[4];/*TextWindows*/
-extern int16 D_EC42;/*LinesBeforeMore*/
+extern struct tClipInfo TextWindows[4];
+extern int16 LinesBeforeMore;
 
-#define StatusDirty D_0F12
-#define PromptFlag D_0F13
-#define MapAnimEnabled D_0F18
-#define TalkBuf D_6EC2
-#define GrInfo D_BA66
-#define GrDriver D_BA6A
-#define TextWindows D_EBD0
-#define LinesBeforeMore D_EC42
 
 
 #define GR_SET_COLOR(c)              (GrDriver.iii.ofs = 0x06, (*GrDriver.f)(c))
@@ -185,19 +177,19 @@ extern int16 D_EC42;/*LinesBeforeMore*/
 			MUS_PlaySong(3);
 		if(portraits[k])
 			ShowPortrait((unsigned char)portraits[k]);
-		if(LZC_loadType(fname, page * 5 + 4, ScratchBuf, 0, D_3E80) == 0)
+		if(LZC_loadType(fname, page * 5 + 4, ScratchBuf, 0, LzcWorkBuf) == 0)
 			break;
-		GR_DRAW_BITMAP(&D_3232, 8, 0x10, ScratchBuf, 0);
-		if(LZC_loadType(fname, page * 5 + 5, ScratchBuf, 0, D_3E80))
-			GR_DRAW_BITMAP(&D_3232, 8, 0x10, ScratchBuf, PlayerIsFemale);
+		GR_DRAW_BITMAP(&Screen, 8, 0x10, ScratchBuf, 0);
+		if(LZC_loadType(fname, page * 5 + 5, ScratchBuf, 0, LzcWorkBuf))
+			GR_DRAW_BITMAP(&Screen, 8, 0x10, ScratchBuf, PlayerIsFemale);
 		ClearText();
 		for(j = 0; j < 3; j ++) {
-			LZC_loadType(fname, page * 5 + j + 1, TalkBuf, 0, D_3E80);
+			LZC_loadType(fname, page * 5 + j + 1, TalkBuf, 0, LzcWorkBuf);
 			if(TalkBuf[0] == '*' && TalkBuf[1] == 'E')
 				continue;
 			CurClip->fgColor = ColorText;
 			CON_printf(TalkBuf);
-			CurClip->fgColor = D_0826;
+			CurClip->fgColor = ColorDarkBlue;
 			MapAnimEnabled = 0;
 			CON_getch();
 			MapAnimEnabled = 1;
@@ -232,8 +224,8 @@ extern int16 D_EC42;/*LinesBeforeMore*/
 	GrInfo->toBackBuffer = 0;
 	if(MouseOn)
 		MOUSE_HIDE();
-	if(LZC_loadType(fname, n, ScratchBuf, 0, D_3E80)) {
-		GR_DRAW_BITMAP(&D_3232, 8, 0x10, ScratchBuf, 0);
+	if(LZC_loadType(fname, n, ScratchBuf, 0, LzcWorkBuf)) {
+		GR_DRAW_BITMAP(&Screen, 8, 0x10, ScratchBuf, 0);
 		MapAnimEnabled = 0;
 		CON_printf("Press any key...");
 		CON_WaitKeyOrClick();
@@ -421,7 +413,7 @@ extern int16 D_EC42;/*LinesBeforeMore*/
 			ObjShapeType[obj] = GetType(obj) + 0x800;
 	}
 	if((obj = AddMapObj(0x1cc, 0, 0, 0x243, 0x27a, 0)) < 0)
-		CON_printf(C_2BB4_22F1);
+		CON_printf(AarghMsg);
 	else
 		ObjStatus[obj] &= ~0x20;
 	MapX = x;
@@ -489,15 +481,15 @@ extern int16 D_EC42;/*LinesBeforeMore*/
 	MapZ = 0;
 	MAP_LoadAround();
 	if((obj = AddMapObj(0xef, 0, 0, MapX - 2, MapY - 2, MapZ)) < 0)
-		CON_printf(C_2BB4_22F1);
+		CON_printf(AarghMsg);
 	else
 		ObjStatus[obj] &= ~0x20;
 	if((obj = AddMapObj(0xef, 0, 0, MapX - 2, MapY - 1, MapZ)) < 0)
-		CON_printf(C_2BB4_22F1);
+		CON_printf(AarghMsg);
 	else
 		ObjStatus[obj] &= ~0x20;
 	if((obj = AddMapObj(0xef, 0, 0, MapX - 2, MapY, MapZ)) < 0)
-		CON_printf(C_2BB4_22F1);
+		CON_printf(AarghMsg);
 	else
 		ObjStatus[obj] &= ~0x20;
 	MapX = 0xb0;

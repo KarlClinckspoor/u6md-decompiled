@@ -1,5 +1,5 @@
 ;----------------------------------------
-;MARTIAN.EXE: copying between far buffers that may overlap (Savage Empire's MEMMOVE.ASM,
+;GAME.EXE segment 2706 (MARTIAN.EXE's module): copying between far buffers that may overlap (Savage Empire's MEMMOVE.ASM,
 ;SAVAGE.EXE 0CAC; this one does nothing for n = 0 and tests n < 1 unsigned). The original
 ;was assembled by an assembler that pads each forward conditional jump to 5 bytes (TASM's
 ;JUMPS): the NOPs after the jumps are written out.

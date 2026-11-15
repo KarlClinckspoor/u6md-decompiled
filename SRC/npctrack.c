@@ -116,7 +116,7 @@ extern ApplyTerrainEffects(int16, int16, int16);
 extern TALK_talkTo(int16, int16, int16);
 extern DrawSkyBar();
 extern MUS_PlaySfx(int16);
-extern C_1FA9_0603();/*the party is knocked out*/
+extern PartyUnconscious();/*the party is knocked out*/
 extern BeltUpdate(int16);
 extern BeltStart();
 extern BargeFindLeader(int16);
@@ -125,9 +125,9 @@ extern MachineryOff();
 extern C_2F75_042D();/*a cut scene*/
 extern C_2F63_0043();
 extern DreamTrigger(int16);
-extern char far C_2BB4_03B5[];/*you must be in party mode to %s*/
-extern char far C_2BB4_2180[];
-extern char far C_2BB4_22F1[];/*failure message*/
+extern char far MustBeInPartyMsg[];/*you must be in party mode to %s*/
+extern char far StokerBlockedMsg[];
+extern char far AarghMsg[];/*failure message*/
 /*functions of this file called before their definition*/
 extern int16 TryMoveTo(int16, int16, int16);
 extern NPC_BecomeObject(int16);
@@ -139,7 +139,7 @@ extern int16 MouseMapX, MouseMapY;
 extern int16 MoveFromX, MoveFromY, MoveFromSet;/*canmove.c*/
 extern int16 LeaderOnBelt, MemberOnBelt;/*canmove.c*/
 extern char LeaderOnBarge;/*barge.c*/
-extern char D_0F13;/*PromptFlag*/
+extern char PromptFlag;
 extern int16 LocPartOffset;
 extern int16 MoveAppliesTerrain;
 extern unsigned char Time_H;
@@ -172,14 +172,14 @@ extern unsigned char AreaTiles[AREA_H][AREA_W];/*the ground tiles of the area*/
 /*53AE*/extern unsigned char far *NPCComMode;/*the combat mode of each NPC*/
 extern int16 Amount[];
 /*6CBA*/extern unsigned char NPCStatus[];/*0x80 in the party, 0x60 alignment, 0x10 dead, 0x08 poisoned, 0x04 asleep, 0x02 paralyzed, 0x01 protected*/
-extern unsigned char far *D_6DBA;/*TileFlag*/
+extern unsigned char far *TileFlag;
 extern unsigned char HitPoints[];
-extern int16 far *D_6EBE;/*BaseTile*/
-extern unsigned char D_6EC6[];/*TalkFlags*/
+extern int16 far *BaseTile;
+extern unsigned char TalkFlags[];
 extern struct coord ObjPos[];
 /*9CC0*/extern unsigned char PartySize;
 extern uint16 ObjShapeType[];
-extern unsigned char far *D_B4C4;/*TerrainType*/
+extern unsigned char far *TerrainType;
 /*B508*/extern int16 far *OrigShapeType;/*the shape an NPC gets back when it wakes up*/
 extern int16 CurrentBarge[9];
 extern int16 AreaX, AreaY;
@@ -195,11 +195,6 @@ extern int16 AreaX, AreaY;
 /*C122*/extern int16 PTH_Found;
 
 
-#define PromptFlag D_0F13
-#define TileFlag D_6DBA
-#define BaseTile D_6EBE
-#define TalkFlags D_6EC6
-#define TerrainType D_B4C4
 
 #define TypeFrame(t, s) ((t) + ((s) << 10))
 #define GetType(i) (ObjShapeType[i] & 0x3ff)
@@ -738,8 +733,8 @@ extern int16 AreaX, AreaY;
 	PassTime(0);
 	if(needPartyMode) {
 		switch(objType) {
-			case 0xa3: case 0xb2: CON_printf(C_2BB4_03B5, "leave"); break;
-			default: CON_printf(C_2BB4_03B5, "enter");
+			case 0xa3: case 0xb2: CON_printf(MustBeInPartyMsg, "leave"); break;
+			default: CON_printf(MustBeInPartyMsg, "enter");
 		}
 		PromptFlag = 1;
 	}
@@ -1650,7 +1645,7 @@ extern int16 AreaX, AreaY;
 			if(TryStraightMove(objNum, 4, 1))
 				break;
 			if(OBJ_IsOnScreen(objNum)) {
-				CON_printf(C_2BB4_2180);
+				CON_printf(StokerBlockedMsg);
 				MUS_PlaySfx(0);
 			}
 		break;
@@ -1687,7 +1682,7 @@ extern int16 AreaX, AreaY;
 				}
 				NPCMode[objNum] = 0x9c;
 			} else if(OBJ_IsOnScreen(objNum)) {
-				CON_printf(C_2BB4_2180);
+				CON_printf(StokerBlockedMsg);
 				MUS_PlaySfx(0);
 			}
 		break;
@@ -1823,7 +1818,7 @@ extern int16 AreaX, AreaY;
 
 /*check who the player controls:
  - in a vehicle, actor 0 (the vehicle) is kept healthy;
- - the Avatar (object 1) dead, or NPC 0 in the dream -> C_1FA9_0603 (the
+ - the Avatar (object 1) dead, or NPC 0 in the dream -> PartyUnconscious (the
    party is knocked out; nothing more in the dream);
  - if the active member is asleep/paralyzed/dead/dragged under/charmed,
    control goes to the next able member (in solo mode: back to party mode);
@@ -1835,7 +1830,7 @@ extern int16 AreaX, AreaY;
 	if(Active > PartySize)
 		return;
 	if(IsDead(1) || (IsDead(0) && (GameFlags & 0x10))) {
-		C_1FA9_0603();
+		PartyUnconscious();
 		if(GameFlags & 0x10)
 			return;
 	}
@@ -2066,7 +2061,7 @@ extern int16 AreaX, AreaY;
 	if(IsNPC(objNum)) {
 		obj = AddMapObj(ObjShapeType[objNum], 0, (GetQual(objNum) << 8) | HitPoints[objNum], GetX(objNum), GetY(objNum), GetZ(objNum));
 		if(obj < 0) {
-			CON_printf(C_2BB4_22F1);
+			CON_printf(AarghMsg);
 		} else {
 			SubMov(objNum, MovePts[objNum]);
 			DeleteObj(objNum);

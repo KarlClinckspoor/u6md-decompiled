@@ -1,7 +1,8 @@
 /* flags: -mm -c -O -G -Z -d */
 /* compiler: Turbo C++ 1.01 */
 /*
- * Martian Dreams, MARTIAN.EXE segment 1046: music and sound effects through the STRAX.DRV
+ * Martian Dreams, GAME.EXE segment 2710 (the same source as MARTIAN.EXE's music.c, segment
+ * 1046; SRC_M/music.c): music and sound effects through the STRAX.DRV
  * sound driver. Plays standard MIDI files (MThd/MTrk, format 0-2, up to 32 tracks) from a
  * timer interrupt, with Origin's 0xFE loop events, and sound effects ("voices": sequences
  * of 8-byte steps) on MIDI channels 2-9, borrowed from the music and given back.
@@ -65,30 +66,30 @@ extern LoopDelay();/*a callback given to the driver*/
 extern int emsInUse;/*expanded memory in use*/
 
 /*uninitialised data*/
-extern tDrv2 D_EA52;/*driver: program change (channel, program)*/
-extern void far *D_EA56;/*driver entry +14h*/
-extern tDrvInit D_EA5A;/*driver: init*/
-extern tDrv3 D_EA66;/*driver: note (channel, note, velocity; 0: off)*/
-extern tDrv1 D_EA72;/*driver: load timbre bank*/
-extern unsigned far *D_EA7C;/*STRAX.DRV in memory: entry offsets at +2..+14h*/
-extern tDrv0 D_EA80;/*driver: shutdown*/
-extern void far *D_EA84;/*driver: timer routine*/
-extern void far *D_EA88;/*driver entry +12h*/
-extern struct tDrvInfo far *D_EA8C;/*what the driver's init returned*/
-extern tDrv3 D_EAD0;/*driver: controller (channel, controller, value)*/
-extern tDrv3 D_EAD4;/*driver: pitch bend (channel, lsb, msb)*/
-extern int D_F204[32];/*the track has ended*/
-extern unsigned char far *D_F0E4[32];/*where each track is*/
-extern char D_F0DA[8];/*hook of the driver's timer routine*/
-extern void far *D_F0CC;/*the timbre bank in memory*/
-extern unsigned char D_F164[32];/*running status of each track*/
-extern int D_F248;/*MThd: ticks per quarter note*/
-extern char D_F0D0[8];/*hook of the timer routine*/
-extern int D_F246;/*MThd: number of tracks*/
-extern long D_F184[32];/*ticks until each track's next event*/
-extern int D_F244;/*MThd: format*/
+/*EA52*/extern tDrv2 drvProgram;/*driver: program change (channel, program)*/
+/*EA56*/extern void far *drvEntry14;/*driver entry +14h*/
+/*EA5A*/extern tDrvInit drvInit;/*driver: init*/
+/*EA66*/extern tDrv3 drvNote;/*driver: note (channel, note, velocity; 0: off)*/
+/*EA72*/extern tDrv1 drvLoadTimbres;/*driver: load timbre bank*/
+/*EA7C*/extern unsigned far *drvCode;/*STRAX.DRV in memory: entry offsets at +2..+14h*/
+/*EA80*/extern tDrv0 drvShutdown;/*driver: shutdown*/
+/*EA84*/extern void far *drvTimer;/*driver: timer routine*/
+/*EA88*/extern void far *drvEntry12;/*driver entry +12h*/
+/*EA8C*/extern struct tDrvInfo far *drvInfo;/*what the driver's init returned*/
+/*EAD0*/extern tDrv3 drvController;/*driver: controller (channel, controller, value)*/
+/*EAD4*/extern tDrv3 drvPitchBend;/*driver: pitch bend (channel, lsb, msb)*/
+/*F204*/extern int trackEnded[32];/*the track has ended*/
+/*F0E4*/extern unsigned char far *trackPtr[32];/*where each track is*/
+/*F0DA*/extern char drvTimerHook[8];/*hook of the driver's timer routine*/
+/*F0CC*/extern void far *timbreBank;/*the timbre bank in memory*/
+/*F164*/extern unsigned char trackStatus[32];/*running status of each track*/
+/*F248*/extern int ticksPerQuarter;/*MThd: ticks per quarter note*/
+/*F0D0*/extern char musTimerHook[8];/*hook of the timer routine*/
+/*F246*/extern int numTracks;/*MThd: number of tracks*/
+/*F184*/extern long trackDelay[32];/*ticks until each track's next event*/
+/*F244*/extern int midiFormat;/*MThd: format*/
 
-/*1046's initialised data*/
+/*2710's initialised data*/
 /*2B4E*/int soundCard = 0;/*0: none, 1: Roland, 2: AdLib, 3: the third driver (timer at 7680 Hz); STRAX.DRV entry soundCard - 1*/
 /*2B50*/int sfxReady = 0;/*the sound effects may be updated (0 while they are changed)*/
 /*2B52*/int musicMarker = 0;/*the last 0xFE type 3 event's value*/
@@ -181,7 +182,7 @@ PlaySong(void far *);
 
 	if (ch >= 2 && ch <= 9) {
 		disable();
-		(*D_EAD0)(ch, 0x7b, 0);
+		(*drvController)(ch, 0x7b, 0);
 		enable();
 		chanUser[ch] = 0;
 		for (i = 0; i < 13; i++) {
@@ -252,24 +253,24 @@ PlaySong(void far *);
 			}
 			disable();
 			if (chanUser[v->chan1] != 2) {
-				(*D_EAD0)(v->chan1, 0x7b, 0);
+				(*drvController)(v->chan1, 0x7b, 0);
 				chanUser[v->chan1] = 2;
 			}
-			(*D_EA52)(v->chan1, program - 1);
+			(*drvProgram)(v->chan1, program - 1);
 			chanProgram[v->chan1] = (program - 1) >> 0;
-			(*D_EAD0)(v->chan1, 7, vol1);
-			(*D_EAD0)(v->chan1, 10, pan1);
-			(*D_EA66)(v->chan1, note, velocity);
+			(*drvController)(v->chan1, 7, vol1);
+			(*drvController)(v->chan1, 10, pan1);
+			(*drvNote)(v->chan1, note, velocity);
 			if ((!!(v->flags & 1)) && v->chan2 != 0) {
 				if (chanUser[v->chan2] != 2) {
-					(*D_EAD0)(v->chan2, 0x7b, 0);
+					(*drvController)(v->chan2, 0x7b, 0);
 					chanUser[v->chan2] = 2;
 				}
-				(*D_EA52)(v->chan2, program - 1);
+				(*drvProgram)(v->chan2, program - 1);
 				chanProgram[v->chan2] = (program - 1) >> 0;
-				(*D_EAD0)(v->chan2, 7, vol2);
-				(*D_EAD0)(v->chan2, 10, pan2);
-				(*D_EA66)(v->chan2, note, velocity);
+				(*drvController)(v->chan2, 7, vol2);
+				(*drvController)(v->chan2, 10, pan2);
+				(*drvNote)(v->chan2, note, velocity);
 			}
 			enable();
 			v->note = note;
@@ -302,9 +303,9 @@ PlaySong(void far *);
 				continue;
 			if (--v->counter)
 				continue;
-			(*D_EA66)(v->chan1, v->note, 0);
+			(*drvNote)(v->chan1, v->note, 0);
 			if (!!(v->flags & 1))
-				(*D_EA66)(v->chan2, v->note, 0);
+				(*drvNote)(v->chan2, v->note, 0);
 			if (flags & 2) {
 				if (v->step->target > v->note) {
 					v->note++;
@@ -319,7 +320,7 @@ PlaySong(void far *);
 			if (flags & 8)
 				changed = 1;
 			if (changed) {
-				(*D_EA66)(v->chan1, v->note, v->step->velocity);
+				(*drvNote)(v->chan1, v->note, v->step->velocity);
 				v->counter = v->step->duration;
 			} else if (flags & 1) {
 				v->step++;
@@ -350,9 +351,9 @@ PlaySong(void far *);
 				ch1 = voices[i].chan1;
 				ch2 = voices[i].chan2;
 				disable();
-				(*D_EA66)(ch1, voices[i].note, 0);
+				(*drvNote)(ch1, voices[i].note, 0);
 				if (!!(voices[i].flags & 1))
-					(*D_EA66)(ch2, voices[i].note, 0);
+					(*drvNote)(ch2, voices[i].note, 0);
 				enable();
 				voices[i].chan1 = 0;
 				break;
@@ -407,16 +408,16 @@ PlaySong(void far *);
 		vol2 = ((v->pan > 0x5f ? 0x7f : v->pan + 0x20) * v->volume) >> 7;
 		disable();
 		if (chanUser[v->chan1] == 2)
-			(*D_EAD0)(v->chan1, 7, vol1);
+			(*drvController)(v->chan1, 7, vol1);
 		if (chanUser[v->chan2] == 2)
-			(*(tDrv3L)D_EAD0)(v->chan2, 7, vol2);/*see above*/
+			(*(tDrv3L)drvController)(v->chan2, 7, vol2);/*see above*/
 		enable();
 	} else {
 		disable();
 		if (chanUser[v->chan1] == 2)
-			(*D_EAD0)(v->chan1, ctl, val);
+			(*drvController)(v->chan1, ctl, val);
 		if ((!!(v->flags & 1)) && chanUser[v->chan2] == 2)
-			(*D_EAD0)(v->chan2, ctl, val);
+			(*drvController)(v->chan2, ctl, val);
 		enable();
 	}
 }
@@ -427,11 +428,11 @@ PlaySong(void far *);
 	if (soundCard && chanUser[ch] == 2) {
 		ChanFree(ch);
 		disable();
-		(*D_EAD0)(ch, 0x7b, 0);
-		(*D_EA52)(ch, chanMusicProgram[ch]);
+		(*drvController)(ch, 0x7b, 0);
+		(*drvProgram)(ch, chanMusicProgram[ch]);
 		chanProgram[ch] = chanMusicProgram[ch];
-		(*D_EAD0)(ch, 7, (chanVolume[ch] * musicVolume) >> 8);
-		(*D_EAD0)(ch, 10, chanPan[ch]);
+		(*drvController)(ch, 7, (chanVolume[ch] * musicVolume) >> 8);
+		(*drvController)(ch, 10, chanPan[ch]);
 		chanUser[ch] = 1;
 		enable();
 	}
@@ -488,9 +489,9 @@ PlaySong(void far *);
 	long n;
 
 	n = 0;
-	while (*D_F0E4[t] & 0x80)
-		n = (n << 7) + (*D_F0E4[t]++ & 0x7f);
-	n = (n << 7) + (unsigned)*D_F0E4[t]++;
+	while (*trackPtr[t] & 0x80)
+		n = (n << 7) + (*trackPtr[t]++ & 0x7f);
+	n = (n << 7) + (unsigned)*trackPtr[t]++;
 	return n;
 }
 
@@ -526,20 +527,20 @@ PlaySong(void far *);
 		tempo = 0;
 		for (i = 0; i < len; i++) {
 			tempo <<= 8;
-			tempo += D_F0E4[t][i];
+			tempo += trackPtr[t][i];
 		}
-		tickTime = tempo / D_F248;
+		tickTime = tempo / ticksPerQuarter;
 		tickTime *= 0x1317;
 		tickTime /= 0x4db;
 		break;
 	}
-	D_F0E4[t] += len;
+	trackPtr[t] += len;
 }
 
 /*adds a delta time to track t*/
 /*C_2710_0B24*/void TrackAddDelta(int t, long delta)
 {
-	D_F184[t] += delta;
+	trackDelay[t] += delta;
 }
 
 /*the track whose event comes next; advances the time to it*/
@@ -551,16 +552,16 @@ PlaySong(void far *);
 
 	t = -1;
 	min = 0x7fffffffL;
-	for (i = 0; i < D_F246; i++) {
-		if (D_F204[i] == 0 && D_F184[i] < min) {
+	for (i = 0; i < numTracks; i++) {
+		if (trackEnded[i] == 0 && trackDelay[i] < min) {
 			t = i;
-			min = D_F184[i];
+			min = trackDelay[i];
 		}
 	}
 	if (min != 0)
 		midiTime += (long)(min * tickTime);
-	for (i = 0; i < D_F246; i++)
-		D_F184[i] -= min;
+	for (i = 0; i < numTracks; i++)
+		trackDelay[i] -= min;
 	return t;
 }
 
@@ -583,55 +584,55 @@ PlaySong(void far *);
 		t = NextTrack();
 		if (midiTime > 0xffffL)
 			break;
-		d1 = *D_F0E4[t]++;
+		d1 = *trackPtr[t]++;
 		if (d1 >= 0x80 && d1 < 0xf0) {
-			D_F164[t] = d1;
-			d1 = *D_F0E4[t]++;
+			trackStatus[t] = d1;
+			d1 = *trackPtr[t]++;
 		}
 		if (d1 < 0xf0) {
-			ch = (D_F164[t] & 0xf) + 1;
+			ch = (trackStatus[t] & 0xf) + 1;
 			if (chanUser[ch] == 0 || chanPriority[ch] < 0) {
-				(*D_EAD0)(ch, 0x7b, 0);
+				(*drvController)(ch, 0x7b, 0);
 				if (chanProgram[ch] != chanMusicProgram[ch]) {
 					if (ch != 10)
-						(*D_EA52)(ch, chanMusicProgram[ch]);
+						(*drvProgram)(ch, chanMusicProgram[ch]);
 					chanProgram[ch] = chanMusicProgram[ch];
 				}
-				(*D_EAD0)(ch, 7, (chanVolume[ch] * musicVolume) >> 8);
-				(*D_EAD0)(ch, 10, chanPan[ch]);
+				(*drvController)(ch, 7, (chanVolume[ch] * musicVolume) >> 8);
+				(*drvController)(ch, 10, chanPan[ch]);
 				chanUser[ch] = 1;
 			}
 			if (chanUser[ch] == 1)
 				ChanTake(ch, 0);
-			switch (D_F164[t] & 0xf0) {
+			switch (trackStatus[t] & 0xf0) {
 			case 0x80:
-				d2 = *D_F0E4[t]++;
+				d2 = *trackPtr[t]++;
 				if (musicNotesOn && chanUser[ch] == 1) {
 					if (ch == 10 && soundCard == 2)
-						(*D_EA66)(drumChan[d1], drumNote[d1], 0);
+						(*drvNote)(drumChan[d1], drumNote[d1], 0);
 					else
-						(*D_EA66)(ch, d1, 0);
+						(*drvNote)(ch, d1, 0);
 				}
 				break;
 			case 0x90:
-				d2 = *D_F0E4[t]++;
+				d2 = *trackPtr[t]++;
 				if (musicNotesOn && chanUser[ch] == 1) {
 					if (ch == 10 && soundCard == 2)
-						(*D_EA66)(drumChan[d1], drumNote[d1], d2);
+						(*drvNote)(drumChan[d1], drumNote[d1], d2);
 					else
-						(*D_EA66)(ch, d1, d2);
+						(*drvNote)(ch, d1, d2);
 				}
 				break;
 			case 0xa0:
-				d2 = *D_F0E4[t]++;
+				d2 = *trackPtr[t]++;
 				break;
 			case 0xb0:
-				d2 = *D_F0E4[t]++;
+				d2 = *trackPtr[t]++;
 				if (musicNotesOn && chanUser[ch] == 1) {
 					if (d1 == 7)
-						(*D_EAD0)(ch, d1, (d2 * musicVolume) >> 8);
+						(*drvController)(ch, d1, (d2 * musicVolume) >> 8);
 					else
-						(*D_EAD0)(ch, d1, d2);
+						(*drvController)(ch, d1, d2);
 				}
 				if (d1 == 7)
 					chanVolume[ch] = d2;
@@ -640,15 +641,15 @@ PlaySong(void far *);
 				break;
 			case 0xc0:
 				if (musicNotesOn && chanUser[ch] == 1) {
-					(*D_EA52)(ch, d1);
+					(*drvProgram)(ch, d1);
 					chanProgram[ch] = d1;
 				}
 				chanMusicProgram[ch] = d1;
 				break;
 			case 0xe0:
-				d2 = *D_F0E4[t]++;
+				d2 = *trackPtr[t]++;
 				if (musicNotesOn && chanUser[ch] == 1)
-					(*D_EAD4)(ch, d1, d2);
+					(*drvPitchBend)(ch, d1, d2);
 				break;
 			}
 		} else {
@@ -656,77 +657,77 @@ PlaySong(void far *);
 			case 0xf0:
 			case 0xf7:
 				len = MidiVarLen(t);
-				D_F0E4[t] += len;
+				trackPtr[t] += len;
 				break;
 			case 0xfe:/*Origin's: type, length, data; types 0, 2, 4, 5 jump back by the
 				  first data word (0: always, 2: when the next song is set, 4/5: when data[2]
 				  differs from/equals musicCondition), 1 ends the song, 3 sets musicMarker*/
-				ch = (D_F164[t] & 0xf) + 1;
-				type = *D_F0E4[t]++;
-				len = *D_F0E4[t]++;
+				ch = (trackStatus[t] & 0xf) + 1;
+				type = *trackPtr[t]++;
+				len = *trackPtr[t]++;
 				if (type == 0) {
 					if (nextSongSet) {
-						D_F0E4[t] += len;
+						trackPtr[t] += len;
 					} else {
 						musicFlags |= 1;
-						(*D_EAD0)(ch, 0x7b, 0);
-						ofs = D_F0E4[t][0] + (D_F0E4[t][1] << 8);
-						D_F0E4[t] -= ofs;
+						(*drvController)(ch, 0x7b, 0);
+						ofs = trackPtr[t][0] + (trackPtr[t][1] << 8);
+						trackPtr[t] -= ofs;
 					}
 				} else if (type == 1) {
 					if (nextSongSet) {
 						musicFlags |= 1;
 						for (i = 2; i <= 10; i++) {
 							if (musicNotesOn && chanUser[i] == 1)
-								(*D_EAD0)(i, 0x7b, 0);
+								(*drvController)(i, 0x7b, 0);
 						}
 						return 1;
 					}
 				} else if (type == 2) {
 					if (nextSongSet) {
 						musicFlags |= 1;
-						(*D_EAD0)(ch, 0x7b, 0);
-						ofs = D_F0E4[t][0] + (D_F0E4[t][1] << 8);
-						D_F0E4[t] -= ofs;
+						(*drvController)(ch, 0x7b, 0);
+						ofs = trackPtr[t][0] + (trackPtr[t][1] << 8);
+						trackPtr[t] -= ofs;
 					} else {
-						D_F0E4[t] += len;
+						trackPtr[t] += len;
 					}
 				} else if (type == 3) {
-					musicMarker = D_F0E4[t][0];
-					D_F0E4[t] += len;
+					musicMarker = trackPtr[t][0];
+					trackPtr[t] += len;
 				} else if (type == 4) {
-					if (D_F0E4[t][2] != musicCondition) {
+					if (trackPtr[t][2] != musicCondition) {
 						musicFlags |= 1;
-						(*D_EAD0)(ch, 0x7b, 0);
-						ofs = D_F0E4[t][0] + (D_F0E4[t][1] << 8);
-						D_F0E4[t] -= ofs;
+						(*drvController)(ch, 0x7b, 0);
+						ofs = trackPtr[t][0] + (trackPtr[t][1] << 8);
+						trackPtr[t] -= ofs;
 					} else {
-						D_F0E4[t] += len;
+						trackPtr[t] += len;
 					}
 				} else if (type == 5) {
-					if (D_F0E4[t][2] == musicCondition) {
+					if (trackPtr[t][2] == musicCondition) {
 						musicFlags |= 1;
-						(*D_EAD0)(ch, 0x7b, 0);
-						ofs = D_F0E4[t][0] + (D_F0E4[t][1] << 8);
-						D_F0E4[t] -= ofs;
+						(*drvController)(ch, 0x7b, 0);
+						ofs = trackPtr[t][0] + (trackPtr[t][1] << 8);
+						trackPtr[t] -= ofs;
 					} else {
-						D_F0E4[t] += len;
+						trackPtr[t] += len;
 					}
 				} else {
-					D_F0E4[t] += len;
+					trackPtr[t] += len;
 				}
 				break;
 			case 0xff:
-				type = *D_F0E4[t]++;
+				type = *trackPtr[t]++;
 				len = MidiVarLen(t);
 				MidiMetaEvent(t, type, len);
 				if (type == 0x2f) {
-					D_F204[t] = 1;
-					for (i = 0; i < D_F246; i++) {
-						if (D_F204[i] == 0)
+					trackEnded[t] = 1;
+					for (i = 0; i < numTracks; i++) {
+						if (trackEnded[i] == 0)
 							break;
 					}
-					if (i == D_F246)
+					if (i == numTracks)
 						done = 1;
 				}
 				break;
@@ -750,7 +751,7 @@ PlaySong(void far *);
 	musicFlags |= 1;
 	for (ch = 1; ch <= 16; ch++) {
 		if (chanUser[ch] == 1)
-			(*D_EAD0)(ch, 0x7b, 0);
+			(*drvController)(ch, 0x7b, 0);
 	}
 }
 
@@ -762,7 +763,7 @@ PlaySong(void far *);
 	musicVolume = vol;
 	for (ch = 2; ch <= 10; ch++) {
 		if (chanUser[ch] == 1)
-			(*D_EAD0)(ch, 7, (chanVolume[ch] * musicVolume) >> 8);
+			(*drvController)(ch, 7, (chanVolume[ch] * musicVolume) >> 8);
 	}
 }
 
@@ -814,14 +815,14 @@ PlaySong(void far *);
 	register int i;
 
 	for (i = 2; i <= 10; i++)
-		(*D_EAD0)(i, 0x79, 0);
-	for (i = 0; i < D_F246; i++) {
-		D_F184[i] = 0;
+		(*drvController)(i, 0x79, 0);
+	for (i = 0; i < numTracks; i++) {
+		trackDelay[i] = 0;
 		if (only == -1 || only == i)
-			D_F204[i] = 0;
+			trackEnded[i] = 0;
 		else
-			D_F204[i] = 1;
-		D_F0E4[i] += 8;
+			trackEnded[i] = 1;
+		trackPtr[i] += 8;
 		TrackAddDelta(i, MidiVarLen(i));
 	}
 	musicStopped = nextSongSet = musicMarker = 0;
@@ -858,31 +859,31 @@ PlaySong(void far *);
 
 	if (soundCard) {
 		card = soundCard - 1;
-		D_EA7C = LZC_load("strax.drv", card, 0L, 0x12, 0L);
-		D_F0CC = LZC_load(name, card, 0L, 0x10, 0L);
-		if (D_F0CC == 0 && soundCard != 1) {
-			MEM_free(D_EA7C);
-			D_EA7C = 0;
+		drvCode = LZC_load("strax.drv", card, 0L, 0x12, 0L);
+		timbreBank = LZC_load(name, card, 0L, 0x10, 0L);
+		if (timbreBank == 0 && soundCard != 1) {
+			MEM_free(drvCode);
+			drvCode = 0;
 			soundCard = 0;
 		}
-		if (D_EA7C) {
-			seg = FP_SEG(D_EA7C);
-			D_EA5A = (tDrvInit)MK_FP(seg, D_EA7C[1]);
-			D_EA72 = (tDrv1)MK_FP(seg, D_EA7C[2]);
-			D_EA80 = (tDrv0)MK_FP(seg, D_EA7C[3]);
-			D_EA84 = MK_FP(seg, D_EA7C[4]);
-			D_EA66 = (tDrv3)MK_FP(seg, D_EA7C[5]);
-			D_EAD0 = (tDrv3)MK_FP(seg, D_EA7C[6]);
-			D_EAD4 = (tDrv3)MK_FP(seg, D_EA7C[7]);
-			D_EA52 = (tDrv2)MK_FP(seg, D_EA7C[8]);
-			D_EA88 = MK_FP(seg, D_EA7C[9]);
-			D_EA56 = MK_FP(seg, D_EA7C[10]);
-			D_EA8C = (*D_EA5A)();
-			D_EA8C->cb1 = HookVector;
-			D_EA8C->cb2 = LoopDelay;
-			(*D_EA72)(D_F0CC);
-			if (!D_EA8C->ok)
-				MEM_free(D_F0CC);
+		if (drvCode) {
+			seg = FP_SEG(drvCode);
+			drvInit = (tDrvInit)MK_FP(seg, drvCode[1]);
+			drvLoadTimbres = (tDrv1)MK_FP(seg, drvCode[2]);
+			drvShutdown = (tDrv0)MK_FP(seg, drvCode[3]);
+			drvTimer = MK_FP(seg, drvCode[4]);
+			drvNote = (tDrv3)MK_FP(seg, drvCode[5]);
+			drvController = (tDrv3)MK_FP(seg, drvCode[6]);
+			drvPitchBend = (tDrv3)MK_FP(seg, drvCode[7]);
+			drvProgram = (tDrv2)MK_FP(seg, drvCode[8]);
+			drvEntry12 = MK_FP(seg, drvCode[9]);
+			drvEntry14 = MK_FP(seg, drvCode[10]);
+			drvInfo = (*drvInit)();
+			drvInfo->cb1 = HookVector;
+			drvInfo->cb2 = LoopDelay;
+			(*drvLoadTimbres)(timbreBank);
+			if (!drvInfo->ok)
+				MEM_free(timbreBank);
 			return 1;
 		}
 	}
@@ -896,23 +897,23 @@ PlaySong(void far *);
 		return;
 	LoadSoundDriver(name);
 	if (soundCard == 2) {
-		(*D_EA52)(10, 0x80);
-		(*D_EA52)(11, 0x72);
-		(*D_EA52)(12, 0x83);
-		(*D_EA52)(13, 0x71);
-		(*D_EA52)(14, 0x86);
-		(*D_EA52)(15, 0x87);
-		(*D_EA52)(16, 0x85);
-		(*D_EA52)(17, 0x84);
-		(*D_EA52)(18, 0x81);
-		(*D_EA52)(19, 0x88);
-		(*D_EA52)(20, 0x8d);
-		(*D_EA52)(21, 0x8f);
-		(*D_EA52)(22, 0x90);
-		(*D_EA52)(23, 0x91);
-		(*D_EA52)(24, 0x93);
-		(*D_EA52)(25, 0x8c);
-		(*D_EA52)(26, 0x8b);
+		(*drvProgram)(10, 0x80);
+		(*drvProgram)(11, 0x72);
+		(*drvProgram)(12, 0x83);
+		(*drvProgram)(13, 0x71);
+		(*drvProgram)(14, 0x86);
+		(*drvProgram)(15, 0x87);
+		(*drvProgram)(16, 0x85);
+		(*drvProgram)(17, 0x84);
+		(*drvProgram)(18, 0x81);
+		(*drvProgram)(19, 0x88);
+		(*drvProgram)(20, 0x8d);
+		(*drvProgram)(21, 0x8f);
+		(*drvProgram)(22, 0x90);
+		(*drvProgram)(23, 0x91);
+		(*drvProgram)(24, 0x93);
+		(*drvProgram)(25, 0x8c);
+		(*drvProgram)(26, 0x8b);
 	}
 	SetTimerRate(soundCard == 3 ? 0x1e00 : 0x3c);
 	musicStopped = 1;
@@ -920,8 +921,8 @@ PlaySong(void far *);
 	nextSong = 0;
 	musicFlags = 0;
 	disable();
-	HookVector(8, (void far *)(long)SoundTimer,/*(long): seg and offset loaded into AX, DX before the pushes*/ D_F0D0, (void far *)&prevTimer);
-	HookVector(8, D_EA84, D_F0DA, D_EA8C->unk02);
+	HookVector(8, (void far *)(long)SoundTimer,/*(long): seg and offset loaded into AX, DX before the pushes*/ musTimerHook, (void far *)&prevTimer);
+	HookVector(8, drvTimer, drvTimerHook, drvInfo->unk02);
 	enable();
 	sfxReady = 1;
 }
@@ -942,8 +943,8 @@ PlaySong(void far *);
 		for (i = 2; i < 10; i++)
 			ChanToMusic(i);
 		for (i = 1; i <= 16; i++)
-			(*D_EAD0)(i, 0x7b, 0);
-		(*D_EA80)();
+			(*drvController)(i, 0x7b, 0);
+		(*drvShutdown)();
 	}
 	UnhookAll();
 }
@@ -975,19 +976,19 @@ PlaySong(void far *);
 		if (ChunkLength(p + ofs) != 6)
 			ok = 0;
 		if (ok) {
-			D_F244 = (p[ofs + 8] << 8) + p[ofs + 9];
-			D_F246 = (p[ofs + 10] << 8) + p[ofs + 11];
-			D_F248 = (p[ofs + 12] << 8) + p[ofs + 13];
-			if (D_F244 > 2 || D_F244 < 0)
+			midiFormat = (p[ofs + 8] << 8) + p[ofs + 9];
+			numTracks = (p[ofs + 10] << 8) + p[ofs + 11];
+			ticksPerQuarter = (p[ofs + 12] << 8) + p[ofs + 13];
+			if (midiFormat > 2 || midiFormat < 0)
 				ok = 0;
-			if (D_F246 > 32 || D_F246 < 0)
+			if (numTracks > 32 || numTracks < 0)
 				ok = 0;
 		}
 		if (ok) {
-			for (t = 0; t < D_F246; t++) {
+			for (t = 0; t < numTracks; t++) {
 				while (!IsChunk(&p[ofs + 14], "MTrk"))
 					ofs += ChunkLength(&p[ofs + 14]) + 8;
-				D_F0E4[t] = &p[ofs + 14];
+				trackPtr[t] = &p[ofs + 14];
 				ofs += ChunkLength(&p[ofs + 14]) + 8;
 			}
 			RewindTracks(-1);
@@ -1057,7 +1058,7 @@ PlaySong(void far *);
 			musicVolume = vol;
 		for (ch = 2; ch <= 10; ch++) {
 			if (chanUser[ch] == 1)
-				(*D_EAD0)(ch, 7, (chanVolume[ch] * vol) >> 8);
+				(*drvController)(ch, 7, (chanVolume[ch] * vol) >> 8);
 		}
 	}
 }
@@ -1075,16 +1076,16 @@ PlaySong(void far *);
 			for (ch = 2; ch <= 10; ch++) {
 				if (chanUser[ch] == 1) {
 					if (ch != 10)
-						(*D_EA52)(ch, chanMusicProgram[ch]);
+						(*drvProgram)(ch, chanMusicProgram[ch]);
 					chanProgram[ch] = chanMusicProgram[ch];
-					(*D_EAD0)(ch, 7, (chanVolume[ch] * musicVolume) >> 8);
-					(*D_EAD0)(ch, 10, chanPan[ch]);
+					(*drvController)(ch, 7, (chanVolume[ch] * musicVolume) >> 8);
+					(*drvController)(ch, 10, chanPan[ch]);
 				}
 			}
 		} else {
 			for (ch = 2; ch <= 10; ch++) {
 				if (chanUser[ch] == 1)
-					(*D_EAD0)(ch, 0x7b, 0);
+					(*drvController)(ch, 0x7b, 0);
 			}
 		}
 	}

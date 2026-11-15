@@ -8,9 +8,10 @@
  * turn. PassTime is the world clock. AnimateTiles / DrawMapWindow /
  * DisplayTick are the per frame display update. TerrainDamage (new: the
  * martian hazards, bombs and rays of object 0x1cf) / ApplyTerrainEffects
- * apply the effects of what a creature stands on. SetActive / SetPartyMode
+ * apply the effects of what a creature stands on (TileDamage, for map
+ * tiles, is empty). GrowPlant / ShrinkWormsbane are PassTime's plants. SetActive / SetPartyMode
  * switch solo mode / party mode. From SE: DrawMapWindow, DisplayTick,
- * C_0359_0D58, FlushViewIfDirty, ApplyTerrainEffects, PassTime's frame,
+ * RedrawMapWithObjects, FlushViewIfDirty, ApplyTerrainEffects, PassTime's frame,
  * RefreshStatus, SetActive, SetPartyMode, ReadHexNumber, ReadDecNumber,
  * GameLoop's frame.
  */
@@ -49,13 +50,13 @@ struct tGr {
 	unsigned char toBackBuffer;
 };
 
-/*the graphic driver: D_BA6A's offset selects the entry*/
-#define GR_SET_COLOR(c)               (D_BA6A.iii.ofs = 0x06, (*D_BA6A.f)(c))
-#define GR_PUT_PIXEL(x,y)             (D_BA6A.iii.ofs = 0x09, (*D_BA6A.f)(x,y))
-#define GR_PUT_TILE(tile,x,y)         (D_BA6A.iii.ofs = 0x42, (*D_BA6A.f)(tile,x,y))
-#define GR_COPY_TO_SCREEN(a,b,c,d,e,g) (D_BA6A.iii.ofs = 0x45, (*D_BA6A.f)(a,b,c,d,e,g))
-#define GR_FADE_TO_SCREEN(a,b,c,d,e,g) (D_BA6A.iii.ofs = 0x48, (*D_BA6A.f)(a,b,c,d,e,g))
-#define GR_SET_ANIM_FRAME(a,b)        (D_BA6A.iii.ofs = 0x4b, (*D_BA6A.f)(a,b))
+/*the graphic driver: GrDriver's offset selects the entry*/
+#define GR_SET_COLOR(c)               (GrDriver.iii.ofs = 0x06, (*GrDriver.f)(c))
+#define GR_PUT_PIXEL(x,y)             (GrDriver.iii.ofs = 0x09, (*GrDriver.f)(x,y))
+#define GR_PUT_TILE(tile,x,y)         (GrDriver.iii.ofs = 0x42, (*GrDriver.f)(tile,x,y))
+#define GR_COPY_TO_SCREEN(a,b,c,d,e,g) (GrDriver.iii.ofs = 0x45, (*GrDriver.f)(a,b,c,d,e,g))
+#define GR_FADE_TO_SCREEN(a,b,c,d,e,g) (GrDriver.iii.ofs = 0x48, (*GrDriver.f)(a,b,c,d,e,g))
+#define GR_SET_ANIM_FRAME(a,b)        (GrDriver.iii.ofs = 0x4b, (*GrDriver.f)(a,b))
 
 /*OSI library (asm)*/
 extern int16 OSI_rand(int16, int16);/*OSI_rand(lo, hi)*/
@@ -110,9 +111,9 @@ extern int16 NextInv();
 extern int16 FindInvOfType(int16, int16);/*first object of a type in an inventory*/
 extern int16 NextInvOfType();/*next one*/
 extern char *GetObjectString(int16);
-extern char far C_2BB4_21E9[];
-extern char far C_2BB4_1737[];
-extern char far C_2BB4_136D[];
+extern char far PsychicPowerFadesMsg[];
+extern char far IceMeltedMsg[];
+extern char far PoisonedMsg[];
 extern int16 WrapDelta(int16);
 extern int16 MapDistance(int16, int16);/*wrapping*/
 extern InitNPCTracker();
@@ -143,12 +144,12 @@ extern BeltUpdate(int16);
 extern PeerMap();
 extern PartyTeleport(int16, int16, int16, int16);
 extern MUS_PlaySong(int16);
-extern C_1FA9_047E();
-extern C_1FA9_0CD2();
-extern C_1FA9_09A5(int16);
-extern C_1FA9_0A8A();
-extern C_1FA9_0AFD();
-extern C_1FA9_0BE4();
+extern MUS_CombatOutcomeSong();
+extern MUS_StopSfx();
+extern MUS_PlayLoopSfx(int16);
+extern MUS_SweepSfx();
+extern MUS_MachinerySfx();
+extern MUS_SplashSfx();
 extern int16 QuanType(int16);
 extern int16 AddMapObj(int16, int16, int16, int16, int16, int16);/*AddMapObj(shape, status, amount, x, y, z)*/
 extern int16 AddInvObj(int16, int16, int16, int16);/*AddInvObj(shape, status, amount, owner)*/
@@ -161,31 +162,31 @@ extern C_2F75_07FA();
 extern C_2F75_0951();
 extern C_2F75_0A64();
 extern C_2F75_0B90();
-extern char far C_2BB4_0130[];/*pass*/
-extern char far C_2BB4_0137[];/*combat*/
-extern char far C_2BB4_0146[];/*break off*/
-extern char far C_2BB4_0159[];/*sound on*/
-extern char far C_2BB4_0163[];/*sound off*/
-extern char far C_2BB4_016E[];/*music off*/
-extern char far C_2BB4_0179[];/*music on*/
-extern char far C_2BB4_0183[];/*exit to DOS?*/
-extern char far C_2BB4_0191[];/*save game?*/
-extern char far C_2BB4_019D[];/*solo mode*/
-extern char far C_2BB4_01A8[];/*party mode*/
-extern char far C_2BB4_02D4[];/*not all here*/
-extern char far C_2BB4_02FA[];/*not in combat*/
-extern char far C_2BB4_0315[];/*not in solo mode*/
-extern char far C_2BB4_0338[];/*not on the barge*/
-extern char far C_2BB4_03F1[];/*what?*/
-extern char far C_2BB4_13C1[];/*fails to respond*/
-extern char far C_2BB4_174D[];
-extern char far C_2BB4_178B[];
-extern char far C_2BB4_215E[];/*no EMS for the music*/
-extern char far C_2BB4_22F9[];/*version*/
+extern char far PassMsg[];/*pass*/
+extern char far CombatMsg[];/*combat*/
+extern char far BreakOffMsg[];/*break off*/
+extern char far SoundOnMsg[];/*sound on*/
+extern char far SoundOffMsg[];/*sound off*/
+extern char far MusicOffMsg[];/*music off*/
+extern char far MusicOnMsg[];/*music on*/
+extern char far ExitToDOSMsg[];/*exit to DOS?*/
+extern char far SaveMsg[];/*save game?*/
+extern char far SoloModeMsg[];/*solo mode*/
+extern char far PartyModeMsg[];/*party mode*/
+extern char far NotAllHereMsg[];/*not all here*/
+extern char far NotInCombatMsg[];/*not in combat*/
+extern char far NotInSoloMsg[];/*not in solo mode*/
+extern char far NotWhileDreamingMsg[];/*not on the barge*/
+extern char far WhatMsg[];/*what?*/
+extern char far FailsToRespondMsg[];/*fails to respond*/
+extern char far KilledHelperMsg[];
+extern char far HistoricalFigureDeadMsg[];
+extern char far NoEmsMsg[];/*no EMS for the music*/
+extern char far VersionMsg[];/*version*/
 extern int16 OBJ_FindTypeAt(int16, int16, int16);/*OBJ_FindTypeAt(type, x, y)*/
 extern int16 FindInvType(int16, int16, int16);/*FindInvType(owner, type, quality)*/
 extern DeleteObj(int16);
-extern char far C_2BB4_22F1[];/*failure message*/
+extern char far AarghMsg[];/*failure message*/
 
 /*variables of the other modules*/
 extern unsigned char MouseOn;
@@ -210,14 +211,14 @@ extern int16 SoundFlag;
 extern int16 AvatarNotSolid;
 extern unsigned char DefaultCommand;
 extern int16 cdecl emsInUse;/*EMSINIT.ASM*/
-extern int16 D_3260;/*free memory for the tiles, in KB*/
+extern int16 GrMemoryKB;
 extern unsigned char far *D_3262;/*talk flags 8-15*/
 extern char MovePts[];
 extern unsigned char far *Level;
-extern void far *D_BA7E;/*mdscreen.lzc entry 2: default command mark*/
-extern int16 D_EB72;/*AdvanceDir*/
-extern int16 D_EBCE;/*Selection.obj*/
-extern int16 D_EBF6, D_EBF8;/*Selection.x, Selection.y*/
+extern void far *ScreenParts;/*mdscreen.lzc entry 2: frames 0/1 mark/unmark a command icon*/
+extern int16 AdvanceDir;
+extern int16 SelectionObj;
+extern int16 SelectionX, SelectionY;
 extern int16 ScreenFade;
 extern int16 VisibilityDirty;
 extern unsigned char NextSleep;
@@ -239,84 +240,43 @@ extern unsigned char IsResting;
 extern unsigned char ObjStatus[];
 extern unsigned char far *NPCMode;
 extern unsigned char Party[];
-extern char D_50CE[][14];/*Names*/
-extern unsigned char far *D_6DBA;/*TileFlag*/
-extern unsigned char D_6EC6[];/*TalkFlags*/
+extern char Names[][14];
+extern unsigned char far *TileFlag;
+extern unsigned char TalkFlags[];
 extern unsigned char PartySize;
 extern uint16 far *OrigShapeType;
-extern int16 D_EC4A;
-extern unsigned char D_BC84[5];/*HexInputBuf*/
-extern unsigned char D_BC89[6];/*DecInputBuf*/
+/*EC4A*/extern int16 CharmedNPC;/*an NPC charmed (never set in Martian Dreams): out of combat it turns hostile again (mode 0x1b)*/
+/*BC84*/extern unsigned char HexInputBuf[5];
+/*BC89*/extern unsigned char DecInputBuf[6];
 extern int32 GameFlags;/*0x10: in a dream*/
 extern int16 MapX, MapY, MapZ;
-extern struct tSurface D_3232;/*Screen*/
-extern unsigned char D_3240[0x20];/*AnimFrameMask*/
-extern struct tMouse D_3E66;/*Mouse*/
+extern struct tSurface Screen;
+extern unsigned char AnimFrameMask[0x20];
+extern struct tMouse Mouse;
 extern unsigned char far *NPCFlag;
 extern int16 Amount[];
 extern unsigned char NPCStatus[];
 extern unsigned char HitPoints[];
-extern int16 far *D_6EBE;/*BaseTile*/
-extern unsigned char far *D_760A;/*TileFlag2*/
-extern int16 D_770E[0x20];/*AnimFirstFrame*/
+extern int16 far *BaseTile;
+extern unsigned char far *TileFlag2;
+extern int16 AnimFirstFrame[0x20];
 extern struct coord ObjPos[];
-extern struct tSurface D_9CAE;/*MapSurface*/
-extern int16 D_9CC2;/*NumAnimData*/
+extern struct tSurface MapSurface;
+extern int16 NumAnimData;
 extern uint16 ObjShapeType[];
-extern unsigned char far *D_B4C4;/*TerrainType*/
-extern int16 D_B4C8[0x20];/*AnimTile*/
-extern unsigned char D_B50C[0x20];/*AnimFrameShift*/
-extern union tHandler D_BA6A;/*GrDriver*/
-extern unsigned char D_BC8E[0x20];/*StateAnimData*/
+extern unsigned char far *TerrainType;
+extern int16 AnimTile[0x20];
+extern unsigned char AnimFrameShift[0x20];
+extern union tHandler GrDriver;
+/*BC8E*/extern unsigned char StateAnimData[0x20];/*animation of each animated tile: 1 normal, 2 reverse, 0 still*/
 extern unsigned char Obj_11x11[11][11];
 extern int16 CellObjTile[];
 extern unsigned char CellObjNext[];
 extern int16 Tile_11x11[11][11];
-extern struct tSurface D_EB78;/*MouseArea*/
+extern struct tSurface MouseArea;
 
-#define AdvanceDir D_EB72
-#define Selection_obj D_EBCE
-#define Selection_x D_EBF6
-#define Selection_y D_EBF8
-#define PassMsg C_2BB4_0130
-#define CombatMsg C_2BB4_0137
-#define BreakOffMsg C_2BB4_0146
-#define SoundOnMsg C_2BB4_0159
-#define SoundOffMsg C_2BB4_0163
-#define MusicOffMsg C_2BB4_016E
-#define MusicOnMsg C_2BB4_0179
-#define ExitToDOSMsg C_2BB4_0183
-#define SaveMsg C_2BB4_0191
-#define SoloModeMsg C_2BB4_019D
-#define PartyModeMsg C_2BB4_01A8
-#define NotAllHereMsg C_2BB4_02D4
-#define NotInCombatMsg C_2BB4_02FA
-#define NotInSoloMsg C_2BB4_0315
-#define NotOnShipMsg C_2BB4_0338
-#define WhatMsg C_2BB4_03F1
-#define FailsToRespondMsg C_2BB4_13C1
-#define NoEmsMsg C_2BB4_215E
-#define VersionMsg C_2BB4_22F9
 #define IN_VEHICLE (Active == PartySize)
-#define GR_DRAW_BITMAP(s,x,y,p,m)    (D_BA6A.iii.ofs = 0x30, (*D_BA6A.f)(s,x,y,p,m))
-#define HexInputBuf D_BC84
-#define DecInputBuf D_BC89
-#define Names D_50CE
-#define TileFlag D_6DBA
-#define TalkFlags D_6EC6
-#define Screen D_3232
-#define AnimFrameMask D_3240
-#define Mouse D_3E66
-#define BaseTile D_6EBE
-#define TileFlag2 D_760A
-#define AnimFirstFrame D_770E
-#define MapSurface D_9CAE
-#define NumAnimData D_9CC2
-#define TerrainType D_B4C4
-#define AnimTile D_B4C8
-#define AnimFrameShift D_B50C
-#define StateAnimData D_BC8E
-#define MouseArea D_EB78
+#define GR_DRAW_BITMAP(s,x,y,p,m)    (GrDriver.iii.ofs = 0x30, (*GrDriver.f)(s,x,y,p,m))
 #define GetOwner(i) (*(int16 *)&(ObjPos[i].raw[0]))
 
 #define GetType(i) (ObjShapeType[i] & 0x3ff)
@@ -329,22 +289,17 @@ extern struct tSurface D_EB78;/*MouseArea*/
 #define GetZ(i) (ObjPos[i].raw[2] >> 4)
 #define TILE_FRAME(i) (BaseTile[GetType(i)] + GetFrame(i))
 
-/*0F10*/int16 D_0F10 = 0;/*AnimFrameCounter*/
-/*0F12*/unsigned char D_0F12 = 1;/*StatusDirty: status area must be redrawn*/
-/*0F13*/unsigned char D_0F13 = 0;/*PromptFlag: the prompt must be printed again*/
-/*0F14*/unsigned char D_0F14 = 0;/*CyclopsFlag (Ultima VI's)*/
-/*0F15*/unsigned char D_0F15 = 0;/*IsArmageddon (Ultima VI's)*/
-/*0F16*/int16 D_0F16 = 0;/*IdleAnimTick*/
-/*0F18*/int16 D_0F18 = 1;/*MapAnimEnabled*/
-/*0F1A*/int16 D_0F1A = 0;/*Erupting (SE's)*/
+/*0F10*/int16 AnimFrameCounter = 0;/*counts the animation frames (AnimateTiles)*/
+/*0F12*/unsigned char StatusDirty = 1;/*the status area must be redrawn*/
+/*0F13*/unsigned char PromptFlag = 0;/*the prompt must be printed again*/
+/*0F14*/unsigned char CyclopsFlag = 0;/*Ultima VI's; not used*/
+/*0F15*/unsigned char IsArmageddon = 0;/*Ultima VI's name: 1 the game cannot be won any more, 2 (combat.c); no saving then*/
+/*0F16*/int16 IdleAnimTick = 0;/*cleared by AnimateTiles*/
+/*0F18*/int16 MapAnimEnabled = 1;/*DisplayTick animates and redraws the map window*/
+/*0F1A*/int16 Erupting = 0;/*SE's name (object.c clears it)*/
 /*wall flag (TerrainType) per direction N,NE,E,SE,S,SW,W (Ultima VI's; not used here)*/
 /*0F1C*/unsigned char DirWallFlags[] = {0x80,0,0x40,0,0x20,0,0x10};
 
-#define AnimFrameCounter D_0F10
-#define StatusDirty D_0F12
-#define PromptFlag D_0F13
-#define IdleAnimTick D_0F16
-#define MapAnimEnabled D_0F18
 
 /*animate the tiles*/
 /*C_120E_0009*/AnimateTiles() {
@@ -436,7 +391,7 @@ window*/
 }
 
 /*redraw the map window, with the objects rebuilt; fade it in if mode is 1*/
-/*C_120E_024B*/C_120E_024B(int16 mode) {
+/*C_120E_024B*/RedrawMapWithObjects(int16 mode) {
 	DrawMapWindow(1);
 	if(mode == 1) {
 		ShowObjects();
@@ -458,7 +413,7 @@ window*/
 }
 
 /*the effect of a map tile (nothing in Martian Dreams)*/
-/*C_120E_029B*/C_120E_029B(int16 npc, int16 tile) {
+/*C_120E_029B*/TileDamage(int16 npc, int16 tile) {
 }
 
 /*the effect of object obj on creature npc (it stands on it)*/
@@ -598,7 +553,7 @@ this turn, on another level or outside the loaded 40x40 area are skipped.*/
 			}
 			tileNum = GetTileAtXYZ(x, y, MapZ);
 			if(TerrainType[tileNum] & 8)
-				C_120E_029B(objNum, tileNum);
+				TileDamage(objNum, tileNum);
 		}
 	}
 }
@@ -606,7 +561,7 @@ this turn, on another level or outside the loaded 40x40 area are skipped.*/
 /*a growing plant obj (quality 0xf, frames 0-2) grows one stage when the date
 kept by the object 0xfc in the container 0x101 under it is old enough (in
 the dream: at random)*/
-/*C_120E_0800*/C_120E_0800(register int16 obj) {
+/*C_120E_0800*/GrowPlant(register int16 obj) {
 	register int16 inv;
 	int16 cont, qual, day, month, frm;
 
@@ -614,11 +569,11 @@ the dream: at random)*/
 	qual = GetQual(obj);
 	if(qual == 0xf && GetFrame(obj) < 3) {
 		if((cont = OBJ_FindTypeAt(0x101, GetX(obj), GetY(obj))) < 0) {
-			CON_printf(C_2BB4_22F1);
+			CON_printf(AarghMsg);
 			return;
 		}
 		if((inv = FindInvType(cont, 0xfc, -1)) < 0) {
-			CON_printf(C_2BB4_22F1);
+			CON_printf(AarghMsg);
 			return;
 		}
 		day = GetQual(inv);
@@ -649,7 +604,7 @@ the dream: at random)*/
 
 /*an object that shrinks: its quality counts down, then its frame (back to
 quality 10-15), then it is deleted*/
-/*C_120E_09C7*/C_120E_09C7(register int16 obj) {
+/*C_120E_09C7*/ShrinkWormsbane(register int16 obj) {
 	int16 q;
 	register int16 frm;
 
@@ -693,8 +648,8 @@ time-dependent state) and process everything that depends on it*/
 				switch(GetType(i)) {
 					case 0x1a2: BargeAddController(i); break;
 					case 0x1d0: UpdateJet(i); break;
-					case 0xfb: C_120E_0800(i); break;
-					case 0x9d: C_120E_09C7(i); break;
+					case 0xfb: GrowPlant(i); break;
+					case 0x9d: ShrinkWormsbane(i); break;
 				}
 			}
 		}
@@ -816,10 +771,10 @@ time-dependent state) and process everything that depends on it*/
 		for(j = 0; j < minutes; j++) {
 			int16 owner;
 
-			if(i == D_EC4A && i && !InCombat) {
-				NPCMode[D_EC4A] = 0x1b;
-				NPCStatus[D_EC4A] = (NPCStatus[D_EC4A] & ~0x60) | 0x60;
-				D_EC4A = 0;
+			if(i == CharmedNPC && i && !InCombat) {
+				NPCMode[CharmedNPC] = 0x1b;
+				NPCStatus[CharmedNPC] = (NPCStatus[CharmedNPC] & ~0x60) | 0x60;
+				CharmedNPC = 0;
 			}
 			if((ObjStatus[i] & 0x80) && !InCombat)
 				ObjStatus[i] &= ~0x80;
@@ -856,7 +811,7 @@ time-dependent state) and process everything that depends on it*/
 				if(--Talents[i].a == 0 && (NPCStatus[i] & 0x80)) {
 					if(!i && (GameFlags & 0x10) || i && !(GameFlags & 0x10)) {
 						MUS_PlaySfx(0x32);
-						CON_printf(C_2BB4_21E9);
+						CON_printf(PsychicPowerFadesMsg);
 						PromptFlag = 1;
 						StatusDirty = 1;
 					}
@@ -866,7 +821,7 @@ time-dependent state) and process everything that depends on it*/
 				if(--Talents[i].b == 0) {
 					if((NPCStatus[i] & 0x80) && (!i && (GameFlags & 0x10) || i && !(GameFlags & 0x10))) {
 						MUS_PlaySfx(0x32);
-						CON_printf(C_2BB4_21E9);
+						CON_printf(PsychicPowerFadesMsg);
 						PromptFlag = 1;
 						StatusDirty = 1;
 					}
@@ -878,7 +833,7 @@ time-dependent state) and process everything that depends on it*/
 				if(--Talents[i].c == 0) {
 					if((NPCStatus[i] & 0x80) && (!i && (GameFlags & 0x10) || i && !(GameFlags & 0x10))) {
 						MUS_PlaySfx(0x32);
-						CON_printf(C_2BB4_21E9);
+						CON_printf(PsychicPowerFadesMsg);
 						PromptFlag = 1;
 						StatusDirty = 1;
 					}
@@ -888,7 +843,7 @@ time-dependent state) and process everything that depends on it*/
 			}
 			for(inv = FindInvOfType(i, 0xa0); inv >= 0; inv = NextInvOfType()) {
 				if(GetFrame(inv) > 1 && OSI_rand(0, 100) < 10) {
-					CON_printf(C_2BB4_1737);
+					CON_printf(IceMeltedMsg);
 					PromptFlag = 1;
 					SetFrame(inv, 1);
 					if(StatusDisplay == 0x92 && Party[StatusMember] == i)
@@ -897,7 +852,7 @@ time-dependent state) and process everything that depends on it*/
 			}
 			for(inv = FindInvOfType(i, 0x100); inv >= 0; inv = NextInvOfType()) {
 				if(OSI_rand(0, 100) < 10) {
-					CON_printf(C_2BB4_1737);
+					CON_printf(IceMeltedMsg);
 					PromptFlag = 1;
 					DeleteObj(inv);
 					if(StatusDisplay == 0x92 && Party[StatusMember] == i)
@@ -909,7 +864,7 @@ time-dependent state) and process everything that depends on it*/
 					for(owner = GetOwner(inv); (ObjStatus[owner] & 0x18) && GetType(owner) != 0x8b; owner = GetOwner(owner))
 						;
 					if((ObjStatus[owner] & 0x18) == 0) {
-						CON_printf(C_2BB4_136D, TALK_GetCharName(i));
+						CON_printf(PoisonedMsg, TALK_GetCharName(i));
 						PromptFlag = 1;
 						NPCStatus[i] |= 8;
 						StatusDirty = 1;
@@ -920,7 +875,7 @@ time-dependent state) and process everything that depends on it*/
 				for(owner = GetOwner(inv); (ObjStatus[owner] & 0x18) && GetType(owner) != 0x8b; owner = GetOwner(owner))
 					;
 				if((ObjStatus[owner] & 0x18) == 0) {
-					CON_printf(C_2BB4_136D, TALK_GetCharName(i));
+					CON_printf(PoisonedMsg, TALK_GetCharName(i));
 					PromptFlag = 1;
 					NPCStatus[i] |= 8;
 					StatusDirty = 1;
@@ -1285,7 +1240,7 @@ Exits on <ALT+X>/<CTRL+Q>/<CTRL+E> confirmed (ch == 0x12D).*/
 		if(ch >= '0' && ch <= '9' && ch < PartySize + '1') {
 			if(ch == '0') {/*Party Mode*/
 				if(IN_VEHICLE) {
-					CON_printf(NotOnShipMsg);
+					CON_printf(NotWhileDreamingMsg);
 				} else if(InCombat) {
 					CON_printf(NotInCombatMsg);
 				} else {
@@ -1314,7 +1269,7 @@ Exits on <ALT+X>/<CTRL+Q>/<CTRL+E> confirmed (ch == 0x12D).*/
 					CON_printf(FailsToRespondMsg, Names[ch - '1']);
 					MUS_PlaySfx(5);
 				} else if(IN_VEHICLE) {
-					CON_printf(NotOnShipMsg);
+					CON_printf(NotWhileDreamingMsg);
 					MUS_PlaySfx(5);
 				} else if(InCombat) {
 					CON_printf(NotInCombatMsg);
@@ -1362,14 +1317,14 @@ Exits on <ALT+X>/<CTRL+Q>/<CTRL+E> confirmed (ch == 0x12D).*/
 			case 0x81:/*"attack"*/
 				if(DefaultCommand != ch) {
 					mouseHidden = CON_mouseOffAt(15, 163, 32, 196);
-					GR_DRAW_BITMAP(&D_3232, 21, 169, D_BA7E, 0);
+					GR_DRAW_BITMAP(&Screen, 21, 169, ScreenParts, 0);
 					CON_mouseOn(mouseHidden);
 				}
 				BargeFindLeader(1);
 				COMBAT_attack();
 				if(DefaultCommand != ch) {
 					mouseHidden = CON_mouseOffAt(15, 163, 32, 196);
-					GR_DRAW_BITMAP(&D_3232, 21, 169, D_BA7E, 1);
+					GR_DRAW_BITMAP(&Screen, 21, 169, ScreenParts, 1);
 					CON_mouseOn(mouseHidden);
 				}
 				PendingCommand = 0x8f;
@@ -1396,7 +1351,7 @@ Exits on <ALT+X>/<CTRL+Q>/<CTRL+E> confirmed (ch == 0x12D).*/
 				if(DefaultCommand != ch) {
 					member = TIL2SCR(ch - 0x81) + ((ch - 0x81) << 1);
 					mouseHidden = CON_mouseOffAt(member + 15, 163, member + 32, 196);
-					GR_DRAW_BITMAP(&D_3232, member + 21, 169, D_BA7E, 0);
+					GR_DRAW_BITMAP(&Screen, member + 21, 169, ScreenParts, 0);
 					CON_mouseOn(mouseHidden);
 				}
 				MouseMode = 1;
@@ -1413,7 +1368,7 @@ Exits on <ALT+X>/<CTRL+Q>/<CTRL+E> confirmed (ch == 0x12D).*/
 						case 0x87: CmdUse(); break;/*"use"*/
 						case 0x82:/*"talk"*/
 							MouseMode = 0;
-							TALK_talkTo(Active, Selection_obj, 1);
+							TALK_talkTo(Active, SelectionObj, 1);
 						break;
 					}
 				} else {
@@ -1422,7 +1377,7 @@ Exits on <ALT+X>/<CTRL+Q>/<CTRL+E> confirmed (ch == 0x12D).*/
 				if(DefaultCommand != ch) {
 					member = TIL2SCR(ch - 0x81) + ((ch - 0x81) << 1);
 					mouseHidden = CON_mouseOffAt(member + 15, 163, member + 32, 196);
-					GR_DRAW_BITMAP(&D_3232, member + 21, 169, D_BA7E, 1);
+					GR_DRAW_BITMAP(&Screen, member + 21, 169, ScreenParts, 1);
 					CON_mouseOn(mouseHidden);
 				}
 				MouseMode = 0;
@@ -1432,10 +1387,10 @@ Exits on <ALT+X>/<CTRL+Q>/<CTRL+E> confirmed (ch == 0x12D).*/
 				CON_UpdateMousePointer();
 			break;
 			case 0xaa:/*"save game"*/
-				if(D_0F15) {
-					switch(D_0F15) {
-						case 1: CON_printf(C_2BB4_174D); break;
-						case 2: CON_printf(C_2BB4_178B); break;
+				if(IsArmageddon) {
+					switch(IsArmageddon) {
+						case 1: CON_printf(KilledHelperMsg); break;
+						case 2: CON_printf(HistoricalFigureDeadMsg); break;
 					}
 					break;
 				}
@@ -1485,7 +1440,7 @@ Exits on <ALT+X>/<CTRL+Q>/<CTRL+E> confirmed (ch == 0x12D).*/
 					CON_printf("No sound available!\n");
 				} else if(SoundFlag) {
 					SoundFlag = 0;
-					C_1FA9_0CD2();
+					MUS_StopSfx();
 					CON_printf(SoundOffMsg);
 				} else {
 					SoundFlag = 1;
@@ -1504,7 +1459,7 @@ Exits on <ALT+X>/<CTRL+Q>/<CTRL+E> confirmed (ch == 0x12D).*/
 					MusicAdapter = 1;
 					if(InCombat) {
 						MUS_PlaySong(8);
-						C_1FA9_047E();
+						MUS_CombatOutcomeSong();
 					} else {
 						MUS_PlayAreaSong();
 					}
@@ -1575,8 +1530,8 @@ Exits on <ALT+X>/<CTRL+Q>/<CTRL+E> confirmed (ch == 0x12D).*/
 							AimY = 5;
 							SelectRange = 8;
 							CON_getch();
-							num2 = Selection_x;
-							num3 = Selection_y;
+							num2 = SelectionX;
+							num3 = SelectionY;
 							CON_printf("from (%03x,%03x) to (%03x,%03x):", GetX(num), GetY(num), num2, num3);
 							MUS_PlaySfx(0x32);
 							MUS_PlaySfx(6);
@@ -1636,11 +1591,11 @@ Exits on <ALT+X>/<CTRL+Q>/<CTRL+E> confirmed (ch == 0x12D).*/
 								CON_printf("SFX number: ");
 								num = ReadDecNumber(2);
 								if(num == 0xe)
-									C_1FA9_0A8A();
+									MUS_SweepSfx();
 								else if(num == 0x13)
-									C_1FA9_0AFD();
+									MUS_MachinerySfx();
 								else if(num == 0x23)
-									C_1FA9_0BE4();
+									MUS_SplashSfx();
 								else
 									MUS_PlaySfx(num);
 							}
@@ -1653,7 +1608,7 @@ Exits on <ALT+X>/<CTRL+Q>/<CTRL+E> confirmed (ch == 0x12D).*/
 							if(SoundFlag) {
 								CON_printf("SFX number: ");
 								num = ReadDecNumber(2);
-								C_1FA9_09A5(num);
+								MUS_PlayLoopSfx(num);
 							}
 						}
 						break;
@@ -1734,34 +1689,34 @@ Exits on <ALT+X>/<CTRL+Q>/<CTRL+E> confirmed (ch == 0x12D).*/
 							AimX =
 							AimY = 5;
 							SelectRange = 9;
-							if(CON_getch() == 0x8e && Selection_obj >= 0) {
-								CON_printf("Obj%x\n(%x,%x,%x)\n", Selection_obj, GetX(Selection_obj), GetY(Selection_obj), GetZ(Selection_obj));
-								CON_printf("T%03x F%x A%x(%d)\n", GetType(Selection_obj), GetFrame(Selection_obj), Amount[Selection_obj], Amount[Selection_obj]);
-								CON_printf("QQ%x(%d)/%x(%d)\n", GetQual(Selection_obj), GetQual(Selection_obj), GetQuan(Selection_obj), GetQuan(Selection_obj));
-								if(ObjStatus[Selection_obj] & 1)
+							if(CON_getch() == 0x8e && SelectionObj >= 0) {
+								CON_printf("Obj%x\n(%x,%x,%x)\n", SelectionObj, GetX(SelectionObj), GetY(SelectionObj), GetZ(SelectionObj));
+								CON_printf("T%03x F%x A%x(%d)\n", GetType(SelectionObj), GetFrame(SelectionObj), Amount[SelectionObj], Amount[SelectionObj]);
+								CON_printf("QQ%x(%d)/%x(%d)\n", GetQual(SelectionObj), GetQual(SelectionObj), GetQuan(SelectionObj), GetQuan(SelectionObj));
+								if(ObjStatus[SelectionObj] & 1)
 									CON_printf("Au ");
-								if(ObjStatus[Selection_obj] & 2)
+								if(ObjStatus[SelectionObj] & 2)
 									CON_printf("In ");
-								if(ObjStatus[Selection_obj] & 4)
+								if(ObjStatus[SelectionObj] & 4)
 									CON_printf("Ch ");
-								if(ObjStatus[Selection_obj] & 0x40)
+								if(ObjStatus[SelectionObj] & 0x40)
 									CON_printf("Cu ");
-								if(ObjStatus[Selection_obj] & 0x80)
+								if(ObjStatus[SelectionObj] & 0x80)
 									CON_printf("Fn ");
-								if(Selection_obj < 0x100 && Selection_obj >= 0) {
-									if(NPCStatus[Selection_obj] & 1)
+								if(SelectionObj < 0x100 && SelectionObj >= 0) {
+									if(NPCStatus[SelectionObj] & 1)
 										CON_printf("Fe ");
-									if(NPCStatus[Selection_obj] & 2)
+									if(NPCStatus[SelectionObj] & 2)
 										CON_printf("Pa ");
-									if(NPCStatus[Selection_obj] & 4)
+									if(NPCStatus[SelectionObj] & 4)
 										CON_printf("As ");
-									if(NPCStatus[Selection_obj] & 8)
+									if(NPCStatus[SelectionObj] & 8)
 										CON_printf("Po ");
-									if(NPCStatus[Selection_obj] & 0x10)
+									if(NPCStatus[SelectionObj] & 0x10)
 										CON_printf("De ");
-									if(NPCStatus[Selection_obj] & 0x80)
+									if(NPCStatus[SelectionObj] & 0x80)
 										CON_printf("Pt ");
-									switch(NPCStatus[Selection_obj] & 0x60) {
+									switch(NPCStatus[SelectionObj] & 0x60) {
 										case 0x40: CON_printf("G\n"); break;
 										case 0x20: CON_printf("E\n"); break;
 										case 0: CON_printf("N\n"); break;
@@ -1822,7 +1777,7 @@ Exits on <ALT+X>/<CTRL+Q>/<CTRL+E> confirmed (ch == 0x12D).*/
 						}
 						break;
 						case 0xfc:/*memory*/
-							CON_printf("%dK free for tiles\n\n", D_3260);
+							CON_printf("%dK free for tiles\n\n", GrMemoryKB);
 						break;
 						default:
 							CON_printf(WhatMsg);
@@ -1863,7 +1818,7 @@ Exits on <ALT+X>/<CTRL+Q>/<CTRL+E> confirmed (ch == 0x12D).*/
 			/*NPCs and the rest of the world take their turn*/
 			RunNPCTurns();
 			if(InCombat && (CombatOutcome == 1 || CombatOutcome == -1))
-				C_1FA9_047E();
+				MUS_CombatOutcomeSong();
 			if(ch != 0x80)
 				PromptFlag = 1;
 		}
