@@ -18,7 +18,8 @@
 1649 A 8DF egg.c 13F0-1412
 16D7 A 358 OSILIB/MOUSE.ASM 1412-1420
 170D 2 3FC0 npctrack.c 1420-14F0
-1B09 2 4A00 -
+1B09 2 4A00 object.c 14F0-1672
+- - 0 gamestat.c 1672-16DA  # data only (the game state block), its zero-length code segment at 1FA9:2
 1FA9 2 CE1 sound.c 16DA-1A8A
 2077 3 1B55 status.c 1A8A-1B84
 222C 8 B8 typetest.c

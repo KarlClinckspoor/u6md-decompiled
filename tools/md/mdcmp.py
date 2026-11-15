@@ -419,6 +419,7 @@ def main():
 
     if a.learn:
         save_learned(learned)
+    if learned and os.environ.get("MD_SHOW_LEARNED"): print("learned:", learned)
     # ---- report ----
     funcs = func_starts(img[base:base + cs.length + 16], cs.length)
     pubs = sorted((o, n) for n, (si, o) in m.pubs.items() if m.segs[si] is cs)
