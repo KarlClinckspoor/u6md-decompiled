@@ -61,11 +61,11 @@ The layout of both programs is in `docs/MAP.md`.
   - use.c's two far tables are C, one segment each.
   - Every data-only module shows up in the segment table as an empty code segment:
     1649:A twice (MSGS, MONSDATA), 1FA9:2 (gamestat.c), 263D:E (drvnames.c).
-- **Sizes.** GAME.EXE is 341,712 bytes (SE's: 270,016). It has 559 resident and 158
-  overlaid functions.
-  - A third of the code starts from SE code nearly as is (`docs/PLAN.md`).
-  - Most of the overlays are new: 77% of their functions are below 0.5 similarity to
-    any SE function.
+- **Sizes.** GAME.EXE is 341,712 bytes (SE's: 270,016). It has 511 resident and 158
+  overlaid functions (`docs/match_game.txt`).
+  - 30% of the code starts from SE code nearly as is (similarity 0.85 or more).
+  - Most of the overlays are new: 77% of their code (about two thirds of their
+    functions) is below 0.5 similarity to any SE function.
 - **Modules reorganised.**
   - SE's objcmd.c was one 35 KB module. In MD it is spread over several:
     - objcmd.c: Look, Get, Drop, Move.
