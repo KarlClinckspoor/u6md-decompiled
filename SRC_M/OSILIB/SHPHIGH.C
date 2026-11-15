@@ -5,8 +5,8 @@
  * the OSI library: shape files, the height of a file's shapes (Savage Empire's
  * SHPHIGH.C, unchanged; compiled by 1.01, which tests h from DI)
  */
-extern int pascal SHP_count(char far *shapes);/*SHP_count*/
-extern int pascal SHP_rect(int far *rect, int x, int y, char far *shapes, int index);/*SHP_rect*/
+extern int pascal SHP_count(char far *shapes);
+extern int pascal SHP_rect(int far *rect, int x, int y, char far *shapes, int index);
 
 /*meant to be the tallest of the shapes' heights; returns the last shape's height*/
 /*C_0E5D_0003*/int pascal SHP_height(char far *shapes) {

@@ -9,7 +9,7 @@ INCLUDE OSI.INC
 DSegStart
 EXTRN _pText:WORD	;struct tText *: the current text window
 EXTRN _drvPutChar:DWORD	;driver: draw a character
-EXTRN D_150C:WORD	;added to the cursor's x to see whether a character fits
+EXTRN charFitSlack:WORD	;added to the cursor's x to see whether a character fits
 DSegEnd
 
 EXTRN TXT_scrollUp1:FAR	;TXT_scrollUp1
@@ -57,7 +57,7 @@ C_0040:
 	MOV	BX,_pText
 	LES	SI,[BX].font
 	MOV	AX,[BX].curX
-	ADD	AX,D_150C
+	ADD	AX,charFitSlack
 	DEC	AX
 	MOV	SI,[BX].surface
 	CMP	AX,[SI].right

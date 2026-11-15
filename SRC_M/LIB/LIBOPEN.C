@@ -1,7 +1,7 @@
 /* flags: -mm -c -O -G */
 /* compiler: Turbo C++ 1.01 */
 /* OSI library: opening one entry of a library file (Savage Empire's LIBOPEN.C,
-   GAME.EXE 2E94; here the buffers are passed as DS far pointers). A library
+   SE's GAME.EXE 2E94; here the buffers are passed as DS far pointers). A library
    starts with its length (a long), then the offset of each entry (a long: the
    high byte is the entry's type); the first offset tells how many there are. */
 

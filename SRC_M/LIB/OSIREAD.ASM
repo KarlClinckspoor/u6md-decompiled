@@ -1,7 +1,7 @@
 ;----------------------------------------
 ;OSI library: reading a file (pascal) into memory that may be EMS (a far
 ;pointer with segment C000h-FFFFh is mapped in first, EMS_map).
-;Savage Empire's OSIREAD.ASM (GAME.EXE 2E7E), changed: it saves BX and CX,
+;Savage Empire's OSIREAD.ASM (SE's GAME.EXE 2E7E), changed: it saves BX and CX,
 ;returns the number of bytes read (a long, kept in osiBytesRead) and reads
 ;nothing for a size of 0. Assembled by TASM with JUMPS: a conditional jump
 ;that turned out short is followed by three NOPs, written out here.

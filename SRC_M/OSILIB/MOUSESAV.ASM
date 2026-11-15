@@ -4,10 +4,10 @@
 INCLUDE OSI.INC
 
 DSegStart
-EXTRN D_191A:WORD	;struct tMouse *: the mouse
-EXTRN D_1938:WORD	;where the pointer is drawn: x
-EXTRN D_193A:WORD	;  y
-EXTRN _D_0E9E:DWORD	;driver: save the background (struct tSurface *s, void far *buf, int x, int y, void far *shapes, int index)
+EXTRN curMouse:WORD	;struct tMouse *: the mouse
+EXTRN mouseDrawX:WORD	;where the pointer is drawn: x
+EXTRN mouseDrawY:WORD	;  y
+EXTRN _drvSaveBG:DWORD	;TM.DRV +10: save the background (s, void far *buf, x, y, void far *shapes, n)
 DSegEnd
 
 CSegStart	MOUSESAV_TEXT
@@ -16,20 +16,20 @@ CSegStart	MOUSESAV_TEXT
 FProc	MOUSE_saveBG	;0FDF:0000
 	PUSH	CS
 	CALL	NEAR PTR MOUSE_clamp
-	MOV	BX,D_191A
+	MOV	BX,curMouse
 	PUSH	[BX].shapeIndex
 	PUSH	WORD PTR [BX].shapes+2
 	PUSH	WORD PTR [BX].shapes
 	MOV	AX,[BX].posY
-	MOV	D_193A,AX
+	MOV	mouseDrawY,AX
 	PUSH	AX
 	MOV	AX,[BX].posX
-	MOV	D_1938,AX
+	MOV	mouseDrawX,AX
 	PUSH	AX
 	PUSH	WORD PTR [BX].saveBuf+2
 	PUSH	WORD PTR [BX].saveBuf
 	PUSH	[BX].mSurface
-	CALL	_D_0E9E
+	CALL	_drvSaveBG
 	ADD	SP,10h
 	RET
 MOUSE_saveBG	ENDP
@@ -40,7 +40,7 @@ FProc	MOUSE_clamp	;0FDF:002F
 	PUSH	CX
 	PUSH	DX
 	PUSH	AX
-	MOV	BX,D_191A
+	MOV	BX,curMouse
 	MOV	CX,[BX].posX
 	MOV	DX,[BX].posY
 	PUSH	BX

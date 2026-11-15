@@ -34,9 +34,10 @@ For comparison SE's GAME.EXE was 195 KB, about 40% of it starting from U6 code. 
 about 313 KB of code, and roughly a third starts from SE code nearly as is. The resident
 segments that are mostly SE: `console.c` (R2238, 75% at 0.85+), SE's music driver (R2710,
 80%), `main.c` (R02CD, 67%), the shared library and OSI assembly (R2669-R2B00, 80-100%),
-`status.c`, `npctrack.c` and `object.c` (43-49%). The overlays are mostly new code: object
-commands and combat that SE kept resident in `objcmd.c` and `combat.c`, apart from one
-segment that is SE's `talkdr.c` almost unchanged (O2F88, 99%).
+`status.c`, `npctrack.c` and `object.c` (43-49%). The overlays are mostly new code: talk
+(`talk.c`; one segment is SE's `talkdr.c` almost unchanged, O2F88, 99%), the dream, the cut
+scenes, the machinery (belts, bridges, levers, power, jetters), rest and the use actions.
+The object commands and combat (`objcmd.c`, `combat.c`) are resident, as in SE.
 
 ## 2. What is different from Savage Empire
 
@@ -175,7 +176,7 @@ from SE's (as SE's did against U6), `docs/MAP.md`, a writeup.
 
 ## 5. Notes
 
-### 5.0 Progress (2026-11-13)
+### 5.0 Progress (2026-11-13 to 2026-11-15)
 
 - **Phase 0 done.** `.venv` (capstone, rapidfuzz, py7zr), `tools/md/setup.py` (7-Zip, no
   mtools), DOSBox from `gamedata/DOSBOX`. A compile takes about 3 seconds.
@@ -186,7 +187,8 @@ from SE's (as SE's did against U6), `docs/MAP.md`, a writeup.
   `mdfunc.py` (function-by-function comparison), `mdmatch.py` (`docs/match_*.txt`),
   `modmap.py` (GAME.EXE from its segment table), `libscan.py`/`seedsyms.py` (EMU, MATHM,
   OVERLAY, CM), `mdbuild.py` (libraries per program, `/o ... /o-` and `-Y` for overlays).
-  `SRC_M/modules.txt` (68 modules) and `SRC/modules.txt` (76, 17 of them overlays).
+  `SRC_M/modules.txt` (68 modules) and `SRC/modules.txt` (76, 17 of them overlays); with
+  the data-only modules found later, 72 and 77 rows.
 - **Phase 2 done.** C0M identical in both programs; `-Y` changes no code; a toy `/o`
   link reproduces GAME.EXE's layout (stubs of class STUBSEG before DGROUP, overlays in
   link order, stub entries for the module's publics); SE's `title.c` compiles to MD's
@@ -201,6 +203,13 @@ from SE's (as SE's did against U6), `docs/MAP.md`, a writeup.
   library C files were built with Turbo C++ 1.01 (`/* compiler: Turbo C++ 1.01 */`), the
   link is case-insensitive (main.c's own Delay/Exit renamed), fixup order matters for the
   relocation table.
+- **Phases 4 and 5 done (2026-11-15).** `mdbuild.py --target game` rebuilds GAME.EXE byte
+  for byte, the `FBOV` block included (SRC/DECOMP.md, docs/GAME_NOTES.md M11-M35).
+- **Phase 6 names (2026-11-15).** Five passes gave names to the functions and variables of
+  both programs (GAME.EXE in four, the overlays last; MARTIAN.EXE in one), the addresses
+  kept in the comment before each definition; docs/FINDINGS.md and docs/MAP.md use the
+  names. By address still: GAME.EXE's OSILIB/CLIP.ASM routines and two unused words,
+  MARTIAN.EXE's 16 variables nothing reads.
 
 Run from the scratchpad with `tools/se/libscan.py`'s `scan()` against both TC++ versions'
 `CM.LIB` and `OVERLAY.LIB`. Every hit matched 1.00; none matched only 1.01.

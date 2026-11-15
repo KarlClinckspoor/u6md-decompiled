@@ -1,5 +1,5 @@
 ;----------------------------------------
-;SAVAGE.EXE (and GAME.EXE 2F30): a delay loop calibrated on the timer interrupt
+;SAVAGE.EXE (and SE's GAME.EXE 2F30): a delay loop calibrated on the timer interrupt
 ;----------------------------------------
 
 _DATA	SEGMENT PUBLIC WORD 'DATA'

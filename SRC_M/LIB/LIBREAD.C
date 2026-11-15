@@ -1,5 +1,5 @@
 /* flags: -mm -c -O -G */
-/* OSI library: reading from a library entry (GAME.EXE 2EAC) */
+/* OSI library: reading from a library entry (SE's GAME.EXE 2EAC) */
 
 /* an open library entry (LIBOPEN.C) */
 struct libfile {

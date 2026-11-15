@@ -1,18 +1,18 @@
 ;----------------------------------------
 ;OSI library (SAVAGE.EXE): events, taking the next one from the queue
-;(the queue and its variables are 07D9's)
+;(the queue and its variables are events.asm's)
 ;----------------------------------------
 INCLUDE OSI.INC
 
 DSegStart
-EXTRN D_18DC:WORD	;the number of events in the queue
-EXTRN D_190E:WORD	;where the next one is read
-EXTRN D_1912:WORD	;the queue's first entry
-EXTRN D_1914:WORD	;its last entry
+EXTRN evtCount:WORD	;the number of events in the queue
+EXTRN evtHead:WORD	;where the next one is read
+EXTRN evtBuffer:WORD	;the queue's first entry
+EXTRN evtBufferLast:WORD	;its last entry
 DSegEnd
 
-EXTRN C_0F2C_07AD:FAR	;(07D9) update the queue
-EXTRN C_0F2C_08E9:FAR	;pascal (int *p): the mouse position to p[0], p[1]
+EXTRN EvtCheckAltX:FAR	;(events.asm) update the queue
+EXTRN EvtGetMousePos:FAR	;pascal (int *p): the mouse position to p[0], p[1]
 
 CSegStart	MOUSEVT_TEXT
 
@@ -26,32 +26,32 @@ FProc	EVT_get	;0FBD:0004
 	PUSH	SI
 	PUSH	DI
 C_000A:
-	CALL	C_0F2C_07AD
+	CALL	EvtCheckAltX
 	PUSH	DS
 	POP	ES
-	MOV	AX,D_18DC
+	MOV	AX,evtCount
 	OR	AX,AX
 	JNZ	C_002E
 	MOV	BX,[BP+06]
 	LEA	AX,[BX+0Ch]
 	PUSH	AX
-	CALL	C_0F2C_08E9	;the mouse position at e+12
+	CALL	EvtGetMousePos	;the mouse position at e+12
 	XOR	AX,AX
 	MOV	DI,[BP+06]
 	MOV	ES:[DI],AX
 	JMP	SHORT C_0053
 C_002E:
-	MOV	SI,D_190E
+	MOV	SI,evtHead
 	MOV	AX,[SI]
 	MOV	DI,[BP+06]
 	MOV	CX,10h
 	REP	MOVSB
-	CMP	SI,D_1914
+	CMP	SI,evtBufferLast
 	JLE	C_0046
-	MOV	SI,D_1912
+	MOV	SI,evtBuffer
 C_0046:
-	MOV	D_190E,SI
-	DEC	D_18DC
+	MOV	evtHead,SI
+	DEC	evtCount
 	CMP	AX,0FFFFh
 	JZ	C_000A
 C_0053:

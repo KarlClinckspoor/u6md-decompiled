@@ -19,29 +19,29 @@ extern void far * pascal LZC_load(char far *name, int kind, void far *buf, int f
 extern void far *EMS_map(void far *p);/*map an EMS pointer: handed to the drivers (header +2E / +0C)*/
 
 extern char tmDrvName[];/*"TM.DRV"*/
-extern unsigned far *D_14F6;/*TM.DRV: its header (an offset per entry point)*/
-extern tDrvFunc D_0E8E;/*+08*/
-extern tDrvFunc D_0E92;/*+0A*/
-extern tDrvFunc D_0E96;/*+0C*/
-extern tDrvFunc D_0E9A;/*+0E*/
-extern tDrvFunc D_0E9E;/*+10*/
-extern tDrvFunc D_0EA2;/*+12*/
-extern tDrvFunc D_0EA6;/*+14*/
-extern tDrvFunc D_0EAA;/*+16*/
-extern tDrvFunc D_0EAE;/*+18*/
-extern tDrvFunc D_0EB2;/*+1A*/
-extern tDrvFunc D_0EB6;/*+1C*/
-extern tDrvFunc D_0EBA;/*+1E*/
-extern tDrvFunc D_0EBE;/*+20*/
-extern tDrvFunc D_0EC2;/*+22*/
-extern tDrvFunc D_0EC6;/*+24*/
-extern tDrvFunc D_0ECA;/*+26*/
-extern tDrvFunc D_0ECE;/*+28*/
-extern tDrvFunc D_0ED2;/*+2A*/
-extern tDrvFunc D_0ED6;/*+32*/
-extern tDrvFunc D_0EEA;/*+2C*/
-extern tDrvFunc D_14FC;/*+04*/
-extern tDrvFunc D_1500;/*+06*/
+extern unsigned far *tmDrvCode;/*TM.DRV in memory: its header (an offset per entry point)*/
+extern tDrvFunc drvColorsUsed;/*+08*/
+extern tDrvFunc drvGetPalette;/*+0A*/
+extern tDrvFunc drvSetPalette;/*+0C*/
+extern tDrvFunc drvDrawShape;/*+0E*/
+extern tDrvFunc drvSaveBG;/*+10*/
+extern tDrvFunc drvRestoreBG;/*+12*/
+extern tDrvFunc tmEntry14;/*+14*/
+extern tDrvFunc drvCopySurface;/*+16*/
+extern tDrvFunc drvClearSurface;/*+18*/
+extern tDrvFunc drvPutPixel;/*+1A*/
+extern tDrvFunc drvGetPixel;/*+1C*/
+extern tDrvFunc tmEntry1E;/*+1E*/
+extern tDrvFunc tmEntry20;/*+20*/
+extern tDrvFunc tmEntry22;/*+22*/
+extern tDrvFunc drvFillRect;/*+24*/
+extern tDrvFunc tmEntry26;/*+26*/
+extern tDrvFunc tmEntry28;/*+28*/
+extern tDrvFunc tmEntry2A;/*+2A*/
+extern tDrvFunc tmEntry32;/*+32*/
+extern tDrvFunc tmEntry2C;/*+2C*/
+extern tDrvFunc drvCopyLine;/*+04*/
+extern tDrvFunc drvFillLine;/*+06*/
 extern tDrvFunc drvPutChar;/*+02*/
 
 /*load TM.DRV (kind 4 loads kind 2's) and take its entry points; 0: not loaded*/
@@ -53,33 +53,33 @@ extern tDrvFunc drvPutChar;/*+02*/
 		k = 2;
 	else
 		k = kind;
-	D_14F6 = LZC_load(tmDrvName, k, 0L, 0x12, 0L);
-	if(D_14F6) {
-		seg = FP_SEG(D_14F6);
-		drvPutChar = ENTRY(seg, D_14F6[0x02 / 2]);
-		D_14FC = ENTRY(seg, D_14F6[0x04 / 2]);
-		D_1500 = ENTRY(seg, D_14F6[0x06 / 2]);
-		D_0E8E = ENTRY(seg, D_14F6[0x08 / 2]);
-		D_0E92 = ENTRY(seg, D_14F6[0x0A / 2]);
-		D_0E96 = ENTRY(seg, D_14F6[0x0C / 2]);
-		D_0E9A = ENTRY(seg, D_14F6[0x0E / 2]);
-		D_0E9E = ENTRY(seg, D_14F6[0x10 / 2]);
-		D_0EA2 = ENTRY(seg, D_14F6[0x12 / 2]);
-		D_0EA6 = ENTRY(seg, D_14F6[0x14 / 2]);
-		D_0EAA = ENTRY(seg, D_14F6[0x16 / 2]);
-		D_0EAE = ENTRY(seg, D_14F6[0x18 / 2]);
-		D_0EB2 = ENTRY(seg, D_14F6[0x1A / 2]);
-		D_0EB6 = ENTRY(seg, D_14F6[0x1C / 2]);
-		D_0EBA = ENTRY(seg, D_14F6[0x1E / 2]);
-		D_0EBE = ENTRY(seg, D_14F6[0x20 / 2]);
-		D_0EC2 = ENTRY(seg, D_14F6[0x22 / 2]);
-		D_0EC6 = ENTRY(seg, D_14F6[0x24 / 2]);
-		D_0ECA = ENTRY(seg, D_14F6[0x26 / 2]);
-		D_0ECE = ENTRY(seg, D_14F6[0x28 / 2]);
-		D_0ED2 = ENTRY(seg, D_14F6[0x2A / 2]);
-		D_0EEA = ENTRY(seg, D_14F6[0x2C / 2]);
-		D_0ED6 = ENTRY(seg, D_14F6[0x32 / 2]);
-		*(tDrvFunc far *)(D_14F6 + 0x2E / 2) = (tDrvFunc)EMS_map;
+	tmDrvCode = LZC_load(tmDrvName, k, 0L, 0x12, 0L);
+	if(tmDrvCode) {
+		seg = FP_SEG(tmDrvCode);
+		drvPutChar = ENTRY(seg, tmDrvCode[0x02 / 2]);
+		drvCopyLine = ENTRY(seg, tmDrvCode[0x04 / 2]);
+		drvFillLine = ENTRY(seg, tmDrvCode[0x06 / 2]);
+		drvColorsUsed = ENTRY(seg, tmDrvCode[0x08 / 2]);
+		drvGetPalette = ENTRY(seg, tmDrvCode[0x0A / 2]);
+		drvSetPalette = ENTRY(seg, tmDrvCode[0x0C / 2]);
+		drvDrawShape = ENTRY(seg, tmDrvCode[0x0E / 2]);
+		drvSaveBG = ENTRY(seg, tmDrvCode[0x10 / 2]);
+		drvRestoreBG = ENTRY(seg, tmDrvCode[0x12 / 2]);
+		tmEntry14 = ENTRY(seg, tmDrvCode[0x14 / 2]);
+		drvCopySurface = ENTRY(seg, tmDrvCode[0x16 / 2]);
+		drvClearSurface = ENTRY(seg, tmDrvCode[0x18 / 2]);
+		drvPutPixel = ENTRY(seg, tmDrvCode[0x1A / 2]);
+		drvGetPixel = ENTRY(seg, tmDrvCode[0x1C / 2]);
+		tmEntry1E = ENTRY(seg, tmDrvCode[0x1E / 2]);
+		tmEntry20 = ENTRY(seg, tmDrvCode[0x20 / 2]);
+		tmEntry22 = ENTRY(seg, tmDrvCode[0x22 / 2]);
+		drvFillRect = ENTRY(seg, tmDrvCode[0x24 / 2]);
+		tmEntry26 = ENTRY(seg, tmDrvCode[0x26 / 2]);
+		tmEntry28 = ENTRY(seg, tmDrvCode[0x28 / 2]);
+		tmEntry2A = ENTRY(seg, tmDrvCode[0x2A / 2]);
+		tmEntry2C = ENTRY(seg, tmDrvCode[0x2C / 2]);
+		tmEntry32 = ENTRY(seg, tmDrvCode[0x32 / 2]);
+		*(tDrvFunc far *)(tmDrvCode + 0x2E / 2) = (tDrvFunc)EMS_map;
 		return 1;
 	}
 	return 0;

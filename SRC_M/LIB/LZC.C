@@ -1,7 +1,7 @@
 /* flags: -mm -c -O -G */
 /* compiler: Turbo C++ 1.01 */
 /* OSI library: decompressing an LZW compressed library entry (see LZW.ASM):
-   LZC_decompress of Savage Empire's LZC.C (GAME.EXE 2EC5). In Martian Dreams
+   LZC_decompress of Savage Empire's LZC.C (SE's GAME.EXE 2EC5). In Martian Dreams
    LZC.C is three modules, linked apart: this one (13A3), LZCTYPE.C (13DD,
    loading by the entry types of LIBSIZE.C) and LZCLOAD.C (13F3, SE's
    LZC_load); LIBSIZE.C sits between the first two. A compressed entry starts

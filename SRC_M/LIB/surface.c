@@ -20,7 +20,7 @@ struct tSurface {
 };
 
 extern int vidMode;/*the video mode*/
-extern void (far *D_0EAE)(struct tSurface *, int);/*a TM.DRV routine (header +18)*/
+extern void (far *drvClearSurface)(struct tSurface *, int);/*a TM.DRV routine (header +18)*/
 
 extern unsigned pascal PAL_alloc(unsigned n);/*EGA video memory: n blocks of 256 bytes (0xFF: none)*/
 extern void far *MEM_alloc(long size, int flags);/*allocate far memory (or EMS: flags)*/
@@ -64,7 +64,7 @@ extern void MEM_free(void far *p);/*free what MEM_alloc allocated*/
 }
 
 /*allocate the pixels and the line offsets of s (its window set), in EGA memory in mode 13;
-  x: handed to the driver (*D_0EAE) unless -1 (always -1 but in VGA/MCGA); flags: for the
+  x: handed to the driver (*drvClearSurface) unless -1 (always -1 but in VGA/MCGA); flags: for the
   far allocation; 0: out of memory*/
 /*C_0ECD_00FE*/int pascal AllocSurface(struct tSurface *s, int x, int flags) {
 	char huge *p;
@@ -145,6 +145,6 @@ extern void MEM_free(void far *p);/*free what MEM_alloc allocated*/
 		}
 	}
 	if(x != -1)
-		(*D_0EAE)(s, x);
+		(*drvClearSurface)(s, x);
 	return 1;
 }

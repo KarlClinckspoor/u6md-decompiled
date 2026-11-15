@@ -1,16 +1,16 @@
 /* flags: -mm -c -O -G */
-/* The conventional heap (see HEAP.C): how much of it is free (GAME.EXE 2E29) */
+/* The conventional heap (see HEAP.C): how much of it is free (SE's GAME.EXE 2E29) */
 
 /* an entry of the heap's block table (the table grows down from the top of
-   the heap, D_1C66 is its lowest entry) */
+   the heap, heapTable is its lowest entry) */
 struct heapent {
 	long addr;	/* +0 linear address of the block */
 	long info;	/* +4 length (bits 0-19), 40000000h fixed, 80000000h in use */
 };
 
-extern long D_1C5E;	/* linear address of the heap */
-extern long D_1C62;	/* its length */
-extern long D_1C66;	/* linear address of the lowest table entry */
+extern long heapStart;	/* linear address of the heap */
+extern long heapLength;	/* its length */
+extern long heapTable;	/* linear address of the lowest table entry */
 
 extern struct heapent far * pascal LinearToPtr(long linear);
 
@@ -22,7 +22,7 @@ extern struct heapent far * pascal LinearToPtr(long linear);
 	long total;
 
 	total = 0;
-	for (a = D_1C5E + D_1C62 - 8; a >= D_1C66; a -= 8) {
+	for (a = heapStart + heapLength - 8; a >= heapTable; a -= 8) {
 		e = LinearToPtr(a);
 		if (!(e->info & 0x80000000L))
 			total += e->info & 0xFFFFFL;
@@ -38,7 +38,7 @@ extern struct heapent far * pascal LinearToPtr(long linear);
 	long best;
 
 	best = 0;
-	for (a = D_1C5E + D_1C62 - 8; a >= D_1C66; a -= 8) {
+	for (a = heapStart + heapLength - 8; a >= heapTable; a -= 8) {
 		e = LinearToPtr(a);
 		if (!(e->info & 0x80000000L) && (e->info & 0xFFFFFL) > best)
 			best = e->info & 0xFFFFFL;

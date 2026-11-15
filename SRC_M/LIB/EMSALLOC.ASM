@@ -1,6 +1,6 @@
 ;----------------------------------------
 ;EMS memory: allocating and freeing a block of the EMS heap (Savage Empire's
-;EMSALLOC.ASM, GAME.EXE 2D29; Martian Dreams' EMS_alloc returns the block's
+;EMSALLOC.ASM, SE's GAME.EXE 2D29; Martian Dreams' EMS_alloc returns the block's
 ;new place when it had to move to the next page, and EMS_none is new).
 ;A block is a 4-byte header, its length (a long, bit 0 set: in use), then
 ;the data; blocks never cross a 16 KB page (the header of a block that would

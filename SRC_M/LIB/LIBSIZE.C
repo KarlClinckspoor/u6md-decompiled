@@ -1,7 +1,7 @@
 /* flags: -mm -c -O -G */
 /* compiler: Turbo C++ 1.01 */
 /* OSI library: the length of a library entry's data (Savage Empire's LIBSIZE.C,
-   GAME.EXE 2E8C, with Martian Dreams' entry types) */
+   SE's GAME.EXE 2E8C, with Martian Dreams' entry types) */
 #include <dos.h>
 
 /* an open library entry (LIBOPEN.C) */

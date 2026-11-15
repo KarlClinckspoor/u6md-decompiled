@@ -5,12 +5,12 @@ INCLUDE OSI.INC
 
 DSegStart
 EXTRN _timerRate:WORD	;(saved and given back to C_0CED_00A5)
-EXTRN D_18D2:WORD	;(07D9) the mouse's x at the last update
-EXTRN D_191A:WORD	;struct tMouse *: the mouse
+EXTRN evtMouseX:WORD	;(events.asm) the mouse's x at the last update
+EXTRN curMouse:WORD	;struct tMouse *: the mouse
 DSegEnd
 
-EXTRN _SetTimerRate:FAR	;cdecl (int): sets D_2458
-EXTRN C_0F2C_0030:FAR	;(07D9) the default onMove: does nothing
+EXTRN _SetTimerRate:FAR	;cdecl (int): sets timerRate (LIB/PIT.ASM)
+EXTRN EvtNoCallback:FAR	;(events.asm) the default onMove: does nothing
 EXTRN MOUSE_saveBG:FAR	;MOUSE_saveBG
 EXTRN _VID_initPort:FAR	;VID_initPort
 EXTRN MOUSE_serve:FAR	;MOUSE_serve
@@ -39,10 +39,10 @@ FProc	MOUSE_init	;0FC2:000A
 	MOV	[BX].posX,AX
 	MOV	[BX].posY,AX
 	MOV	[BX].installed,AL
-	MOV	WORD PTR [BX].onMove,OFFSET C_0F2C_0030
-	MOV	WORD PTR [BX].onMove+2,SEG C_0F2C_0030
+	MOV	WORD PTR [BX].onMove,OFFSET EvtNoCallback
+	MOV	WORD PTR [BX].onMove+2,SEG EvtNoCallback
 	MOV	CX,BX
-	MOV	D_191A,BX
+	MOV	curMouse,BX
 	INT	33h	;AX 0: reset, get the number of buttons
 	OR	AX,AX
 	JZ	C_007B
@@ -59,7 +59,7 @@ FProc	MOUSE_init	;0FC2:000A
 	CALL	_VID_initPort
 	CMP	WORD PTR [BP+06],1
 	JNZ	C_007A
-	MOV	D_18D2,0FFFFh
+	MOV	evtMouseX,0FFFFh
 	CALL	MOUSE_serve
 C_007A:
 	POP	AX

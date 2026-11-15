@@ -17,12 +17,12 @@ extern void far * pascal LZC_load(char far *name, int kind, void far *buf, int f
 extern void far *EMS_map(void far *p);/*map an EMS pointer: handed to the drivers (header +2E / +0C)*/
 
 extern char superTmDrvName[];/*"SUPERTM.DRV"*/
-extern unsigned far *D_0E86;/*SUPERTM.DRV: its header*/
-extern tDrvFunc D_0EDA;/*+02*/
-extern tDrvFunc D_0EDE;/*+04*/
-extern tDrvFunc D_0EE2;/*+06*/
-extern tDrvFunc D_0EE6;/*+08*/
-extern tDrvFunc D_0EEE;/*+0A*/
+extern unsigned far *superTmDrvCode;/*SUPERTM.DRV in memory: its header*/
+extern tDrvFunc drvDrawScaled;/*+02*/
+extern tDrvFunc superTmEntry04;/*+04*/
+extern tDrvFunc drvDrawScaledRect;/*+06*/
+extern tDrvFunc superTmEntry08;/*+08*/
+extern tDrvFunc superTmEntry0A;/*+0A*/
 
 extern int LoadTM(int kind);/*LIB/tmdrv.c*/
 
@@ -36,15 +36,15 @@ extern int LoadTM(int kind);/*LIB/tmdrv.c*/
 			k = 2;
 		else
 			k = kind;
-		D_0E86 = LZC_load(superTmDrvName, k, 0L, 0x12, 0L);
-		if(D_0E86) {
-			seg = FP_SEG(D_0E86);
-			D_0EDA = ENTRY(seg, D_0E86[0x02 / 2]);
-			D_0EDE = ENTRY(seg, D_0E86[0x04 / 2]);
-			D_0EE2 = ENTRY(seg, D_0E86[0x06 / 2]);
-			D_0EE6 = ENTRY(seg, D_0E86[0x08 / 2]);
-			D_0EEE = ENTRY(seg, D_0E86[0x0A / 2]);
-			*(tDrvFunc far *)(D_0E86 + 0x0C / 2) = (tDrvFunc)EMS_map;
+		superTmDrvCode = LZC_load(superTmDrvName, k, 0L, 0x12, 0L);
+		if(superTmDrvCode) {
+			seg = FP_SEG(superTmDrvCode);
+			drvDrawScaled = ENTRY(seg, superTmDrvCode[0x02 / 2]);
+			superTmEntry04 = ENTRY(seg, superTmDrvCode[0x04 / 2]);
+			drvDrawScaledRect = ENTRY(seg, superTmDrvCode[0x06 / 2]);
+			superTmEntry08 = ENTRY(seg, superTmDrvCode[0x08 / 2]);
+			superTmEntry0A = ENTRY(seg, superTmDrvCode[0x0A / 2]);
+			*(tDrvFunc far *)(superTmDrvCode + 0x0C / 2) = (tDrvFunc)EMS_map;
 			return 1;
 		}
 	}

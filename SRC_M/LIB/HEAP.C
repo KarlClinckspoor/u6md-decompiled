@@ -1,11 +1,11 @@
 /* flags: -mm -c -O -G */
 /* compiler: Turbo C++ 1.01 */
-/* The conventional heap (Savage Empire's HEAP.C, GAME.EXE 2D70, a little
+/* The conventional heap (Savage Empire's HEAP.C, SE's GAME.EXE 2D70, a little
    later): one block of DOS memory, taken with farmalloc() at the start,
    given out in blocks. Addresses are linear (longs; LinearToPtr makes a far
    pointer of one, PtrToLinear the other way). The block table is at the top
    of the heap and grows down: one 8-byte entry per block, in the order of
-   the blocks (the lowest entry, D_1C66, is the lowest block);
+   the blocks (the lowest entry, heapTable, is the lowest block);
    heapSpareEntries entries are kept for it. On a machine with 624 KB (BIOS:
    270h KB) the heap stops at 98000h and what was above it is moved up to
    9C000h (and back at the end). Martian Dreams' version marks word- and
@@ -21,7 +21,7 @@ struct heapent {
 			   40000000h fixed, 80000000h in use */
 };
 
-extern void far *D_4658;	/* the heap, as farmalloc() gave it (BSS, 4 bytes) */
+/*4658*/extern void far *heapBlock;	/* the heap, as farmalloc() gave it (BSS, 4 bytes) */
 
 extern struct heapent far * pascal LinearToPtr(long linear);
 extern long pascal PtrToLinear(void far *p);
@@ -29,9 +29,9 @@ extern void pascal MemMove(void far *dest, void far *src, unsigned n);	/* MemMov
 
 /*1C5A*/int heapReady = 0;		/* 1: the heap is set up */
 /*1C5C*/int heapSpareEntries = 0x80;	/* table entries kept at the top */
-/*1C5E*/long D_1C5E = 0;		/* linear address of the heap */
-/*1C62*/long D_1C62 = 0;		/* its length */
-/*1C66*/long D_1C66 = 0;		/* linear address of the lowest table entry */
+/*1C5E*/long heapStart = 0;		/* linear address of the heap */
+/*1C62*/long heapLength = 0;		/* its length */
+/*1C66*/long heapTable = 0;		/* linear address of the lowest table entry */
 /*1C6A*/long heapMovedBytes = 0;	/* bytes moved from below 9C000h (624 KB machines) */
 
 /* merge the free block of entry a with the next one (entry a + 8) if that is
@@ -45,13 +45,13 @@ extern void pascal MemMove(void far *dest, void far *src, unsigned n);	/* MemMov
 	    && e->addr + (e->info & 0xFFFFFL) == e[1].addr) {
 		e[1].addr = e->addr;
 		e[1].info += e->info & 0xFFFFFL;
-		while (a > D_1C66) {
+		while (a > heapTable) {
 			a -= 8;
 			e = LinearToPtr(a);
 			e[1].addr = e->addr;
 			e[1].info = e->info;
 		}
-		D_1C66 += 8;
+		heapTable += 8;
 		return 1;
 	}
 	return 0;
@@ -65,11 +65,11 @@ extern void pascal MemMove(void far *dest, void far *src, unsigned n);	/* MemMov
 
 	e = LinearToPtr(a);
 	e->info &= 0x7FFFFFFFL;
-	if (a + 8 < D_1C5E + D_1C62) {
+	if (a + 8 < heapStart + heapLength) {
 		if (HEAP_merge(a))
 			a += 8;
 	}
-	if (a > D_1C66)
+	if (a > heapTable)
 		HEAP_merge(a - 8);
 	return a;
 }
@@ -83,12 +83,12 @@ extern void pascal MemMove(void far *dest, void far *src, unsigned n);	/* MemMov
 
 	if (heapReady) {
 		if (flags & 0x10) {
-			D_1C66 = D_1C5E + D_1C62 - 8;
-			e = LinearToPtr(D_1C66);
-			e->addr = D_1C5E;
-			e->info = D_1C62 - heapSpareEntries * 8;
+			heapTable = heapStart + heapLength - 8;
+			e = LinearToPtr(heapTable);
+			e->addr = heapStart;
+			e->info = heapLength - heapSpareEntries * 8;
 		} else {
-			for (a = D_1C5E + D_1C62 - 8; a >= D_1C66; a -= 8) {
+			for (a = heapStart + heapLength - 8; a >= heapTable; a -= 8) {
 				e = LinearToPtr(a);
 				if (!(e->info & 0x40000000L))
 					a = HEAP_freeEntry(a);
@@ -101,21 +101,21 @@ extern void pascal MemMove(void far *dest, void far *src, unsigned n);	/* MemMov
 /*C_1259_0296*/int HEAP_init(void)
 {
 	if (!heapReady) {
-		D_1C62 = farcoreleft();
-		D_4658 = 0;
-		if (heapSpareEntries * 8 < D_1C62)
-			D_4658 = farmalloc(D_1C62);
-		if (D_4658) {
+		heapLength = farcoreleft();
+		heapBlock = 0;
+		if (heapSpareEntries * 8 < heapLength)
+			heapBlock = farmalloc(heapLength);
+		if (heapBlock) {
 			heapReady++;
-			D_1C5E = PtrToLinear(D_4658);
+			heapStart = PtrToLinear(heapBlock);
 			if (*(int far *)0x00400013L == 0x270) {
-				heapMovedBytes = 0x9C000L - (D_1C62 + D_1C5E);
-				D_1C62 = 0x98000L - (heapMovedBytes + D_1C5E);
-				if (heapSpareEntries * 8 < D_1C62) {
-					MemMove(LinearToPtr(D_1C5E + D_1C62),
+				heapMovedBytes = 0x9C000L - (heapLength + heapStart);
+				heapLength = 0x98000L - (heapMovedBytes + heapStart);
+				if (heapSpareEntries * 8 < heapLength) {
+					MemMove(LinearToPtr(heapStart + heapLength),
 						LinearToPtr(0x9C000L - heapMovedBytes), heapMovedBytes);
 				} else {
-					farfree(D_4658);
+					farfree(heapBlock);
 					heapReady = 0;
 				}
 			}
@@ -131,9 +131,9 @@ extern void pascal MemMove(void far *dest, void far *src, unsigned n);	/* MemMov
 {
 	if (heapMovedBytes)
 		MemMove(LinearToPtr(0x9C000L - heapMovedBytes),
-			LinearToPtr(D_1C5E + D_1C62), heapMovedBytes);
+			LinearToPtr(heapStart + heapLength), heapMovedBytes);
 	if (heapReady)
-		farfree(D_4658);
+		farfree(heapBlock);
 	heapReady = 0;
 }
 
@@ -162,23 +162,23 @@ extern void pascal MemMove(void far *dest, void far *src, unsigned n);	/* MemMov
 	if (flags & 0x10)
 		flagbits |= 0x40000000L;
 	result = 0;
-	for (a = D_1C5E + D_1C62 - 8; a >= D_1C66; a -= 8) {
+	for (a = heapStart + heapLength - 8; a >= heapTable; a -= 8) {
 		e = LinearToPtr(a);
 		len = e->info & 0xFFFFFL;
 		if (!(e->info & 0x80000000L) && size <= len) {
 			if (size < len) {
-				if (D_1C5E + D_1C62 - heapSpareEntries * 8 >= D_1C66) {
-					e2 = LinearToPtr(D_1C5E + D_1C62 - 8);
+				if (heapStart + heapLength - heapSpareEntries * 8 >= heapTable) {
+					e2 = LinearToPtr(heapStart + heapLength - 8);
 					if (!(e2->info & 0x80000000L)
-					    && e2->addr + (e2->info & 0xFFFFFL) == D_1C66
+					    && e2->addr + (e2->info & 0xFFFFFL) == heapTable
 					    && (e2->info & 0xFFFFFL) > 8) {
 						e2->info -= 8;
 						heapSpareEntries++;
 					}
 				}
-				if (D_1C5E + D_1C62 - heapSpareEntries * 8 < D_1C66) {
-					D_1C66 -= 8;
-					for (b = D_1C66; b < a; b += 8) {
+				if (heapStart + heapLength - heapSpareEntries * 8 < heapTable) {
+					heapTable -= 8;
+					for (b = heapTable; b < a; b += 8) {
 						e2 = LinearToPtr(b);
 						e2->addr = e2[1].addr;
 						e2->info = e2[1].info;
@@ -235,23 +235,23 @@ extern void pascal MemMove(void far *dest, void far *src, unsigned n);	/* MemMov
 	if (flags & 0x10)
 		flagbits |= 0x40000000L;
 	result = 0;
-	for (a = D_1C66; a < D_1C5E + D_1C62; a += 8) {
+	for (a = heapTable; a < heapStart + heapLength; a += 8) {
 		e = LinearToPtr(a);
 		len = e->info & 0xFFFFFL;
 		if (!(e->info & 0x80000000L) && size <= len) {
 			if (size < len) {
-				if (D_1C5E + D_1C62 - heapSpareEntries * 8 >= D_1C66) {
-					e2 = LinearToPtr(D_1C5E + D_1C62 - 8);
+				if (heapStart + heapLength - heapSpareEntries * 8 >= heapTable) {
+					e2 = LinearToPtr(heapStart + heapLength - 8);
 					if (!(e2->info & 0x80000000L)
-					    && e2->addr + (e2->info & 0xFFFFFL) == D_1C66
+					    && e2->addr + (e2->info & 0xFFFFFL) == heapTable
 					    && (e2->info & 0xFFFFFL) > 8) {
 						e2->info -= 8;
 						heapSpareEntries++;
 					}
 				}
-				if (D_1C5E + D_1C62 - heapSpareEntries * 8 < D_1C66) {
-					D_1C66 -= 8;
-					for (b = D_1C66; b < a; b += 8) {
+				if (heapStart + heapLength - heapSpareEntries * 8 < heapTable) {
+					heapTable -= 8;
+					for (b = heapTable; b < a; b += 8) {
 						e2 = LinearToPtr(b);
 						e2->addr = e2[1].addr;
 						e2->info = e2[1].info;
@@ -288,7 +288,7 @@ extern void pascal MemMove(void far *dest, void far *src, unsigned n);	/* MemMov
 	struct heapent far *e;
 
 	lin = PtrToLinear(p);
-	for (a = D_1C5E + D_1C62 - 8; a >= D_1C66; a -= 8) {
+	for (a = heapStart + heapLength - 8; a >= heapTable; a -= 8) {
 		e = LinearToPtr(a);
 		if (e->addr <= lin && e->addr + (e->info & 0xFFFFFL) > lin) {
 			HEAP_freeEntry(a);
@@ -308,7 +308,7 @@ extern void pascal MemMove(void far *dest, void far *src, unsigned n);	/* MemMov
 
 	len = 0;
 	lin = PtrToLinear(p);
-	for (a = D_1C5E + D_1C62 - 8; a >= D_1C66; a -= 8) {
+	for (a = heapStart + heapLength - 8; a >= heapTable; a -= 8) {
 		e = LinearToPtr(a);
 		if (e->addr <= lin && e->addr + (e->info & 0xFFFFFL) > lin) {
 			len = e->info & 0xFFFFFL;

@@ -34,7 +34,16 @@ identical to the original** (118480 bytes, sha1 5e0e77776cdfe1222254ae4663c9f252
 
 `modules.txt` lists Origin's modules in link order: frame, first byte, length, source,
 `_DATA` range; `- - 0` rows are modules with data only. `python tools/md/mdcheck.py
---target martian` compares every module with code (72 of 72 identical).
+--target martian` prints "72 of 72 modules decompiled, 0 failing": the 72 rows of
+`modules.txt`, all with a source. It compares the 68 modules with code (all identical); the
+four data-only rows (OBJHDR.ASM, LIB/drvdata.c, OSILIB/OSIDATA.ASM, OSILIB/MOUSDATA.ASM)
+are checked by the full build.
+
+**Names (Phase 6, 2026-11-15).** Every function and variable has a name but for 16
+variables nothing reads (unused, or set and never read: `mdsym.py --target martian list`
+shows them by address). The library keeps GAME.EXE's names where the two programs share
+the source (music.c, HEAP.C); the drivers' entry points are named after what they do
+(`drvDrawShape`, ...) or their header offset when not called (`tmEntry14`).
 
 Before a build, after renaming or adding names: `tools/md/mkbss.py --start 2366 --end
 465C` (BSS.ASM) and `tools/md/mdsym.py apply` (references by address become the

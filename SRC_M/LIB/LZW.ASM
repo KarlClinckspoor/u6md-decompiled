@@ -1,5 +1,5 @@
 ;----------------------------------------
-;LZW decompression: Savage Empire's LZW.ASM (GAME.EXE 2E5D), Origin's LZW
+;LZW decompression: Savage Empire's LZW.ASM (SE's GAME.EXE 2E5D), Origin's LZW
 ;(as U6's LZW.ASM: 9 to 12 bit codes, 256 clear, 257 end), decoding from a
 ;file through an input buffer to far memory. LZC sets it up: lzwFile the
 ;file, lzwIn the input buffer of lzwInSize bytes, lzwOut where the data goes,

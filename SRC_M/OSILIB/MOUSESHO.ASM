@@ -4,9 +4,9 @@
 INCLUDE OSI.INC
 
 DSegStart
-EXTRN D_18D9:WORD	;(07D9) the pointer is shown when 0, hidden when below
-EXTRN _D_14F6:DWORD	;int far *: while not 0 the pointer is left alone
-EXTRN _D_0E86:DWORD	;int far *: the same
+EXTRN mouseShowLevel:WORD	;(events.asm) the pointer is shown when 0, hidden when below
+EXTRN _tmDrvCode:DWORD	;int far *: while not 0 the pointer is left alone
+EXTRN _superTmDrvCode:DWORD	;int far *: the same
 DSegEnd
 
 EXTRN MOUSE_saveBG:FAR	;MOUSE_saveBG
@@ -20,16 +20,16 @@ busy	db 0	;0FD4:0008 1 while drawing
 FProc	MOUSE_show	;0FD4:0009
 	PUSH	DI
 	PUSH	ES
-	INC	D_18D9
+	INC	mouseShowLevel
 	JNZ	C_003F
 	CMP	busy,0
 	JNZ	C_003F
 	INC	busy
-	LES	DI,_D_14F6
+	LES	DI,_tmDrvCode
 	MOV	AX,ES:[DI]
 	OR	AX,AX
 	JNZ	C_003A
-	LES	DI,_D_0E86
+	LES	DI,_superTmDrvCode
 	MOV	AX,ES:[DI]
 	OR	AX,AX
 	JNZ	C_003A

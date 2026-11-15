@@ -5,7 +5,7 @@ INCLUDE OSI.INC
 
 DSegStart
 EXTRN _pText:WORD	;struct tText *: the current text window
-EXTRN _D_14FC:DWORD	;driver: copy a line of pixels
+EXTRN _drvCopyLine:DWORD	;driver: copy a line of pixels
 DSegEnd
 
 CSegStart	TXTCOPY_TEXT
@@ -24,7 +24,7 @@ FProc	TXT_copyLine	;0EB9:0000
 	MOV	SI,[DI].scanlines
 	MOV	DI,BX
 	MOV	BX,AX
-	CALL	_D_14FC
+	CALL	_drvCopyLine
 	POP	DI
 	POP	ES
 	POP	DX

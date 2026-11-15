@@ -4,26 +4,26 @@
 INCLUDE OSI.INC
 
 DSegStart
-EXTRN D_191A:WORD	;struct tMouse *: the mouse
-EXTRN D_1938:WORD	;where the pointer was drawn: x
-EXTRN D_193A:WORD	;  y
-EXTRN _D_0EA2:DWORD	;driver: restore the background (struct tSurface *s, void far *buf, int x, int y, void far *shapes, int index)
+EXTRN curMouse:WORD	;struct tMouse *: the mouse
+EXTRN mouseDrawX:WORD	;where the pointer was drawn: x
+EXTRN mouseDrawY:WORD	;  y
+EXTRN _drvRestoreBG:DWORD	;TM.DRV +12: restore the background (s, void far *buf, x, y, void far *shapes, n)
 DSegEnd
 
 CSegStart	MOUSERST_TEXT
 
 ;put back what the pointer covered
 FProc	MOUSE_restoreBG	;0FDC:000A
-	MOV	BX,D_191A
+	MOV	BX,curMouse
 	PUSH	[BX].shapeIndex
 	PUSH	WORD PTR [BX].shapes+2
 	PUSH	WORD PTR [BX].shapes
-	PUSH	D_193A
-	PUSH	D_1938
+	PUSH	mouseDrawY
+	PUSH	mouseDrawX
 	PUSH	WORD PTR [BX].saveBuf+2
 	PUSH	WORD PTR [BX].saveBuf
 	PUSH	[BX].mSurface
-	CALL	_D_0EA2
+	CALL	_drvRestoreBG
 	ADD	SP,10h
 	RET
 MOUSE_restoreBG	ENDP

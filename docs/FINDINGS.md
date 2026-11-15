@@ -8,9 +8,11 @@ headers in `SRC/` and `SRC_M/`).
 
 Conventions:
 
-- Addresses are Martian Dreams'. A function or variable with no name yet is written by its
-  address: `C_SSSS_OOOO` or `D_XXXX`.
-- An overlaid function is named by its stub segment (`C_2F8D_01C1`).
+- Addresses are Martian Dreams'. Functions and variables are called by the names the
+  sources give them (`python tools/md/mdsym.py --target game list` maps names to
+  addresses). The few still without a name are written by their address: `C_SSSS_OOOO` or
+  `D_XXXX`; an overlaid function's address is its stub segment's (`C_2F8D_01C1`, UseRead).
+  An address of Savage Empire's says so.
 - `TalkFlags[n] & m` is bit m of NPC n's conversation flags. The scripts and the engine
   use these bits as the story's state.
 
@@ -81,26 +83,26 @@ The layout of both programs is in `docs/MAP.md`.
   (8x8-tile chunks, a map of 12-bit chunk indexes, superchunks), and both axes wrap.
   - Sums are masked with `& 0x3ff` everywhere: map, object, npctrack, combat, gfx,
     console, the cut scenes.
-  - Differences go through `WrapDelta` (C_1534_1101, a value in -0x200..0x200) or
-    `MapDistance` (C_1534_1129), where SE subtracted or used `abs()`.
+  - Differences go through `WrapDelta` (a value in -0x200..0x200) or
+    `MapDistance`, where SE subtracted or used `abs()`.
 - **The 40x40 area can cross the map's edge.**
   - `MAP_BuildArea` records where it crosses: when AreaX > 0x3d8, AreaFirstCol = 0x400 - AreaX
     and AreaLastCol = AreaFirstCol - 1. Y is handled the same way in AreaFirstRow/AreaLastRow.
   - `OBJ_FindListPos` scans `MapObjPtr` in map order across the edge.
   - `SearchArea(x1, y1, x2, y2)` takes x1 > x2 (or y1 > y2) as a rectangle that crosses
-    it (AreaWrapX/AreaWrapY D_EA4E/D_EA50).
+    it (AreaWrapX/AreaWrapY).
   - IsOutOfArea/IsSquareOutOfArea tell whether an object or a square is outside the area.
   - The peer map lost SE's world-edge cases.
 - **Double tiles.**
-  - `FindLoc` keeps four cursors (LocCursor[4] D_158E, LocTarget[4] D_159A): the square,
+  - `FindLoc` keeps four cursors (LocCursor[4], LocTarget[4]): the square,
     and the squares right, below and below-right of it. An object of two or four squares
     is found from any of them. SE had one cursor.
   - Creatures of two squares: TileFlag 0x40 means the other square is above, 0x80 to the
     left; types 0x167-0x169 depend on the direction. Creatures of four squares: 0xc0.
   - `CanMoveTo` (canmove.c) tests every square of such a creature, and so do the combat
-    distances (`C_07D1_35F5`).
-- **The view can rotate.** D_16AE holds the rotation (console.c's RotCos/RotSin).
-  - Stepping on an object 0x1d1 sets D_16AE = quality & 7 ("You feel dizzy...").
+    distances (`COMBAT_RangeToObj`).
+- **The view can rotate.** ViewRotation holds the rotation (console.c's RotCos/RotSin).
+  - Stepping on an object 0x1d1 sets ViewRotation = quality & 7 ("You feel dizzy...").
   - One of the dream's levers toggles it between 0 and 4.
   - Waking from the dream resets it.
 - **Entrances.** SE had destination tables by object type. MD has one table,
@@ -129,7 +131,7 @@ The layout of both programs is in `docs/MAP.md`.
 Savage Empire has nothing like it. Three overlays hold it: dream.c (2F5F), dreamobj.c
 (2F63) and dreamstg.c (2F68).
 
-- **The dreamer is NPC 0.** Its shape is 0x157, or 0x158 for a woman (D_16A8 is the
+- **The dreamer is NPC 0.** Its shape is 0x157, or 0x158 for a woman (PlayerIsFemale is the
   player's sex).
   - It goes into the dream through the dream machine: useact2.c's cabinet panel 4 and its
     chair 0x122 with the headgear. Settings other than 3 call `DreamSleep(npc, setting)`,
@@ -140,7 +142,7 @@ Savage Empire has nothing like it. Three overlays hold it: dream.c (2F5F), dream
 - **The party becomes the dreamer.** Active = PartySize, Party[Active] = 0, with NPC 0's
   name. This is U6's "in a vehicle" state (`IN_VEHICLE` is still `Active == PartySize`).
   MD has no vehicles.
-  - The panel turns gray (ColorPaper 7), AmbientLight is 6, and the int32 D_16AA gets
+  - The panel turns gray (ColorPaper 7), AmbientLight is 6, and the int32 GameFlags gets
     bit 0x10. Every module tests that bit for the dream:
     - the status panel shows only the dreamer's inventory, talents and hit points;
     - `mk_npcnum` turns NPC 1 into 0;
@@ -149,7 +151,7 @@ Savage Empire has nothing like it. Three overlays hold it: dream.c (2F5F), dream
     - buckets stay full;
     - plants grow at random;
     - air and cold are not checked.
-- **Triggers.** A dream trigger is a map object stepped on (`DreamTrigger`, C_2F5F_0688).
+- **Triggers.** A dream trigger is a map object stepped on (`DreamTrigger`).
   - Its status bits & 0xe5 give the kind of stage, its quality and quantity a place, its
     frame a teleport mode.
   - The trigger cleans up the stage the dreamer leaves and sets up the next. dreamstg.c's
@@ -157,26 +159,26 @@ Savage Empire has nothing like it. Three overlays hold it: dream.c (2F5F), dream
     its objects and creatures anew.
   - The stages are known by number: 4, 5, 0x20, 0x25, 0x40, 0x44, 0x60, 0x85, 0xa0, 0xa1,
     0xc0, 0xe0 ...
-  - DreamStage (D_16D4) is saved with the game.
-- **Waking.** `DreamWakeUp` (C_2F5F_0477) wakes the party at 8:00 on the date the dream
-  began, or the next day after 8:00 (WakeDay/WakeMonth/WakeYear D_16D0-D_16D2).
+  - DreamStage is saved with the game.
+- **Waking.** `DreamWakeUp` wakes the party at 8:00 on the date the dream
+  began, or the next day after 8:00 (WakeDay/WakeMonth/WakeYear).
   - It clears the party's talents and costs poisoned members hit points.
   - It puts NPC 0 back on MapZ 6 and prints "You wake up."
   - Other ways out:
     - Talking to yourself wakes you.
-    - A dreamer knocked out goes back to its wake-up place (D_1684/D_1685, then
+    - A dreamer knocked out goes back to its wake-up place (WakeX/WakeY, then
       conversation 0x66). With no place to go back to, it shakes itself awake from the
       nightmare.
-    - If the dreamer passes out ("Overcome by fatigue, you pass out.", C_2F63_0086), the
+    - If the dreamer passes out ("Overcome by fatigue, you pass out.", DreamerPassesOut), the
       party's bodies are moved and the dreamer wakes in NPC 1's place with NPC 1's
       inventory: "All your friends have been killed!"
 - **Dream creatures.**
-  - The A.I. modes 0x13 and 0x16 (combat.c) and 0x18 (C_2F63_083C, which walks towards an
+  - The A.I. modes 0x13 and 0x16 (combat.c) and 0x18 (AI_SeekSeed, which walks towards an
     object 0xfb) are the dream's.
-  - D_16A3 counts the creatures of a stage. Killing the last one ends stages 0x20, 0xa1
+  - DreamFoesLeft counts the creatures of a stage. Killing the last one ends stages 0x20, 0xa1
     and 0xc0.
-  - Tile 0x6f animates faster and faster (C_2F63_0043, "...faster!").
-  - Objects 0x85 go off in chains (C_2F63_0A13/0ACF/0C0C).
+  - Tile 0x6f animates faster and faster (DreamAnimFaster, "...faster!").
+  - Objects 0x85 go off in chains (BurnMoney, FireBurnAt, FireSpread).
 
 ## Machinery
 
@@ -196,7 +198,7 @@ The world's machines are new code. Talk flags hold their state:
   `MachineryOff` undoes it.
   - Loading an area (`__ObjectsDeserialize`) and saving one (`OBJ_CommitBlocks`) keep
     these objects in step with the flags.
-  - `ShowObjects` plays the looping sound of the nearest machine (MachineTypes D_15F2).
+  - `ShowObjects` plays the looping sound of the nearest machine (MachineTypes).
 - **Levers** (lever.c, use action 24). `UseLever` goes by the lever's quality:
   - 1-2: the doors 0xb3/0xe3 whose quality & 0x7f is the lever's quantity.
   - 10: a drawbridge.
@@ -219,7 +221,7 @@ The world's machines are new code. Talk flags hold their state:
   the direction and its quantity the number of pieces.
   - While the pumps run, or in the dream, each barge moves one tile per turn over water
     and carries what stands on it.
-  - `MoveFollowers` keeps the party on its places aboard (CurrentBarge D_B978).
+  - `MoveFollowers` keeps the party on its places aboard (CurrentBarge).
   - The controller is steered by Use (action 23): the pointer gives the direction, or
     "center." to stop.
   - barge.c begins with a debugging dump to a file "brg" (debug key f6).
@@ -244,7 +246,7 @@ The world's machines are new code. Talk flags hold their state:
 
 ## The "use" command
 
-- **SE vs MD.** SE's `CmdUse` (objcmd.c C_1DBD_8276) is a long chain of tests by type. MD's
+- **SE vs MD.** SE's `CmdUse` (objcmd.c, C_1DBD_8276 in SE's GAME.EXE) is a long chain of tests by type. MD's
   (use.c) looks the type up in two far tables.
 - **UseObjects** (far 2E08). 125 rows of 12 bytes: an object type and up to 10 action
   numbers (0xff ends). A type may have several rows. The table ends with a type < 0.
@@ -254,7 +256,7 @@ The world's machines are new code. Talk flags hold their state:
   - then the far pascal function, called as `f(obj, on, to)`.
   - In both lists -1 ends the list; -1 alone means no such object; -2 means anything,
     or a map tile.
-- **UseObject** (C_2597_059D). It gathers the actions of the used object's type. It asks
+- **UseObject** (use.c). It gathers the actions of the used object's type. It asks
   "On - " while one of them wants a second object, and "To -" for a third. It drops the
   actions that refuse what was chosen and calls the most specific one left.
   - When none accepts: "%s has no effect on ...".
@@ -303,7 +305,7 @@ The world's machines are new code. Talk flags hold their state:
   - A thrown or fetched object flies along `COMBAT_Missile`'s path ("Blocked!").
   - A refusal plays sound effect 5.
 - **Inventories.**
-  - An inventory or a container holds 16 slots (C_1B09_0D34 counts them).
+  - An inventory or a container holds 16 slots (OBJ_InvSlotsUsed counts them).
   - What is carried is weighed against 20 x strength, what is worn against 10 x strength
     (SE weighed against STREN).
   - A container may not go into a container, and a lit light may not go into one.
@@ -322,7 +324,7 @@ The world's machines are new code. Talk flags hold their state:
 - **Object changes.**
   - Containers are searched on the map.
   - The clock types 0x5b/0x62 are swapped as they are picked up and put down.
-  - Creatures 0x17f join their neighbours' frames (C_1B09_4868).
+  - Creatures 0x17f join their neighbours' frames (OBJ_JoinCreepingCacti).
   - `OBJ_MakeDeadBody` prints "Oh no!" when the body cannot take the inventory.
   - `GiveObj` refuses instead of dropping.
   - `TakeObj` also takes non-stacking objects one by one.
@@ -357,9 +359,9 @@ The world's machines are new code. Talk flags hold their state:
   - An NPC without a script is called "NPC 0x<hex>".
 - **Events.** TALK_Event has 31 events: 1-11, 0x33-0x39, 0x65-0x6f, 0xfe and 0xff.
   - They move NPCs, make creatures and objects, and (0x6a-0x6e) teleport the party.
-  - An event may leave a number in TalkEvent (D_247A) for `TALK_talkTo` to run after the
+  - An event may leave a number in TalkEvent for `TALK_talkTo` to run after the
     conversation:
-    - 9 ends the game (C_2F75_16A8);
+    - 9 ends the game (GameEnd);
     - 10 plays cut scene 10;
     - 0x34, 0x36 and 0x38 wake the dreamer.
   - Event 0xfe makes the party drunker. Event 0xff resets the video and exits to DOS.
@@ -368,7 +370,7 @@ The world's machines are new code. Talk flags hold their state:
   - At most five members in all. SE allowed five besides its three core characters.
   - LeaveParty has no SetOkToGet.
 - **Scripts.**
-  - Scripts come from `talk.lzc` by a face/conversation number (C_0E1A_16AA). NPCs 10-15
+  - Scripts come from `talk.lzc` by a face/conversation number (ConversationNum). NPCs 10-15
     share 0x51's. Temporary NPCs of type 0x179 use 0x1d's.
   - Scripts of 0x36b0 bytes or more are refused.
 
@@ -378,7 +380,7 @@ The world's machines are new code. Talk flags hold their state:
   - MaxHP is 240 for NPC 6, 2 x STR + 24 x level for an actor under the player's control,
     else the class's MonsterHP.
   - GetStr subtracts 3 for a member with the first talent and stays within 1-30.
-  - Armour (`GetProtection`) is the sum of what the equipped objects give (C_100B_00C4),
+  - Armour (`GetProtection`) is the sum of what the equipped objects give (GetArmorPoints),
     with no curse or protection terms.
 - **The monster tables** (`MONSDATA.ASM`). MonsterTypes lists 49 creature types after an
   unused first entry. `GetMonsterClass` returns the index minus 1. So the byte tables
@@ -398,14 +400,14 @@ The world's machines are new code. Talk flags hold their state:
   | 0x2000 | bleeds: blood objects 0x14e-0x150 |
   | 0x8000 | walks only on certain tiles |
 
-- **Ranged weapons.** objtype.c's C_100B_00FF gives a weapon's missile tile, its sound and
+- **Ranged weapons.** objtype.c's GetMissileInfo gives a weapon's missile tile, its sound and
   its ammunition: an ammunition type taken from the inventory, the weapon's own quantity,
   none, or the weapon itself thrown.
   - A thrown weapon lands where the missile stops, and the next one of its type is
     readied in the same hand.
   - COMBAT_AttackWithNextWeapon checks the ammunition (0x30 needs 0x40, 0x2b needs 0x3a
     ...).
-- **Sprayers.** Weapons 0x2b, 0x2d, 0xf0 and 0xf1 spray 12 missiles (C_0E1A_1003, damage
+- **Sprayers.** Weapons 0x2b, 0x2d, 0xf0 and 0xf1 spray 12 missiles (MissileSpray, damage
   20/20/25/10). Actors dodge by dexterity.
   - 0xf1 freezes water (bucket 0xa0 frame 1 to 2) and paralyzes.
   - A clever ally (`OSI_rand(1, 30) <= intelligence`) does not spray through the party.
@@ -418,15 +420,15 @@ The world's machines are new code. Talk flags hold their state:
   | 2 | ignores armour |
   | 3 | burns; thaws ice |
 
-  Plants (C_100B_0410's types) are hurt only by kinds 0 and 3.
+  Plants (IsPlantType's types) are hurt only by kinds 0 and 3.
 - **Bodies.** Humans fall as 0x155; other creatures as 0x151-0x154, 0x9f or 0xfd.
-- **Unwinnable game.** Killing certain NPCs sets IsArmageddon (D_0F15) to 1 or 2. For some
+- **Unwinnable game.** Killing certain NPCs sets IsArmageddon to 1 or 2. For some
   it prints "You have killed someone whose help you need to win the game!". Saving is
   refused while it is set. Killing 0x3b or 0x36 turns NPCs 0x33-0x3e hostile.
 - **Invulnerable NPCs** (IsInvulnerable) answer a blow instead:
   - some talk;
   - 0x6d/0x67 send the party to the dreamer's wake-up place;
-  - 0x40 hurls the player south (C_07D1_632C).
+  - 0x40 hurls the player south (COMBAT_RasputinThrow).
 - **New A.I. modes:**
 
   | Mode | What |
@@ -455,9 +457,9 @@ The world's machines are new code. Talk flags hold their state:
   - Immobile creatures 0x175/0x182 hide when the enemy is far.
 - **Special blows.**
   - Type 0x17b swallows a body ("Gulp!").
-  - The weapon 0x139 strikes through C_07D1_5FEF. Hitting NPC 0x66 with it plays cut
+  - The weapon 0x139 strikes through COMBAT_FireM60. Hitting NPC 0x66 with it plays cut
     scene 9, wakes the dreamer and sets TalkFlags[0x46] & 8.
-- **Music.** Combat has its own music: C_1FA9_0555 at the start, C_1FA9_03DA at the end,
+- **Music.** Combat has its own music: MUS_CombatSong at the start, MUS_CombatEndSong at the end,
   by the outcome.
 
 ## Attributes, talents and levels
@@ -469,7 +471,7 @@ The world's machines are new code. Talk flags hold their state:
   - the sword raises strength, the heart dexterity, the book intelligence, up to 30;
   - 30 hit points come back.
   - In SE a bear, a jaguar and a monkey asked the questions.
-- **Talents.** Each NPC has three talents: D_16B0[16], three 4-bit fields .a, .psychic
+- **Talents.** Each NPC has three talents: Talents[16], three 4-bit fields .a, .psychic
   and .c, saved with the game. The party view shows them as icons (tiles 0x120-0x122).
   - **First (.a).** The actor reaches as far as its level (Get, Move, Use, Drop) and its
     strength counts 3 less. It may handle the hot objects.
@@ -527,7 +529,7 @@ The world's machines are new code. Talk flags hold their state:
 
 ## Cut scenes and the end of the game
 
-- **Cut scenes** (cutscene.c, overlay 2F75). C_2F75_0000(n) plays cut scene n of
+- **Cut scenes** (cutscene.c, overlay 2F75). PlayCutscene(n) plays cut scene n of
   `MIDGAMEX.LZC`, where X is "123456789abcdef"[n - 1] (MIDGAME1-D).
   - Each page is five entries: three texts and two pictures, the second drawn over the
     first by the player's sex.
@@ -535,25 +537,25 @@ The world's machines are new code. Talk flags hold their state:
 
   | Scene | Pages | Function | Called from | Changes |
   |---|---|---|---|---|
-  | 1 | 2 | C_2F75_02E1 | a use action (useact1.c 0A67) | |
-  | 2 | 3 | C_2F75_042D | LeverMachinery 1; the coal workers' lever | underground power: lights 0xc9 and machines 0xd6 in (0x3d0, 0x1d0)-(0x3f0, 0x1e7) |
-  | 3 | 2 | C_2F75_0532 | LeverMachinery 2; the power cable | surface power: removes the objects 0x13b at four places |
-  | 4 | 2 | C_2F75_0757 | dream.c, before entering | |
-  | 5 | 3 | C_2F75_07AA | the dream machine, NPC 0x21 | |
-  | 6 | 3 | C_2F75_07FA | LeverMachinery 3; cabinet panel 6 | canal pumps on |
-  | 7 | 3 | C_2F75_0951 | LeverMachinery 4; panel 7, the valve | canal pumps off |
-  | 8 | 3 | C_2F75_0A64 | LeverMachinery 6; the rubber sprayer | moves NPCs 0x40-0x46 |
-  | 9 | 2 | C_2F75_0B90 | combat.c, the weapon 0x139 hitting NPC 0x66 | puts NPCs back on MapZ 4 |
-  | 10 | 2 | C_2F75_1429 | talk.c, event 10 | removes or moves NPCs 0x20-0x31 and 0x50-0x57 |
-  | 11 | 1 | C_2F75_157A | dream.c, before entering | |
-  | 12 | 3 | C_2F75_1607 | the dream machine, the robot 0x11f | NPC 6 |
-  | 13 | 1 | C_2F75_1657 | the ruby slippers, answer "N" | |
+  | 1 | 2 | Cutscene1 | a use action (useact1.c's UseOpenHatch) | |
+  | 2 | 3 | Cutscene2 | LeverMachinery 1; the coal workers' lever | underground power: lights 0xc9 and machines 0xd6 in (0x3d0, 0x1d0)-(0x3f0, 0x1e7) |
+  | 3 | 2 | Cutscene3 | LeverMachinery 2; the power cable | surface power: removes the objects 0x13b at four places |
+  | 4 | 2 | Cutscene4 | dream.c, before entering | |
+  | 5 | 3 | Cutscene5 | the dream machine, NPC 0x21 | |
+  | 6 | 3 | Cutscene6 | LeverMachinery 3; cabinet panel 6 | canal pumps on |
+  | 7 | 3 | Cutscene7 | LeverMachinery 4; panel 7, the valve | canal pumps off |
+  | 8 | 3 | Cutscene8 | LeverMachinery 6; the rubber sprayer | moves NPCs 0x40-0x46 |
+  | 9 | 2 | Cutscene9 | combat.c, the weapon 0x139 hitting NPC 0x66 | puts NPCs back on MapZ 4 |
+  | 10 | 2 | Cutscene10 | talk.c, event 10 | removes or moves NPCs 0x20-0x31 and 0x50-0x57 |
+  | 11 | 1 | Cutscene11 | dream.c, before entering | |
+  | 12 | 3 | Cutscene12 | the dream machine, the robot 0x11f | NPC 6 |
+  | 13 | 1 | Cutscene13 | the ruby slippers, answer "N" | |
 
-  - C_2F75_032D shows a map of `MDMAP.LZC` (the map object 0x96).
+  - ShowMdMap shows a map of `MDMAP.LZC` (the map object 0x96).
   - Debug key f5 plays scenes 1-9.
   - SE had four cut scenes and the MIDGAMEn.LZC pictures in gfx.c's `ShowMidgame`, which
     is gone.
-- **The end.** C_2F75_16A8 runs when the answer to the Grand Finale question is "Y", or
+- **The end.** GameEnd runs when the answer to the Grand Finale question is "Y", or
   from event 9.
   - It plays song 0xc and deletes the `.tmp` area files. The game is not saved.
   - It shuts sound and memory down and runs `execl("martian.exe", "martian.exe", "!",
@@ -566,7 +568,7 @@ The world's machines are new code. Talk flags hold their state:
   - Event 0xff exits to DOS.
   - A party knocked out before the capsule door is open (TalkFlags[0x10] & 0x10 clear)
     ends the game on the text screen: "Your character cannot be resurrected before the
-    capsule door is open.", exit code 4 (sound.c C_1FA9_0603).
+    capsule door is open.", exit code 4 (sound.c PartyUnconscious).
 
 ## Status display, graphics and sound
 
@@ -588,7 +590,7 @@ The world's machines are new code. Talk flags hold their state:
   tiles.
 - **Graphics effects.**
   - The missile tables have 23 tiles. A missile's hit list puts objects first, then NPCs.
-  - C_0E1A_1003 sprays 12 missiles in one of eight directions. It replaces SE's AnimWebs.
+  - MissileSpray sprays 12 missiles in one of eight directions. It replaces SE's AnimWebs.
   - Darkness is tile 0x10c (SE: 0x1bc).
 - **What is visible** (visible.c).
   - A square keeps the brightest light reaching it instead of the sum. A light of level n
@@ -603,13 +605,13 @@ The world's machines are new code. Talk flags hold their state:
   - 16 songs from `music.lzc`, timbres from `md.tim`.
   - The area song is 3 in the dream, 2 underground, 8 in combat, 0 by day, else 1.
   - Jingles queue the next song with SetNextSong instead of waiting for a marker.
-  - 56 sound effects; machines keep one looping (C_1FA9_09A5).
-  - Someone at the organ plays a melody (C_1FA9_0C15, Melody D_18AE).
+  - 56 sound effects; machines keep one looping (MUS_PlayLoopSfx).
+  - Someone at the organ plays a melody (MUS_PlayMelody, Melody).
 - **Debug keys.** They work when TalkFlags[1] & 0x40 is set. Without the flag, most
   answer "Are you a god?" and one says "That's an old, worn-out magic word!". They give:
   - time and goto, +60 minutes, the peer map;
   - "Divine Flare--";
-  - not solid (D_1689);
+  - not solid (AvatarNotSolid);
   - going to an NPC, sound effects, talk flags;
   - cut scenes 1-9, the barge dump;
   - analyse, create, heal.
@@ -630,7 +632,7 @@ The world's machines are new code. Talk flags hold their state:
   - the worms (head 0x174, body 0x172, segments 0x173);
   - the 0x175 with its parts 0x16a/0xfe.
 - **Other gone code.**
-  - SE's type tests C_130F_0002-01C6 and FindAdjacentPlate.
+  - SE's type tests C_130F_0002-01C6 (SE's addresses) and FindAdjacentPlate.
   - The door case of __ComputeResistance and the 0x149 seats of NPC_TakeTurn.
   - TeleportToSchedule's test that spared NPCs near the player.
   - EGG_CombatRange, and EGG_GivePossessions' items (it is empty).
@@ -657,7 +659,7 @@ The world's machines are new code. Talk flags hold their state:
   - DiskNames (disk.c);
   - D_1682 and D_16D8 in the game state.
 - U6's `XRayView` is back in use, by the telescope. SE had no X-ray view.
-- `C_120E_029B`, the hook for map tiles that hurt, is an empty function.
+- `TileDamage`, the hook for map tiles that hurt, is an empty function.
 
 ## Library and compiler
 
@@ -719,11 +721,11 @@ The sources reproduce these, marked `/*sic*/` or described in a comment:
   - LoseHP computes `damage << 1;` and drops the result: kind 3 against class flag 0x10.
   - AI_Like and AI_Unfriendly: `x = (x + OSI_rand(0, 1)?10:-10) & 0x3ff`. Because of
     precedence, x becomes 10 or 0x3f6.
-  - C_07D1_35F5's default case returns `x / (x - x)`, a division by zero for frames 16
+  - COMBAT_RangeToObj's default case returns `x / (x - x)`, a division by zero for frames 16
     and up.
-  - C_07D1_5FEF places its 0xda with the target's y.
+  - COMBAT_FireM60 places its 0xda with the target's y.
 - **npctrack.c**
-  - `GetQual(o) != D_16AE & 7` (precedence).
+  - `GetQual(o) != ViewRotation & 7` (precedence).
   - `GetY(o) + DirIncrY[info] == y & 0x3ff` in __DoOnPath.
   - `area_y = +PTH_DirY[dir] & 0x3ff`: an `=+`, so nothing is added.
   - `y = WrapDelta(x - area_y)` in PTH_FindPath.
@@ -738,7 +740,7 @@ The sources reproduce these, marked `/*sic*/` or described in a comment:
     `objNum > 0xbf` after `objNum >= 0xc0`.
   - CmdMove's map branch prints `GetObjectString(obj)` with obj never set, and its "into"
     branch sets the frame of a target it never set.
-  - The light-type test C_100B_01D4 is called with object numbers (CanPutInContainer,
+  - The light-type test IsUnlitLightType is called with object numbers (CanPutInContainer,
     CmdDrop, CmdMove).
   - CmdGet's `found` is uninitialised; CmdMove's "out of" compares GetQuan with the
     quantity code. Both are SE's.

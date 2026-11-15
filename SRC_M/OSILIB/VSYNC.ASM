@@ -4,14 +4,14 @@
 INCLUDE OSI.INC
 
 DSegStart
-EXTRN D_150E:WORD	;the CRT status port
+EXTRN crtStatusPort:WORD	;the CRT status port
 DSegEnd
 
 CSegStart	VSYNC_TEXT
 
 ;wait for the beginning of a vertical retrace
 FProc	_VID_waitRetrace	;0F2A:000E
-	MOV	DX,D_150E
+	MOV	DX,crtStatusPort
 C_000C:
 	IN	AL,DX
 	TEST	AL,8

@@ -14,10 +14,10 @@ _DATA	ENDS
 DGROUP	GROUP _DATA
 
 _DATA	SEGMENT
-EXTRN _D_236C:BYTE	;struct tSurface (16 bytes): the screen (see screen.c)
-EXTRN _D_0EB6:DWORD	;int (far *)(void far *, long): a TM.DRV routine (header +1C, tmdrv.c)
+EXTRN _theScreen:BYTE	;D_236C struct tSurface (16 bytes): the screen (see screen.c)
+EXTRN _drvGetPixel:DWORD	;int (far *)(void far *, long): a TM.DRV routine (header +1C, tmdrv.c)
 EXTRN _timerDivisor:WORD	;the timer chip divisor (PIT.ASM)
-EXTRN _D_0EB2:DWORD	;(far *)(void far *, long, int): a TM.DRV routine (header +1A)
+EXTRN _drvPutPixel:DWORD	;(far *)(void far *, long, int): a TM.DRV routine (header +1A)
 
 _DATA	ENDS
 
@@ -38,9 +38,9 @@ _DrvCountLoop	PROC FAR	;0DD4:0006
 	PUSH	AX
 	MOV	AX,DGROUP
 	PUSH	AX
-	MOV	AX,OFFSET DGROUP:_D_236C
+	MOV	AX,OFFSET DGROUP:_theScreen
 	PUSH	AX
-	CALL	_D_0EB6
+	CALL	_drvGetPixel
 	ADD	SP,8
 	MOV	[BP-2],AX
 	MOV	AX,[BP+8]
@@ -57,9 +57,9 @@ C_0036:
 	PUSH	AX
 	MOV	AX,DGROUP
 	PUSH	AX
-	MOV	AX,OFFSET DGROUP:_D_236C
+	MOV	AX,OFFSET DGROUP:_theScreen
 	PUSH	AX
-	CALL	_D_0EB2
+	CALL	_drvPutPixel
 	ADD	SP,0Ah
 	CMP	BYTE PTR _drvCalCounting,0
 	JZ	C_006A

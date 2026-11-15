@@ -8,18 +8,18 @@
 INCLUDE OSI.INC
 
 DSegStart
-PUBLIC D_1916,D_191A,D_191C,D_1936,D_1938,D_193A,D_193C,D_193E
+PUBLIC D_1916,curMouse,mouseState,mouseDX,mouseDrawX,mouseDrawY,mouseDY,mouseMoved
 
 D_1916	LABEL	DWORD	;D_1916 (not used by MARTIAN.EXE (Savage Empire's, addresses moved))
 	FarNull
-D_191A	dw 0	;D_191A struct tMouse *: the mouse
-D_191C	LABEL	BYTE	;D_191C struct tMouse: the mouse events.asm initialises
+curMouse	dw 0	;D_191A struct tMouse *: the mouse
+mouseState	LABEL	BYTE	;D_191C struct tMouse: the mouse events.asm initialises
 	tMouse	<0,0,0,0,0,0,0,0,0,0,0,0>
-D_1936	dw 0	;D_1936 (events.asm) how far the mouse moved: x
-D_1938	dw 0	;D_1938 where the pointer was drawn: x
-D_193A	dw 0	;D_193A   y
-D_193C	dw 0	;D_193C (events.asm) how far the mouse moved: y
-D_193E	db 0	;D_193E (events.asm) 1: the mouse moved
+mouseDX	dw 0	;D_1936 (events.asm) how far the mouse moved: x
+mouseDrawX	dw 0	;D_1938 where the pointer was drawn: x
+mouseDrawY	dw 0	;D_193A   y
+mouseDY	dw 0	;D_193C (events.asm) how far the mouse moved: y
+mouseMoved	db 0	;D_193E (events.asm) 1: the mouse moved
 DSegEnd
 
 ;an empty code segment, as Origin's macros always gave a module: being WORD aligned, it

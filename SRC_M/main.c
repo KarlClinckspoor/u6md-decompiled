@@ -60,21 +60,21 @@ struct tLine {
 		-1 a key, -2 a or b, -3 a, b or c, -4 the name*/
 };
 
-/*00A8*/char D_00A8[] = "MARTIAN DREAMS (c) 1991 Origin Systems, All Rights Reserved.";/*unused*/
-/*00E5*/struct tPoint D_00E5[4] = {{26, 130}, {26, 147}, {26, 164}, {26, 181}};/*the main menu's buttons*/
-/*00F5*/struct tPoint D_00F5[13] = {/*the cannon shot's path (scene 2)*/
+/*00A8*/char copyright[] = "MARTIAN DREAMS (c) 1991 Origin Systems, All Rights Reserved.";/*unused*/
+/*00E5*/struct tPoint menuButtons[4] = {{26, 130}, {26, 147}, {26, 164}, {26, 181}};/*the main menu's buttons*/
+/*00F5*/struct tPoint shotPath[13] = {/*the cannon shot's path (scene 2)*/
 	{190, 80}, {180, 82}, {170, 84}, {162, 81}, {154, 75}, {145, 73}, {135, 73},
 	{125, 74}, {115, 76}, {105, 78}, {95, 81}, {86, 86}, {0, 0}
 };
 /*0129*/int D_0129 = 0;/*unused*/
-/*012B*/int D_012B[15] = {4, 14, 14, 2, 14, 2, 9, 9, 2, 9, 2, 14, 2, 2, 14};/*text colours of scene 1, by line*/
-/*0149*/struct tStep D_0149[10] = {/*scene 3*/
+/*012B*/int scene1Colors[15] = {4, 14, 14, 2, 14, 2, 9, 9, 2, 9, 2, 14, 2, 2, 14};/*text colours of scene 1, by line*/
+/*0149*/struct tStep moongateSteps[10] = {/*scene 3*/
 	{1, 2, 0, 0, 1000}, {1, 2, 0, 1, 4000}, {2, 14, 0, 1, 4000}, {3, 2, 0, 2, 4000},
 	{4, 2, -1, 0, 4000}, {5, 14, -2, 0, 4000}, {6, 2, -1, 0, 4000}, {7, 14, 1, 3, 4000},
 	{8, 2, 1, 2, 4000}, {9, 14, 0, 2, 4000}
 };
-/*01AD*/int D_01AD[27] = {4, 6, 7, 7, 14, 2, 2, 7, 4, 4, 7, 9, 7, 4, 7, 4, 7, 2, 7, 7, 7, 7, 7, 11, 2, 7, 7};/*text colours of scene 4*/
-/*01E3*/struct tLine D_01E3[93] = {/*the character creation dialogue*/
+/*01AD*/int scene4Colors[27] = {4, 6, 7, 7, 14, 2, 2, 7, 4, 4, 7, 9, 7, 4, 7, 4, 7, 2, 7, 7, 7, 7, 7, 11, 2, 7, 7};/*text colours of scene 4*/
+/*01E3*/struct tLine creationLines[93] = {/*the character creation dialogue*/
 	{-1, 1, 0, -1}, {-2, 1, 0, -1}, {3, 2, 0, -1}, {4, 3, 1, -1}, {5, 2, 0, -4}, {6, 3, 1, -1},
 	{7, 1, 0, -2}, {0, 2, 0, -1}, {8, 3, 1, -1}, {9, 1, 0, -1}, {0, 2, 0, -1}, {10, 3, 1, -1},
 	{11, 1, 0, -1}, {0, 2, 0, -1}, {12, 2, 0, -1}, {13, 1, 0, -1}, {14, 1, 0, -3}, {0, 2, 0, -1},
@@ -92,51 +92,67 @@ struct tLine {
 	{58, 3, 1, -1}, {59, 2, 0, -2}, {0, 2, 0, -1}, {60, 3, 1, -1}, {61, 1, 0, -1}, {0, 2, 0, -1},
 	{62, 3, 1, -1}, {63, 1, 0, -1}, {0, 2, 0, -1}
 };
-/*04CB*/char D_04CB[8] = {0x00, 0x74, 0x0C, 0x7F, 0x3C, 0x00, 0x00, 0x00};/*a sound: the flash at the fair*/
-/*04D3*/char D_04D3[8] = {0x04, 0x2A, 0x30, 0x7F, 0x3C, 0x00, 0x00, 0x00};/*a sound (PlayIntro)*/
+/*04CB*/char flashSound[8] = {0x00, 0x74, 0x0C, 0x7F, 0x3C, 0x00, 0x00, 0x00};/*a sound: the flash at the fair*/
+/*04D3*/char introSound[8] = {0x04, 0x2A, 0x30, 0x7F, 0x3C, 0x00, 0x00, 0x00};/*a sound (PlayIntro)*/
 
 extern int soundCard;/*music.c*/
-extern void (far *D_0E9A)();/*driver: draw a shape (surface, x, y, shapes, n)*/
-extern void (far *D_0EAA)();/*driver: copy a surface onto another (from, to)*/
-extern void (far *D_0EAE)();/*driver: clear a surface (surface, colour)*/
-extern void (far *D_0EC6)();/*driver (ScrollCredits)*/
-extern void (far *D_0ED2)();/*driver (PlayIntro)*/
-extern void (far *D_0EDA)();/*driver: draw a shape rotated and scaled (surface, x, y, shapes, n, angle, scale, flags)*/
-extern unsigned char D_0BC0[0x62];/*objlist's header: another module's initialised data*/
-extern unsigned char D_0BF6, D_0BF7;/*in it: the gender, a character exists*/
+extern void (far *drvDrawShape)();/*driver: draw a shape (surface, x, y, shapes, n)*/
+extern void (far *drvCopySurface)();/*driver: copy a surface onto another (from, to)*/
+extern void (far *drvClearSurface)();/*driver: clear a surface (surface, colour)*/
+extern void (far *drvFillRect)();/*driver: fill a rectangle (surface, x1, y1, x2, y2, colour)*/
+extern void (far *tmEntry2A)();/*driver: TM.DRV +2A (surface, x, y, 1, 1, colour)*/
+extern void (far *drvDrawScaled)();/*driver: draw a shape rotated and scaled (surface, x, y, shapes, n, angle, scale, flags)*/
+extern unsigned char gameState[0x62];/*the game state block at the end of savegame\objlist (OBJHDR.ASM)*/
+extern unsigned char PlayerIsFemale;/*in it (GAME.EXE's names): the avatar is a woman*/
+extern unsigned char AvatarPortrait;/*nonzero: a character exists*/
 
 /*uninitialised data*/
-extern int D_2382;
-extern struct tSurface D_236C;/*the screen*/
-extern struct tSurface D_2384;/*the back buffer's picture area (y 24-151)*/
-extern struct tText D_2394;/*the text window*/
-extern struct tSurface D_23A6;/*the back buffer*/
-extern int D_23B6;
-extern int D_23B8;/*graphic adapter: 0 VGA, 1 EGA, 3 Tandy*/
-extern long D_23BA;/*time() now*/
-extern int D_23C2;/*speed of the machine (Calibrate); the intro draws every D_23C2-th frame*/
-extern void far *D_23C4, far *D_23C8, far *D_23CC, far *D_23D0;/*mdd_mus.lzc 0..7*/
-extern void far *D_23D4, far *D_23D8, far *D_23DC, far *D_23E0;
-extern int D_23E4;/*'!': endgame only*/
-extern char **D_23E6;/*argv*/
-extern int D_23E8;/*X: skip the introduction*/
-extern int D_23EE;
-extern int D_23F0;/*M mouse, K keyboard*/
-extern char D_23F2[];/*the text window's buffer*/
-extern unsigned char D_24F6[0x1cf1];/*savegame\objlist*/
-extern unsigned D_28F8;/*objlist +0x402: the avatar's shape*/
-extern unsigned char D_2DF7, D_2EF7, D_2FF7;/*the avatar's strength, dexterity, intelligence*/
-extern unsigned D_30F8;/*experience*/
-extern unsigned char D_32F7, D_34E8, D_3AE8;/*hit points, level*/
-extern char D_33F6[];/*the avatar's name*/
-extern unsigned D_3BE7, D_3BE9;
-extern void far *D_41F4;/*strx_mus.lzc 0*/
-extern int D_41F8;
-extern void far *D_4210, far *D_4214, far *D_4218, far *D_421C;/*mdd_mus.lzc 8..11*/
-extern long D_4220;/*calibration count*/
-extern long D_4224;/*time() at the start*/
-extern int D_422A;/*music on*/
-extern void far *D_422C;/*the font*/
+extern int D_2382;/*set (0x182), never read*/
+/*236C*/extern struct tSurface theScreen;/*the screen*/
+/*2384*/extern struct tSurface pictureArea;/*the back buffer's picture area (y 24-151)*/
+/*2394*/extern struct tText textWin;/*the text window*/
+/*23A6*/extern struct tSurface backBuf;/*the back buffer*/
+extern int D_23B6;/*set (1), never read*/
+/*23B8*/extern int videoAdapter;/*graphic adapter: 0 VGA, 1 EGA, 3 Tandy*/
+/*23BA*/extern long timeNow;/*time() now*/
+/*23C2*/extern int machineSpeed;/*speed of the machine (Calibrate); the intro draws every machineSpeed-th frame*/
+/*23C4*/extern void far *mddSong0;/*the songs: mdd_mus.lzc 0..7 here, 8..11 below*/
+/*23C8*/extern void far *mddSong1;
+/*23CC*/extern void far *mddSong2;
+/*23D0*/extern void far *mddSong3;
+/*23D4*/extern void far *mddSong4;
+/*23D8*/extern void far *mddSong5;
+/*23DC*/extern void far *mddSong6;
+/*23E0*/extern void far *mddSong7;
+/*23E4*/extern int endgameOnly;/*'!': endgame only*/
+/*23E6*/extern char **mainArgv;/*argv*/
+/*23E8*/extern int skipIntro;/*X: skip the introduction*/
+extern int D_23EE;/*set (2, or 0 without EMS), never read*/
+/*23F0*/extern int useMouse;/*M mouse, K keyboard*/
+/*23F2*/extern char textBuf[];/*the text window's buffer*/
+/*the objlist image and, in it, the avatar's (object 1's) entries of GAME.EXE's arrays*/
+/*24F6*/extern unsigned char objList[0x1cf1];/*savegame\objlist*/
+/*28F8*/extern unsigned avatarShape;/*+0x402: ObjShapeType[1], the avatar's shape*/
+/*2DF7*/extern unsigned char avatarStr;/*+0x901: STREN[1]*/
+/*2EF7*/extern unsigned char avatarDex;/*+0xA01: DEXTE[1]*/
+/*2FF7*/extern unsigned char avatarInt;/*+0xB01: INTEL[1]*/
+/*30F8*/extern unsigned avatarExp;/*+0xC02: ExpPoints[1]*/
+/*32F7*/extern unsigned char avatarHP;/*+0xE01: HitPoints[1]*/
+/*33F6*/extern char avatarName[];/*+0xF00: Names[0], the avatar's name*/
+/*34E8*/extern unsigned char avatarLevel;/*+0xFF2: Level[1]*/
+/*3AE8*/extern unsigned char avatarMovePts2;/*+0x15F2: the second movement points array (GAME.EXE reads both into MovePts)*/
+/*3BE7*/extern unsigned origShape0;/*+0x16F1: OrigShapeType[0]*/
+/*3BE9*/extern unsigned avatarOrigShape;/*+0x16F3: OrigShapeType[1]*/
+/*41F4*/extern void far *titleSong;/*strx_mus.lzc 0: the title's song*/
+extern int D_41F8;/*set (1), never read*/
+/*4210*/extern void far *mddSong8;/*mdd_mus.lzc 8*/
+/*4214*/extern void far *mddSong9;
+/*4218*/extern void far *mddSong10;
+/*421C*/extern void far *mddSong11;
+/*4220*/extern long calibCount;/*calibration count*/
+/*4224*/extern long timeStart;/*time() at the start*/
+/*422A*/extern int musicOn;/*music on*/
+/*422C*/extern void far *textFont;/*the font*/
 
 extern long pascal LIB_entrySize(char far *name, int n);
 extern void far * pascal LZC_loadType(char far *name, int n, void far *buf, int a, long b);
@@ -185,23 +201,23 @@ int PlayIntro(void);
 int ScrollCredits(void);
 
 /*load a palette file (VGA) and save it*/
-/* strings: none; data: D_23B8 */
+/* strings: none; data: videoAdapter */
 /*C_04FE_0004*/void LoadPalette(char *name) {
-	if(D_23B8 == 0) {
+	if(videoAdapter == 0) {
 		PAL_loadFile(name);
 		PAL_save();
 	}
 }
 
 /*measure the machine: count until time() ticks over; *speed from the count*/
-/* data: D_4224 (long), D_23BA (long) */
+/* data: timeStart (long), timeNow (long) */
 /*C_04FE_001D*/long Calibrate(long *count, int *speed) {
-	time(&D_4224);
+	time(&timeStart);
 	*count = 0;
-	while(time(&D_23BA) == D_4224)
+	while(time(&timeNow) == timeStart)
 		;
-	D_4224++;
-	while(time(&D_23BA) == D_4224)
+	timeStart++;
+	while(time(&timeNow) == timeStart)
 		(*count)++;
 	*speed = sqrt(max(1L, 25 - *count / 100));
 	return *count;
@@ -236,16 +252,16 @@ int ScrollCredits(void);
 }
 
 /*set up a text window on a surface with the font in item n of name*/
-/* data: D_422C, D_23F2 */
+/* data: textFont, textBuf */
 /*C_04FE_01C2*/void InitText(struct tText *t, struct tSurface *s, char *name, int n) {
-	D_422C = LoadLzc(name, n);
+	textFont = LoadLzc(name, n);
 	t->surface = s;
 	t->curX = 0;
 	t->curY = 0;
 	t->fg = 7;
 	t->bg = 0xff;
-	t->font = D_422C;
-	t->buffer = D_23F2;
+	t->font = textFont;
+	t->buffer = textBuf;
 	t->bufPtr = t->buffer;
 	t->justify = 0;
 }
@@ -275,7 +291,7 @@ lines[] gets a pointer to each, then 0; returns the block*/
 
 /*print s in a text window from (x, y), a line for each part between '^'s,
 12 pixels apart, in colour color with justification justify*/
-/* data: D_23F2 */
+/* data: textBuf */
 /*C_04FE_02D5*/void PrintText(struct tText *t, int x, int y, char far *s, char justify, char color) {
 	char fg;
 	char just;
@@ -288,7 +304,7 @@ lines[] gets a pointer to each, then 0; returns the block*/
 	fg = t->fg;
 	buffer = t->buffer;
 	just = t->justify;
-	p = D_23F2;
+	p = textBuf;
 	for(i = 0; s[i] != 0; i++)
 		p[i] = s[i];
 	p[i] = 0;
@@ -346,26 +362,26 @@ lines[] gets a pointer to each, then 0; returns the block*/
 
 /*load the songs; 0 if there is no music*/
 /* strings: 051D "strx_mus.lzc", 052A..05AE "mdd_mus.lzc" (12 times);
-   data: D_422A, soundCard soundCard, D_41F4, D_23C4..D_23E0, D_4210..D_421C */
+   data: musicOn, soundCard, titleSong, mddSong0..mddSong11 */
 /*C_04FE_0429*/int LoadMusic() {
-	if(D_422A == 0 || soundCard == 0)
+	if(musicOn == 0 || soundCard == 0)
 		return 0;
 	if(EMS_totalFree() <= 0)
 		return 0;
-	D_41F4 = LoadLzc4("strx_mus.lzc", 0);
-	D_23C4 = LoadLzc4("mdd_mus.lzc", 0);
-	D_23C8 = LoadLzc4("mdd_mus.lzc", 1);
-	D_23CC = LoadLzc4("mdd_mus.lzc", 2);
-	D_23D0 = LoadLzc4("mdd_mus.lzc", 3);
-	D_23D4 = LoadLzc4("mdd_mus.lzc", 4);
-	D_23D8 = LoadLzc4("mdd_mus.lzc", 5);
-	D_23DC = LoadLzc4("mdd_mus.lzc", 6);
-	D_23E0 = LoadLzc4("mdd_mus.lzc", 7);
-	D_4210 = LoadLzc4("mdd_mus.lzc", 8);
-	D_4214 = LoadLzc4("mdd_mus.lzc", 9);
-	D_4218 = LoadLzc4("mdd_mus.lzc", 10);
-	D_421C = LoadLzc4("mdd_mus.lzc", 11);
-	if(D_41F4 == 0 || D_421C == 0)
+	titleSong = LoadLzc4("strx_mus.lzc", 0);
+	mddSong0 = LoadLzc4("mdd_mus.lzc", 0);
+	mddSong1 = LoadLzc4("mdd_mus.lzc", 1);
+	mddSong2 = LoadLzc4("mdd_mus.lzc", 2);
+	mddSong3 = LoadLzc4("mdd_mus.lzc", 3);
+	mddSong4 = LoadLzc4("mdd_mus.lzc", 4);
+	mddSong5 = LoadLzc4("mdd_mus.lzc", 5);
+	mddSong6 = LoadLzc4("mdd_mus.lzc", 6);
+	mddSong7 = LoadLzc4("mdd_mus.lzc", 7);
+	mddSong8 = LoadLzc4("mdd_mus.lzc", 8);
+	mddSong9 = LoadLzc4("mdd_mus.lzc", 9);
+	mddSong10 = LoadLzc4("mdd_mus.lzc", 10);
+	mddSong11 = LoadLzc4("mdd_mus.lzc", 11);
+	if(titleSong == 0 || mddSong11 == 0)
 		return 0;
 	return 1;
 }
@@ -388,25 +404,25 @@ lines[] gets a pointer to each, then 0; returns the block*/
 }
 
 /*fade the screen out (VGA), clear it, restore the palette*/
-/* data: D_23B8, D_236C */
+/* data: videoAdapter, theScreen */
 /*C_04FE_05C5*/int FadeOut() {
-	if(D_23B8 == 0)
-		FADE_out(&D_236C, 0, 1);
+	if(videoAdapter == 0)
+		FADE_out(&theScreen, 0, 1);
 	VID_waitRetrace();
-	(*D_0EAE)(&D_236C, 0);
+	(*drvClearSurface)(&theScreen, 0);
 	PAL_restore();
 	return 0;
 }
 
 /*show the back buffer, fading in (VGA)*/
-/* data: D_23B8, D_23A6, D_236C */
+/* data: videoAdapter, backBuf, theScreen */
 /*C_04FE_05FB*/int FadeIn() {
-	if(D_23B8 == 0) {
-		if(!FADE_in(&D_23A6, &D_236C))
+	if(videoAdapter == 0) {
+		if(!FADE_in(&backBuf, &theScreen))
 			0;/*a dropped statement: keeps the original's jne/jmp*/
 		else
 			VID_waitRetrace();
-		(*D_0EAA)(&D_23A6, &D_236C);
+		(*drvCopySurface)(&backBuf, &theScreen);
 	}
 	return 0;
 }
@@ -445,29 +461,29 @@ lines[] gets a pointer to each, then 0; returns the block*/
 /*parse a configuration string (CONFIG.MD or a command line argument), up to
 its end or a CR: V/E/T graphic adapter, M/K mouse or keyboard, N/P/A/R music
 (none, none, AdLib, Roland), X skip the introduction, ! the endgame*/
-/* data: D_23B8, D_23F0, D_422A, soundCard soundCard, D_23E8, D_23E4 */
+/* data: videoAdapter, useMouse, musicOn, soundCard, skipIntro, endgameOnly */
 /*C_04FE_06C6*/void ParseConfig(char *s) {
 	while(*s != 0 && *s != '\r') {
 		switch(toupper(*s++)) {
-			case 'V': D_23B8 = 0; break;
-			case 'E': D_23B8 = 1; break;
-			case 'T': D_23B8 = 3; break;
-			case 'M': D_23F0 = 1; break;
-			case 'K': D_23F0 = 0; break;
-			case 'N': case 'P': D_422A = 0; soundCard = 0; break;
-			case 'A': D_422A = 1; soundCard = 2; break;
-			case 'R': D_422A = 1; soundCard = 1; break;
-			case 'X': D_23E8 = 1; break;
-			case '!': D_23E4 = 1; break;
+			case 'V': videoAdapter = 0; break;
+			case 'E': videoAdapter = 1; break;
+			case 'T': videoAdapter = 3; break;
+			case 'M': useMouse = 1; break;
+			case 'K': useMouse = 0; break;
+			case 'N': case 'P': musicOn = 0; soundCard = 0; break;
+			case 'A': musicOn = 1; soundCard = 2; break;
+			case 'R': musicOn = 1; soundCard = 1; break;
+			case 'X': skipIntro = 1; break;
+			case '!': endgameOnly = 1; break;
 		}
 	}
 }
 
 /* strings: 05BA "config.md", 05C4 "fonts.lzc", 05CE "md.tim", 05D5 "md_title.pal",
    05E2 "strax.pal", 05EC "md_title.pal", 05F9 "mdmenu.lzc", 0604 "mdmenu.lzc", 060F "game.exe";
-   data: D_00E5 (menu buttons), D_23E6, D_4220, D_23C2, D_2382, D_23EE, soundCard soundCard,
-   D_23B6, D_41F8, D_23F0, D_422A, D_23E8, D_23E4, D_23B8, D_236C, D_23A6, D_2384, D_2394,
-   D_41F4, D_4224, D_23BA */
+   data: menuButtons, mainArgv, calibCount, machineSpeed, D_2382, D_23EE, soundCard,
+   D_23B6, D_41F8, useMouse, musicOn, skipIntro, endgameOnly, videoAdapter, theScreen, backBuf, pictureArea, textWin,
+   titleSong, timeStart, timeNow */
 /*C_04FE_0797*/main(int argc, char **argv) {
 	int prev;
 	int reload;
@@ -478,10 +494,10 @@ its end or a CR: V/E/T graphic adapter, M/K mouse or keyboard, N/P/A/R music
 	unsigned now[2];
 	register int sel, key;
 
-	D_23E6 = argv;
+	mainArgv = argv;
 	setcbrk(0);
 	ctrlbrk(Quit);
-	Calibrate(&D_4220, &D_23C2);
+	Calibrate(&calibCount, &machineSpeed);
 	gettime((struct time *)now);
 	MEM_init(8);
 	SeedRandom(now[1]);
@@ -492,10 +508,10 @@ its end or a CR: V/E/T graphic adapter, M/K mouse or keyboard, N/P/A/R music
 	soundCard = 0;
 	D_23B6 = 1;
 	D_41F8 = 1;
-	D_23F0 = 0;
-	D_422A = 0;
-	D_23E8 = 0;
-	D_23E4 = 0;
+	useMouse = 0;
+	musicOn = 0;
+	skipIntro = 0;
+	endgameOnly = 0;
 	fd = DOS_open("config.md");
 	if(fd >= 0) {
 		DOS_read(fd, 0L, 6L, cfg);
@@ -505,30 +521,30 @@ its end or a CR: V/E/T graphic adapter, M/K mouse or keyboard, N/P/A/R music
 	}
 	for(i = 1; i < argc; i++)
 		ParseConfig(argv[i]);
-	switch(D_23B8) {
+	switch(videoAdapter) {
 		case 0: VID_setMode(0x13); break;
 		case 1: VID_setMode(0xd); break;
 	}
-	if(LoadSuperTM(D_23B8) == 0) {
+	if(LoadSuperTM(videoAdapter) == 0) {
 		MEM_reset(8);
 		MEM_shutdown(8);
 		exit(1);
 	}
-	ScreenSurface(&D_236C, 0);
-	BufferSurface(&D_23A6, 0);
-	BufferSurface(&D_2384, 0);
-	D_2384 = D_23A6;
-	D_2384.top = 0x18;
-	D_2384.bottom = 0x97;
-	InitText(&D_2394, &D_23A6, "fonts.lzc", 0);
+	ScreenSurface(&theScreen, 0);
+	BufferSurface(&backBuf, 0);
+	BufferSurface(&pictureArea, 0);
+	pictureArea = backBuf;
+	pictureArea.top = 0x18;
+	pictureArea.bottom = 0x97;
+	InitText(&textWin, &backBuf, "fonts.lzc", 0);
 	InitSound("md.tim");
 	if(LoadMusic())
-		D_422A = 1;
+		musicOn = 1;
 	else
-		D_422A = 0;
+		musicOn = 0;
 	if(max(1, 2 - DrvCalibrate() / 8) != 1)
 		D_23EE = 0;
-	if(D_23E4 == 1) {
+	if(endgameOnly == 1) {
 		LoadPalette("md_title.pal");
 		Endgame();
 		FadeOutMusic(0);
@@ -536,17 +552,17 @@ its end or a CR: V/E/T graphic adapter, M/K mouse or keyboard, N/P/A/R music
 		ExitGame(0);
 	}
 	LoadPalette("strax.pal");
-	PlayTitle(&D_23A6, &D_236C, D_23B8, D_422A ? D_41F4 : (void far *)0, D_23C2);
+	PlayTitle(&backBuf, &theScreen, videoAdapter, musicOn ? titleSong : (void far *)0, machineSpeed);
 	FadeOutMusic(0);
 	LoadPalette("md_title.pal");
-	if(D_23E8 == 0) {
+	if(skipIntro == 0) {
 		Intro();
 		FadeOutMusic(0);
 	}
 	shapes = LoadLzc("mdmenu.lzc", 0);
 	reload = 0;
-	(*D_0EAE)(&D_23A6, 0);
-	(*D_0E9A)(&D_23A6, 0, 0, shapes, 0);
+	(*drvClearSurface)(&backBuf, 0);
+	(*drvDrawShape)(&backBuf, 0, 0, shapes, 0);
 	VID_waitRetrace();
 	FadeIn();
 	sel = 0;
@@ -556,15 +572,15 @@ its end or a CR: V/E/T graphic adapter, M/K mouse or keyboard, N/P/A/R music
 			shapes = LoadLzc("mdmenu.lzc", 0);
 			reload = 0;
 		}
-		(*D_0EAE)(&D_23A6, 0);
-		(*D_0E9A)(&D_23A6, 0, 0, shapes, 0);
-		(*D_0E9A)(&D_23A6, D_00E5[prev].x, D_00E5[prev].y, shapes, 1);
-		(*D_0E9A)(&D_23A6, D_00E5[sel].x, D_00E5[sel].y, shapes, 2);
+		(*drvClearSurface)(&backBuf, 0);
+		(*drvDrawShape)(&backBuf, 0, 0, shapes, 0);
+		(*drvDrawShape)(&backBuf, menuButtons[prev].x, menuButtons[prev].y, shapes, 1);
+		(*drvDrawShape)(&backBuf, menuButtons[sel].x, menuButtons[sel].y, shapes, 2);
 		VID_waitRetrace();
-		(*D_0EAA)(&D_23A6, &D_236C);
-		time(&D_4224);
+		(*drvCopySurface)(&backBuf, &theScreen);
+		time(&timeStart);
 		while(!kbhit()) {
-			if(time(&D_23BA) > D_4224 + 120) {
+			if(time(&timeNow) > timeStart + 120) {
 				key = 8;
 				break;
 			}
@@ -628,7 +644,7 @@ its end or a CR: V/E/T graphic adapter, M/K mouse or keyboard, N/P/A/R music
 cannot be read, 0 if stopped by a key, -1 at its end*/
 /* strings: 0618 "savegame\\objlist", 0629 "rb", 062C "scenetxt.lzc", 0639 0645 0651 065D 0669
    "endgame.lzc", 0675 "moongate.lzc", 0682 068E 069A 06A6 "endgame.lzc";
-   data: D_24F6 (0x1CF1 bytes), D_28F8, D_422A, D_421C, D_23A6, D_2384, D_2394, D_236C */
+   data: objList (0x1CF1 bytes), avatarShape, musicOn, mddSong11, backBuf, pictureArea, textWin, theScreen */
 /*C_04FE_0CA4*/int Endgame() {
 	void far *shapes;
 	void far *gate;
@@ -643,27 +659,27 @@ cannot be read, 0 if stopped by a key, -1 at its end*/
 	register int i, key;
 
 	fp = fopen("savegame\\objlist", "rb");
-	if(fread(D_24F6, 0x1cf1, 1, fp) < 1)
+	if(fread(objList, 0x1cf1, 1, fp) < 1)
 		return 1;
 	fclose(fp);
-	if((D_28F8 & 0x3ff) == 0x157)
+	if((avatarShape & 0x3ff) == 0x157)
 		avatar = 0;
 	else
 		avatar = 1;
 	txt = ReadLines("scenetxt.lzc", 3, text);
 	shapes = LoadLzc("endgame.lzc", 0);
-	if(D_422A == 1) {
+	if(musicOn == 1) {
 		FadeOutMusic(0);
-		PlaySong(D_421C);
+		PlaySong(mddSong11);
 	}
 	for(i = 0; i < 2; i++) {
-		(*D_0EAE)(&D_23A6, 0);
-		(*D_0E9A)(&D_2384, 0, 24, shapes, 0);
-		(*D_0E9A)(&D_2384, 155, 151, shapes, avatar + 1);
-		PrintText(&D_2394, 0, 160, text[i], 2, 4);
+		(*drvClearSurface)(&backBuf, 0);
+		(*drvDrawShape)(&pictureArea, 0, 24, shapes, 0);
+		(*drvDrawShape)(&pictureArea, 155, 151, shapes, avatar + 1);
+		PrintText(&textWin, 0, 160, text[i], 2, 4);
 		if(i > 0) {
 			VID_waitRetrace();
-			(*D_0EAA)(&D_23A6, &D_236C);
+			(*drvCopySurface)(&backBuf, &theScreen);
 		} else
 			FadeIn();
 		if((key = Pause(6000)) == -1) {
@@ -676,18 +692,18 @@ cannot be read, 0 if stopped by a key, -1 at its end*/
 	shapes = LoadLzc("endgame.lzc", 1);
 	key = 0;
 	for(i = -1; i < 40 && key == 0; i++) {
-		(*D_0EAE)(&D_23A6, 0);
-		(*D_0E9A)(&D_2384, (i + 2) % 5 - 2, (i + 3) % 4 + 23, shapes, 0);
+		(*drvClearSurface)(&backBuf, 0);
+		(*drvDrawShape)(&pictureArea, (i + 2) % 5 - 2, (i + 3) % 4 + 23, shapes, 0);
 		if(i > -1 && i < 13) {
-			(*D_0EDA)(&D_2384, i * i * 2 / 3 + 105, 112 - i * i, shapes, 1, 0, i * i * 2 + 16, 0);
-			(*D_0E9A)(&D_2384, 105, 112, shapes, i / 2 + 2);
+			(*drvDrawScaled)(&pictureArea, i * i * 2 / 3 + 105, 112 - i * i, shapes, 1, 0, i * i * 2 + 16, 0);
+			(*drvDrawShape)(&pictureArea, 105, 112, shapes, i / 2 + 2);
 		}
-		PrintText(&D_2394, 0, 160, text[2], 2, 4);
+		PrintText(&textWin, 0, 160, text[2], 2, 4);
 		if(i > -1) {
 			VID_waitRetrace();
-			(*D_0EAA)(&D_23A6, &D_236C);
-		} else if(!FADE_in(&D_23A6, &D_236C))
-			(*D_0EAA)(&D_23A6, &D_236C);
+			(*drvCopySurface)(&backBuf, &theScreen);
+		} else if(!FADE_in(&backBuf, &theScreen))
+			(*drvCopySurface)(&backBuf, &theScreen);
 		if((key = Pause(100)) == -1) {
 			MEM_free(shapes);
 			MEM_free(txt);
@@ -704,15 +720,15 @@ cannot be read, 0 if stopped by a key, -1 at its end*/
 	key = 0;
 	for(j = 0; j < 10 && key == 0; j++) {
 		for(i = 0; i < 4 && key == 0; i++) {
-			(*D_0EAE)(&D_23A6, 0);
-			(*D_0E9A)(&D_2384, 0, 24, shapes, 0);
-			(*D_0E9A)(&D_2384, 170, 150, shapes, abs(2 - i) + 1);
-			PrintText(&D_2394, 0, 160, text[(j > 4) + 3], 2, 4);
+			(*drvClearSurface)(&backBuf, 0);
+			(*drvDrawShape)(&pictureArea, 0, 24, shapes, 0);
+			(*drvDrawShape)(&pictureArea, 170, 150, shapes, abs(2 - i) + 1);
+			PrintText(&textWin, 0, 160, text[(j > 4) + 3], 2, 4);
 			if(j > 0 || i > 0) {
 				VID_waitRetrace();
-				(*D_0EAA)(&D_23A6, &D_236C);
-			} else if(!FADE_in(&D_23A6, &D_236C))
-				(*D_0EAA)(&D_23A6, &D_236C);
+				(*drvCopySurface)(&backBuf, &theScreen);
+			} else if(!FADE_in(&backBuf, &theScreen))
+				(*drvCopySurface)(&backBuf, &theScreen);
 			if((key = Pause(300)) == -1) {
 				MEM_free(shapes);
 				MEM_free(txt);
@@ -722,12 +738,12 @@ cannot be read, 0 if stopped by a key, -1 at its end*/
 	}
 	MEM_free(shapes);
 	shapes = LoadLzc("endgame.lzc", 3);
-	(*D_0EAE)(&D_23A6, 0);
-	(*D_0E9A)(&D_2384, 0, 24, shapes, 0);
-	(*D_0E9A)(&D_2384, 190, 151, shapes, avatar + 1);
-	PrintText(&D_2394, 0, 160, text[5], 2, 4);
-	if(!FADE_in(&D_23A6, &D_236C))
-		(*D_0EAA)(&D_23A6, &D_236C);
+	(*drvClearSurface)(&backBuf, 0);
+	(*drvDrawShape)(&pictureArea, 0, 24, shapes, 0);
+	(*drvDrawShape)(&pictureArea, 190, 151, shapes, avatar + 1);
+	PrintText(&textWin, 0, 160, text[5], 2, 4);
+	if(!FADE_in(&backBuf, &theScreen))
+		(*drvCopySurface)(&backBuf, &theScreen);
 	if(Pause(6000) == -1) {
 		MEM_free(shapes);
 		MEM_free(txt);
@@ -739,10 +755,10 @@ cannot be read, 0 if stopped by a key, -1 at its end*/
 	gate = LoadLzc("moongate.lzc", 1);
 	key = 0;
 	for(i = 0; i < 80 && key == 0; i++) {
-		(*D_0EAE)(&D_23A6, 0);
+		(*drvClearSurface)(&backBuf, 0);
 		if(i == 40) {
-			(*D_0E9A)(&D_2384, 0, 24, shapes, 5);
-			(*D_0EAA)(&D_23A6, &D_236C);
+			(*drvDrawShape)(&pictureArea, 0, 24, shapes, 5);
+			(*drvCopySurface)(&backBuf, &theScreen);
 			FadeOut();
 			if((key = Pause(10)) == -1) {
 				MEM_free(shapes);
@@ -751,15 +767,15 @@ cannot be read, 0 if stopped by a key, -1 at its end*/
 				return 0;
 			}
 		} else {
-			(*D_0E9A)(&D_2384, 0, 24, shapes, 0);
-			(*D_0E9A)(&D_2384, 35, 135, gate, i % 8);
-			(*D_0E9A)(&D_2384, 195, 151, shapes, avatar + 1);
-			(*D_0E9A)(&D_2384, 75, 151, shapes, (i >= 38 && i <= 42) + 3);
-			PrintText(&D_2394, 0, 160, text[(i > 39) + 6], 2, 4);
+			(*drvDrawShape)(&pictureArea, 0, 24, shapes, 0);
+			(*drvDrawShape)(&pictureArea, 35, 135, gate, i % 8);
+			(*drvDrawShape)(&pictureArea, 195, 151, shapes, avatar + 1);
+			(*drvDrawShape)(&pictureArea, 75, 151, shapes, (i >= 38 && i <= 42) + 3);
+			PrintText(&textWin, 0, 160, text[(i > 39) + 6], 2, 4);
 			VID_waitRetrace();
 			if(i > 0 && i != 41) {
 				VID_waitRetrace();
-				(*D_0EAA)(&D_23A6, &D_236C);
+				(*drvCopySurface)(&backBuf, &theScreen);
 			} else
 				FadeIn();
 			if((key = Pause(100)) == -1) {
@@ -779,20 +795,20 @@ cannot be read, 0 if stopped by a key, -1 at its end*/
 	shapes8 = LoadLzc("endgame.lzc", 8);
 	key = 0;
 	for(i = 0; i < 63 && key == 0; i++) {
-		(*D_0EAE)(&D_23A6, 0);
-		(*D_0E9A)(&D_2384, 0, 24, shapes, 0);
-		(*D_0E9A)(&D_2384, 240, 140, shapes7, i / 8 > 4 ? 4 : i / 8);
+		(*drvClearSurface)(&backBuf, 0);
+		(*drvDrawShape)(&pictureArea, 0, 24, shapes, 0);
+		(*drvDrawShape)(&pictureArea, 240, 140, shapes7, i / 8 > 4 ? 4 : i / 8);
 		if(i < 56)
-			(*D_0E9A)(&D_2384, 0, 140, shapes8, i - 50 < 0 ? 0 : i - 50);
-		(*D_0E9A)(&D_2384, 340 - i * 10 - Random(0, 19), 24 - Random(0, 9), ship, 0);
-		(*D_0E9A)(&D_2384, 420 - i * 20 - Random(0, 19), 24 - Random(0, 9), ship, 0);
-		(*D_0E9A)(&D_2384, 500 - i * 30 - Random(0, 19), 24 - Random(0, 9), ship, 0);
-		(*D_0E9A)(&D_2384, 580 - i * 30 - Random(0, 19), 24 - Random(0, 9), ship, 0);
-		(*D_0E9A)(&D_2384, 660 - i * 20 - Random(0, 19), 24 - Random(0, 9), ship, 0);
-		PrintText(&D_2394, 0, 160, text[(i > 61) + 8], 2, 4);
+			(*drvDrawShape)(&pictureArea, 0, 140, shapes8, i - 50 < 0 ? 0 : i - 50);
+		(*drvDrawShape)(&pictureArea, 340 - i * 10 - Random(0, 19), 24 - Random(0, 9), ship, 0);
+		(*drvDrawShape)(&pictureArea, 420 - i * 20 - Random(0, 19), 24 - Random(0, 9), ship, 0);
+		(*drvDrawShape)(&pictureArea, 500 - i * 30 - Random(0, 19), 24 - Random(0, 9), ship, 0);
+		(*drvDrawShape)(&pictureArea, 580 - i * 30 - Random(0, 19), 24 - Random(0, 9), ship, 0);
+		(*drvDrawShape)(&pictureArea, 660 - i * 20 - Random(0, 19), 24 - Random(0, 9), ship, 0);
+		PrintText(&textWin, 0, 160, text[(i > 61) + 8], 2, 4);
 		if(i > 0) {
 			VID_waitRetrace();
-			(*D_0EAA)(&D_23A6, &D_236C);
+			(*drvCopySurface)(&backBuf, &theScreen);
 		} else
 			FadeIn();
 		if((key = Pause(50)) == -1) {
@@ -812,7 +828,7 @@ cannot be read, 0 if stopped by a key, -1 at its end*/
 		MEM_free(txt);
 		return 0;
 	}
-	if(D_422A == 1)
+	if(musicOn == 1)
 		FadeOutMusic(120);
 	FadeOut();
 	MEM_free(shapes);
@@ -832,8 +848,8 @@ Pause) stops it, another key skips to the next scene
  0732 "credits.lzc", 073E 0747 0750 0759 "fair.lzc", 0762 076C "flash.lzc",
  0776 "credits.lzc", 0782 078D "flight.lzc", 0798 07A2 07AC 07B6 07C0 07CA 07D4 "cabin.lzc",
  07DE "credits.lzc", 07EA "mars.lzc", 07F3 "credits.lzc" (07FF) */
-/* data: D_04CB D_0E9A D_0EAA D_0EAE D_0EDA D_236C D_2384 D_23A6 D_23C2
- D_23C4 D_23C8 D_23CC D_23D0 D_23D4 D_23D8 D_23DC D_422A */
+/* data: flashSound drvDrawShape drvCopySurface drvClearSurface drvDrawScaled theScreen pictureArea backBuf machineSpeed
+ mddSong0 mddSong1 mddSong2 mddSong3 mddSong4 mddSong5 mddSong6 musicOn */
 /*C_04FE_177E*/int Intro() {
 	void far *s0;
 	void far *s1;
@@ -848,11 +864,11 @@ Pause) stops it, another key skips to the next scene
 	register int i, key;
 
 	s0 = LoadLzc("logos.lzc", 0);
-	(*D_0EAE)(&D_23A6, 0);
-	(*D_0E9A)(&D_23A6, 0, 0, s0, 0);
-	if(D_422A == 1) {
+	(*drvClearSurface)(&backBuf, 0);
+	(*drvDrawShape)(&backBuf, 0, 0, s0, 0);
+	if(musicOn == 1) {
 		FadeOutMusic(0);
-		PlaySong(D_23C4);
+		PlaySong(mddSong0);
 		music = 1;
 	}
 	FadeIn();
@@ -866,10 +882,10 @@ Pause) stops it, another key skips to the next scene
 		music = 0;
 	MEM_free(s0);
 	s0 = LoadLzc("logos.lzc", 1);
-	(*D_0EAE)(&D_23A6, 0);
-	(*D_0E9A)(&D_23A6, 0, 0, s0, 0);
-	if(!FADE_in(&D_23A6, &D_236C))
-		(*D_0EAA)(&D_23A6, &D_236C);
+	(*drvClearSurface)(&backBuf, 0);
+	(*drvDrawShape)(&backBuf, 0, 0, s0, 0);
+	if(!FADE_in(&backBuf, &theScreen))
+		(*drvCopySurface)(&backBuf, &theScreen);
 	if((key = Pause(4000)) == -1) {
 		MEM_free(s0);
 		return -1;
@@ -878,17 +894,17 @@ Pause) stops it, another key skips to the next scene
 		music = 0;
 	MEM_free(s0);
 	s0 = LoadLzc("logos.lzc", 2);
-	(*D_0EAE)(&D_23A6, 0);
-	(*D_0E9A)(&D_23A6, 15, 0, s0, 0);
-	if(D_422A == 1) {
+	(*drvClearSurface)(&backBuf, 0);
+	(*drvDrawShape)(&backBuf, 15, 0, s0, 0);
+	if(musicOn == 1) {
 		if(music)
 			WaitMusicFlags(1);
 		FadeOutMusic(0);
-		PlaySong(D_23C8);
+		PlaySong(mddSong1);
 		music = 1;
 	}
-	if(!FADE_in(&D_23A6, &D_236C))
-		(*D_0EAA)(&D_23A6, &D_236C);
+	if(!FADE_in(&backBuf, &theScreen))
+		(*drvCopySurface)(&backBuf, &theScreen);
 	if((key = Pause(3000)) == -1) {
 		MEM_free(s0);
 		return -1;
@@ -904,19 +920,19 @@ Pause) stops it, another key skips to the next scene
 	s6 = LoadLzc("fair.lzc", 5);
 	key = 0;
 	for(i = 0; i < 10 && key == 0; i++) {
-		if(i % D_23C2 == 0) {
-			(*D_0EAE)(&D_23A6, 0);
-			(*D_0E9A)(&D_23A6, 0, 24, s0, 0);
-			(*D_0E9A)(&D_23A6, 0, 24, s1, 0);
-			(*D_0E9A)(&D_23A6, 0, 24, s2, i % 5);
-			(*D_0E9A)(&D_23A6, 190, 24, s3, 0);
-			(*D_0E9A)(&D_23A6, 240, 24, s4, 0);
-			(*D_0E9A)(&D_23A6, 0, 24, s6, 0);
+		if(i % machineSpeed == 0) {
+			(*drvClearSurface)(&backBuf, 0);
+			(*drvDrawShape)(&backBuf, 0, 24, s0, 0);
+			(*drvDrawShape)(&backBuf, 0, 24, s1, 0);
+			(*drvDrawShape)(&backBuf, 0, 24, s2, i % 5);
+			(*drvDrawShape)(&backBuf, 190, 24, s3, 0);
+			(*drvDrawShape)(&backBuf, 240, 24, s4, 0);
+			(*drvDrawShape)(&backBuf, 0, 24, s6, 0);
 			if(i > 0) {
 				VID_waitRetrace();
-				(*D_0EAA)(&D_23A6, &D_236C);
-			} else if(!FADE_in(&D_23A6, &D_236C))
-				(*D_0EAA)(&D_23A6, &D_236C);
+				(*drvCopySurface)(&backBuf, &theScreen);
+			} else if(!FADE_in(&backBuf, &theScreen))
+				(*drvCopySurface)(&backBuf, &theScreen);
 			if((key = Pause(50)) == -1) {
 				MEM_free(s0);
 				MEM_free(s1);
@@ -931,18 +947,18 @@ Pause) stops it, another key skips to the next scene
 		}
 	}
 	for(i = 0; i < 80 && key == 0; i++) {
-		if((i + 10) % D_23C2 == 0 || i >= 79) {
-			(*D_0EAE)(&D_23A6, 0);
-			(*D_0E9A)(&D_23A6, 0, 24, s0, 0);
-			(*D_0E9A)(&D_23A6, 0 - i, 24, s1, 0);
-			(*D_0E9A)(&D_23A6, 320 - i, 24, s1, 1);
-			(*D_0E9A)(&D_23A6, 0 - i * 2, 24, s2, i % 5);
-			(*D_0E9A)(&D_23A6, 190 - i * 2, 24, s3, 0);
-			(*D_0E9A)(&D_23A6, 240 - i * 2, 24, s4, 0);
-			(*D_0E9A)(&D_23A6, 0 - i * 3, 24, s6, 0);
-			(*D_0E9A)(&D_23A6, 320 - i * 3, 24, s6, 1);
+		if((i + 10) % machineSpeed == 0 || i >= 79) {
+			(*drvClearSurface)(&backBuf, 0);
+			(*drvDrawShape)(&backBuf, 0, 24, s0, 0);
+			(*drvDrawShape)(&backBuf, 0 - i, 24, s1, 0);
+			(*drvDrawShape)(&backBuf, 320 - i, 24, s1, 1);
+			(*drvDrawShape)(&backBuf, 0 - i * 2, 24, s2, i % 5);
+			(*drvDrawShape)(&backBuf, 190 - i * 2, 24, s3, 0);
+			(*drvDrawShape)(&backBuf, 240 - i * 2, 24, s4, 0);
+			(*drvDrawShape)(&backBuf, 0 - i * 3, 24, s6, 0);
+			(*drvDrawShape)(&backBuf, 320 - i * 3, 24, s6, 1);
 			VID_waitRetrace();
-			(*D_0EAA)(&D_23A6, &D_236C);
+			(*drvCopySurface)(&backBuf, &theScreen);
 			if((key = Pause(50)) == -1) {
 				MEM_free(s0);
 				MEM_free(s1);
@@ -977,11 +993,11 @@ Pause) stops it, another key skips to the next scene
 	MEM_free(s6);
 	s0 = LoadLzc("credits.lzc", 0);
 	VID_waitRetrace();
-	(*D_0EAE)(&D_236C, 15);
-	(*D_0EAE)(&D_23A6, 0);
-	(*D_0E9A)(&D_23A6, 0, 0, s0, 0);
-	if(!FADE_in(&D_23A6, &D_236C))
-		(*D_0EAA)(&D_23A6, &D_236C);
+	(*drvClearSurface)(&theScreen, 15);
+	(*drvClearSurface)(&backBuf, 0);
+	(*drvDrawShape)(&backBuf, 0, 0, s0, 0);
+	if(!FADE_in(&backBuf, &theScreen))
+		(*drvCopySurface)(&backBuf, &theScreen);
 	if((key = Pause(3000)) == -1) {
 		MEM_free(s0);
 		return -1;
@@ -992,15 +1008,15 @@ Pause) stops it, another key skips to the next scene
 	s0 = LoadLzc("lowell.lzc", 0);
 	key = 0;
 	for(i = 1; i < 21 && key == 0; i++) {
-		if(i % D_23C2 == 0 || i >= 20) {
-			(*D_0EAE)(&D_23A6, 0);
-			(*D_0E9A)(&D_23A6, 0, 24, s0, 0);
-			(*D_0E9A)(&D_23A6, 0, 24, s0, i);
+		if(i % machineSpeed == 0 || i >= 20) {
+			(*drvClearSurface)(&backBuf, 0);
+			(*drvDrawShape)(&backBuf, 0, 24, s0, 0);
+			(*drvDrawShape)(&backBuf, 0, 24, s0, i);
 			if(i > 1) {
 				VID_waitRetrace();
-				(*D_0EAA)(&D_23A6, &D_236C);
-			} else if(!FADE_in(&D_23A6, &D_236C))
-				(*D_0EAA)(&D_23A6, &D_236C);
+				(*drvCopySurface)(&backBuf, &theScreen);
+			} else if(!FADE_in(&backBuf, &theScreen))
+				(*drvCopySurface)(&backBuf, &theScreen);
 			if((key = Pause(50)) == -1) {
 				MEM_free(s0);
 				return -1;
@@ -1012,11 +1028,11 @@ Pause) stops it, another key skips to the next scene
 	MEM_free(s0);
 	s0 = LoadLzc("credits.lzc", 1);
 	VID_waitRetrace();
-	(*D_0EAE)(&D_236C, 15);
-	(*D_0EAE)(&D_23A6, 0);
-	(*D_0E9A)(&D_23A6, 0, 0, s0, 0);
-	if(!FADE_in(&D_23A6, &D_236C))
-		(*D_0EAA)(&D_23A6, &D_236C);
+	(*drvClearSurface)(&theScreen, 15);
+	(*drvClearSurface)(&backBuf, 0);
+	(*drvDrawShape)(&backBuf, 0, 0, s0, 0);
+	if(!FADE_in(&backBuf, &theScreen))
+		(*drvCopySurface)(&backBuf, &theScreen);
 	if((key = Pause(3000)) == -1) {
 		MEM_free(s0);
 		return -1;
@@ -1027,23 +1043,23 @@ Pause) stops it, another key skips to the next scene
 	s0 = LoadLzc("fuse.lzc", 0);
 	key = 0;
 	for(i = 1; i < 29 && key == 0; i++) {
-		if(i % D_23C2 == 0 || i >= 28) {
-			(*D_0EAE)(&D_23A6, 0);
-			(*D_0E9A)(&D_23A6, 0, 24, s0, 0);
-			(*D_0E9A)(&D_23A6, 0, 24, s0, i);
+		if(i % machineSpeed == 0 || i >= 28) {
+			(*drvClearSurface)(&backBuf, 0);
+			(*drvDrawShape)(&backBuf, 0, 24, s0, 0);
+			(*drvDrawShape)(&backBuf, 0, 24, s0, i);
 			if(i > 1) {
 				VID_waitRetrace();
-				(*D_0EAA)(&D_23A6, &D_236C);
+				(*drvCopySurface)(&backBuf, &theScreen);
 			} else {
-				if(D_422A == 1) {
+				if(musicOn == 1) {
 					if(music)
 						WaitMusicFlags(1);
 					FadeOutMusic(0);
-					PlaySong(D_23CC);
+					PlaySong(mddSong2);
 					music = 1;
 				}
-				if(!FADE_in(&D_23A6, &D_236C))
-					(*D_0EAA)(&D_23A6, &D_236C);
+				if(!FADE_in(&backBuf, &theScreen))
+					(*drvCopySurface)(&backBuf, &theScreen);
 			}
 			if((key = Pause(50)) == -1) {
 				MEM_free(s0);
@@ -1056,11 +1072,11 @@ Pause) stops it, another key skips to the next scene
 	MEM_free(s0);
 	s0 = LoadLzc("credits.lzc", 2);
 	VID_waitRetrace();
-	(*D_0EAE)(&D_236C, 15);
-	(*D_0EAE)(&D_23A6, 0);
-	(*D_0E9A)(&D_23A6, 0, 0, s0, 0);
-	if(!FADE_in(&D_23A6, &D_236C))
-		(*D_0EAA)(&D_23A6, &D_236C);
+	(*drvClearSurface)(&theScreen, 15);
+	(*drvClearSurface)(&backBuf, 0);
+	(*drvDrawShape)(&backBuf, 0, 0, s0, 0);
+	if(!FADE_in(&backBuf, &theScreen))
+		(*drvCopySurface)(&backBuf, &theScreen);
 	if((key = Pause(3000)) == -1) {
 		MEM_free(s0);
 		return -1;
@@ -1076,32 +1092,32 @@ Pause) stops it, another key skips to the next scene
 	s4 = LoadLzc("flash.lzc", 1);
 	key = 0;
 	for(i = 0; i < 20 && key == 0; i++) {
-		if(i % D_23C2 == 0 || i >= 19) {
-			(*D_0EAE)(&D_23A6, 0);
-			(*D_0E9A)(&D_23A6, 0, 24, s0, 0);
-			(*D_0E9A)(&D_23A6, -80, 24, s1, 0);
-			(*D_0E9A)(&D_23A6, 240, 24, s1, 1);
-			(*D_0E9A)(&D_23A6, 30, 24, s2, 0);
-			(*D_0E9A)(&D_23A6, 80, 24, s6, 0);
+		if(i % machineSpeed == 0 || i >= 19) {
+			(*drvClearSurface)(&backBuf, 0);
+			(*drvDrawShape)(&backBuf, 0, 24, s0, 0);
+			(*drvDrawShape)(&backBuf, -80, 24, s1, 0);
+			(*drvDrawShape)(&backBuf, 240, 24, s1, 1);
+			(*drvDrawShape)(&backBuf, 30, 24, s2, 0);
+			(*drvDrawShape)(&backBuf, 80, 24, s6, 0);
 			if(i > 0 && i < 11)
-				(*D_0E9A)(&D_23A6, 80, 24, s3, i - 1);
+				(*drvDrawShape)(&backBuf, 80, 24, s3, i - 1);
 			if(i > 10)
-				(*D_0E9A)(&D_23A6, 80, 24, s4, i - 11);
+				(*drvDrawShape)(&backBuf, 80, 24, s4, i - 11);
 			if(i == 1)
-				PlaySound(D_04CB, 0, 255, 192, 0, 1);
+				PlaySound(flashSound, 0, 255, 192, 0, 1);
 			if(i > 0) {
 				VID_waitRetrace();
-				(*D_0EAA)(&D_23A6, &D_236C);
+				(*drvCopySurface)(&backBuf, &theScreen);
 			} else {
-				if(D_422A == 1) {
+				if(musicOn == 1) {
 					if(music)
 						WaitMusicFlags(1);
 					FadeOutMusic(0);
-					PlaySong(D_23D0);
+					PlaySong(mddSong3);
 					music = 1;
 				}
-				if(!FADE_in(&D_23A6, &D_236C))
-					(*D_0EAA)(&D_23A6, &D_236C);
+				if(!FADE_in(&backBuf, &theScreen))
+					(*drvCopySurface)(&backBuf, &theScreen);
 			}
 			if((key = Pause(75)) == -1) {
 				MEM_free(s0);
@@ -1123,11 +1139,11 @@ Pause) stops it, another key skips to the next scene
 	MEM_free(s4);
 	s0 = LoadLzc("credits.lzc", 3);
 	VID_waitRetrace();
-	(*D_0EAE)(&D_236C, 15);
-	(*D_0EAE)(&D_23A6, 0);
-	(*D_0E9A)(&D_23A6, 0, 0, s0, 0);
-	if(!FADE_in(&D_23A6, &D_236C))
-		(*D_0EAA)(&D_23A6, &D_236C);
+	(*drvClearSurface)(&theScreen, 15);
+	(*drvClearSurface)(&backBuf, 0);
+	(*drvDrawShape)(&backBuf, 0, 0, s0, 0);
+	if(!FADE_in(&backBuf, &theScreen))
+		(*drvCopySurface)(&backBuf, &theScreen);
 	if((key = Pause(3000)) == -1) {
 		MEM_free(s0);
 		return -1;
@@ -1139,23 +1155,23 @@ Pause) stops it, another key skips to the next scene
 	s6 = LoadLzc("flight.lzc", 1);
 	key = 0;
 	for(i = 0; i < 12 && key == 0; i++) {
-		if(i % D_23C2 == 0 || i >= 11) {
-			(*D_0EAE)(&D_23A6, 0);
-			(*D_0E9A)(&D_2384, 0, 24, s0, 0);
-			(*D_0EDA)(&D_2384, 270 - i * 4 * i, 140 - i * 2 * i, s6, 0, 0, i * 4 * i, 0);
+		if(i % machineSpeed == 0 || i >= 11) {
+			(*drvClearSurface)(&backBuf, 0);
+			(*drvDrawShape)(&pictureArea, 0, 24, s0, 0);
+			(*drvDrawScaled)(&pictureArea, 270 - i * 4 * i, 140 - i * 2 * i, s6, 0, 0, i * 4 * i, 0);
 			if(i > 0) {
 				VID_waitRetrace();
-				(*D_0EAA)(&D_23A6, &D_236C);
+				(*drvCopySurface)(&backBuf, &theScreen);
 			} else {
-				if(D_422A == 1) {
+				if(musicOn == 1) {
 					if(music)
 						WaitMusicFlags(1);
 					FadeOutMusic(0);
-					PlaySong(D_23D4);
+					PlaySong(mddSong4);
 					music = 1;
 				}
-				if(!FADE_in(&D_23A6, &D_236C))
-					(*D_0EAA)(&D_23A6, &D_236C);
+				if(!FADE_in(&backBuf, &theScreen))
+					(*drvCopySurface)(&backBuf, &theScreen);
 			}
 			if((key = Pause(5)) == -1) {
 				MEM_free(s0);
@@ -1177,29 +1193,29 @@ Pause) stops it, another key skips to the next scene
 	s6 = LoadLzc("cabin.lzc", 2);
 	key = 0;
 	for(i = 0; i < 30 && key == 0; i++) {
-		if(i % D_23C2 == 0 || i >= 29) {
-			(*D_0EAE)(&D_23A6, 0);
-			(*D_0E9A)(&D_2384, 0, 24, s0, 0);
-			(*D_0E9A)(&D_2384, 116, 28, s1, (i + 2) % 15);
-			(*D_0E9A)(&D_2384, 222, 53, s1, i % 15);
-			(*D_0EDA)(&D_2384, i * 64 - 900, i * 16 - 150, s2, 0, i * 32 % 360, 256, 0);
-			(*D_0EDA)(&D_2384, i * 32 + 62, (i << (3 - (i > 6))) + 15, s3, 0, i * 16 % 360, 256, 0);
-			(*D_0EDA)(&D_2384, i * 32 - 150, i * 8, s4, 0, i * 32 % 360, 256, 0);
-			(*D_0EDA)(&D_2384, i * 32 - 500, i * 4, s5, 0, i * 16 % 360, 256, 0);
-			(*D_0EDA)(&D_2384, -(i * 4), i * i * 2 + 50, s6, 0, 0, i * 64 + 256, 0);
+		if(i % machineSpeed == 0 || i >= 29) {
+			(*drvClearSurface)(&backBuf, 0);
+			(*drvDrawShape)(&pictureArea, 0, 24, s0, 0);
+			(*drvDrawShape)(&pictureArea, 116, 28, s1, (i + 2) % 15);
+			(*drvDrawShape)(&pictureArea, 222, 53, s1, i % 15);
+			(*drvDrawScaled)(&pictureArea, i * 64 - 900, i * 16 - 150, s2, 0, i * 32 % 360, 256, 0);
+			(*drvDrawScaled)(&pictureArea, i * 32 + 62, (i << (3 - (i > 6))) + 15, s3, 0, i * 16 % 360, 256, 0);
+			(*drvDrawScaled)(&pictureArea, i * 32 - 150, i * 8, s4, 0, i * 32 % 360, 256, 0);
+			(*drvDrawScaled)(&pictureArea, i * 32 - 500, i * 4, s5, 0, i * 16 % 360, 256, 0);
+			(*drvDrawScaled)(&pictureArea, -(i * 4), i * i * 2 + 50, s6, 0, 0, i * 64 + 256, 0);
 			if(i > 0) {
 				VID_waitRetrace();
-				(*D_0EAA)(&D_23A6, &D_236C);
+				(*drvCopySurface)(&backBuf, &theScreen);
 			} else {
-				if(D_422A == 1) {
+				if(musicOn == 1) {
 					if(music)
 						WaitMusicFlags(1);
 					FadeOutMusic(0);
-					PlaySong(D_23D8);
+					PlaySong(mddSong5);
 					music = 1;
 				}
-				if(!FADE_in(&D_23A6, &D_236C))
-					(*D_0EAA)(&D_23A6, &D_236C);
+				if(!FADE_in(&backBuf, &theScreen))
+					(*drvCopySurface)(&backBuf, &theScreen);
 			}
 			if((key = Pause(5)) == -1) {
 				MEM_free(s0);
@@ -1224,11 +1240,11 @@ Pause) stops it, another key skips to the next scene
 	MEM_free(s6);
 	s0 = LoadLzc("credits.lzc", 4);
 	VID_waitRetrace();
-	(*D_0EAE)(&D_236C, 15);
-	(*D_0EAE)(&D_23A6, 0);
-	(*D_0E9A)(&D_23A6, 0, 0, s0, 0);
-	if(!FADE_in(&D_23A6, &D_236C))
-		(*D_0EAA)(&D_23A6, &D_236C);
+	(*drvClearSurface)(&theScreen, 15);
+	(*drvClearSurface)(&backBuf, 0);
+	(*drvDrawShape)(&backBuf, 0, 0, s0, 0);
+	if(!FADE_in(&backBuf, &theScreen))
+		(*drvCopySurface)(&backBuf, &theScreen);
 	if((key = Pause(3000)) == -1) {
 		MEM_free(s0);
 		return -1;
@@ -1237,18 +1253,18 @@ Pause) stops it, another key skips to the next scene
 		music = 0;
 	MEM_free(s0);
 	s0 = LoadLzc("mars.lzc", 0);
-	(*D_0EAE)(&D_23A6, 0);
-	(*D_0E9A)(&D_23A6, 0, 24, s0, 0);
-	(*D_0E9A)(&D_23A6, 0, 24, s0, 1);
-	if(D_422A == 1) {
+	(*drvClearSurface)(&backBuf, 0);
+	(*drvDrawShape)(&backBuf, 0, 24, s0, 0);
+	(*drvDrawShape)(&backBuf, 0, 24, s0, 1);
+	if(musicOn == 1) {
 		if(music)
 			WaitMusicFlags(1);
 		FadeOutMusic(0);
-		PlaySong(D_23DC);
+		PlaySong(mddSong6);
 		music = 1;
 	}
-	if(!FADE_in(&D_23A6, &D_236C))
-		(*D_0EAA)(&D_23A6, &D_236C);
+	if(!FADE_in(&backBuf, &theScreen))
+		(*drvCopySurface)(&backBuf, &theScreen);
 	if((key = Pause(80)) == -1) {
 		MEM_free(s0);
 		return -1;
@@ -1259,12 +1275,12 @@ Pause) stops it, another key skips to the next scene
 	for(j = -1; j < 2 && key == 0; j++) {
 		for(k = 0; k < 3 && key == 0; k++) {
 			for(i = -1; i < 3 && key == 0; i++) {
-				if(((j + 1) * 12 + k * 4 + i + 1) % D_23C2 == 0 || (j >= 1 && k >= 2 && i >= 2)) {
-					(*D_0EAE)(&D_23A6, 0);
-					(*D_0E9A)(&D_23A6, 0, 24, s0, 0);
-					(*D_0E9A)(&D_23A6, 0, 24, s0, 3 - abs(i));
+				if(((j + 1) * 12 + k * 4 + i + 1) % machineSpeed == 0 || (j >= 1 && k >= 2 && i >= 2)) {
+					(*drvClearSurface)(&backBuf, 0);
+					(*drvDrawShape)(&backBuf, 0, 24, s0, 0);
+					(*drvDrawShape)(&backBuf, 0, 24, s0, 3 - abs(i));
 					VID_waitRetrace();
-					(*D_0EAA)(&D_23A6, &D_236C);
+					(*drvCopySurface)(&backBuf, &theScreen);
 					if((key = Pause((j == 0) * 60 + 20)) == -1) {
 						MEM_free(s0);
 						return -1;
@@ -1294,18 +1310,18 @@ Pause) stops it, another key skips to the next scene
 	MEM_free(s0);
 	s0 = LoadLzc("credits.lzc", 5);
 	VID_waitRetrace();
-	(*D_0EAE)(&D_236C, 15);
-	(*D_0EAE)(&D_23A6, 0);
-	(*D_0E9A)(&D_23A6, 0, 0, s0, 0);
-	if(!FADE_in(&D_23A6, &D_236C))
-		(*D_0EAA)(&D_23A6, &D_236C);
+	(*drvClearSurface)(&theScreen, 15);
+	(*drvClearSurface)(&backBuf, 0);
+	(*drvDrawShape)(&backBuf, 0, 0, s0, 0);
+	if(!FADE_in(&backBuf, &theScreen))
+		(*drvCopySurface)(&backBuf, &theScreen);
 	if((key = Pause(3000)) == -1) {
 		MEM_free(s0);
 		return -1;
 	}
 	if(key)
 		music = 0;
-	if(D_422A == 1) {
+	if(musicOn == 1) {
 		if(music)
 			WaitMusicFlags(1);
 		FadeOutMusic(0);
@@ -1321,7 +1337,7 @@ Pause) stops it, another key skips to the next scene
 /*play lines start.. of the character creation dialogue (up to one with text 0) over
 the speaker (shapes: frame 0 the background, then its pose), a picture (pic) and a
 drifting shape (moving); the lines come from lines[]. Returns the last key read
-(-1: none); a line with wait -4 reads the character's name into D_33F6*/
+(-1: none); a line with wait -4 reads the character's name into avatarName*/
 /*C_04FE_2E9A*/int PlayDialogue(void far *shapes, void far *pic, void far *moving,
 	char far **lines, int start)
 {
@@ -1353,7 +1369,7 @@ drifting shape (moving); the lines come from lines[]. Returns the last key read
 	tMove = t0;
 	tPause = t0;
 	tBlink = t0;
-	for(i = start; D_01E3[i].text != 0; i++) {
+	for(i = start; creationLines[i].text != 0; i++) {
 		shown = 0;
 		do {
 			if(blink > 0 && clock() > tBlink + blink) {
@@ -1369,7 +1385,7 @@ drifting shape (moving); the lines come from lines[]. Returns the last key read
 				blink = Random(2, 10);
 				shown = 0;
 			}
-			if(D_01E3[i].animate != 0 && clock() > tMove + (unsigned)Random(2, 20) && blink == 0) {
+			if(creationLines[i].animate != 0 && clock() > tMove + (unsigned)Random(2, 20) && blink == 0) {
 				tMove = clock();
 				if(clock() > tPause + (unsigned)Random(150, 300)) {
 					tPause = clock();
@@ -1386,41 +1402,41 @@ drifting shape (moving); the lines come from lines[]. Returns the last key read
 				shown = 0;
 			}
 			if(shown == 0) {
-				(*D_0EAE)(&D_23A6, 0);
-				(*D_0E9A)(&D_2384, 0, 24, shapes, 0);
+				(*drvClearSurface)(&backBuf, 0);
+				(*drvDrawShape)(&pictureArea, 0, 24, shapes, 0);
 				if(blink)
-					(*D_0E9A)(&D_2384, 0, 24, shapes, D_01E3[i].frame == 2 ? 5 : 4);
+					(*drvDrawShape)(&pictureArea, 0, 24, shapes, creationLines[i].frame == 2 ? 5 : 4);
 				else if(pause)
-					(*D_0E9A)(&D_2384, 0, 24, shapes, 1);
+					(*drvDrawShape)(&pictureArea, 0, 24, shapes, 1);
 				else
-					(*D_0E9A)(&D_2384, 0, 24, shapes, D_01E3[i].frame);
-				(*D_0E9A)(&D_2384, 0x80 - movX, movY + 0x53, moving, movFrame);
-				(*D_0E9A)(&D_2384, 0x59, 0x6d, pic, 0);
-				line = lines[abs(D_01E3[i].text)];
+					(*drvDrawShape)(&pictureArea, 0, 24, shapes, creationLines[i].frame);
+				(*drvDrawShape)(&pictureArea, 0x80 - movX, movY + 0x53, moving, movFrame);
+				(*drvDrawShape)(&pictureArea, 0x59, 0x6d, pic, 0);
+				line = lines[abs(creationLines[i].text)];
 				for(j = 0, n = 0; line[j] != 0; j++, n++) {
 					if(line[j] != '$' || tolower(line[j + 1]) != 'p')
 						buf[n] = line[j];
 					else {
-						strcpy(&buf[n], D_33F6);
+						strcpy(&buf[n], avatarName);
 						j++;
-						n += strlen(D_33F6) - 1;
+						n += strlen(avatarName) - 1;
 					}
 				}
 				buf[n] = 0;
-				PrintText(&D_2394, 0, 0xa0, buf, 2, D_01E3[i].text < 0 ? 4 : 6);
+				PrintText(&textWin, 0, 0xa0, buf, 2, creationLines[i].text < 0 ? 4 : 6);
 				VID_waitRetrace();
-				(*D_0EAA)(&D_23A6, &D_236C);
+				(*drvCopySurface)(&backBuf, &theScreen);
 			}
 			shown = 1;
 			key = -1;
-			if(D_01E3[i].wait >= 0) {
+			if(creationLines[i].wait >= 0) {
 				if(kbhit()) {
 					shown = 0;
 					while(kbhit())
 						getch();
-				} else if((clock() - t0) / CLK_TCK > D_01E3[i].wait)
+				} else if((clock() - t0) / CLK_TCK > creationLines[i].wait)
 					shown = 0;
-			} else switch(D_01E3[i].wait) {
+			} else switch(creationLines[i].wait) {
 				case -1:
 					if(kbhit()) {
 						if(getch() == 0)
@@ -1456,7 +1472,7 @@ drifting shape (moving); the lines come from lines[]. Returns the last key read
 					k = 0;
 					cursor = clock() % 16 / 8;
 					for(;;) {
-						PrintText(&D_2394, 0x78, 0xb8, buf, 0, 0);
+						PrintText(&textWin, 0x78, 0xb8, buf, 0, 0);
 						if(kbhit()) {
 							if((key = getch()) == '\r' && k > 0)
 								break;
@@ -1474,11 +1490,11 @@ drifting shape (moving); the lines come from lines[]. Returns the last key read
 						else
 							buf[k] = ' ';
 						buf[k + 1] = 0;
-						PrintText(&D_2394, 0x78, 0xb8, buf, 0, 0xe);
-						(*D_0EAA)(&D_23A6, &D_236C);
+						PrintText(&textWin, 0x78, 0xb8, buf, 0, 0xe);
+						(*drvCopySurface)(&backBuf, &theScreen);
 					}
 					buf[k] = 0;
-					strcpy(D_33F6, buf);
+					strcpy(avatarName, buf);
 					shown = 0;
 					while(kbhit())
 						getch();
@@ -1518,30 +1534,30 @@ saves savegame\objlist (1: no objlist or a character exists, -1: done)*/
 
 	if((fd = open("savegame\\objlist", O_RDONLY | O_BINARY)) == -1)
 		return 1;
-	if(read(fd, D_24F6, len1) < 1)
+	if(read(fd, objList, len1) < 1)
 		return 1;
-	if(read(fd, D_0BC0, len2) < 1)
+	if(read(fd, gameState, len2) < 1)
 		return 1;
 	close(fd);
-	if(D_0BF7 == 1) {
-		(*D_0EAE)(&D_23A6, 0);
-		PrintText(&D_2394, 0, 0x14,
+	if(AvatarPortrait == 1) {
+		(*drvClearSurface)(&backBuf, 0);
+		PrintText(&textWin, 0, 0x14,
 			"Run INSTALL to remove your existing character before creating another.", 2, 0xf);
-		(*D_0EAA)(&D_23A6, &D_236C);
+		(*drvCopySurface)(&backBuf, &theScreen);
 		Pause(-1);
 		return 1;
 	}
 	hi = Random(24, 26);
 	mid = Random(22, 24);
 	lo = Random(18, 22);
-	D_2DF7 = lo;
-	D_2EF7 = lo;
-	D_2FF7 = lo;
-	D_3AE8 = 20;
-	D_30F8 = 600;
-	D_34E8 = 4;
-	if(D_422A == 1)
-		PlaySong(D_23E0);
+	avatarStr = lo;
+	avatarDex = lo;
+	avatarInt = lo;
+	avatarMovePts2 = 20;
+	avatarExp = 600;
+	avatarLevel = 4;
+	if(musicOn == 1)
+		PlaySong(mddSong7);
 	txt = ReadLines("scenetxt.lzc", 5, lines);
 	shapes = LoadLzc("create.lzc", 0);
 	pic = LoadLzc("create.lzc", 1);
@@ -1558,27 +1574,27 @@ saves savegame\objlist (1: no objlist or a character exists, -1: done)*/
 		if((q2 = LINES(0x14)) == 'a') {
 			if((q3 = LINES(0x17)) == 'a') {
 				if((q4 = LINES(0x1d)) == 'a') {
-					D_2DF7 = hi;
-					D_2FF7 = mid;
+					avatarStr = hi;
+					avatarInt = mid;
 					if(sex == 'a')
 						LINES(0x1f);
 					if(sex == 'b')
 						LINES(0x22);
 				}
 				if(q4 == 'b') {
-					D_2FF7 = hi;
-					D_2DF7 = mid;
+					avatarInt = hi;
+					avatarStr = mid;
 				}
 			}
 			if(q3 == 'b') {
 				if((q4 = LINES(0x25)) == 'a') {
-					D_2FF7 = hi;
-					D_2EF7 = mid;
+					avatarInt = hi;
+					avatarDex = mid;
 					LINES(0x28);
 				}
 				if(q4 == 'b') {
-					D_2EF7 = hi;
-					D_2FF7 = mid;
+					avatarDex = hi;
+					avatarInt = mid;
 					LINES(0x2b);
 				}
 			}
@@ -1586,16 +1602,16 @@ saves savegame\objlist (1: no objlist or a character exists, -1: done)*/
 		if(q2 == 'b') {
 			if((q3 = LINES(0x1a)) == 'a') {
 				if((q4 = LINES(0x2e)) == 'a') {
-					D_2DF7 = hi;
-					D_2EF7 = mid;
+					avatarStr = hi;
+					avatarDex = mid;
 					if(sex == 'a')
 						LINES(0x31);
 					if(sex == 'b')
 						LINES(0x34);
 				}
 				if(q4 == 'b') {
-					D_2EF7 = hi;
-					D_2DF7 = mid;
+					avatarDex = hi;
+					avatarStr = mid;
 					if(sex == 'a')
 						LINES(0x3a);
 					if(sex == 'b')
@@ -1604,13 +1620,13 @@ saves savegame\objlist (1: no objlist or a character exists, -1: done)*/
 			}
 			if(q3 == 'b') {
 				if((q4 = LINES(0x3d)) == 'a') {
-					D_2FF7 = hi;
-					D_2EF7 = mid;
+					avatarInt = hi;
+					avatarDex = mid;
 					LINES(0x40);
 				}
 				if(q4 == 'b') {
-					D_2EF7 = hi;
-					D_2FF7 = mid;
+					avatarDex = hi;
+					avatarInt = mid;
 					LINES(0x42);
 				}
 			}
@@ -1620,27 +1636,27 @@ saves savegame\objlist (1: no objlist or a character exists, -1: done)*/
 		if((q2 = LINES(0x1a)) == 'a') {
 			if((q3 = LINES(0x17)) == 'a') {
 				if((q4 = LINES(0x1d)) == 'a') {
-					D_2DF7 = hi;
-					D_2FF7 = mid;
+					avatarStr = hi;
+					avatarInt = mid;
 					if(sex == 'a')
 						LINES(0x1f);
 					if(sex == 'b')
 						LINES(0x22);
 				}
 				if(q4 == 'b') {
-					D_2FF7 = hi;
-					D_2DF7 = mid;
+					avatarInt = hi;
+					avatarStr = mid;
 				}
 			}
 			if(q3 == 'b') {
 				if((q4 = LINES(0x25)) == 'a') {
-					D_2FF7 = hi;
-					D_2EF7 = mid;
+					avatarInt = hi;
+					avatarDex = mid;
 					LINES(0x28);
 				}
 				if(q4 == 'b') {
-					D_2EF7 = hi;
-					D_2FF7 = mid;
+					avatarDex = hi;
+					avatarInt = mid;
 					LINES(0x2b);
 				}
 			}
@@ -1648,28 +1664,28 @@ saves savegame\objlist (1: no objlist or a character exists, -1: done)*/
 		if(q2 == 'b') {
 			if((q3 = LINES(0x14)) == 'a') {
 				if((q4 = LINES(0x48)) == 'a') {
-					D_2FF7 = hi;
-					D_2DF7 = mid;
+					avatarInt = hi;
+					avatarStr = mid;
 					LINES(0x4b);
 				}
 				if(q4 == 'b') {
-					D_2DF7 = hi;
-					D_2FF7 = mid;
+					avatarStr = hi;
+					avatarInt = mid;
 					LINES(0x4e);
 				}
 			}
 			if(q3 == 'b') {
 				if((q4 = LINES(0x2e)) == 'a') {
-					D_2DF7 = hi;
-					D_2EF7 = mid;
+					avatarStr = hi;
+					avatarDex = mid;
 					if(sex == 'a')
 						LINES(0x31);
 					if(sex == 'b')
 						LINES(0x34);
 				}
 				if(q4 == 'b') {
-					D_2EF7 = hi;
-					D_2DF7 = mid;
+					avatarDex = hi;
+					avatarStr = mid;
 					if(sex == 'a')
 						LINES(0x3a);
 					if(sex == 'b')
@@ -1683,16 +1699,16 @@ saves savegame\objlist (1: no objlist or a character exists, -1: done)*/
 		if((q2 = LINES(0x17)) == 'a') {
 			if((q3 = LINES(0x1a)) == 'a') {
 				if((q4 = LINES(0x2e)) == 'a') {
-					D_2DF7 = hi;
-					D_2EF7 = mid;
+					avatarStr = hi;
+					avatarDex = mid;
 					if(sex == 'a')
 						LINES(0x31);
 					if(sex == 'b')
 						LINES(0x34);
 				}
 				if(q4 == 'b') {
-					D_2EF7 = hi;
-					D_2DF7 = mid;
+					avatarDex = hi;
+					avatarStr = mid;
 					if(sex == 'a')
 						LINES(0x3a);
 					if(sex == 'b')
@@ -1701,13 +1717,13 @@ saves savegame\objlist (1: no objlist or a character exists, -1: done)*/
 			}
 			if(q3 == 'b') {
 				if((q4 = LINES(0x25)) == 'a') {
-					D_2FF7 = hi;
-					D_2EF7 = mid;
+					avatarInt = hi;
+					avatarDex = mid;
 					LINES(0x28);
 				}
 				if(q4 == 'b') {
-					D_2EF7 = hi;
-					D_2FF7 = mid;
+					avatarDex = hi;
+					avatarInt = mid;
 					LINES(0x2b);
 				}
 			}
@@ -1715,27 +1731,27 @@ saves savegame\objlist (1: no objlist or a character exists, -1: done)*/
 		if(q2 == 'b') {
 			if((q3 = LINES(0x14)) == 'a') {
 				if((q4 = LINES(0x1d)) == 'a') {
-					D_2DF7 = hi;
-					D_2FF7 = mid;
+					avatarStr = hi;
+					avatarInt = mid;
 					if(sex == 'a')
 						LINES(0x1f);
 					if(sex == 'b')
 						LINES(0x22);
 				}
 				if(q4 == 'b') {
-					D_2FF7 = hi;
-					D_2DF7 = mid;
+					avatarInt = hi;
+					avatarStr = mid;
 				}
 			}
 			if(q3 == 'b') {
 				if((q4 = LINES(0x54)) == 'a') {
-					D_2EF7 = hi;
-					D_2DF7 = mid;
+					avatarDex = hi;
+					avatarStr = mid;
 					LINES(0x57);
 				}
 				if(q4 == 'b') {
-					D_2DF7 = hi;
-					D_2EF7 = mid;
+					avatarStr = hi;
+					avatarDex = mid;
 					LINES(0x5a);
 				}
 			}
@@ -1746,20 +1762,20 @@ saves savegame\objlist (1: no objlist or a character exists, -1: done)*/
 	MEM_free(pic);
 	MEM_free(moving);
 	MEM_free(txt);
-	D_32F7 = (D_2DF7 << 1) + D_34E8 * 24;
+	avatarHP = (avatarStr << 1) + avatarLevel * 24;
 	if(sex == 'b') {
-		D_0BF6 = 1;
-		D_28F8 = D_28F8 & 0xfc00 | 0x158;
+		PlayerIsFemale = 1;
+		avatarShape = avatarShape & 0xfc00 | 0x158;
 	} else {
-		D_0BF6 = 0;
-		D_28F8 = D_28F8 & 0xfc00 | 0x157;
+		PlayerIsFemale = 0;
+		avatarShape = avatarShape & 0xfc00 | 0x157;
 	}
-	D_3BE9 = D_28F8;
-	D_3BE7 = D_28F8;
-	D_0BF7 = 1;
+	avatarOrigShape = avatarShape;
+	origShape0 = avatarShape;
+	AvatarPortrait = 1;
 	fd = open("savegame\\objlist", O_RDWR | O_BINARY);
-	write(fd, D_24F6, len1);
-	write(fd, D_0BC0, len2);
+	write(fd, objList, len1);
+	write(fd, gameState, len2);
 	close(fd);
 	FadeOutMusic(120);
 	FadeOut();
@@ -1772,8 +1788,8 @@ moongate.lzc), the moongate on Mars (scene4a.lzc, scene4b.lzc); 0: a key stopped
 /* strings: 089E-0BAA, 60 literals in order of use, none shared (no -d): 089E "scenetxt.lzc",
    08AB.. 14 x "scene1.lzc", 093A.. 5 x "scene2.lzc", 0971 "scenetxt.lzc", 097E.. 5 x "scene3.lzc",
    09B5.. 4 x "moongate.lzc", 09E9 "scenetxt.lzc", 09F6.. "scene4a/4b.lzc", "moongate.lzc" ... 0B9E "scene4b.lzc"
-   variables: D_00F5, D_012B, D_0149, D_01AD, D_04D3 (initialised); D_0E9A, D_0EAA, D_0EAE, D_0ED2, D_0EDA,
-   D_236C, D_2384, D_2394, D_23A6, D_4210, D_4214, D_4218, D_422A */
+   variables: shotPath, scene1Colors, moongateSteps, scene4Colors, introSound (initialised); drvDrawShape, drvCopySurface, drvClearSurface, tmEntry2A, drvDrawScaled,
+   theScreen, pictureArea, textWin, backBuf, mddSong8, mddSong9, mddSong10, musicOn */
 /*C_04FE_4286*/int PlayIntro() {
 	void far *bg;
 	void far *p2;
@@ -1797,17 +1813,17 @@ moongate.lzc), the moongate on Mars (scene4a.lzc, scene4b.lzc); 0: a key stopped
 	p4 = LoadLzc("scene1.lzc", 1);
 	p5 = LoadLzc("scene1.lzc", 2);
 	p6 = LoadLzc("scene1.lzc", 8);
-	(*D_0EAE)(&D_23A6, 0);
-	(*D_0E9A)(&D_2384, 0, 24, bg, 0);
-	(*D_0E9A)(&D_2384, 0, 24, bg, 1);
-	(*D_0E9A)(&D_2384, 240, 151, p4, 0);
-	PrintText(&D_2394, 0, 160, text[1], 2, D_012B[1]);
+	(*drvClearSurface)(&backBuf, 0);
+	(*drvDrawShape)(&pictureArea, 0, 24, bg, 0);
+	(*drvDrawShape)(&pictureArea, 0, 24, bg, 1);
+	(*drvDrawShape)(&pictureArea, 240, 151, p4, 0);
+	PrintText(&textWin, 0, 160, text[1], 2, scene1Colors[1]);
 	FadeIn();
 	while(kbhit())
 		getch();
-	if(D_422A == 1) {
+	if(musicOn == 1) {
 		FadeOutMusic(0);
-		PlaySong(D_4210);
+		PlaySong(mddSong8);
 	}
 	if(Pause(3000) == -1) {
 		MEM_free(bg);
@@ -1817,13 +1833,13 @@ moongate.lzc), the moongate on Mars (scene4a.lzc, scene4b.lzc); 0: a key stopped
 		MEM_free(txt);
 		return 0;
 	}
-	(*D_0EAE)(&D_23A6, 0);
-	(*D_0E9A)(&D_2384, 0, 24, bg, 0);
-	(*D_0E9A)(&D_2384, 240, 151, p4, 1);
-	(*D_0E9A)(&D_2384, 0, 151, p6, 0);
-	(*D_0E9A)(&D_2384, 60, 151, p5, 0);
-	PrintText(&D_2394, 0, 160, text[2], 2, D_012B[2]);
-	(*D_0EAA)(&D_23A6, &D_236C);
+	(*drvClearSurface)(&backBuf, 0);
+	(*drvDrawShape)(&pictureArea, 0, 24, bg, 0);
+	(*drvDrawShape)(&pictureArea, 240, 151, p4, 1);
+	(*drvDrawShape)(&pictureArea, 0, 151, p6, 0);
+	(*drvDrawShape)(&pictureArea, 60, 151, p5, 0);
+	PrintText(&textWin, 0, 160, text[2], 2, scene1Colors[2]);
+	(*drvCopySurface)(&backBuf, &theScreen);
 	if(Pause(4000) == -1) {
 		MEM_free(bg);
 		MEM_free(p4);
@@ -1832,13 +1848,13 @@ moongate.lzc), the moongate on Mars (scene4a.lzc, scene4b.lzc); 0: a key stopped
 		MEM_free(txt);
 		return 0;
 	}
-	(*D_0EAE)(&D_23A6, 0);
-	(*D_0E9A)(&D_2384, 0, 24, bg, 0);
-	(*D_0E9A)(&D_2384, 240, 151, p4, 3);
-	(*D_0E9A)(&D_2384, 0, 151, p6, 0);
-	(*D_0E9A)(&D_2384, 80, 151, p5, 1);
-	PrintText(&D_2394, 0, 160, text[3], 2, D_012B[3]);
-	(*D_0EAA)(&D_23A6, &D_236C);
+	(*drvClearSurface)(&backBuf, 0);
+	(*drvDrawShape)(&pictureArea, 0, 24, bg, 0);
+	(*drvDrawShape)(&pictureArea, 240, 151, p4, 3);
+	(*drvDrawShape)(&pictureArea, 0, 151, p6, 0);
+	(*drvDrawShape)(&pictureArea, 80, 151, p5, 1);
+	PrintText(&textWin, 0, 160, text[3], 2, scene1Colors[3]);
+	(*drvCopySurface)(&backBuf, &theScreen);
 	if(Pause(4000) == -1) {
 		MEM_free(bg);
 		MEM_free(p4);
@@ -1847,13 +1863,13 @@ moongate.lzc), the moongate on Mars (scene4a.lzc, scene4b.lzc); 0: a key stopped
 		MEM_free(txt);
 		return 0;
 	}
-	(*D_0EAE)(&D_23A6, 0);
-	(*D_0E9A)(&D_2384, 0, 24, bg, 0);
-	(*D_0E9A)(&D_2384, 240, 151, p4, 3);
-	(*D_0E9A)(&D_2384, 0, 151, p6, 1);
-	(*D_0E9A)(&D_2384, 80, 151, p5, 1);
-	PrintText(&D_2394, 0, 160, text[4], 2, D_012B[4]);
-	(*D_0EAA)(&D_23A6, &D_236C);
+	(*drvClearSurface)(&backBuf, 0);
+	(*drvDrawShape)(&pictureArea, 0, 24, bg, 0);
+	(*drvDrawShape)(&pictureArea, 240, 151, p4, 3);
+	(*drvDrawShape)(&pictureArea, 0, 151, p6, 1);
+	(*drvDrawShape)(&pictureArea, 80, 151, p5, 1);
+	PrintText(&textWin, 0, 160, text[4], 2, scene1Colors[4]);
+	(*drvCopySurface)(&backBuf, &theScreen);
 	if(Pause(4000) == -1) {
 		MEM_free(bg);
 		MEM_free(p4);
@@ -1862,13 +1878,13 @@ moongate.lzc), the moongate on Mars (scene4a.lzc, scene4b.lzc); 0: a key stopped
 		MEM_free(txt);
 		return 0;
 	}
-	(*D_0EAE)(&D_23A6, 0);
-	(*D_0E9A)(&D_2384, 0, 24, bg, 0);
-	(*D_0E9A)(&D_2384, 240, 151, p4, 3);
-	(*D_0E9A)(&D_2384, 0, 151, p6, 2);
-	(*D_0E9A)(&D_2384, 100, 151, p5, 2);
-	PrintText(&D_2394, 0, 160, text[5], 2, D_012B[5]);
-	(*D_0EAA)(&D_23A6, &D_236C);
+	(*drvClearSurface)(&backBuf, 0);
+	(*drvDrawShape)(&pictureArea, 0, 24, bg, 0);
+	(*drvDrawShape)(&pictureArea, 240, 151, p4, 3);
+	(*drvDrawShape)(&pictureArea, 0, 151, p6, 2);
+	(*drvDrawShape)(&pictureArea, 100, 151, p5, 2);
+	PrintText(&textWin, 0, 160, text[5], 2, scene1Colors[5]);
+	(*drvCopySurface)(&backBuf, &theScreen);
 	if(Pause(3000) == -1) {
 		MEM_free(bg);
 		MEM_free(p4);
@@ -1879,13 +1895,13 @@ moongate.lzc), the moongate on Mars (scene4a.lzc, scene4b.lzc); 0: a key stopped
 	}
 	MEM_free(p6);
 	p6 = LoadLzc("scene1.lzc", 3);
-	(*D_0EAE)(&D_23A6, 0);
-	(*D_0E9A)(&D_2384, 0, 24, bg, 0);
-	(*D_0E9A)(&D_2384, 240, 151, p4, 3);
-	(*D_0E9A)(&D_2384, -10, 155, p6, 0);
-	(*D_0E9A)(&D_2384, 145, 151, p5, 3);
-	PrintText(&D_2394, 0, 160, text[6], 2, D_012B[6]);
-	(*D_0EAA)(&D_23A6, &D_236C);
+	(*drvClearSurface)(&backBuf, 0);
+	(*drvDrawShape)(&pictureArea, 0, 24, bg, 0);
+	(*drvDrawShape)(&pictureArea, 240, 151, p4, 3);
+	(*drvDrawShape)(&pictureArea, -10, 155, p6, 0);
+	(*drvDrawShape)(&pictureArea, 145, 151, p5, 3);
+	PrintText(&textWin, 0, 160, text[6], 2, scene1Colors[6]);
+	(*drvCopySurface)(&backBuf, &theScreen);
 	if(Pause(3000) == -1) {
 		MEM_free(bg);
 		MEM_free(p4);
@@ -1896,13 +1912,13 @@ moongate.lzc), the moongate on Mars (scene4a.lzc, scene4b.lzc); 0: a key stopped
 	}
 	key = 0;
 	for(i = 0; i < 11 && key == 0; i++) {
-		(*D_0EAE)(&D_23A6, 0);
-		(*D_0E9A)(&D_2384, 0, 24, bg, 0);
-		(*D_0E9A)(&D_2384, 240, 151, p4, 3);
-		(*D_0E9A)(&D_2384, -10, 155, p6, min(9, i));
-		(*D_0E9A)(&D_2384, 145, 151, p5, i + 5);
-		PrintText(&D_2394, 0, 160, text[7], 2, D_012B[7]);
-		(*D_0EAA)(&D_23A6, &D_236C);
+		(*drvClearSurface)(&backBuf, 0);
+		(*drvDrawShape)(&pictureArea, 0, 24, bg, 0);
+		(*drvDrawShape)(&pictureArea, 240, 151, p4, 3);
+		(*drvDrawShape)(&pictureArea, -10, 155, p6, min(9, i));
+		(*drvDrawShape)(&pictureArea, 145, 151, p5, i + 5);
+		PrintText(&textWin, 0, 160, text[7], 2, scene1Colors[7]);
+		(*drvCopySurface)(&backBuf, &theScreen);
 		if((key = Pause(100)) == -1) {
 			MEM_free(bg);
 			MEM_free(p4);
@@ -1920,13 +1936,13 @@ moongate.lzc), the moongate on Mars (scene4a.lzc, scene4b.lzc); 0: a key stopped
 		MEM_free(txt);
 		return 0;
 	}
-	(*D_0EAE)(&D_23A6, 0);
-	(*D_0E9A)(&D_2384, 0, 24, bg, 0);
-	(*D_0E9A)(&D_2384, 240, 151, p4, 3);
-	(*D_0E9A)(&D_2384, -10, 155, p6, 9);
-	(*D_0E9A)(&D_2384, 145, 151, p5, 15);
-	PrintText(&D_2394, 0, 160, text[8], 2, D_012B[8]);
-	(*D_0EAA)(&D_23A6, &D_236C);
+	(*drvClearSurface)(&backBuf, 0);
+	(*drvDrawShape)(&pictureArea, 0, 24, bg, 0);
+	(*drvDrawShape)(&pictureArea, 240, 151, p4, 3);
+	(*drvDrawShape)(&pictureArea, -10, 155, p6, 9);
+	(*drvDrawShape)(&pictureArea, 145, 151, p5, 15);
+	PrintText(&textWin, 0, 160, text[8], 2, scene1Colors[8]);
+	(*drvCopySurface)(&backBuf, &theScreen);
 	if(Pause(4000) == -1) {
 		MEM_free(bg);
 		MEM_free(p4);
@@ -1940,10 +1956,10 @@ moongate.lzc), the moongate on Mars (scene4a.lzc, scene4b.lzc); 0: a key stopped
 	MEM_free(p5);
 	MEM_free(p6);
 	bg = LoadLzc("scene1.lzc", 7);
-	(*D_0EAE)(&D_23A6, 0);
-	(*D_0E9A)(&D_2384, 0, 24, bg, 0);
-	PrintText(&D_2394, 0, 160, text[9], 2, D_012B[9]);
-	(*D_0EAA)(&D_23A6, &D_236C);
+	(*drvClearSurface)(&backBuf, 0);
+	(*drvDrawShape)(&pictureArea, 0, 24, bg, 0);
+	PrintText(&textWin, 0, 160, text[9], 2, scene1Colors[9]);
+	(*drvCopySurface)(&backBuf, &theScreen);
 	if(Pause(4000) == -1) {
 		MEM_free(bg);
 		MEM_free(txt);
@@ -1953,13 +1969,13 @@ moongate.lzc), the moongate on Mars (scene4a.lzc, scene4b.lzc); 0: a key stopped
 	bg = LoadLzc("scene1.lzc", 0);
 	p4 = LoadLzc("scene1.lzc", 1);
 	p5 = LoadLzc("scene1.lzc", 2);
-	(*D_0EAE)(&D_23A6, 0);
-	(*D_0E9A)(&D_2384, 0, 24, bg, 0);
-	(*D_0E9A)(&D_2384, 0, 24, bg, 1);
-	(*D_0E9A)(&D_2384, 270, 151, p4, 1);
-	(*D_0E9A)(&D_2384, 193, 161, p5, 16);
-	PrintText(&D_2394, 0, 160, text[10], 2, D_012B[10]);
-	(*D_0EAA)(&D_23A6, &D_236C);
+	(*drvClearSurface)(&backBuf, 0);
+	(*drvDrawShape)(&pictureArea, 0, 24, bg, 0);
+	(*drvDrawShape)(&pictureArea, 0, 24, bg, 1);
+	(*drvDrawShape)(&pictureArea, 270, 151, p4, 1);
+	(*drvDrawShape)(&pictureArea, 193, 161, p5, 16);
+	PrintText(&textWin, 0, 160, text[10], 2, scene1Colors[10]);
+	(*drvCopySurface)(&backBuf, &theScreen);
 	if(Pause(3000) == -1) {
 		MEM_free(bg);
 		MEM_free(p4);
@@ -1972,23 +1988,23 @@ moongate.lzc), the moongate on Mars (scene4a.lzc, scene4b.lzc); 0: a key stopped
 	MEM_free(p5);
 	bg = LoadLzc("scene1.lzc", 5);
 	p2 = LoadLzc("scene1.lzc", 4);
-	(*D_0EAE)(&D_23A6, 0);
-	(*D_0E9A)(&D_2384, 0, 24, bg, 0);
-	(*D_0E9A)(&D_2384, 50, 24, bg, 1);
-	(*D_0E9A)(&D_2384, 235, 78, p2, 0);
-	PrintText(&D_2394, 0, 160, text[11], 2, D_012B[11]);
-	(*D_0EAA)(&D_23A6, &D_236C);
+	(*drvClearSurface)(&backBuf, 0);
+	(*drvDrawShape)(&pictureArea, 0, 24, bg, 0);
+	(*drvDrawShape)(&pictureArea, 50, 24, bg, 1);
+	(*drvDrawShape)(&pictureArea, 235, 78, p2, 0);
+	PrintText(&textWin, 0, 160, text[11], 2, scene1Colors[11]);
+	(*drvCopySurface)(&backBuf, &theScreen);
 	if(Pause(4000) == -1) {
 		MEM_free(bg);
 		MEM_free(p2);
 		MEM_free(txt);
 		return 0;
 	}
-	(*D_0EAE)(&D_23A6, 0);
-	(*D_0E9A)(&D_2384, 0, 24, bg, 0);
-	(*D_0E9A)(&D_2384, 50, 24, bg, 1);
-	PrintText(&D_2394, 0, 160, text[12], 2, D_012B[12]);
-	(*D_0EAA)(&D_23A6, &D_236C);
+	(*drvClearSurface)(&backBuf, 0);
+	(*drvDrawShape)(&pictureArea, 0, 24, bg, 0);
+	(*drvDrawShape)(&pictureArea, 50, 24, bg, 1);
+	PrintText(&textWin, 0, 160, text[12], 2, scene1Colors[12]);
+	(*drvCopySurface)(&backBuf, &theScreen);
 	if(Pause(4000) == -1) {
 		MEM_free(bg);
 		MEM_free(p2);
@@ -2001,11 +2017,11 @@ moongate.lzc), the moongate on Mars (scene4a.lzc, scene4b.lzc); 0: a key stopped
 	p2 = LoadLzc("scene1.lzc", 6);
 	key = 0;
 	for(i = 0; i < 20 && key == 0; i++) {
-		(*D_0EAE)(&D_23A6, 0);
-		(*D_0E9A)(&D_2384, 0, 24, bg, 0);
-		(*D_0EDA)(&D_2384, 0, -20 - i, p2, 0, -i << 1, 256, 0);
-		PrintText(&D_2394, 0, 160, text[13], 2, D_012B[13]);
-		(*D_0EAA)(&D_23A6, &D_236C);
+		(*drvClearSurface)(&backBuf, 0);
+		(*drvDrawShape)(&pictureArea, 0, 24, bg, 0);
+		(*drvDrawScaled)(&pictureArea, 0, -20 - i, p2, 0, -i << 1, 256, 0);
+		PrintText(&textWin, 0, 160, text[13], 2, scene1Colors[13]);
+		(*drvCopySurface)(&backBuf, &theScreen);
 		if((key = Pause(25)) == -1) {
 			MEM_free(bg);
 			MEM_free(p2);
@@ -2019,10 +2035,10 @@ moongate.lzc), the moongate on Mars (scene4a.lzc, scene4b.lzc); 0: a key stopped
 		MEM_free(txt);
 		return 0;
 	}
-	(*D_0EAE)(&D_23A6, 0);
-	(*D_0E9A)(&D_2384, 0, 24, bg, 0);
-	PrintText(&D_2394, 0, 160, text[14], 2, D_012B[14]);
-	(*D_0EAA)(&D_23A6, &D_236C);
+	(*drvClearSurface)(&backBuf, 0);
+	(*drvDrawShape)(&pictureArea, 0, 24, bg, 0);
+	PrintText(&textWin, 0, 160, text[14], 2, scene1Colors[14]);
+	(*drvCopySurface)(&backBuf, &theScreen);
 	if(Pause(3000) == -1) {
 		MEM_free(bg);
 		MEM_free(p2);
@@ -2036,8 +2052,8 @@ moongate.lzc), the moongate on Mars (scene4a.lzc, scene4b.lzc); 0: a key stopped
 
 	/* scene 2 */
 	bg = LoadLzc("scene2.lzc", 0);
-	(*D_0EAE)(&D_23A6, 0);
-	(*D_0E9A)(&D_2384, 0, 24, bg, 0);
+	(*drvClearSurface)(&backBuf, 0);
+	(*drvDrawShape)(&pictureArea, 0, 24, bg, 0);
 	FadeIn();
 	if((key = Pause(1000)) == -1) {
 		MEM_free(bg);
@@ -2045,8 +2061,8 @@ moongate.lzc), the moongate on Mars (scene4a.lzc, scene4b.lzc); 0: a key stopped
 		return 0;
 	}
 	for(i = 0; i < 13 && key == 0; i++) {
-		(*D_0ED2)(&D_2384, D_00F5[i].x, D_00F5[i].y - 5, 1, 1, 9);
-		(*D_0EAA)(&D_23A6, &D_236C);
+		(*tmEntry2A)(&pictureArea, shotPath[i].x, shotPath[i].y - 5, 1, 1, 9);
+		(*drvCopySurface)(&backBuf, &theScreen);
 		if((key = Pause(400)) == -1) {
 			MEM_free(bg);
 			MEM_free(txt);
@@ -2066,13 +2082,13 @@ moongate.lzc), the moongate on Mars (scene4a.lzc, scene4b.lzc); 0: a key stopped
 	p5 = LoadLzc("scene2.lzc", 4);
 	key = 0;
 	for(i = 0; i < 95 && key == 0; i++) {
-		(*D_0EAE)(&D_23A6, 0);
-		(*D_0E9A)(&D_2384, 0, 24, bg, 0);
-		(*D_0E9A)(&D_2384, i * 4 - 15, 148, p4, i % 12);
-		(*D_0E9A)(&D_2384, i * 4 - 45, 149, p5, (i + 4) % 12);
-		(*D_0E9A)(&D_2384, 0, 24, p3, 0);
+		(*drvClearSurface)(&backBuf, 0);
+		(*drvDrawShape)(&pictureArea, 0, 24, bg, 0);
+		(*drvDrawShape)(&pictureArea, i * 4 - 15, 148, p4, i % 12);
+		(*drvDrawShape)(&pictureArea, i * 4 - 45, 149, p5, (i + 4) % 12);
+		(*drvDrawShape)(&pictureArea, 0, 24, p3, 0);
 		if(i > 0)
-			(*D_0EAA)(&D_23A6, &D_236C);
+			(*drvCopySurface)(&backBuf, &theScreen);
 		else
 			FadeIn();
 		if((key = Pause(50)) == -1) {
@@ -2084,7 +2100,7 @@ moongate.lzc), the moongate on Mars (scene4a.lzc, scene4b.lzc); 0: a key stopped
 			return 0;
 		}
 	}
-	if(D_422A == 1)
+	if(musicOn == 1)
 		FadeOutMusic(120);
 	FadeOut();
 	MEM_free(bg);
@@ -2100,23 +2116,23 @@ moongate.lzc), the moongate on Mars (scene4a.lzc, scene4b.lzc); 0: a key stopped
 	p5 = LoadLzc("scene3.lzc", 3);
 	p2 = LoadLzc("scene3.lzc", 4);
 	for(i = 0; i < 7; i++) {
-		(*D_0EAE)(&D_23A6, 0);
-		if(D_0149[i].frame >= 0) {
-			(*D_0E9A)(&D_2384, 0, 24, bg, 0);
-			(*D_0E9A)(&D_2384, 165, 137, p5, D_0149[i].frame2);
-			(*D_0E9A)(&D_2384, 65, 150, p4, min(7, D_0149[i].frame));
-			(*D_0E9A)(&D_2384, 151, 82, p3, 0);
+		(*drvClearSurface)(&backBuf, 0);
+		if(moongateSteps[i].frame >= 0) {
+			(*drvDrawShape)(&pictureArea, 0, 24, bg, 0);
+			(*drvDrawShape)(&pictureArea, 165, 137, p5, moongateSteps[i].frame2);
+			(*drvDrawShape)(&pictureArea, 65, 150, p4, min(7, moongateSteps[i].frame));
+			(*drvDrawShape)(&pictureArea, 151, 82, p3, 0);
 		} else
-			(*D_0E9A)(&D_2384, 0, 24, p2, abs(D_0149[i].frame) - 1);
-		PrintText(&D_2394, 0, 160, text[D_0149[i].text], 2, D_0149[i].color);
+			(*drvDrawShape)(&pictureArea, 0, 24, p2, abs(moongateSteps[i].frame) - 1);
+		PrintText(&textWin, 0, 160, text[moongateSteps[i].text], 2, moongateSteps[i].color);
 		if(i > 0)
-			(*D_0EAA)(&D_23A6, &D_236C);
+			(*drvCopySurface)(&backBuf, &theScreen);
 		else {
 			FadeIn();
-			if(D_422A == 1)
-				PlaySong(D_4214);
+			if(musicOn == 1)
+				PlaySong(mddSong9);
 		}
-		if(Pause(D_0149[i].delay) == -1) {
+		if(Pause(moongateSteps[i].delay) == -1) {
 			MEM_free(bg);
 			MEM_free(p2);
 			MEM_free(p3);
@@ -2130,13 +2146,13 @@ moongate.lzc), the moongate on Mars (scene4a.lzc, scene4b.lzc); 0: a key stopped
 	p2 = LoadLzc("moongate.lzc", 0);
 	key = 0;
 	for(i = 0; i < 9 && key == 0; i++) {
-		(*D_0EAE)(&D_23A6, 0);
-		(*D_0E9A)(&D_2384, 0, 24, bg, 0);
-		(*D_0E9A)(&D_2384, 125, 130, p2, i);
-		(*D_0E9A)(&D_2384, 165, 137, p5, 3);
-		(*D_0E9A)(&D_2384, 65, 150, p4, 1);
-		(*D_0E9A)(&D_2384, 151, 82, p3, 1);
-		(*D_0EAA)(&D_23A6, &D_236C);
+		(*drvClearSurface)(&backBuf, 0);
+		(*drvDrawShape)(&pictureArea, 0, 24, bg, 0);
+		(*drvDrawShape)(&pictureArea, 125, 130, p2, i);
+		(*drvDrawShape)(&pictureArea, 165, 137, p5, 3);
+		(*drvDrawShape)(&pictureArea, 65, 150, p4, 1);
+		(*drvDrawShape)(&pictureArea, 151, 82, p3, 1);
+		(*drvCopySurface)(&backBuf, &theScreen);
 		if((key = Pause(50)) == -1) {
 			MEM_free(bg);
 			MEM_free(p2);
@@ -2152,14 +2168,14 @@ moongate.lzc), the moongate on Mars (scene4a.lzc, scene4b.lzc); 0: a key stopped
 	for(i = 7; i < 10; i++) {
 		key = 0;
 		for(j = 0; j < 40 && key == 0; j++) {
-			(*D_0EAE)(&D_23A6, 0);
-			(*D_0E9A)(&D_2384, 0, 24, bg, 0);
-			(*D_0E9A)(&D_2384, 125, 130, p2, j % 8);
-			(*D_0E9A)(&D_2384, 165, 137, p5, D_0149[i].frame2);
-			(*D_0E9A)(&D_2384, 65, 150, p4, min(7, D_0149[i].frame));
-			(*D_0E9A)(&D_2384, 151, 82, p3, 1);
-			PrintText(&D_2394, 0, 160, text[D_0149[i].text], 2, D_0149[i].color);
-			(*D_0EAA)(&D_23A6, &D_236C);
+			(*drvClearSurface)(&backBuf, 0);
+			(*drvDrawShape)(&pictureArea, 0, 24, bg, 0);
+			(*drvDrawShape)(&pictureArea, 125, 130, p2, j % 8);
+			(*drvDrawShape)(&pictureArea, 165, 137, p5, moongateSteps[i].frame2);
+			(*drvDrawShape)(&pictureArea, 65, 150, p4, min(7, moongateSteps[i].frame));
+			(*drvDrawShape)(&pictureArea, 151, 82, p3, 1);
+			PrintText(&textWin, 0, 160, text[moongateSteps[i].text], 2, moongateSteps[i].color);
+			(*drvCopySurface)(&backBuf, &theScreen);
 			if((key = Pause(50)) == -1) {
 				MEM_free(bg);
 				MEM_free(p2);
@@ -2177,13 +2193,13 @@ moongate.lzc), the moongate on Mars (scene4a.lzc, scene4b.lzc); 0: a key stopped
 	p5 = LoadLzc("moongate.lzc", 4);
 	key = 0;
 	for(i = 0; i < 65 && key == 0; i++) {
-		(*D_0EAE)(&D_23A6, 0);
-		(*D_0E9A)(&D_2384, 0, 24, bg, 0);
-		(*D_0E9A)(&D_2384, 125, 130, p2, i % 8);
-		(*D_0E9A)(&D_2384, 165, 137, p5, 0);
-		(*D_0E9A)(&D_2384, 65, 150, p4, i / 2);
-		(*D_0E9A)(&D_2384, 151, 82, p3, 1);
-		(*D_0EAA)(&D_23A6, &D_236C);
+		(*drvClearSurface)(&backBuf, 0);
+		(*drvDrawShape)(&pictureArea, 0, 24, bg, 0);
+		(*drvDrawShape)(&pictureArea, 125, 130, p2, i % 8);
+		(*drvDrawShape)(&pictureArea, 165, 137, p5, 0);
+		(*drvDrawShape)(&pictureArea, 65, 150, p4, i / 2);
+		(*drvDrawShape)(&pictureArea, 151, 82, p3, 1);
+		(*drvCopySurface)(&backBuf, &theScreen);
 		if((key = Pause(50)) == -1) {
 			MEM_free(bg);
 			MEM_free(p2);
@@ -2196,13 +2212,13 @@ moongate.lzc), the moongate on Mars (scene4a.lzc, scene4b.lzc); 0: a key stopped
 	}
 	key = 0;
 	for(i = 0; i < 40 && key == 0; i++) {
-		(*D_0EAE)(&D_23A6, 0);
-		(*D_0E9A)(&D_2384, 0, 24, bg, 0);
-		(*D_0E9A)(&D_2384, 125, 130, p2, i % 8);
+		(*drvClearSurface)(&backBuf, 0);
+		(*drvDrawShape)(&pictureArea, 0, 24, bg, 0);
+		(*drvDrawShape)(&pictureArea, 125, 130, p2, i % 8);
 		if(i < 39)
-			(*D_0E9A)(&D_2384, 165, 137, p5, i / 2);
-		(*D_0E9A)(&D_2384, 151, 82, p3, 1);
-		(*D_0EAA)(&D_23A6, &D_236C);
+			(*drvDrawShape)(&pictureArea, 165, 137, p5, i / 2);
+		(*drvDrawShape)(&pictureArea, 151, 82, p3, 1);
+		(*drvCopySurface)(&backBuf, &theScreen);
 		if((key = Pause(50)) == -1) {
 			MEM_free(bg);
 			MEM_free(p2);
@@ -2213,7 +2229,7 @@ moongate.lzc), the moongate on Mars (scene4a.lzc, scene4b.lzc); 0: a key stopped
 			return 0;
 		}
 	}
-	if(D_422A == 1)
+	if(musicOn == 1)
 		FadeOutMusic(120);
 	FadeOut();
 	MEM_free(bg);
@@ -2233,23 +2249,23 @@ moongate.lzc), the moongate on Mars (scene4a.lzc, scene4b.lzc); 0: a key stopped
 	for(j = 1; j < 3; j++) {
 		key = 0;
 		for(i = 0; i < 21 && key == 0; i++) {
-			(*D_0EAE)(&D_23A6, 0);
-			(*D_0E9A)(&D_2384, 0, 24, bg, 0);
-			(*D_0E9A)(&D_2384, 187, 125, p8, min(5, 10 - abs(i - 10)));
+			(*drvClearSurface)(&backBuf, 0);
+			(*drvDrawShape)(&pictureArea, 0, 24, bg, 0);
+			(*drvDrawShape)(&pictureArea, 187, 125, p8, min(5, 10 - abs(i - 10)));
 			if(i > 4 && i < 16) {
-				PlaySound(D_04D3, 0, 255, 64, 0, 1);
-				(*D_0E9A)(&D_2384, 32, 24, p2, i % 10);
+				PlaySound(introSound, 0, 255, 64, 0, 1);
+				(*drvDrawShape)(&pictureArea, 32, 24, p2, i % 10);
 			}
-			(*D_0E9A)(&D_2384, 240, 40, p9, 0);
-			(*D_0E9A)(&D_2384, 0, 74, p7, 0);
-			(*D_0E9A)(&D_2384, 23, 100, p7, 2);
-			PrintText(&D_2394, 0, 160, text[j], 2, D_01AD[j]);
+			(*drvDrawShape)(&pictureArea, 240, 40, p9, 0);
+			(*drvDrawShape)(&pictureArea, 0, 74, p7, 0);
+			(*drvDrawShape)(&pictureArea, 23, 100, p7, 2);
+			PrintText(&textWin, 0, 160, text[j], 2, scene4Colors[j]);
 			if(j > 1 || i > 0)
-				(*D_0EAA)(&D_23A6, &D_236C);
+				(*drvCopySurface)(&backBuf, &theScreen);
 			else {
 				FadeIn();
-				if(D_422A == 1)
-					PlaySong(D_4218);
+				if(musicOn == 1)
+					PlaySong(mddSong10);
 			}
 			if(i == 16)
 				StopSound(0, 0);
@@ -2277,14 +2293,14 @@ moongate.lzc), the moongate on Mars (scene4a.lzc, scene4b.lzc); 0: a key stopped
 	p2 = LoadLzc("moongate.lzc", 0);
 	key = 0;
 	for(i = 0; i < 9 && key == 0; i++) {
-		(*D_0EAE)(&D_23A6, 0);
-		(*D_0E9A)(&D_2384, 0, 24, bg, 0);
-		(*D_0E9A)(&D_2384, 188, 128, p8, (i > 4) + 6);
-		(*D_0E9A)(&D_2384, 140, 125, p2, i);
-		(*D_0E9A)(&D_2384, 240, 40, p9, i > 1);
-		(*D_0E9A)(&D_2384, 0, 74, p7, 0);
-		(*D_0E9A)(&D_2384, 23, 100, p7, 2);
-		(*D_0EAA)(&D_23A6, &D_236C);
+		(*drvClearSurface)(&backBuf, 0);
+		(*drvDrawShape)(&pictureArea, 0, 24, bg, 0);
+		(*drvDrawShape)(&pictureArea, 188, 128, p8, (i > 4) + 6);
+		(*drvDrawShape)(&pictureArea, 140, 125, p2, i);
+		(*drvDrawShape)(&pictureArea, 240, 40, p9, i > 1);
+		(*drvDrawShape)(&pictureArea, 0, 74, p7, 0);
+		(*drvDrawShape)(&pictureArea, 23, 100, p7, 2);
+		(*drvCopySurface)(&backBuf, &theScreen);
 		if((key = Pause(100)) == -1) {
 			MEM_free(bg);
 			MEM_free(p2);
@@ -2301,17 +2317,17 @@ moongate.lzc), the moongate on Mars (scene4a.lzc, scene4b.lzc); 0: a key stopped
 	p5 = LoadLzc("moongate.lzc", 5);
 	key = 0;
 	for(i = 0; i < 69 && key == 0; i++) {
-		(*D_0EAE)(&D_23A6, 0);
-		(*D_0E9A)(&D_2384, 0, 24, bg, 0);
-		(*D_0E9A)(&D_2384, 180, 133, p8, 8);
-		(*D_0E9A)(&D_2384, 140, 125, p2, i % 8);
-		(*D_0E9A)(&D_2384, 240, 40, p9, (i > 2) + 1);
-		(*D_0E9A)(&D_2384, 80, 150, p4, i / 2);
-		(*D_0E9A)(&D_2384, 0, 74, p7, 0);
-		(*D_0E9A)(&D_2384, 23, 100, p7, (i > 3) + 2);
+		(*drvClearSurface)(&backBuf, 0);
+		(*drvDrawShape)(&pictureArea, 0, 24, bg, 0);
+		(*drvDrawShape)(&pictureArea, 180, 133, p8, 8);
+		(*drvDrawShape)(&pictureArea, 140, 125, p2, i % 8);
+		(*drvDrawShape)(&pictureArea, 240, 40, p9, (i > 2) + 1);
+		(*drvDrawShape)(&pictureArea, 80, 150, p4, i / 2);
+		(*drvDrawShape)(&pictureArea, 0, 74, p7, 0);
+		(*drvDrawShape)(&pictureArea, 23, 100, p7, (i > 3) + 2);
 		if(i > 10)
-			PrintText(&D_2394, 0, 160, text[3], 2, D_01AD[3]);
-		(*D_0EAA)(&D_23A6, &D_236C);
+			PrintText(&textWin, 0, 160, text[3], 2, scene4Colors[3]);
+		(*drvCopySurface)(&backBuf, &theScreen);
 		if((key = Pause(50)) == -1) {
 			MEM_free(bg);
 			MEM_free(p2);
@@ -2326,17 +2342,17 @@ moongate.lzc), the moongate on Mars (scene4a.lzc, scene4b.lzc); 0: a key stopped
 	}
 	key = 0;
 	for(i = 0; i < 25 && key == 0; i++) {
-		(*D_0EAE)(&D_23A6, 0);
-		(*D_0E9A)(&D_2384, 0, 24, bg, 0);
-		(*D_0E9A)(&D_2384, 180, 133, p8, 8);
-		(*D_0E9A)(&D_2384, 140, 125, p2, i % 8);
-		(*D_0E9A)(&D_2384, 240, 40, p9, 2);
-		(*D_0E9A)(&D_2384, 140, 130, p5, i / 2);
-		(*D_0E9A)(&D_2384, 80, 150, p4, 34);
-		(*D_0E9A)(&D_2384, 0, 74, p7, 0);
-		(*D_0E9A)(&D_2384, 23, 100, p7, 3);
-		PrintText(&D_2394, 0, 160, text[4], 2, D_01AD[4]);
-		(*D_0EAA)(&D_23A6, &D_236C);
+		(*drvClearSurface)(&backBuf, 0);
+		(*drvDrawShape)(&pictureArea, 0, 24, bg, 0);
+		(*drvDrawShape)(&pictureArea, 180, 133, p8, 8);
+		(*drvDrawShape)(&pictureArea, 140, 125, p2, i % 8);
+		(*drvDrawShape)(&pictureArea, 240, 40, p9, 2);
+		(*drvDrawShape)(&pictureArea, 140, 130, p5, i / 2);
+		(*drvDrawShape)(&pictureArea, 80, 150, p4, 34);
+		(*drvDrawShape)(&pictureArea, 0, 74, p7, 0);
+		(*drvDrawShape)(&pictureArea, 23, 100, p7, 3);
+		PrintText(&textWin, 0, 160, text[4], 2, scene4Colors[4]);
+		(*drvCopySurface)(&backBuf, &theScreen);
 		if((key = Pause(50)) == -1) {
 			MEM_free(bg);
 			MEM_free(p2);
@@ -2357,11 +2373,11 @@ moongate.lzc), the moongate on Mars (scene4a.lzc, scene4b.lzc); 0: a key stopped
 	MEM_free(p4);
 	MEM_free(p5);
 	bg = LoadLzc("scene4a.lzc", 9);
-	(*D_0EAE)(&D_23A6, 0);
-	(*D_0E9A)(&D_2384, 0, 24, bg, 0);
-	(*D_0E9A)(&D_2384, 0, 24, bg, 1);
-	PrintText(&D_2394, 0, 160, text[5], 2, D_01AD[5]);
-	(*D_0EAA)(&D_23A6, &D_236C);
+	(*drvClearSurface)(&backBuf, 0);
+	(*drvDrawShape)(&pictureArea, 0, 24, bg, 0);
+	(*drvDrawShape)(&pictureArea, 0, 24, bg, 1);
+	PrintText(&textWin, 0, 160, text[5], 2, scene4Colors[5]);
+	(*drvCopySurface)(&backBuf, &theScreen);
 	if(Pause(4000) == -1) {
 		MEM_free(bg);
 		MEM_free(txt);
@@ -2374,16 +2390,16 @@ moongate.lzc), the moongate on Mars (scene4a.lzc, scene4b.lzc); 0: a key stopped
 	p9 = LoadLzc("scene4a.lzc", 5);
 	p4 = LoadLzc("scene4a.lzc", 2);
 	p5 = LoadLzc("scene4a.lzc", 3);
-	(*D_0EAE)(&D_23A6, 0);
-	(*D_0E9A)(&D_2384, 0, 24, bg, 0);
-	(*D_0E9A)(&D_2384, 180, 133, p8, 9);
-	(*D_0E9A)(&D_2384, 240, 40, p9, 2);
-	(*D_0E9A)(&D_2384, 145, 140, p5, 1);
-	(*D_0E9A)(&D_2384, 80, 150, p4, 1);
-	(*D_0E9A)(&D_2384, 0, 74, p7, 0);
-	(*D_0E9A)(&D_2384, 23, 100, p7, 2);
-	PrintText(&D_2394, 0, 160, text[6], 2, D_01AD[6]);
-	(*D_0EAA)(&D_23A6, &D_236C);
+	(*drvClearSurface)(&backBuf, 0);
+	(*drvDrawShape)(&pictureArea, 0, 24, bg, 0);
+	(*drvDrawShape)(&pictureArea, 180, 133, p8, 9);
+	(*drvDrawShape)(&pictureArea, 240, 40, p9, 2);
+	(*drvDrawShape)(&pictureArea, 145, 140, p5, 1);
+	(*drvDrawShape)(&pictureArea, 80, 150, p4, 1);
+	(*drvDrawShape)(&pictureArea, 0, 74, p7, 0);
+	(*drvDrawShape)(&pictureArea, 23, 100, p7, 2);
+	PrintText(&textWin, 0, 160, text[6], 2, scene4Colors[6]);
+	(*drvCopySurface)(&backBuf, &theScreen);
 	if(Pause(4000) == -1) {
 		MEM_free(bg);
 		MEM_free(p7);
@@ -2401,11 +2417,11 @@ moongate.lzc), the moongate on Mars (scene4a.lzc, scene4b.lzc); 0: a key stopped
 	MEM_free(p4);
 	MEM_free(p5);
 	bg = LoadLzc("scene4a.lzc", 7);
-	(*D_0EAE)(&D_23A6, 0);
-	(*D_0E9A)(&D_2384, 0, 24, bg, 0);
-	(*D_0E9A)(&D_2384, 0, 24, bg, 3);
-	PrintText(&D_2394, 0, 160, text[7], 2, D_01AD[7]);
-	(*D_0EAA)(&D_23A6, &D_236C);
+	(*drvClearSurface)(&backBuf, 0);
+	(*drvDrawShape)(&pictureArea, 0, 24, bg, 0);
+	(*drvDrawShape)(&pictureArea, 0, 24, bg, 3);
+	PrintText(&textWin, 0, 160, text[7], 2, scene4Colors[7]);
+	(*drvCopySurface)(&backBuf, &theScreen);
 	if(Pause(4000) == -1) {
 		MEM_free(bg);
 		MEM_free(txt);
@@ -2414,11 +2430,11 @@ moongate.lzc), the moongate on Mars (scene4a.lzc, scene4b.lzc); 0: a key stopped
 	MEM_free(bg);
 	bg = LoadLzc("scene4a.lzc", 8);
 	for(i = 8; i < 10; i++) {
-		(*D_0EAE)(&D_23A6, 0);
-		(*D_0E9A)(&D_2384, 0, 24, bg, 0);
-		(*D_0E9A)(&D_2384, 0, 24, bg, i - 7);
-		PrintText(&D_2394, 0, 160, text[i], 2, D_01AD[i]);
-		(*D_0EAA)(&D_23A6, &D_236C);
+		(*drvClearSurface)(&backBuf, 0);
+		(*drvDrawShape)(&pictureArea, 0, 24, bg, 0);
+		(*drvDrawShape)(&pictureArea, 0, 24, bg, i - 7);
+		PrintText(&textWin, 0, 160, text[i], 2, scene4Colors[i]);
+		(*drvCopySurface)(&backBuf, &theScreen);
 		if(Pause(4000) == -1) {
 			MEM_free(bg);
 			MEM_free(txt);
@@ -2433,16 +2449,16 @@ moongate.lzc), the moongate on Mars (scene4a.lzc, scene4b.lzc); 0: a key stopped
 	p4 = LoadLzc("scene4a.lzc", 2);
 	p5 = LoadLzc("scene4a.lzc", 3);
 	p10 = LoadLzc("scene4b.lzc", 0);
-	(*D_0EAE)(&D_23A6, 0);
-	(*D_0E9A)(&D_2384, 0, 24, bg, 0);
-	(*D_0E9A)(&D_2384, 180, 133, p8, 10);
-	(*D_0E9A)(&D_2384, 240, 40, p9, 2);
-	(*D_0E9A)(&D_2384, 145, 140, p5, 0);
-	(*D_0E9A)(&D_2384, 80, 150, p4, 0);
-	(*D_0E9A)(&D_2384, 0, 74, p7, 0);
-	(*D_0E9A)(&D_2384, 23, 100, p7, 2);
-	PrintText(&D_2394, 0, 160, text[10], 2, D_01AD[10]);
-	(*D_0EAA)(&D_23A6, &D_236C);
+	(*drvClearSurface)(&backBuf, 0);
+	(*drvDrawShape)(&pictureArea, 0, 24, bg, 0);
+	(*drvDrawShape)(&pictureArea, 180, 133, p8, 10);
+	(*drvDrawShape)(&pictureArea, 240, 40, p9, 2);
+	(*drvDrawShape)(&pictureArea, 145, 140, p5, 0);
+	(*drvDrawShape)(&pictureArea, 80, 150, p4, 0);
+	(*drvDrawShape)(&pictureArea, 0, 74, p7, 0);
+	(*drvDrawShape)(&pictureArea, 23, 100, p7, 2);
+	PrintText(&textWin, 0, 160, text[10], 2, scene4Colors[10]);
+	(*drvCopySurface)(&backBuf, &theScreen);
 	if(Pause(4000) == -1) {
 		MEM_free(bg);
 		MEM_free(p7);
@@ -2456,17 +2472,17 @@ moongate.lzc), the moongate on Mars (scene4a.lzc, scene4b.lzc); 0: a key stopped
 	}
 	key = 0;
 	for(i = 0; i < 32 && key == 0; i++) {
-		(*D_0EAE)(&D_23A6, 0);
-		(*D_0E9A)(&D_2384, 0, 24, bg, 0);
-		(*D_0E9A)(&D_2384, 180, 133, p8, 10);
-		(*D_0E9A)(&D_2384, 240, 40, p9, 2);
-		(*D_0E9A)(&D_2384, 150, 140, p5, (i > 4) << 1);
-		(*D_0E9A)(&D_2384, 80, 150, p4, min(10, i));
-		(*D_0E9A)(&D_2384, 270, 45, p10, i);
-		(*D_0E9A)(&D_2384, 0, 74, p7, 0);
-		(*D_0E9A)(&D_2384, 23, 100, p7, 2);
-		PrintText(&D_2394, 0, 160, text[11], 2, D_01AD[11]);
-		(*D_0EAA)(&D_23A6, &D_236C);
+		(*drvClearSurface)(&backBuf, 0);
+		(*drvDrawShape)(&pictureArea, 0, 24, bg, 0);
+		(*drvDrawShape)(&pictureArea, 180, 133, p8, 10);
+		(*drvDrawShape)(&pictureArea, 240, 40, p9, 2);
+		(*drvDrawShape)(&pictureArea, 150, 140, p5, (i > 4) << 1);
+		(*drvDrawShape)(&pictureArea, 80, 150, p4, min(10, i));
+		(*drvDrawShape)(&pictureArea, 270, 45, p10, i);
+		(*drvDrawShape)(&pictureArea, 0, 74, p7, 0);
+		(*drvDrawShape)(&pictureArea, 23, 100, p7, 2);
+		PrintText(&textWin, 0, 160, text[11], 2, scene4Colors[11]);
+		(*drvCopySurface)(&backBuf, &theScreen);
 		if((key = Pause(50)) == -1) {
 			MEM_free(bg);
 			MEM_free(p7);
@@ -2491,18 +2507,18 @@ moongate.lzc), the moongate on Mars (scene4a.lzc, scene4b.lzc); 0: a key stopped
 		return 0;
 	}
 	for(i = 12; i < 21; i++) {
-		(*D_0EAE)(&D_23A6, 0);
+		(*drvClearSurface)(&backBuf, 0);
 		if(i != 13 && i != 16 && i != 20) {
-			(*D_0E9A)(&D_2384, 0, 24, bg, 0);
-			(*D_0E9A)(&D_2384, 180, 133, p8, 11 - ((i == 12 || i == 17) << 1) - (i == 14 || i == 15));
-			(*D_0E9A)(&D_2384, 240, 40, p9, 2);
-			(*D_0E9A)(&D_2384, 155, 140, p5, (i < 14) << 1);
-			(*D_0E9A)(&D_2384, 80, 150, p4, 10);
-			(*D_0E9A)(&D_2384, 270, 45, p10, 31);
-			(*D_0E9A)(&D_2384, 0, 74, p7, 0);
-			(*D_0E9A)(&D_2384, 23, 100, p7, 1);
-			PrintText(&D_2394, 0, 160, text[i], 2, D_01AD[i]);
-			(*D_0EAA)(&D_23A6, &D_236C);
+			(*drvDrawShape)(&pictureArea, 0, 24, bg, 0);
+			(*drvDrawShape)(&pictureArea, 180, 133, p8, 11 - ((i == 12 || i == 17) << 1) - (i == 14 || i == 15));
+			(*drvDrawShape)(&pictureArea, 240, 40, p9, 2);
+			(*drvDrawShape)(&pictureArea, 155, 140, p5, (i < 14) << 1);
+			(*drvDrawShape)(&pictureArea, 80, 150, p4, 10);
+			(*drvDrawShape)(&pictureArea, 270, 45, p10, 31);
+			(*drvDrawShape)(&pictureArea, 0, 74, p7, 0);
+			(*drvDrawShape)(&pictureArea, 23, 100, p7, 1);
+			PrintText(&textWin, 0, 160, text[i], 2, scene4Colors[i]);
+			(*drvCopySurface)(&backBuf, &theScreen);
 			if(Pause(4000) == -1) {
 				MEM_free(bg);
 				MEM_free(p7);
@@ -2524,20 +2540,20 @@ moongate.lzc), the moongate on Mars (scene4a.lzc, scene4b.lzc); 0: a key stopped
 			MEM_free(p10);
 			if(i == 13) {
 				bg = LoadLzc("scene4a.lzc", 8);
-				(*D_0E9A)(&D_2384, 0, 24, bg, 0);
-				(*D_0E9A)(&D_2384, 0, 24, bg, 1);
+				(*drvDrawShape)(&pictureArea, 0, 24, bg, 0);
+				(*drvDrawShape)(&pictureArea, 0, 24, bg, 1);
 			} else {
 				bg = LoadLzc("scene4a.lzc", 7);
 				if(i == 16) {
-					(*D_0E9A)(&D_2384, 0, 24, bg, 0);
-					(*D_0E9A)(&D_2384, 0, 24, bg, 2);
+					(*drvDrawShape)(&pictureArea, 0, 24, bg, 0);
+					(*drvDrawShape)(&pictureArea, 0, 24, bg, 2);
 				} else {
-					(*D_0E9A)(&D_2384, 0, 24, bg, 0);
-					(*D_0E9A)(&D_2384, 0, 24, bg, 1);
+					(*drvDrawShape)(&pictureArea, 0, 24, bg, 0);
+					(*drvDrawShape)(&pictureArea, 0, 24, bg, 1);
 				}
 			}
-			PrintText(&D_2394, 0, 160, text[i], 2, D_01AD[i]);
-			(*D_0EAA)(&D_23A6, &D_236C);
+			PrintText(&textWin, 0, 160, text[i], 2, scene4Colors[i]);
+			(*drvCopySurface)(&backBuf, &theScreen);
 			if(Pause(4000) == -1) {
 				MEM_free(bg);
 				MEM_free(txt);
@@ -2557,19 +2573,19 @@ moongate.lzc), the moongate on Mars (scene4a.lzc, scene4b.lzc); 0: a key stopped
 	p11 = LoadLzc("scene4b.lzc", 1);
 	key = 0;
 	for(i = 0; i < 32 && key == 0; i++) {
-		(*D_0EAE)(&D_23A6, 0);
-		(*D_0E9A)(&D_2384, 0, 24, bg, 0);
-		(*D_0E9A)(&D_2384, 180, 133, p8, 10);
-		(*D_0E9A)(&D_2384, 320 - i * 3, (max(0, i - 26) << 1) + 125, p11, i % 4);
-		(*D_0E9A)(&D_2384, 242, 24, p2, 0);
-		(*D_0E9A)(&D_2384, 240, 40, p9, 2);
-		(*D_0E9A)(&D_2384, 160, 140, p5, 0);
-		(*D_0E9A)(&D_2384, 80, 150, p4, max(4, min(10, 20 - i)));
-		(*D_0E9A)(&D_2384, 270, 45, p10, max(18, min(31, 45 - i)));
-		(*D_0E9A)(&D_2384, 0, 74, p7, 0);
-		(*D_0E9A)(&D_2384, 23, 100, p7, (i > 6) + 1);
-		PrintText(&D_2394, 0, 160, text[21], 2, D_01AD[21]);
-		(*D_0EAA)(&D_23A6, &D_236C);
+		(*drvClearSurface)(&backBuf, 0);
+		(*drvDrawShape)(&pictureArea, 0, 24, bg, 0);
+		(*drvDrawShape)(&pictureArea, 180, 133, p8, 10);
+		(*drvDrawShape)(&pictureArea, 320 - i * 3, (max(0, i - 26) << 1) + 125, p11, i % 4);
+		(*drvDrawShape)(&pictureArea, 242, 24, p2, 0);
+		(*drvDrawShape)(&pictureArea, 240, 40, p9, 2);
+		(*drvDrawShape)(&pictureArea, 160, 140, p5, 0);
+		(*drvDrawShape)(&pictureArea, 80, 150, p4, max(4, min(10, 20 - i)));
+		(*drvDrawShape)(&pictureArea, 270, 45, p10, max(18, min(31, 45 - i)));
+		(*drvDrawShape)(&pictureArea, 0, 74, p7, 0);
+		(*drvDrawShape)(&pictureArea, 23, 100, p7, (i > 6) + 1);
+		PrintText(&textWin, 0, 160, text[21], 2, scene4Colors[21]);
+		(*drvCopySurface)(&backBuf, &theScreen);
 		if((key = Pause(100)) == -1) {
 			MEM_free(bg);
 			MEM_free(p7);
@@ -2585,19 +2601,19 @@ moongate.lzc), the moongate on Mars (scene4a.lzc, scene4b.lzc); 0: a key stopped
 		}
 	}
 	for(i = 22; i < 27; i++) {
-		(*D_0EAE)(&D_23A6, 0);
-		(*D_0E9A)(&D_2384, 0, 24, bg, 0);
-		(*D_0E9A)(&D_2384, 180, 133, p8, 12 - (i == 25) * 3 - (i == 26));
-		(*D_0E9A)(&D_2384, 227, 135, p11, (i == 23) + ((i == 24) << 1) + 5);
-		(*D_0E9A)(&D_2384, 242, 24, p2, 0);
-		(*D_0E9A)(&D_2384, 240, 40, p9, 2);
-		(*D_0E9A)(&D_2384, 165, 140, p5, (i == 24) * 3);
-		(*D_0E9A)(&D_2384, 80, 150, p4, 4);
-		(*D_0E9A)(&D_2384, 270, 45, p10, 18);
-		(*D_0E9A)(&D_2384, 0, 74, p7, 0);
-		(*D_0E9A)(&D_2384, 23, 100, p7, 2);
-		PrintText(&D_2394, 0, 160, text[i], 2, D_01AD[i]);
-		(*D_0EAA)(&D_23A6, &D_236C);
+		(*drvClearSurface)(&backBuf, 0);
+		(*drvDrawShape)(&pictureArea, 0, 24, bg, 0);
+		(*drvDrawShape)(&pictureArea, 180, 133, p8, 12 - (i == 25) * 3 - (i == 26));
+		(*drvDrawShape)(&pictureArea, 227, 135, p11, (i == 23) + ((i == 24) << 1) + 5);
+		(*drvDrawShape)(&pictureArea, 242, 24, p2, 0);
+		(*drvDrawShape)(&pictureArea, 240, 40, p9, 2);
+		(*drvDrawShape)(&pictureArea, 165, 140, p5, (i == 24) * 3);
+		(*drvDrawShape)(&pictureArea, 80, 150, p4, 4);
+		(*drvDrawShape)(&pictureArea, 270, 45, p10, 18);
+		(*drvDrawShape)(&pictureArea, 0, 74, p7, 0);
+		(*drvDrawShape)(&pictureArea, 23, 100, p7, 2);
+		PrintText(&textWin, 0, 160, text[i], 2, scene4Colors[i]);
+		(*drvCopySurface)(&backBuf, &theScreen);
 		if(Pause(4000) == -1) {
 			MEM_free(bg);
 			MEM_free(p7);
@@ -2612,7 +2628,7 @@ moongate.lzc), the moongate on Mars (scene4a.lzc, scene4b.lzc); 0: a key stopped
 			return 0;
 		}
 	}
-	if(D_422A == 1)
+	if(musicOn == 1)
 		FadeOutMusic(120);
 	FadeOut();
 	MEM_free(bg);
@@ -2632,7 +2648,7 @@ moongate.lzc), the moongate on Mars (scene4a.lzc, scene4b.lzc); 0: a key stopped
 /*the closing credits: lines 9.. of scenetxt.lzc item 4 scroll up over mars.lzc
 (0: a key stopped them)*/
 /* strings: 0BAA "scenetxt.lzc", 0BB7 "mars.lzc" (_DATA of this file ends at 0BC0)
-   variables: D_0E9A, D_0EAA, D_0EAE, D_0EC6, D_236C, D_23A6, D_2394, D_4210, D_422A */
+   variables: drvDrawShape, drvCopySurface, drvClearSurface, drvFillRect, theScreen, backBuf, textWin, mddSong8, musicOn */
 /*C_04FE_792B*/int ScrollCredits() {
 	void far *shapes;
 	char far *txt;
@@ -2646,29 +2662,29 @@ moongate.lzc), the moongate on Mars (scene4a.lzc, scene4b.lzc); 0: a key stopped
 	for(count = 0; text[count] != 0; count++)
 		;
 	shapes = LoadLzc("mars.lzc", 0);
-	if(D_422A == 1) {
+	if(musicOn == 1) {
 		FadeOutMusic(0);
-		PlaySong(D_4210);
+		PlaySong(mddSong8);
 	}
-	(*D_0EAE)(&D_23A6, 0);
-	(*D_0E9A)(&D_23A6, 0, 24, shapes, 0);
-	(*D_0E9A)(&D_23A6, 0, 24, shapes, 1);
+	(*drvClearSurface)(&backBuf, 0);
+	(*drvDrawShape)(&backBuf, 0, 24, shapes, 0);
+	(*drvDrawShape)(&backBuf, 0, 24, shapes, 1);
 	FadeIn();
 	while(kbhit())
 		getch();
 	for(line = 0; line < count + 9; line++) {
 		for(scroll = 0; scroll < 14; scroll++) {
-			(*D_0E9A)(&D_23A6, 0, 24, shapes, 0);
+			(*drvDrawShape)(&backBuf, 0, 24, shapes, 0);
 			for(i = 0; i < 10; i++) {
 				if(line + i - 9 >= 0 && line + i - 9 < count) {
-					PrintText(&D_2394, 11, i * 14 - scroll + 26, text[line + i - 9], 0, 6);
-					PrintText(&D_2394, 12, i * 14 - scroll + 25, text[line + i - 9], 0, 14);
+					PrintText(&textWin, 11, i * 14 - scroll + 26, text[line + i - 9], 0, 6);
+					PrintText(&textWin, 12, i * 14 - scroll + 25, text[line + i - 9], 0, 14);
 				}
 			}
-			(*D_0EC6)(&D_23A6, 11, 12, 240, 23, 0);
-			(*D_0EC6)(&D_23A6, 11, 152, 240, 162, 0);
+			(*drvFillRect)(&backBuf, 11, 12, 240, 23, 0);
+			(*drvFillRect)(&backBuf, 11, 152, 240, 162, 0);
 			VID_waitRetrace();
-			(*D_0EAA)(&D_23A6, &D_236C);
+			(*drvCopySurface)(&backBuf, &theScreen);
 			if((key = Pause(10)) == -1) {
 				MEM_free(shapes);
 				MEM_free(txt);
@@ -2678,7 +2694,7 @@ moongate.lzc), the moongate on Mars (scene4a.lzc, scene4b.lzc); 0: a key stopped
 				line += 4;
 		}
 	}
-	if(D_422A == 1)
+	if(musicOn == 1)
 		FadeOutMusic(120);
 	FadeOut();
 	MEM_free(shapes);

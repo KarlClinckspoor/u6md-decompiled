@@ -1,5 +1,5 @@
 ;----------------------------------------
-;SAVAGE.EXE (and GAME.EXE 2F2B): a far pointer to its linear address
+;SAVAGE.EXE (and SE's GAME.EXE 2F2B): a far pointer to its linear address
 ;----------------------------------------
 
 PTRLIN_TEXT	SEGMENT PUBLIC WORD 'CODE'

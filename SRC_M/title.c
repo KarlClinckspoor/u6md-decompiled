@@ -17,7 +17,7 @@ struct tSurface {
 	int w0E;
 };
 
-/*a sparkle of the last scene (12 bytes; see segment 071C)*/
+/*a sparkle of the last scene (12 bytes; see sprites.c)*/
 struct tSprite {
 	int frame;/*+00 -1: free*/
 	int x;/*+02*/
@@ -34,19 +34,19 @@ struct tLetter {
 	int dy;
 };
 
-extern unsigned char far C_0F2C_0027;/*nonzero when a key was pressed (the event module's code segment)*/
+extern unsigned char far escapePressed;/*nonzero when a key was pressed (the event module's code segment)*/
 extern int soundCard;/*the sound card? (1, 2: sounds are played; 3)*/
 extern int musicMarker;/*how far the music has got?*/
-extern int (*D_0EE2)();/*the graphics driver: draws a shape, reports its rectangle*/
-extern void (pascal *D_23EA)();/*the sound driver: plays a sound*/
-extern int (*D_0EAA)();/*the graphics driver: shows a surface*/
-extern int (*D_0E9A)();/*the graphics driver: draws a shape*/
-extern int (*D_0EDA)();/*the graphics driver: draws a shape, scaled*/
-extern int (*D_0EAE)();
-extern int D_422A;/*nonzero: music?*/
-extern void far *D_4330[13];/*the shapes of TITLE.LZC*/
-extern void far *D_4364;
-extern struct tSprite D_4368[30];
+extern int (*drvDrawScaledRect)();/*the graphics driver: draws a shape, reports its rectangle*/
+extern void (pascal *drvNote)();/*the sound driver (music.c): a note (channel, note, velocity; 0: off)*/
+extern int (*drvCopySurface)();/*the graphics driver: shows a surface*/
+extern int (*drvDrawShape)();/*the graphics driver: draws a shape*/
+extern int (*drvDrawScaled)();/*the graphics driver: draws a shape, scaled*/
+extern int (*drvClearSurface)();
+extern int musicOn;/*nonzero: music?*/
+/*4330*/extern void far *titleShapes[13];/*the shapes of TITLE.LZC*/
+extern void far *sparkleShapes;
+extern struct tSprite sparkleList[30];
 
 extern void far *LoadLzc(char *name, int n);/*item n of an LZC file, loaded*/
 extern PAL_restore();
@@ -64,8 +64,8 @@ extern int DrvCalibrate();
 extern int pascal Random(int lo, int hi);/*random number from lo to hi*/
 extern int kbhit(void);
 
-/*0C24*/char D_0C24[] = "opoqopoqopoqopoqqrstrq";/*frames of the sun: p, q play a sound*/
-/*0C3B*/char *D_0C3B[10] = {/*frames of each letter of the title*/
+/*0C24*/char sunFrames[] = "opoqopoqopoqopoqqrstrq";/*frames of the sun: p, q play a sound*/
+/*0C3B*/char *letterFrames[10] = {/*frames of each letter of the title*/
 	"abcdefghijkaakkkkaaaalllllllmmll",
 	"aaaaaaaabcddeeddccffgghhgghhiiih",
 	"aaaaaaaaaabbccbbaaccccccccccaccc",
@@ -77,7 +77,7 @@ extern int kbhit(void);
 	"aaaaaaaaabbbccbbbbccddddddccaaaa",
 	"abccdefgghiijjiihhkkllmmllkkhnnn"
 };
-/*0C4F*/struct tLetter D_0C4F[10] = {
+/*0C4F*/struct tLetter letterMoves[10] = {
 	{0x3a, 0x5e, -1, 1}, {0xba, 0x5e, 0, 1}, {0x116, 0x5e, 1, 1},
 	{0x3a, 0x66, -3, 2}, {0xba, 0x66, 0, 2}, {0x116, 0x66, 3, 2},
 	{0x3a, 0x6e, -5, 3}, {0xba, 0x6e, 0, 3}, {0x116, 0x6e, 5, 3},
@@ -86,25 +86,25 @@ extern int kbhit(void);
 
 /*C_0CD9_0004*/void Show(struct tSurface *surf, struct tSurface *screen) {
 	VID_waitRetrace();
-	(*D_0EAA)(surf, screen);
+	(*drvCopySurface)(surf, screen);
 }
 
 /*C_0CD9_001A*/void DrawBackground(struct tSurface *surf, int y) {
-	(*D_0E9A)(surf, 0, 0, D_4330[0], 0);
-	(*D_0E9A)(surf, 0xa0, y, D_4330[12], 0);
+	(*drvDrawShape)(surf, 0, 0, titleShapes[0], 0);
+	(*drvDrawShape)(surf, 0xa0, y, titleShapes[12], 0);
 }
 
-/*C_0CD9_0052*/void C_0CD9_0052(struct tSurface *surf, struct tSurface *screen) {
+/*C_0CD9_0052*/void TitleFadeIn(struct tSurface *surf, struct tSurface *screen) {
 	int i;
 
 	DrawBackground(surf, 0x18);
 	for(i = 0; i < 10; i++)
-		(*D_0E9A)(surf, D_0C4F[i].x, D_0C4F[i].y, D_4330[i + 1], 0);
+		(*drvDrawShape)(surf, letterMoves[i].x, letterMoves[i].y, titleShapes[i + 1], 0);
 	FADE_in(surf, screen);
 }
 
 /*the letters of the title change*/
-/*C_0CD9_00AD*/void C_0CD9_00AD(struct tSurface *surf, struct tSurface *screen, int speed) {
+/*C_0CD9_00AD*/void LettersChange(struct tSurface *surf, struct tSurface *screen, int speed) {
 	int from;
 	int count;
 	int t;
@@ -120,14 +120,14 @@ extern int kbhit(void);
 				t = speed;
 				DrawBackground(surf, 0x18);
 				for(i = 0; i < 10; i++)
-					(*D_0E9A)(surf, D_0C4F[i].x, D_0C4F[i].y, D_4330[i + 1], D_0C3B[i][f] - 'a');
+					(*drvDrawShape)(surf, letterMoves[i].x, letterMoves[i].y, titleShapes[i + 1], letterFrames[i][f] - 'a');
 				Show(surf, screen);
 			}
 			if(kbhit())
-				C_0F2C_0027 = 0xff;
+				escapePressed = 0xff;
 			if(musicMarker >= 1)
 				return;
-			if(C_0F2C_0027)
+			if(escapePressed)
 				return;
 			count++;
 		}
@@ -137,42 +137,42 @@ extern int kbhit(void);
 				t = speed;
 				DrawBackground(surf, 0x18);
 				for(i = 0; i < 10; i++)
-					(*D_0E9A)(surf, D_0C4F[i].x, D_0C4F[i].y, D_4330[i + 1], D_0C3B[i][f] - 'a');
+					(*drvDrawShape)(surf, letterMoves[i].x, letterMoves[i].y, titleShapes[i + 1], letterFrames[i][f] - 'a');
 				Show(surf, screen);
 			}
 			if(kbhit())
-				C_0F2C_0027 = 0xff;
+				escapePressed = 0xff;
 			if(musicMarker >= 1)
 				return;
-			if(C_0F2C_0027)
+			if(escapePressed)
 				return;
 			count++;
 		}
-	} while((D_422A && soundCard != 3) || count <= 30);
+	} while((musicOn && soundCard != 3) || count <= 30);
 }
 
 /*the sun sets*/
-/*C_0CD9_0256*/void C_0CD9_0256(struct tSurface *surf, struct tSurface *screen, int speed) {
+/*C_0CD9_0256*/void PlaySunFrames(struct tSurface *surf, struct tSurface *screen, int speed) {
 	int i;
 	int t;
 	int f;
 
 	t = 1;
 	for(f = 0; f < 0x14; f++) {
-		if(D_0C24[f] == 'p') {
+		if(sunFrames[f] == 'p') {
 			if(soundCard == 2) {
 				t = 1;
-				(*D_23EA)(0x12, 0x30, 0x60);
+				(*drvNote)(0x12, 0x30, 0x60);
 			} else if(soundCard == 1) {
 				t = 1;
-				(*D_23EA)(0xa, 0x25, 0x60);
+				(*drvNote)(0xa, 0x25, 0x60);
 			}
-		} else if(D_0C24[f] == 'q') {
+		} else if(sunFrames[f] == 'q') {
 			if(soundCard == 2) {
-				(*D_23EA)(0x12, 0x30, 0);
+				(*drvNote)(0x12, 0x30, 0);
 				t = 1;
 			} else if(soundCard == 1) {
-				(*D_23EA)(0xa, 0x25, 0);
+				(*drvNote)(0xa, 0x25, 0);
 				t = 1;
 			}
 		}
@@ -180,47 +180,47 @@ extern int kbhit(void);
 			t = speed;
 			DrawBackground(surf, 0x18);
 			for(i = 0; i < 9; i++)
-				(*D_0E9A)(surf, D_0C4F[i].x, D_0C4F[i].y, D_4330[i + 1], D_0C3B[i][0x1f] - 'a');
-			(*D_0E9A)(surf, D_0C4F[9].x, D_0C4F[9].y, D_4330[10], D_0C24[f] - 'a');
+				(*drvDrawShape)(surf, letterMoves[i].x, letterMoves[i].y, titleShapes[i + 1], letterFrames[i][0x1f] - 'a');
+			(*drvDrawShape)(surf, letterMoves[9].x, letterMoves[9].y, titleShapes[10], sunFrames[f] - 'a');
 			Show(surf, screen);
 		}
 		if(kbhit())
-			C_0F2C_0027 = 0xff;
-		if(C_0F2C_0027)
+			escapePressed = 0xff;
+		if(escapePressed)
 			return;
 	}
 	DrawBackground(surf, 0x18);
-	(*D_0E9A)(surf, D_0C4F[0].x, D_0C4F[0].y, D_4330[1], D_0C3B[0][0x1f] - 'a');
-	(*D_0E9A)(surf, D_0C4F[1].x, D_0C4F[1].y, D_4330[2], D_0C3B[1][0x1f] - 'a');
-	(*D_0E9A)(surf, D_0C4F[2].x, D_0C4F[2].y, D_4330[3], D_0C3B[2][0x1f] - 'a');
-	(*D_0E9A)(surf, D_0C4F[3].x, D_0C4F[3].y, D_4330[4], D_0C3B[3][0x1f] - 'a');
-	(*D_0E9A)(surf, D_0C4F[4].x, D_0C4F[4].y, D_4330[5], D_0C3B[4][0x1f] - 'a');
-	(*D_0E9A)(surf, D_0C4F[5].x, D_0C4F[5].y, D_4330[6], D_0C3B[5][0x1f] - 'a');
-	(*D_0E9A)(surf, D_0C4F[6].x, D_0C4F[6].y, D_4330[7], D_0C3B[6][0x1f] - 'a');
-	(*D_0E9A)(surf, D_0C4F[7].x, D_0C4F[7].y, D_4330[8], D_0C3B[7][0x1f] - 'a');
-	(*D_0E9A)(surf, D_0C4F[8].x, D_0C4F[8].y, D_4330[9], D_0C3B[8][0x1f] - 'a');
-	(*D_0E9A)(surf, D_0C4F[9].x, D_0C4F[9].y, D_4330[10], D_0C24[20] - 'a');
-	if(D_422A && (soundCard == 2 || soundCard == 1)) {
+	(*drvDrawShape)(surf, letterMoves[0].x, letterMoves[0].y, titleShapes[1], letterFrames[0][0x1f] - 'a');
+	(*drvDrawShape)(surf, letterMoves[1].x, letterMoves[1].y, titleShapes[2], letterFrames[1][0x1f] - 'a');
+	(*drvDrawShape)(surf, letterMoves[2].x, letterMoves[2].y, titleShapes[3], letterFrames[2][0x1f] - 'a');
+	(*drvDrawShape)(surf, letterMoves[3].x, letterMoves[3].y, titleShapes[4], letterFrames[3][0x1f] - 'a');
+	(*drvDrawShape)(surf, letterMoves[4].x, letterMoves[4].y, titleShapes[5], letterFrames[4][0x1f] - 'a');
+	(*drvDrawShape)(surf, letterMoves[5].x, letterMoves[5].y, titleShapes[6], letterFrames[5][0x1f] - 'a');
+	(*drvDrawShape)(surf, letterMoves[6].x, letterMoves[6].y, titleShapes[7], letterFrames[6][0x1f] - 'a');
+	(*drvDrawShape)(surf, letterMoves[7].x, letterMoves[7].y, titleShapes[8], letterFrames[7][0x1f] - 'a');
+	(*drvDrawShape)(surf, letterMoves[8].x, letterMoves[8].y, titleShapes[9], letterFrames[8][0x1f] - 'a');
+	(*drvDrawShape)(surf, letterMoves[9].x, letterMoves[9].y, titleShapes[10], sunFrames[20] - 'a');
+	if(musicOn && (soundCard == 2 || soundCard == 1)) {
 		do {
 			if(kbhit())
-				C_0F2C_0027 = 0xff;
-		} while(musicMarker < 2 && C_0F2C_0027 == 0);
+				escapePressed = 0xff;
+		} while(musicMarker < 2 && escapePressed == 0);
 		Show(surf, screen);
 	}
 }
 
 /*draws the mountains in front of the sun at x, y*/
-/*C_0CD9_0565*/void C_0CD9_0565(struct tSurface *surf, int x, int y) {
+/*C_0CD9_0565*/void DrawMountains(struct tSurface *surf, int x, int y) {
 	int r[4];
 
-	(*D_0EE2)(surf, 0xa2, x, D_4330[0], 2, 0, y, 0, r);
-	(*D_0EDA)(surf, r[0], x, D_4330[0], 1, 0, y, 0);
-	(*D_0EDA)(surf, 0xa2, x, D_4330[0], 2, 0, y, 0);
-	(*D_0EDA)(surf, r[2], x, D_4330[0], 3, 0, y, 0);
+	(*drvDrawScaledRect)(surf, 0xa2, x, titleShapes[0], 2, 0, y, 0, r);
+	(*drvDrawScaled)(surf, r[0], x, titleShapes[0], 1, 0, y, 0);
+	(*drvDrawScaled)(surf, 0xa2, x, titleShapes[0], 2, 0, y, 0);
+	(*drvDrawScaled)(surf, r[2], x, titleShapes[0], 3, 0, y, 0);
 }
 
 /*the letters fly apart*/
-/*C_0CD9_05FB*/void C_0CD9_05FB(struct tSurface *surf, struct tSurface *screen, int speed) {
+/*C_0CD9_05FB*/void LettersFlyApart(struct tSurface *surf, struct tSurface *screen, int speed) {
 	int x;
 	int y;
 	int t;
@@ -233,24 +233,24 @@ extern int kbhit(void);
 			t = speed;
 			DrawBackground(surf, 0x18);
 			for(i = 0; i < 9; i++) {
-				x = D_0C4F[i].x + D_0C4F[i].dx * d;
-				y = D_0C4F[i].y + D_0C4F[i].dy * d;
-				(*D_0EDA)(surf, x, y, D_4330[i + 1], D_0C3B[i][0x1f] - 'a', 0, d * 4 * D_0C4F[i].dy + 0x100, 0);
+				x = letterMoves[i].x + letterMoves[i].dx * d;
+				y = letterMoves[i].y + letterMoves[i].dy * d;
+				(*drvDrawScaled)(surf, x, y, titleShapes[i + 1], letterFrames[i][0x1f] - 'a', 0, d * 4 * letterMoves[i].dy + 0x100, 0);
 			}
-			x = D_0C4F[9].x + d * D_0C4F[9].dx;
-			y = D_0C4F[9].y + d * D_0C4F[9].dy;
-			(*D_0EDA)(surf, x, y, D_4330[10], D_0C24[21] - 'a', 0, d * 4 * D_0C4F[9].dy + 0x100, 0);
+			x = letterMoves[9].x + d * letterMoves[9].dx;
+			y = letterMoves[9].y + d * letterMoves[9].dy;
+			(*drvDrawScaled)(surf, x, y, titleShapes[10], sunFrames[21] - 'a', 0, d * 4 * letterMoves[9].dy + 0x100, 0);
 			Show(surf, screen);
 		}
 		if(kbhit())
-			C_0F2C_0027 = 0xff;
-		if(C_0F2C_0027)
+			escapePressed = 0xff;
+		if(escapePressed)
 			break;
 	}
 }
 
 /*the mountains rise and the sun sets; returns where the mountains are*/
-/*C_0CD9_0765*/C_0CD9_0765(struct tSurface *surf, struct tSurface *screen, int speed) {
+/*C_0CD9_0765*/MountainsRise(struct tSurface *surf, struct tSurface *screen, int speed) {
 	int unused;
 	int y;
 	int sunY;
@@ -283,33 +283,33 @@ extern int kbhit(void);
 		if(moved) {
 			if(--t < 1) {
 				t = speed;
-				(*D_0E9A)(surf, 0, 0, D_4330[0], 0);
-				(*D_0EE2)(surf, 0xa2, x, D_4330[0], 2, 0, y, 0, r);
+				(*drvDrawShape)(surf, 0, 0, titleShapes[0], 0);
+				(*drvDrawScaledRect)(surf, 0xa2, x, titleShapes[0], 2, 0, y, 0, r);
 				if(r[3] < sunY)
 					behind = 1;
 				if(!behind) {
-					C_0CD9_0565(surf, x, y);
-					(*D_0E9A)(surf, 0xa0, sunY, D_4330[12], 0);
+					DrawMountains(surf, x, y);
+					(*drvDrawShape)(surf, 0xa0, sunY, titleShapes[12], 0);
 				} else {
-					(*D_0E9A)(surf, 0xa0, sunY, D_4330[12], 0);
-					C_0CD9_0565(surf, x, y);
+					(*drvDrawShape)(surf, 0xa0, sunY, titleShapes[12], 0);
+					DrawMountains(surf, x, y);
 				}
 				Show(surf, screen);
 			}
 		}
 		if(kbhit())
-			C_0F2C_0027 = 0xff;
-		if(C_0F2C_0027)
+			escapePressed = 0xff;
+		if(escapePressed)
 			return;
 	}
-	(*D_0E9A)(surf, 0, 0, D_4330[0], 0);
-	C_0CD9_0565(surf, x, y);
+	(*drvDrawShape)(surf, 0, 0, titleShapes[0], 0);
+	DrawMountains(surf, x, y);
 	Show(surf, screen);
 	return x;
 }
 
 /*sparkles over the mountains*/
-/*C_0CD9_0921*/void C_0CD9_0921(struct tSurface *surf, struct tSurface *screen, int x) {
+/*C_0CD9_0921*/void TitleSparkles(struct tSurface *surf, struct tSurface *screen, int x) {
 	int j;
 	int nFree;
 	int done;
@@ -326,7 +326,7 @@ extern int kbhit(void);
 			/*DIFFERS: the original does not merge the end of "add = Random(0, 5) == 0"
 			  (0636:0977-0993) with the same code of the last case; this merges it (9 bytes
 			  shorter)*/
-			if(D_422A && (soundCard == 2 || soundCard == 1)) {
+			if(musicOn && (soundCard == 2 || soundCard == 1)) {
 				if(musicMarker >= 4)
 					add = Random(0, 0) == 0;
 				else
@@ -336,66 +336,66 @@ extern int kbhit(void);
 		}
 		if(add && !done) {
 			for(i = 0; i < 5; i++) {
-				if(D_4368[i].frame == -1) {
-					D_4368[i].frame = 0;
-					D_4368[i].x = Random(0, 0x13f);
-					D_4368[i].y = Random(0, 0x7f);
-					D_4368[i].kind = Random(0, 2);
+				if(sparkleList[i].frame == -1) {
+					sparkleList[i].frame = 0;
+					sparkleList[i].x = Random(0, 0x13f);
+					sparkleList[i].y = Random(0, 0x7f);
+					sparkleList[i].kind = Random(0, 2);
 					break;
 				}
 			}
 		}
-		(*D_0E9A)(surf, 0, 0, D_4330[0], 0);
+		(*drvDrawShape)(surf, 0, 0, titleShapes[0], 0);
 		nFree = DrawSprites(surf, 5);
-		C_0CD9_0565(surf, x, 0x100);
+		DrawMountains(surf, x, 0x100);
 		Show(surf, screen);
 		count++;
 		if(done == 1 && nFree == 5)
 			goto all;
 		/*DIFFERS: the original keeps both "done = 1" (0636:0A9A, 0AA7); this merges them
 		  (2 bytes shorter)*/
-		if(D_422A && (soundCard == 2 || soundCard == 1)) {
+		if(musicOn && (soundCard == 2 || soundCard == 1)) {
 			if(musicMarker >= 5)
 				done = 1;
 		} else if(count > 10)
 			done = 1;
 		if(kbhit())
-			C_0F2C_0027 = 0xff;
-	} while(C_0F2C_0027 == 0);
+			escapePressed = 0xff;
+	} while(escapePressed == 0);
 	return;
 all:
 	for(i = 0; i < 0x1d; i++) {
-		D_4368[i].frame = 0;
-		D_4368[i].x = Random(0, 0x13f);
-		D_4368[i].y = Random(0, 0x7f);
-		D_4368[i].kind = Random(0, 2);
+		sparkleList[i].frame = 0;
+		sparkleList[i].x = Random(0, 0x13f);
+		sparkleList[i].y = Random(0, 0x7f);
+		sparkleList[i].kind = Random(0, 2);
 	}
 	nFree = 0;
 	j = 0;
 	while(nFree != 0x1e) {
 		if(++j == 4) {
-			D_4368[29].frame = 0;
-			D_4368[29].x = Random(0, 0x13f);
-			D_4368[29].y = Random(0, 0x7f);
-			D_4368[29].kind = Random(0, 2);
+			sparkleList[29].frame = 0;
+			sparkleList[29].x = Random(0, 0x13f);
+			sparkleList[29].y = Random(0, 0x7f);
+			sparkleList[29].kind = Random(0, 2);
 		}
-		(*D_0E9A)(surf, 0, 0, D_4330[0], 0);
+		(*drvDrawShape)(surf, 0, 0, titleShapes[0], 0);
 		nFree = DrawSprites(surf, 0x1e);
-		C_0CD9_0565(surf, x, 0x100);
+		DrawMountains(surf, x, 0x100);
 		Show(surf, screen);
 		if(kbhit())
-			C_0F2C_0027 = 0xff;
-		if(C_0F2C_0027)
+			escapePressed = 0xff;
+		if(escapePressed)
 			return;
 	}
 	for(i = 0x1d; i >= 0; i--) {
-		if(D_4368[i].frame != -1)
-			StopSound(D_4368[i].sound, i);
+		if(sparkleList[i].frame != -1)
+			StopSound(sparkleList[i].sound, i);
 	}
 }
 
 /*the number of frames between two pictures, from the speed of the computer*/
-/*C_0CD9_0C2A*/C_0CD9_0C2A() {
+/*C_0CD9_0C2A*/TitleSpeed() {
 	return 2 - DrvCalibrate() / 8 < 1 ? 1 : 2 - DrvCalibrate() / 8;
 }
 
@@ -405,7 +405,7 @@ all:
 
 /*plays the title on surf, shown on screen; mode: the video mode (3: shapes 7-9 are not
   loaded); music: the song to play during it (or 0); speed: frames between two pictures
-  (the caller's C_0CD9_0C2A())*/
+  (the caller's TitleSpeed())*/
 /*C_0CD9_0C6E*/void PlayTitle(struct tSurface *surf, struct tSurface *screen, int mode, void far *music, int speed) {
 	struct tSurface save;
 	int i;
@@ -415,47 +415,47 @@ all:
 	screen->y0 = 0x97;
 	for(i = 0; i < 12; i++) {
 		if(mode != 3)
-			D_4330[i] = LoadShape(i);
+			titleShapes[i] = LoadShape(i);
 		else if(i < 7 || i > 9)
-			D_4330[i] = LoadShape(i);
+			titleShapes[i] = LoadShape(i);
 	}
-	D_4364 = D_4330[11];
-	D_4330[12] = LoadShape(12);
-	C_0F2C_0027 = 0;
+	sparkleShapes = titleShapes[11];
+	titleShapes[12] = LoadShape(12);
+	escapePressed = 0;
 	if(music)
 		PlaySong(music);
-	C_0CD9_0052(surf, screen);
-	if(C_0F2C_0027 == 0xff)
+	TitleFadeIn(surf, screen);
+	if(escapePressed == 0xff)
 		goto end;
-	C_0CD9_00AD(surf, screen, speed);
-	if(C_0F2C_0027 == 0xff)
+	LettersChange(surf, screen, speed);
+	if(escapePressed == 0xff)
 		goto end;
-	C_0CD9_0256(surf, screen, speed);
-	if(C_0F2C_0027 == 0xff)
+	PlaySunFrames(surf, screen, speed);
+	if(escapePressed == 0xff)
 		goto end;
-	C_0CD9_05FB(surf, screen, speed);
-	if(C_0F2C_0027 != 0xff) {
-		i = C_0CD9_0765(surf, screen, speed);
-		if(D_422A && (soundCard == 2 || soundCard == 1)) {
+	LettersFlyApart(surf, screen, speed);
+	if(escapePressed != 0xff) {
+		i = MountainsRise(surf, screen, speed);
+		if(musicOn && (soundCard == 2 || soundCard == 1)) {
 			while(musicMarker < 3) {
 				if(kbhit())
-					C_0F2C_0027 = 0xff;
-				if(C_0F2C_0027 == 0xff)
+					escapePressed = 0xff;
+				if(escapePressed == 0xff)
 					break;
 			}
 		}
-		if(C_0F2C_0027 != 0xff)
-			C_0CD9_0921(surf, screen, i);
+		if(escapePressed != 0xff)
+			TitleSparkles(surf, screen, i);
 	}
 end:
-	C_0F2C_0027 = 0;
+	escapePressed = 0;
 	if(music)
 		FadeOutMusic(0);
 	FADE_out(&save, 0, 1);
-	(*D_0EAE)(&save, 0);
+	(*drvClearSurface)(&save, 0);
 	PAL_restore();
 	for(i = 0; i < 13; i++)
-		MEM_free(D_4330[i]);
+		MEM_free(titleShapes[i]);
 	if(music)
 		MEM_free(music);
 	*screen = save;

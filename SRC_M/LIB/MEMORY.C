@@ -2,7 +2,7 @@
 /* compiler: Turbo C++ 1.01 */
 /* Memory: the two heaps together, the EMS heap (EMSINIT, EMSALLOC, EMSFREE,
    EMSMAP) and the conventional one (HEAP, HEAPFREE) (Savage Empire's
-   MEMORY.C, GAME.EXE 2E3C, with Martian Dreams' changes: MEM_alloc sets up
+   MEMORY.C, SE's GAME.EXE 2E3C, with Martian Dreams' changes: MEM_alloc sets up
    the conventional heap if needed, MEM_free compacts the EMS heap, MEM_size
    is new).
    The flags of each call say which: 4 the EMS heap first (else the

@@ -15,14 +15,14 @@ struct tSurface {
 };
 struct tRGB { int r, g, b; };
 
-extern unsigned char D_4230[256];/*the colors a picture uses (uninitialised, 256 bytes)*/
-extern int (far *D_0EB6)(struct tSurface *s, int x, int y);/*TM.DRV +1C: the color of a pixel*/
-extern void (far *D_0EAA)(struct tSurface *src, struct tSurface *dst);/*TM.DRV +16: copy a surface's window*/
-extern void (far pascal *D_0E92)(int index, struct tRGB *c);/*TM.DRV +0A: get a palette entry*/
-extern void (far pascal *D_0E96)(int index, struct tRGB *c);/*TM.DRV +0C: set a palette entry*/
-extern void far VID_waitRetrace(void);/*VID_waitRetrace*/
-extern int pascal PAL_colorsUsed(struct tSurface *s, unsigned char *out, int n);/*PAL_colorsUsed*/
-extern int pascal FADE_step(int *cur, int *target, int n);/*FADE_step*/
+/*4230*/extern unsigned char fadeColors[256];/*the colors a picture uses (uninitialised, 256 bytes)*/
+extern int (far *drvGetPixel)(struct tSurface *s, int x, int y);/*TM.DRV +1C: the color of a pixel*/
+extern void (far *drvCopySurface)(struct tSurface *src, struct tSurface *dst);/*TM.DRV +16: copy a surface's window*/
+extern void (far pascal *drvGetPalette)(int index, struct tRGB *c);/*TM.DRV +0A: get a palette entry*/
+extern void (far pascal *drvSetPalette)(int index, struct tRGB *c);/*TM.DRV +0C: set a palette entry*/
+extern void far VID_waitRetrace(void);
+extern int pascal PAL_colorsUsed(struct tSurface *s, unsigned char *out, int n);
+extern int pascal FADE_step(int *cur, int *target, int n);
 
 /*show the picture src on dst, its colors fading in from the color of dst's top left
   pixel: 0 without memory, otherwise 1*/
@@ -33,24 +33,24 @@ extern int pascal FADE_step(int *cur, int *target, int n);/*FADE_step*/
 	struct tRGB rgb;
 	int i;
 
-	count = PAL_colorsUsed(src, D_4230, 256);
+	count = PAL_colorsUsed(src, fadeColors, 256);
 	cur = calloc(count, sizeof(struct tRGB));
 	target = calloc(count, sizeof(struct tRGB));
 	if(!cur || !target)
 		return 0;
-	(*D_0E92)((*D_0EB6)(dst, dst->left, dst->top), &rgb);
+	(*drvGetPalette)((*drvGetPixel)(dst, dst->left, dst->top), &rgb);
 	VID_waitRetrace();
 	for(i = 0; i < count; i++) {
-		(*D_0E92)(D_4230[i], &cur[i]);
-		(*D_0E96)(D_4230[i], &rgb);
+		(*drvGetPalette)(fadeColors[i], &cur[i]);
+		(*drvSetPalette)(fadeColors[i], &rgb);
 		target[i] = rgb;
 	}
 	VID_waitRetrace();
-	(*D_0EAA)(src, dst);
+	(*drvCopySurface)(src, dst);
 	while(FADE_step((int *)target, (int *)cur, count * 3)) {
 		VID_waitRetrace();
 		for(i = 0; i < count; i++)
-			(*D_0E96)(D_4230[i], &target[i]);
+			(*drvSetPalette)(fadeColors[i], &target[i]);
 	}
 	free(target);
 	free(cur);
@@ -66,14 +66,14 @@ extern int pascal FADE_step(int *cur, int *target, int n);/*FADE_step*/
 	struct tRGB rgb;
 	int i;
 
-	count = PAL_colorsUsed(s, D_4230, 256);
+	count = PAL_colorsUsed(s, fadeColors, 256);
 	cur = calloc(count, sizeof(struct tRGB));
 	target = calloc(count, sizeof(struct tRGB));
 	if(!cur || !target)
 		return 0;
-	(*D_0E92)(color, &rgb);
+	(*drvGetPalette)(color, &rgb);
 	for(i = 0; i < count; i++) {
-		(*D_0E92)(D_4230[i], &cur[i]);
+		(*drvGetPalette)(fadeColors[i], &cur[i]);
 		target[i] = rgb;
 	}
 	while(FADE_step((int *)cur, (int *)target, count * 3)) {
@@ -81,7 +81,7 @@ extern int pascal FADE_step(int *cur, int *target, int n);/*FADE_step*/
 			for(i = delay; i--; )
 				VID_waitRetrace();
 		for(i = 0; i < count; i++)
-			(*D_0E96)(D_4230[i], &cur[i]);
+			(*drvSetPalette)(fadeColors[i], &cur[i]);
 	}
 	free(target);
 	free(cur);

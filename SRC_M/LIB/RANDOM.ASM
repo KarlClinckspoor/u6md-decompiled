@@ -1,5 +1,5 @@
 ;----------------------------------------
-;SAVAGE.EXE (like GAME.EXE 2B57): random numbers
+;SAVAGE.EXE (like SE's GAME.EXE 2B57): random numbers
 ;----------------------------------------
 
 _DATA	SEGMENT PUBLIC WORD 'DATA'

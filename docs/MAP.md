@@ -65,7 +65,7 @@ its relocations sit in the relocation table). An empty DS column: no `_DATA` of 
 | Frame:at | Length | Source (`SRC_M/`) | DS | What |
 |---|---|---|---|---|
 | 04FE:4 | 7B8D | `main.c` | 00A8-0BC0 | the program: configuration, memory, drivers, the menu, the introduction, character creation, the endgame, the credits |
-| - | 0 | `OBJHDR.ASM` | 0BC0-0C24 | data only: the header of savegame\objlist (the avatar's gender, "a character exists") |
+| - | 0 | `OBJHDR.ASM` | 0BC0-0C24 | data only: the game state block at the end of savegame\objlist (GAME.EXE's gamestat.c; PlayerIsFemale, AvatarPortrait: "a character exists") |
 | 0CB7:1 | 223 | `OSILIB/FADEIN.C` |  | palette fades: fade a picture in, colours out (1.00) |
 | 0CD9:4 | E5C | `title.c` | 0C24-0DF4 | the title (TITLE.LZC): letters, sunset, sparkles (SE's) |
 | 0DBF:0 | 156 | `sprites.c` | 0DF4-0DFC | the sparkles of the title's last scene (SE's) |
@@ -141,7 +141,9 @@ Compared with `SAVAGE.EXE`: `LIB/palfile.c`, `LIB/emsmerge.c`, `LIB/EMSNEXT.ASM`
 `OSILIB/TXTSEL.ASM` are new; `LIB/tmdrv.c` and `LIB/supertm.c` are SE's `tmdrv.c` split in
 two; `title.c`, `sprites.c` and `events.asm` are SE's with the addresses moved. From
 `LIB/MEMMOVE.ASM` on, the library is the same code as `GAME.EXE` 2706-2B00. `SRC_M/BSS.ASM`
-(the uninitialised data) has no row. All 68 modules with code have identical sources.
+(the uninitialised data) has no row. All 68 modules with code have identical sources
+(`tools/md/mdcheck.py --target martian` prints "72 of 72": the 72 rows, all with a source;
+it compares the 68 with code, and the four data-only rows are checked by the link).
 
 ## GAME.EXE
 
@@ -334,5 +336,5 @@ Origin library file (.LZC: a table of offsets, entries LZW-compressed or stored)
 | `scenetxt.lzc` | the texts of the introduction (entries 0-2), the endgame (3) and character creation (5) |
 | `create.lzc` | character creation's pictures |
 | `endgame.lzc`, `moongate.lzc` | the endgame |
-| `savegame\objlist` | read by the endgame (the avatar's shape); its first 62h bytes read and written by character creation (`OBJHDR.ASM`) |
+| `savegame\objlist` | read by the endgame (the avatar's shape); read and written by character creation: 1CF1h bytes into objList (main.c), then the 62h-byte game state block (`OBJHDR.ASM`) |
 | `game.exe` | run to play |

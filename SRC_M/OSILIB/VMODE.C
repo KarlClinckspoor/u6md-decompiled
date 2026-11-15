@@ -9,7 +9,7 @@
 #pragma inline
 #include <stdio.h>
 
-extern void far VID_initPort(void);/*VID_initPort: the CRT status port*/
+extern void far VID_initPort(void);/*the CRT status port*/
 
 /*1526*/int vidMode = -1;/*the video mode last set (a graphics mode)*/
 /*1528*/int palAlloc[256] = {0};/*colors allocated: at each color of a run, the run's length (0: free)*/

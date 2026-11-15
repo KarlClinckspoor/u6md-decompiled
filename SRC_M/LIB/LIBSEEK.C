@@ -1,6 +1,6 @@
 /* flags: -mm -c -O -G */
 /* compiler: Turbo C++ 1.01 */
-/* OSI library: moving in a library entry (Savage Empire's LIBSEEK.C, GAME.EXE 2EB7) */
+/* OSI library: moving in a library entry (Savage Empire's LIBSEEK.C, SE's GAME.EXE 2EB7) */
 
 /* an open library entry (LIBOPEN.C) */
 struct libfile {

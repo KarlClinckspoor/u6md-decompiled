@@ -1,14 +1,15 @@
 /* flags: -mm -c -O -G */
 /*
- * Worlds of Ultima: The Savage Empire - SAVAGE.EXE
- * the OSI library: save and restore the whole palette
+ * MARTIAN.EXE segment 0E62, the OSI library: save and restore the whole palette.
+ * Savage Empire's SRC_S/OSILIB/PALSAVE.C (SAVAGE.EXE 0737); here an entry is addressed as
+ * (int)savedPalette + i * 6. savedPalette (600h bytes) is defined in LIB/drvdata.c.
  */
 struct tRGB { int r, g, b; };
 
-extern void (pascal *D_0E92)(int index, struct tRGB *c);/*driver: get a palette entry*/
-extern void (pascal *D_0E96)(int index, struct tRGB *c);/*driver: set a palette entry*/
-extern struct tRGB D_0EF2[256];/*the saved palette*/
-extern void far VID_waitRetrace(void);/*VID_waitRetrace*/
+extern void (pascal *drvGetPalette)(int index, struct tRGB *c);/*driver: get a palette entry*/
+extern void (pascal *drvSetPalette)(int index, struct tRGB *c);/*driver: set a palette entry*/
+extern struct tRGB savedPalette[256];/*the saved palette*/
+extern void far VID_waitRetrace(void);
 
 /*save the 256 colors (waiting for the retrace every 16)*/
 /*C_0E62_0008*/PAL_save() {
@@ -17,7 +18,7 @@ extern void far VID_waitRetrace(void);/*VID_waitRetrace*/
 	for(i = 0; i < 256; i++) {
 		if(!(i & 15))
 			VID_waitRetrace();
-		(*D_0E92)(i, (struct tRGB *)((int)D_0EF2 + i * sizeof(struct tRGB)));
+		(*drvGetPalette)(i, (struct tRGB *)((int)savedPalette + i * sizeof(struct tRGB)));
 	}
 }
 
@@ -28,6 +29,6 @@ extern void far VID_waitRetrace(void);/*VID_waitRetrace*/
 	for(i = 0; i < 256; i++) {
 		if(!(i & 15))
 			VID_waitRetrace();
-		(*D_0E96)(i, (struct tRGB *)((int)D_0EF2 + i * sizeof(struct tRGB)));
+		(*drvSetPalette)(i, (struct tRGB *)((int)savedPalette + i * sizeof(struct tRGB)));
 	}
 }

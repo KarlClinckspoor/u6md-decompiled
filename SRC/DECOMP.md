@@ -42,9 +42,10 @@ library's F24E-F378.
 identical to the original** (341712 bytes: header, 3202 relocations, image and FBOV
 block; sha1 6b6b91fd6291d6d4d7b91615e5b6333c3e2b68a8).
 
-`python tools/md/mdcheck.py --target game` compares every module that has code (73, all
-identical; the data-only rows, gamestat.c, OSILIB/drvnames.c, MSGS.ASM and MONSDATA.ASM,
-are checked by the link). Before a build, after renaming or adding names: `tools/md/mkbss.py
+`python tools/md/mdcheck.py --target game` prints "77 of 77 modules decompiled, 0
+failing": the 77 rows of `modules.txt`, all with a source. It compares the 73 modules that
+have code (all identical); the four data-only rows, gamestat.c, OSILIB/drvnames.c, MSGS.ASM
+and MONSDATA.ASM, are checked by the link. Before a build, after renaming or adding names: `tools/md/mkbss.py
 --target game --start 3232 --end F24E` (BSS.ASM) and `tools/md/mdsym.py --target game
 apply`.
 
@@ -69,6 +70,12 @@ apply`.
   third and last of them, new code; M34).
 - Every code module of GAME.EXE has an identical source.
   SRC/se.h is SE's.
+
+**Names (Phase 6, 2026-11-15).** The functions and variables have names (four passes,
+resident modules then the overlays); the address stays in the comment before each
+definition (`/*C_SSSS_OOOO*/`, `/*XXXX*/`), which is how `mdsym.py` knows them. By address
+still: OSILIB/CLIP.ASM's four routines (nothing calls them directly) and gamestat.c's two
+unused words (D_1682, D_16D8).
 
 ## Documents
 

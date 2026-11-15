@@ -4,10 +4,10 @@
 INCLUDE OSI.INC
 
 DSegStart
-EXTRN D_191A:WORD	;struct tMouse *: the mouse
-EXTRN D_1938:WORD	;where the pointer is drawn: x
-EXTRN D_193A:WORD	;  y
-EXTRN _D_0E9A:DWORD	;driver: draw a shape (struct tSurface *s, int x, int y, void far *shapes, int index)
+EXTRN curMouse:WORD	;struct tMouse *: the mouse
+EXTRN mouseDrawX:WORD	;where the pointer is drawn: x
+EXTRN mouseDrawY:WORD	;  y
+EXTRN _drvDrawShape:DWORD	;driver: draw a shape (struct tSurface *s, int x, int y, void far *shapes, int index)
 DSegEnd
 
 EXTRN MOUSE_clamp:FAR	;MOUSE_clamp
@@ -17,7 +17,7 @@ CSegStart	MOUSEDRW_TEXT
 ;draw the pointer at the mouse position (kept in the surface)
 FProc	MOUSE_draw	;0FE6:000C
 	CALL	MOUSE_clamp
-	MOV	BX,D_191A
+	MOV	BX,curMouse
 	MOV	CX,[BX].posX
 	MOV	DX,[BX].posY
 	CMP	[BX].installed,0
@@ -30,12 +30,12 @@ C_0025:
 	PUSH	[BX].shapeIndex
 	PUSH	WORD PTR [BX].shapes+2
 	PUSH	WORD PTR [BX].shapes
-	MOV	D_193A,DX
+	MOV	mouseDrawY,DX
 	PUSH	DX
-	MOV	D_1938,CX
+	MOV	mouseDrawX,CX
 	PUSH	CX
 	PUSH	[BX].mSurface
-	CALL	_D_0E9A
+	CALL	_drvDrawShape
 	ADD	SP,0Ch
 	RET
 MOUSE_draw	ENDP
