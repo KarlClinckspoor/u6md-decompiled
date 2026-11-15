@@ -189,8 +189,8 @@ extern struct tClipInfo D_EBD0[4];/*TextWindows*/
 #define GetQuan(i) (((unsigned char *)(Amount + (i)))[0])
 #define GetQual(i) (((unsigned char *)(Amount + (i)))[1])
 
-/*1E48*/int16 D_1E48 = -1;/*used by overlay 2F63*/
-/*1E4A*/int16 D_1E4A = 0;/*used by overlay 2F63*/
+/*1E48*/int16 D_1E48 = -1;/*the AnimTile entry of tile 0x6f (-1: not looked up yet; overlays 2F63, 2F68)*/
+/*1E4A*/int16 D_1E4A = 0;/*how much faster tile 0x6f animates, 0-4 (overlays 2F63, 2F68)*/
 
 DreamTrigger(int16);
 

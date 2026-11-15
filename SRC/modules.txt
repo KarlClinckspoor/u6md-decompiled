@@ -64,8 +64,8 @@
 2F58 0 552 bridge.c 1CD6-1DA4  # overlay
 2F5B 0 8F disk.c 1DA4-1E48  # overlay
 2F5F 0 C13 dream.c 1E48-1E88  # overlay
-2F63 0 D00 -  # overlay
-2F68 0 1A87 -  # overlay
+2F63 0 D00 dreamobj.c 1E88-1F02  # overlay
+2F68 0 1A87 dreamstg.c 1F02-1F28  # overlay
 2F6E 0 60F lever.c 1F28-20F4  # overlay
 2F72 0 402 power.c  # overlay
 2F75 0 16F2 -  # overlay

@@ -37,7 +37,8 @@ the library's C files name their own flags (cdecl) and often Turbo C++ 1.01.
   (overlay 2F80), visible.c (1157), use.c (2597), power.c (overlay 2F72), barge.c (03CE),
   belt.c (overlay 2F52), bridge.c (overlay 2F58), sound.c (1FA9, SE's game-side music.c),
   lever.c (overlay 2F6E), rest.c (overlay 2F7C),
-  gfx.c (0E1A), canmove.c (104E), dream.c (overlay 2F5F).
+  gfx.c (0E1A), canmove.c (104E), dream.c (overlay 2F5F), dreamobj.c (overlay 2F63),
+  dreamstg.c (overlay 2F68).
 - Next: the SE-like modules, then the new code and the other overlays (docs/PLAN.md
   Phase 4). SRC/se.h is SE's.
 
