@@ -19,7 +19,7 @@
 16D7 A 358 OSILIB/MOUSE.ASM 1412-1420
 170D 2 3FC0 -
 1B09 2 4A00 -
-1FA9 2 CE1 -
+1FA9 2 CE1 sound.c 16DA-1A8A
 2077 3 1B55 status.c 1A8A-1B84
 222C 8 B8 typetest.c
 2238 0 35F2 console.c 1B84-1CBA
@@ -66,10 +66,10 @@
 2F5F 0 C13 -  # overlay
 2F63 0 D00 -  # overlay
 2F68 0 1A87 -  # overlay
-2F6E 0 60F -  # overlay
+2F6E 0 60F lever.c 1F28-20F4  # overlay
 2F72 0 402 power.c  # overlay
 2F75 0 16F2 -  # overlay
-2F7C 0 B3D -  # overlay
+2F7C 0 B3D rest.c 213E-2408  # overlay
 2F80 0 268 jet.c 2408-247A  # overlay
 2F83 0 1700 talk.c 247A-2802  # overlay
 2F88 0 1F6B talkdr.c 2802-28F0  # overlay
