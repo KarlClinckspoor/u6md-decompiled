@@ -11,9 +11,9 @@ not be established, the section says so at its end.
 The game runs on the Ultima VI engine, by way of *The Savage Empire*. How its engine differs
 from Savage Empire's is in [`docs/FINDINGS.md`](FINDINGS.md); this document only says "as in
 SE" or "unlike SE" where that helps a reader who knows Savage Empire
-(`..\u6se-decompiled\docs\MECHANICS.md`). Where this document and FINDINGS.md disagree, this
-document was checked against the code later; the disagreements are listed under *What could
-not be determined*.
+(`..\u6se-decompiled\docs\MECHANICS.md`). Where this document first disagreed with
+FINDINGS.md, both were checked against the code and FINDINGS.md was corrected (see the end
+of *What could not be determined*).
 
 Conventions:
 
@@ -1382,9 +1382,9 @@ time passes:
 `HP += (OSI_rand(3, 8) + OSI_rand(3, 8)) × (hours / 2)` (integer division), up to MaxHP.
 
 A separate roll is made for each member. Then `NextSleep` is set to **6**; it goes down by
-1 each game hour, so the next rest heals only 6 hours later. (The source's header comment,
-and FINDINGS.md, say 2-8 + 2-8; the calls are `OSI_rand(3, 8)`.) An 8-hour rest heals
-24-64 points. No other hit points come back while resting.
+1 each game hour, so the next rest heals only 6 hours later. (The source's header comment
+says 2-8 + 2-8; the calls are `OSI_rand(3, 8)`.) An 8-hour rest heals 24-64 points. No
+other hit points come back while resting.
 
 #### The time passes
 
@@ -5522,48 +5522,16 @@ Each section ends with its own list. The questions that matter most to a player 
 - **`TypeWeight`**, the weight of each object type, is game data (TILEFLAG) and is not
   tabulated here.
 
-### Where this document corrects docs/FINDINGS.md
+### FINDINGS.md and this document
 
-These were checked in the code while writing this document; FINDINGS.md says otherwise or
-less:
-
-| FINDINGS.md says | The code does | Section |
-|---|---|---|
-| The R key gives "0x89 rest"; rest is "sleeping in a bed" | `GameLoop` has no case for 0x89; resting is *Use* on a folded tent 0x6a (`UseBed`) | Time, rest, stats and levels |
-| Rest heals "(2-8 + 2-8) x hours/2" | `OSI_rand(3, 8) + OSI_rand(3, 8)` | Time, rest, stats and levels |
-| AmbientLight is "never below what a carried light gives" | it is *set* to the light's level when below 4, so at dawn or dusk a torch can lower it | Time, rest, stats and levels |
-| PassTime updates barges, jetters, plants "every call" | only on calls with minutes > 0, once per call | Time, rest, stats and levels |
-| Ice and radium act per minute on the party | on NPCs 0-7, in the party or not | Time, rest, stats and levels |
-| (silent) | a step of the leader passes no time; `ComputeLevel` is never called | Time, rest, stats and levels |
-| (silent on the to-hit result) | the to-hit test is used: a miss does nothing | Combat |
-| `GetDamagePoints` off by one gives a creature the damage of the class before it | no caller passes it an actor; natural attacks read `MonsterDamage[class + 1]` themselves, so it has no effect | Combat |
-| Plants are hurt only by damage kinds 0 and 3 | the reverse: plants by every kind, other breakables only by 0 and 3 | Combat |
-| Damage kind 1 paralyses | `LoseHP` kind 1 only flashes and freezes water; the freeze ray's own code paralyses | Combat |
-| A thrown weapon lands and the next is readied | that code is unreachable | Combat |
-| Class flags 8 "resists burning" and 0x40 "divides" | no class has either bit (nor 0x10) | Combat |
-| (egg.c comment) eggs of quality 100+ hatch after `TalkFlags[0x46] & 8` | they never hatch | Combat |
-| (console.c comment) the combat-mode button cycles 2, 4, 5, 7, 8 | 2, 4, 7, 8 | Combat |
-| A lit light may not go into a container | `CanPutInContainer` tests the object number as a type, so it never refuses | Objects and commands |
-| `GiveObj` refuses instead of dropping | it refuses only while `GiveObjRefuses` is set, and that word is the script variable `#T` | Objects and commands; Conversations |
-| Get reaches as far as the level with the first talent | Get tests only a clear missile path; Drop has no reach limit; Move tests level + 1 | Objects and commands |
-| The hot objects need "gloves 0x88" | 0x88 is tongs; NPC 6 is exempt; the burn poisons | Objects and commands |
-| Barrels 0x19a float along the canal | 0x19a is a rail car on its track; the barrels are 0x1cb | The map and machinery |
-| Plates 0x12d react to NPCs | 0x12d is a mirror showing the NPC south of it | The map and machinery |
-| Coal workers pull the lever 0xe9 | 0xe9 is a furnace, which the stoker stokes | The map and machinery |
-| `CanMoveTo` tests every square of a big creature | only creatures of two squares; four-square creatures are tested on their own square | The map and machinery |
-| The view can rotate | no drawing code reads `ViewRotation`; it turns the direction keys and the pointer | The map and machinery |
-| Swimmers use canal water only while the pumps run | any water tile | The map and machinery |
-| Belts move one tile per turn (from `PassTime`) | `BeltUpdate` runs after each leader step and the Pass command | The map and machinery |
-| Cut scenes 6 and 7: "canal pumps on" / "off" | 6: the ruby lenses melt the ice; 7: the valves open the canals; nothing turns the pumps off | Cut scenes and the endgame |
-| Cut scene 8 moves NPCs 0x40-0x46 | it also kills 0x41 and 0x43-0x45 and sends 0x40 to level 6 | Cut scenes and the endgame |
-| Cut scene 12 has 3 pages | `MIDGAMEC.LZC` holds 1 | Cut scenes and the endgame |
-| Without the debug flag most keys say "Are you a god?" | key 242 still prints time and position; "f5" is key code 0xF5, not the F5 key | Debug keys |
-| The game starts at (0x198, 0x270, 0) | that is the compiled-in default; the installed saved game overrides it | Character creation |
-| The dreamer passing out wakes in NPC 1's place with NPC 1's inventory | only when the last proto martian of stage 0x20 dies; the dreamer gets a copy of the inventory and wakes inside the dream (a false waking) | The dream |
-| A knocked-out dreamer goes back and conversation 0x66 runs | 0x66 runs only at stage 0xc0 | The dream |
-| Someone on the organ's seat plays a melody | the melody needs sheet music 0x199 west of the organ | The use command |
-| The telescope looks 40 squares away | 41 steps, stopping at darkness | The use command |
-| `#O` counts NPCs near the view's middle | every actor slot on screen, dead or on other levels included | Conversations and quest state |
+When this document was written, it disagreed with `docs/FINDINGS.md` in 35 places,
+among them rest and the R key, the rest heal, light, what PassTime does on each call, the
+to-hit test, damage kinds, class flags, eggs, reach, containers, `GiveObj`, the hot
+radium, the rail car, the mirror, the furnace, big creatures, view rotation, swimmers,
+belts, cut scenes 6, 7, 8 and 12, the debug keys, the starting place, the dreamer passing
+out, the organ, the telescope and `#O`. Each was checked again in the code. In every case
+the code does what this document says, and FINDINGS.md was corrected, its list of the
+original's bugs included. None of them is still open.
 
 ## Sources
 

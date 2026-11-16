@@ -99,9 +99,13 @@ The layout of both programs is in `docs/MAP.md`.
     is found from any of them. SE had one cursor.
   - Creatures of two squares: TileFlag 0x40 means the other square is above, 0x80 to the
     left; types 0x167-0x169 depend on the direction. Creatures of four squares: 0xc0.
-  - `CanMoveTo` (canmove.c) tests every square of such a creature, and so do the combat
-    distances (`COMBAT_RangeToObj`).
-- **The view can rotate.** ViewRotation holds the rotation (console.c's RotCos/RotSin).
+  - `CanMoveTo` (canmove.c) tests both squares of a creature of two squares. A creature of
+    four squares (0xc0) is tested on its own square only. The combat distance
+    (`COMBAT_RangeToObj`) to a creature of two squares is measured to one square chosen
+    by its frame; a square next to a creature of four squares is at distance 1.
+- **The controls can rotate, not the view.** ViewRotation (eighths of a turn) turns the
+  direction keys and the pointer's direction (console.c's RotCos/RotSin). No drawing code
+  reads it: the map is always drawn the same way.
   - Stepping on an object 0x1d1 sets ViewRotation = quality & 7 ("You feel dizzy...").
   - One of the dream's levers toggles it between 0 and 4.
   - Waking from the dream resets it.
@@ -115,8 +119,10 @@ The layout of both programs is in `docs/MAP.md`.
   - MapZ 2 and 3 are the dream. There the area song is 3 and the sky bar is gray.
   - MapZ 6 is "nowhere": NPCs leave the world with `MoveObj(n, n, n, 6)`, and NPC 0 waits
     there between dreams.
-- **Where the game starts and where the party wakes.** The game starts at 8:00 on day 6 of
-  month 1, 1895, at (0x198, 0x270, 0) (gamestat.c).
+- **Where the game starts and where the party wakes.** gamestat.c's defaults are 8:00 on
+  day 6 of month 1, 1895, at (0x198, 0x270, 0), but `GAME_Load` overwrites them at start-up
+  from the installed `savegame\objlist`, and the view goes to the party leader. In the
+  GOG release's copy that is (0x1a1, 0x274, 0) at 8:00 on 6 January 1895.
   - After the party's death (ResurrectParty) it wakes at 7:00-7:59 at (0xa4, 0xc3, 4), the
     "Olympus mine", once TalkFlags[0x46] & 8 is set. Otherwise it wakes at
     (0x19d, 0x278, 0), the "space capsule". Then conversation 0x12 runs.
@@ -166,12 +172,15 @@ Savage Empire has nothing like it. Three overlays hold it: dream.c (2F5F), dream
   - It puts NPC 0 back on MapZ 6 and prints "You wake up."
   - Other ways out:
     - Talking to yourself wakes you.
-    - A dreamer knocked out goes back to its wake-up place (WakeX/WakeY, then
-      conversation 0x66). With no place to go back to, it shakes itself awake from the
-      nightmare.
-    - If the dreamer passes out ("Overcome by fatigue, you pass out.", DreamerPassesOut), the
-      party's bodies are moved and the dreamer wakes in NPC 1's place with NPC 1's
-      inventory: "All your friends have been killed!"
+    - A dreamer knocked out goes back to its wake-up place (WakeX/WakeY, sound.c
+      PartyUnconscious). Conversation 0x66 runs only at stage 0xc0. With no place to go
+      back to, it shakes itself awake from the nightmare.
+  - **A false waking.** Killing the last creature of stage 0x20 makes the dreamer pass out
+    ("Overcome by fatigue, you pass out.", DreamerPassesOut, from COMBAT_Kill; nothing else
+    calls it). The party's bodies and their things are moved, the dreamer gets copies of
+    NPC 1's inventory and NPC 1's shape, and wakes at (0x10, 0x33, 2), still in the dream,
+    with the panel's normal colour: "You wake up!", "All your friends have been killed!".
+    DreamStage becomes 0xa0.
 - **Dream creatures.**
   - The A.I. modes 0x13 and 0x16 (combat.c) and 0x18 (AI_SeekSeed, which walks towards an
     object 0xfb) are the dream's.
@@ -202,29 +211,36 @@ The world's machines are new code. Talk flags hold their state:
 - **Levers** (lever.c, use action 24). `UseLever` goes by the lever's quality:
   - 1-2: the doors 0xb3/0xe3 whose quality & 0x7f is the lever's quantity.
   - 10: a drawbridge.
-  - 20: the power station and the canal pumps, by quantity: 1 underground power (cut
-    scene 2), 2 surface power (cut scene 3), 3 and 4 pumps on and off (cut scenes 6 and
-    7), 5 start the belt, 6 cut scene 8.
+  - 20: the power station and the canals, by quantity: 1 underground power (cut scene 2),
+    2 surface power (cut scene 3), 3 the ruby lenses, water in the canals
+    (TalkFlags[0x76] & 0x20, cut scene 6), 4 the canals working (& 0x40, cut scene 7;
+    refused without the water), 5 start the belt, 6 cut scene 8. Nothing turns the
+    pumps off.
   - 21: the dream's levers.
-  - Objects 0xe3/0xb3 and plates 0x12d react to the NPCs standing on them, with a sound
-    (`ShowObjects`).
+  - Objects 0xe3/0xb3 react to the NPCs standing on them, with a sound (`ShowObjects`).
+  - The mirror 0x12d ("reflective surface") shows the NPC south of it: frame 0 none, 1 a
+    human, 2 a Martian, chosen by NPC number.
 - **Conveyor belts** (belt.c, overlay 2F52). Each belt object 0xbc moves what lies on it one
-  tile per turn, west when its quality bit 0 is set, else east.
-  - The first piece puts coal 0xbd on the belt every fourth turn; the last piece takes it
-    off.
+  tile per update, west when its quality bit 0 is set, else east. `BeltUpdate` runs after
+  each step of the party leader (PartyAdvance) and after the Pass command, not in
+  PassTime.
+  - The first piece puts coal 0xbd on the belt every fourth update; the last piece takes
+    it off.
   - NPCs ride along, and the view follows the leader (LeaderOnBelt/MemberOnBelt,
     canmove.c).
-  - The coal workers are NPC modes 0x99-0x9e (npctrack.c). They carry coal 0x1be/0x1bf to
-    the belt and pull the lever 0xe9.
+  - The coal workers are NPC modes 0x99-0x9e (npctrack.c). They carry coal 0x1be/0x1bf
+    and the stoker stokes the furnace 0xe9 north of him: that starts the belt, or the
+    underground power (cut scene 2) once the rollers are fixed (TalkFlags[0x72] & 4).
 - **Barges** (barge.c, resident 03CE). A barge is a set of pieces 0x1a1 with one
   controller 0x1a2. They share the barge's number as quality; the controller's frame is
   the direction and its quantity the number of pieces.
-  - While the pumps run, or in the dream, each barge moves one tile per turn over water
-    and carries what stands on it.
+  - While the pumps run, or in the dream, each barge moves one tile over water on each
+    call of PassTime that passes time (once per call, whatever the minutes), and carries
+    what stands on it.
   - `MoveFollowers` keeps the party on its places aboard (CurrentBarge).
   - The controller is steered by Use (action 23): the pointer gives the direction, or
     "center." to stop.
-  - barge.c begins with a debugging dump to a file "brg" (debug key f6).
+  - barge.c begins with a debugging dump to a file "brg" (debug key 246, 0xf6).
 - **Drawbridges** (bridge.c, overlay 2F58). A drawbridge is worked by levers 0xc4
   (quality 10, quantity the bridge's number) and spans posts 0xc3. The first post's
   quantity gives the length (bits 0-4) and 0x80 for north-south.
@@ -234,11 +250,13 @@ The world's machines are new code. Talk flags hold their state:
   jet's length; quantity the countdown and the direction. The jet is drawn with
   `Missiles` and hurts what it hits. Jetters run only with TalkFlags[0x73] & 4.
 - **Canals.**
-  - Barrels 0x19a float only along the canal (`PushObj`). `MoveObj` gives them their
-    side effects: "BOOM!!!", "Crash!!", "Splash!!" while the pumps run.
+  - The rail car 0x19a runs only along its track (`PushObj`). Pushed alone into water,
+    `MoveObj` makes it drift and break on the shore ("Crash!!") while the pumps are off, or
+    sink ("Splash!!") while they run; "BOOM!!!" when it came from no neighbouring square.
   - Objects dropped or pushed into a running canal splash.
-  - Swimming creatures (class flag 0x200) can use canal water only while the pumps run
-    (canmove.c).
+  - Swimming creatures (class flag 0x200) can use any water only while the pumps run
+    (canmove.c). The code exempts tile 8, but that tile has TerrainType & 4, which
+    refuses it anyway.
 - **Hazards** (gameloop.c `TerrainDamage`, new). Object 0x1cf's quality picks one of: "It's
   hot here!", "Fire!", "Frost!", "Fire bomb!", "Fragmentation bomb!", "Steam jet!",
   "Heat Ray!", "Freeze Ray!", "Acid!". Objects 0xd1, 0x17d, 0xd7 and 0xa8 hurt by
@@ -266,14 +284,16 @@ The world's machines are new code. Talk flags hold their state:
   (2F98, 22) and useact3.c (2FA1, 24). Plus lever.c's `UseLever`. The table points at the
   stub entries (`2F8D:0020 + 5k`).
 - **What they do.**
-  - Sleeping in a bed (`REST_Command`); reading (`MDTEXT.LZC`).
+  - Camping: action 0 on the folded tent 0x6a (`UseBed`, then `REST_Command`) is the only
+    way to rest; reading (`MDTEXT.LZC`).
   - Dirt: digging, filling and burying, and the dirt loaded into wheelbarrows and rail
     cars. A cart's quantity is its loads, its quality the kind.
   - The drill and its cart, the power cable.
   - Radium for the guns, the power station and the mechanical man.
   - The guns' setting (Rifle/Shotgun/Combination).
-  - Billiards ("Good shot, old bean!"); the pipe organ (keys 0-9 play notes; someone on
-    its seat plays a melody); the cannon ("Kaboom! You blew the door down!").
+  - Billiards ("Good shot, old bean!"); the pipe organ 0xa5 (keys 0-9 play notes; with
+    sheet music 0x199 on the square west of it, a melody); the cannon ("Kaboom! You blew
+    the door down!").
   - The cabinet panels 0x1ca:
     - 4 the dream machines;
     - 5 the rubber sprayer;
@@ -287,7 +307,8 @@ The world's machines are new code. Talk flags hold their state:
     with EGG_generate.
   - Oxygenated air revives a body.
   - Light sources: lit, put out, refuelled; they burn things.
-  - The telescope looks 40 squares away (with U6's `XRayView`).
+  - The telescope steps the view 41 squares in a direction (with U6's `XRayView`),
+    stopping early at darkness (tile 0xff).
   - Buckets of water and ice, the chemicals on a mound, oil on rusted doors, the berries,
     the instruments ("GONG!!!!").
 
@@ -299,21 +320,30 @@ The world's machines are new code. Talk flags hold their state:
     0x87 use (keys A T L G D M U), 18 pixels apart from x = 16.
   - The keys B, R and Ctrl-S give 0x88 combat, 0x89 rest and 0xaa save. ALT+letter makes
     a command the default.
-- **Reach.**
-  - Get, Move and Use reach as far as the actor's level when it has the first talent
-    (`TALENT_RANGE`), plus one for Move and Use; otherwise only the adjacent square.
-  - A thrown or fetched object flies along `COMBAT_Missile`'s path ("Blocked!").
+  - `GameLoop` has no case for 0x89: the R key does nothing. Resting is the folded tent's
+    use action.
+- **Reach.** Without the first talent an actor handles only the adjacent square. With it
+  (`REACH`, `TALENT_RANGE`, the actor's level):
+  - Move and Use reach the level plus one.
+  - Get compares no distance with the level. The object must fly to the actor along a
+    clear path (`COMBAT_Missile`, at most 8 squares; "Blocked!"). The keyboard cursor
+    stops at level + 1, a mouse click reaches the whole map window.
+  - Drop has no reach limit. The thrown object flies along its path, and the reach only
+    decides whether a fragile object (the devil pod 0x133) breaks.
   - A refusal plays sound effect 5.
 - **Inventories.**
   - An inventory or a container holds 16 slots (OBJ_InvSlotsUsed counts them).
   - What is carried is weighed against 20 x strength, what is worn against 10 x strength
     (SE weighed against STREN).
-  - A container may not go into a container, and a lit light may not go into one.
+  - A container may not go into a container. The test meant to keep lit lights out
+    (`CanPutInContainer`) passes the object number to IsUnlitLightType, so it never
+    refuses: a lit light can go into a container.
 - **Ready and Unready.** Readying no longer has SE's "can't use modern weapons!" rule.
   - Lit torches burn out in the hand.
   - Some objects can't be taken off ("They won't come off!").
-  - The hot objects 0x1c0/0x1c1 hurt a member who lacks the first talent and gloves 0x88
-    in a hand ("OUCH. It is very hot.").
+- **The hot radium.** Handling the radium 0x1c0/0x1c1 (Get, Drop, Move, and its use
+  action) poisons a member (not NPC 6) who lacks the first talent and tongs 0x88 in a hand
+  ("OUCH. It is very hot.").
 - **Look.** Look reports the state of many objects:
   - a plant's growth and a lamp's fuel;
   - a cart's loads of dirt, rock, iron ore or coal;
@@ -326,7 +356,9 @@ The world's machines are new code. Talk flags hold their state:
   - The clock types 0x5b/0x62 are swapped as they are picked up and put down.
   - Creatures 0x17f join their neighbours' frames (OBJ_JoinCreepingCacti).
   - `OBJ_MakeDeadBody` prints "Oh no!" when the body cannot take the inventory.
-  - `GiveObj` refuses instead of dropping.
+  - `GiveObj` drops what does not fit, as in SE, unless `GiveObjRefuses` is set; then it
+    refuses. That word (D_EBC0) is `VarInt[29]`, the script variable #T: it is 0 when a
+    conversation starts, and a script that sets #T before OP_GIVEOBJ asks for a refusal.
   - `TakeObj` also takes non-stacking objects one by one.
 
 ## Talk
@@ -346,7 +378,8 @@ The world's machines are new code. Talk flags hold their state:
   - the avatar's (NPC 1's) #A dexterity, #E experience, #I intelligence, #P hit points,
     #S strength;
   - #G and $G ("Madam"/"Sir"), #N party size;
-  - #O how many NPCs are near the view's middle;
+  - #O how many actor slots 0-0xff `OBJ_IsOnScreen` accepts, with no level, life or
+    empty-slot test (the party, the dead and actors on other levels count);
   - $T morning/afternoon/evening.
   - It calls TalkDriver with 0 in the dream.
 - **Talking to things.** Talking to an object gives a psychic impression when the active
@@ -382,6 +415,10 @@ The world's machines are new code. Talk flags hold their state:
   - GetStr subtracts 3 for a member with the first talent and stays within 1-30.
   - Armour (`GetProtection`) is the sum of what the equipped objects give (GetArmorPoints),
     with no curse or protection terms.
+- **Attacks can miss.** `__AttackTest` hits an actor when `OSI_rand(1, 30) >= (defender's
+  DEX + 30 - attacker's stat) / 2`; the stat is STR for a creature's own attack with class
+  flag 0x20, else DEX. Objects are always hit. `__TryHit` uses the result: a miss only
+  plays sound effect 3. SE tested `didHit != -1`, so its attacks never missed.
 - **The monster tables** (`MONSDATA.ASM`). MonsterTypes lists 49 creature types after an
   unused first entry. `GetMonsterClass` returns the index minus 1. So the byte tables
   (strength, dexterity, intelligence, armour, damage, HP, alignment) are read at
@@ -390,9 +427,7 @@ The world's machines are new code. Talk flags hold their state:
   | Flag | Effect |
   |---|---|
   | 4 | the attacker paralyzes 1 time in 4 |
-  | 8 | resists burning |
   | 0x20 | attacks with strength |
-  | 0x40 | divides ("%s divides!") |
   | 0x80, 0x4000 | living: "killed" (else "destroyed") |
   | 0x100, 0x200, 0x400 | movement: goes anywhere but walls, swims, flies |
   | 0x800 | explodes, leaves no body |
@@ -400,11 +435,18 @@ The world's machines are new code. Talk flags hold their state:
   | 0x2000 | bleeds: blood objects 0x14e-0x150 |
   | 0x8000 | walks only on certain tiles |
 
+  LoseHP also tests 8 (immune to burning), 0x10 (burning doubled, a dropped `damage << 1`)
+  and 0x40 (divides, "%s divides!"), but no class in MonsterFlags has any of the three.
+- **Eggs** (egg.c). An egg's quality 100 or more is meant to wait for TalkFlags[0x46] & 8
+  (the module header says so). Once the flag is set, its quality / 10 (10 or more) matches
+  none of the time-of-day cases 0, 1 and 2 in `EGG_hatches`, so such an egg never hatches.
 - **Ranged weapons.** objtype.c's GetMissileInfo gives a weapon's missile tile, its sound and
   its ammunition: an ammunition type taken from the inventory, the weapon's own quantity,
   none, or the weapon itself thrown.
-  - A thrown weapon lands where the missile stops, and the next one of its type is
-    readied in the same hand.
+  - `COMBAT_FireRangedWeapon` keeps SE's thrown weapon, which lands where the missile
+    stops while the next one of its type is readied in the same hand. No MD weapon
+    reaches that code: every type with a range above 1 is in MissileWeaponTypes but the
+    shotgun 0x2b, which never makes a single shot.
   - COMBAT_AttackWithNextWeapon checks the ammunition (0x30 needs 0x40, 0x2b needs 0x3a
     ...).
 - **Sprayers.** Weapons 0x2b, 0x2d, 0xf0 and 0xf1 spray 12 missiles (MissileSpray, damage
@@ -416,11 +458,14 @@ The world's machines are new code. Talk flags hold their state:
   | Kind | Effect |
   |---|---|
   | 0 | normal: the target may bleed |
-  | 1 | paralyzes; freezes water |
+  | 1 | the paralysis flash (tile 0x102); freezes water |
   | 2 | ignores armour |
   | 3 | burns; thaws ice |
 
-  Plants (IsPlantType's types) are hurt only by kinds 0 and 3.
+  Kind 1 does not paralyze by itself: the freeze ray 0xf1's own code in `__TryHit` and the
+  spray do. Breakable objects (IsBreakableType: 0xb3, 0x184, 0x133, 0x12c, 0xd9) are hurt
+  only by kinds 0 and 3, except the two that are also plants (IsPlantType: 0x12c, 0x133),
+  which every kind hurts.
 - **Bodies.** Humans fall as 0x155; other creatures as 0x151-0x154, 0x9f or 0xfd.
 - **Unwinnable game.** Killing certain NPCs sets IsArmageddon to 1 or 2. For some
   it prints "You have killed someone whose help you need to win the game!". Saving is
@@ -465,7 +510,8 @@ The world's machines are new code. Talk flags hold their state:
 ## Attributes, talents and levels
 
 - **Attributes and levels.** Strength, dexterity, intelligence, `ComputeLevel` (the
-  experience halved until 99 or less) and `AddXP` are as in SE.
+  experience halved until 99 or less) and `AddXP` are as in SE, but nothing calls
+  `ComputeLevel`: levels rise only in the rest dream below.
 - **Levels in a dream.** A member goes up a level while resting, in a dream of three
   obelisks (`REST_LevelUp`):
   - the sword raises strength, the heart dexterity, the book intelligence, up to 30;
@@ -473,8 +519,8 @@ The world's machines are new code. Talk flags hold their state:
   - In SE a bear, a jaguar and a monkey asked the questions.
 - **Talents.** Each NPC has three talents: Talents[16], three 4-bit fields .a, .psychic
   and .c, saved with the game. The party view shows them as icons (tiles 0x120-0x122).
-  - **First (.a).** The actor reaches as far as its level (Get, Move, Use, Drop) and its
-    strength counts 3 less. It may handle the hot objects.
+  - **First (.a).** The actor reaches beyond the adjacent square (Get, Move and Use; see
+    "Reach") and its strength counts 3 less. It may handle the hot radium.
   - **Second (.psychic).**
     - Impressions of objects when talking to them.
     - Objects flagged for it show.
@@ -491,21 +537,26 @@ The world's machines are new code. Talk flags hold their state:
 
 ## Rest and time
 
-- **Rest** (rest.c, overlay 2F7C).
+- **Rest** (rest.c, overlay 2F7C). It starts only from the folded tent's use action
+  (`UseBed`); the R key does nothing.
   - Refused in combat, with foes within 39 tiles, with someone watching within 5, in solo
     mode and in the dream.
   - Poisoned members are named and the player may give up.
   - The party camps in a tent of five objects 0x86, until sunrise or sunset or for 1-9
     hours.
-  - More than 4 hours heals (2-8 + 2-8) x hours/2 when NextSleep allows (then NextSleep is
-    6).
+  - More than 4 hours heals (3-8 + 3-8) x hours/2 (`OSI_rand(3, 8) + OSI_rand(3, 8)`)
+    when NextSleep allows (then NextSleep is 6).
   - Poison wears off on 2-16 >= 15, else costs hit points.
   - SE's food (IsEdible, TryEat ...) and gathering around the leader are gone. CampOfsX/Y
     and CampFacing remain, unused.
-- **PassTime** (gameloop.c) keeps SE's frame with much new code. Every call:
-  - updates barges, jetters, plants 0xfb and shrinking objects 0x9d. A plant grows a
-    frame three days after planting; the seed 0xfc in the hole beneath holds the date.
-  - shakes the screen one time in 5 once TalkFlags[0x46] & 8 is set.
+- **PassTime** (gameloop.c) keeps SE's frame with much new code.
+  - Every call shakes the screen one time in 5 once TalkFlags[0x46] & 8 is set.
+  - A call that passes time (minutes > 0) updates barges, jetters, plants 0xfb and
+    shrinking objects 0x9d, once whatever the minutes. A plant grows a frame three days
+    after planting; the seed 0xfc in the hole beneath holds the date.
+- **Walking passes no time.** A step of the leader does not call PassTime with minutes.
+  The clock moves one minute each time every actor has spent its movement points
+  (`PassTime(1)` in npctrack.c's scheduler), and by rest, waits and a few events.
 - **For each member out of the dream:**
   - **Air.** Under TalkFlags[0x10] & 0x20, a member without oxium 0x83 "gasps for air!"
     (ObjStatus 0x40), then "breathes easier!".
@@ -514,8 +565,8 @@ The world's machines are new code. Talk flags hold their state:
   - **Cold.** On the surface at night (22-3 h, or 18-6 h with too little warmth from what
     is worn) a member "is freezing!" and loses 1-2 points a minute, until it "feels
     warmer!". Never NPC 6.
-- **Per minute:**
-  - charm and other effects wear off;
+- **Per minute, for every NPC:** charm and other effects wear off. **For NPCs 0-7, in the
+  party or not:**
   - the talents drop;
   - ice in a bucket melts back to water, and ice 0x100 melts away;
   - carrying 0x1c0/0x1c1 outside a container 0x8b poisons.
@@ -525,7 +576,8 @@ The world's machines are new code. Talk flags hold their state:
   - DrunkCounter goes down;
   - the schedules are updated.
 - **Light.** AmbientLight ramps at 6:40-7:20 and 17:20-18:00. It is 0 underground and at
-  night, but never below what a carried light gives.
+  night. When it is below 4 and a member carries a lit light, it is *set* to that light's
+  level (1-3), so at dawn or dusk a torch can lower it.
 
 ## Cut scenes and the end of the game
 
@@ -538,21 +590,25 @@ The world's machines are new code. Talk flags hold their state:
   | Scene | Pages | Function | Called from | Changes |
   |---|---|---|---|---|
   | 1 | 2 | Cutscene1 | a use action (useact1.c's UseOpenHatch) | |
-  | 2 | 3 | Cutscene2 | LeverMachinery 1; the coal workers' lever | underground power: lights 0xc9 and machines 0xd6 in (0x3d0, 0x1d0)-(0x3f0, 0x1e7) |
+  | 2 | 3 | Cutscene2 | LeverMachinery 1; the stoker at the furnace 0xe9 | underground power: lights 0xc9 and machines 0xd6 in (0x3d0, 0x1d0)-(0x3f0, 0x1e7) |
   | 3 | 2 | Cutscene3 | LeverMachinery 2; the power cable | surface power: removes the objects 0x13b at four places |
   | 4 | 2 | Cutscene4 | dream.c, before entering | |
   | 5 | 3 | Cutscene5 | the dream machine, NPC 0x21 | |
-  | 6 | 3 | Cutscene6 | LeverMachinery 3; cabinet panel 6 | canal pumps on |
-  | 7 | 3 | Cutscene7 | LeverMachinery 4; panel 7, the valve | canal pumps off |
-  | 8 | 3 | Cutscene8 | LeverMachinery 6; the rubber sprayer | moves NPCs 0x40-0x46 |
+  | 6 | 3 | Cutscene6 | LeverMachinery 3; cabinet panel 6 | the ruby lenses melt the ice: removes the ice 0xd2 in (0x13b, 0x116)-(0x140, 0x11a) |
+  | 7 | 3 | Cutscene7 | LeverMachinery 4; panel 7, the valve | the valves open the canals: the objects 0x1cb of frame 1 around (0x241, 0x27b) get frame 2, a 0x1cc is added |
+  | 8 | 3 | Cutscene8 | LeverMachinery 6; the rubber sprayer | kills NPCs 0x41 and 0x43-0x45, moves 0x42 and 0x46, sends 0x40 to MapZ 6 |
   | 9 | 2 | Cutscene9 | combat.c, the weapon 0x139 hitting NPC 0x66 | puts NPCs back on MapZ 4 |
   | 10 | 2 | Cutscene10 | talk.c, event 10 | removes or moves NPCs 0x20-0x31 and 0x50-0x57 |
   | 11 | 1 | Cutscene11 | dream.c, before entering | |
-  | 12 | 3 | Cutscene12 | the dream machine, the robot 0x11f | NPC 6 |
+  | 12 | 1 | Cutscene12 | the dream machine, the robot 0x11f | NPC 6 |
   | 13 | 1 | Cutscene13 | the ruby slippers, answer "N" | |
 
+  - Pages are the pages that play. Cutscene12 asks for 3, but `MIDGAMEC.LZC` holds one
+    page's five entries, and PlayCutscene stops at the first missing picture.
+  - Nothing turns the canal pumps off: cut scenes 6 and 7 are the two steps that start
+    them.
   - ShowMdMap shows a map of `MDMAP.LZC` (the map object 0x96).
-  - Debug key f5 plays scenes 1-9.
+  - Debug key 245 (0xf5) plays scenes 1-9.
   - SE had four cut scenes and the MIDGAMEn.LZC pictures in gfx.c's `ShowMidgame`, which
     is gone.
 - **The end.** GameEnd runs when the answer to the Grand Finale question is "Y", or
@@ -599,6 +655,8 @@ The world's machines are new code. Talk flags hold their state:
   - Wall variants exist only for the wall tiles 0xa0-0xa5, 0xb0-0xb2 and 0xe0-0xe5.
 - **Console.**
   - The "more" prompt waits for any key or click.
+  - The combat-mode button of the equipment view cycles a member's combat mode 2, 4, 7, 8
+    (`MouseInEquipView`; its comment says 2, 4, 5, 7, 8).
   - Containers can be locked.
   - Load and save have no disk swapping.
 - **Sound** (sound.c, SE's game-side music.c reworked).
@@ -606,9 +664,11 @@ The world's machines are new code. Talk flags hold their state:
   - The area song is 3 in the dream, 2 underground, 8 in combat, 0 by day, else 1.
   - Jingles queue the next song with SetNextSong instead of waiting for a marker.
   - 56 sound effects; machines keep one looping (MUS_PlayLoopSfx).
-  - Someone at the organ plays a melody (MUS_PlayMelody, Melody).
-- **Debug keys.** They work when TalkFlags[1] & 0x40 is set. Without the flag, most
-  answer "Are you a god?" and one says "That's an old, worn-out magic word!". They give:
+  - The organ with sheet music beside it plays a melody (MUS_PlayMelody, Melody).
+- **Debug keys.** They are key codes 213-252 (0xd5-0xfc, typed as Alt plus the decimal
+  code), not function keys. They work when TalkFlags[1] & 0x40 is set. Without the flag,
+  242 (0xf2) still prints the time and position, 213 (0xd5) says "That's an old, worn-out
+  magic word!" and the others answer "Are you a god?". With it they give:
   - time and goto, +60 minutes, the peer map;
   - "Divine Flare--";
   - not solid (AvatarNotSolid);
@@ -719,6 +779,7 @@ The sources reproduce these, marked `/*sic*/` or described in a comment:
 
 - **combat.c**
   - LoseHP computes `damage << 1;` and drops the result: kind 3 against class flag 0x10.
+    (No class has flag 0x10, so the line never runs.)
   - AI_Like and AI_Unfriendly: `x = (x + OSI_rand(0, 1)?10:-10) & 0x3ff`. Because of
     precedence, x becomes 10 or 0x3f6.
   - COMBAT_RangeToObj's default case returns `x / (x - x)`, a division by zero for frames 16
@@ -741,7 +802,8 @@ The sources reproduce these, marked `/*sic*/` or described in a comment:
   - CmdMove's map branch prints `GetObjectString(obj)` with obj never set, and its "into"
     branch sets the frame of a target it never set.
   - The light-type test IsUnlitLightType is called with object numbers (CanPutInContainer,
-    CmdDrop, CmdMove).
+    CmdDrop, CmdMove), so it never matches: CanPutInContainer never keeps a lit light out
+    of a container.
   - CmdGet's `found` is uninitialised; CmdMove's "out of" compares GetQuan with the
     quantity code. Both are SE's.
 - **dreamobj.c**
@@ -762,4 +824,8 @@ The sources reproduce these, marked `/*sic*/` or described in a comment:
   - REST_LevelUp's `default: done = 0;` is written twice: the original clears DI twice.
 - **objtype.c** (not marked in the source)
   - GetDamagePoints reads `MonsterDamage[class]`, where combat.c reads the same table at
-    `[class + 1]`. A creature's own attack takes the damage of the class before it.
+    `[class + 1]`. It has no effect: every caller passes a weapon from an inventory, and
+    `__TryHit` reads `MonsterDamage[class + 1]` itself for a creature's own attack.
+- **egg.c** (not marked in the source)
+  - EGG_hatches lets an egg of quality 100 or more through once TalkFlags[0x46] & 8 is
+    set, then tests quality / 10 against 0, 1 and 2 only: such an egg never hatches.

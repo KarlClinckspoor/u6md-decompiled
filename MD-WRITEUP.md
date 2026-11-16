@@ -399,8 +399,9 @@ A byte-identical rebuild keeps every mistake in the original source. The sources
 - `COMBAT_RangeToObj`'s default case returns `x / (x - x)`.
 - `TalkFlags[2] &= 4;` where `&= ~4` was meant. The radium action tests an uninitialised
   local ("Radium has already been installed.").
-- `GetDamagePoints` reads `MonsterDamage[class]` where combat.c reads `[class + 1]`, so a
-  creature's own attack takes the damage of the class before it.
+- `GetDamagePoints` reads `MonsterDamage[class]` where combat.c reads `[class + 1]`. No
+  caller passes it a creature (combat.c reads the table itself for a creature's own
+  attack), so the slip has no effect.
 
 ## What remains unknown
 

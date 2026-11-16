@@ -269,9 +269,10 @@ everywhere in the engine.
   harmful map tiles, is empty too. U6's `XRayView`, absent from SE, came back for the
   telescope.
 - *Copies that drifted:* MD's objtype.c reads `MonsterDamage[class]` where combat.c reads
-  `[class + 1]`, so a creature's own attack takes the previous class's damage. That is the
-  kind of mistake you get when a table moves to a new module and one of its readers is
-  copied from an older layout. (The off-by-one is a fact. The cause is a guess.)
+  `[class + 1]`. That is the kind of mistake you get when a table moves to a new module and
+  one of its readers is copied from an older layout. It does no harm only because no caller
+  passes `GetDamagePoints` a creature: combat.c reads the table itself for a creature's own
+  attack. (The off-by-one is a fact. The cause is a guess.)
 
 ### 1.6 The changes and their likely reasons
 
@@ -285,7 +286,7 @@ everywhere in the engine.
 | MD splits objcmd.c, talkdr.c, npctrack.c | `docs/FINDINGS.md`, "Modules reorganised" | overlays need module boundaries; tidiness |
 | Overlays in MD | 17 overlaid modules, 66,603 bytes | conventional memory: tile cache, DGROUP full |
 | Table-driven use in MD | `use.c` | many object combinations; the chain had become unmanageable (guess) |
-| Wrapping map, double tiles, view rotation | 506 wrap sites; `FindLoc`'s four cursors; `ViewRotation` | the design: a spherical Mars, big creatures, the dream |
+| Wrapping map, double tiles, rotated controls | 506 wrap sites; `FindLoc`'s four cursors; `ViewRotation` (turns the direction keys and pointer, not the drawing) | the design: a spherical Mars, big creatures, the dream |
 | Removed magic, floppies, vehicles | `docs/FINDINGS.md`, "What was removed" | design; hard-disk installs by 1991 (guess) |
 | Dead data left in place | the leftover lists above | removing costs testing time and gains nothing on screen |
 
@@ -382,8 +383,8 @@ edited in place. MD is SE's files edited, split and extended. Fixes did not flow
 
 **Argument.** Forking is the fastest way to start a game and the slowest way to finish the
 next one. Nothing is shared, so nothing is protected. Any change to the core (the wrapping
-map, double tiles, the view rotation) is free to touch every file, and does. The next team
-inherits an engine that now carries two games' assumptions.
+map, double tiles) is free to touch every file, and does. The next team inherits an engine
+that now carries two games' assumptions.
 
 **Confidence: high** on the facts. **Medium** on the cost: for two games a fork may well have
 been the cheapest option (see Part 3).
@@ -393,8 +394,9 @@ been the cheapest option (see Part 3).
 **Evidence.** The wrapping map touches 32 of 37 files (90 → 506 sites). The dream bit is
 tested in 19 files. Removing the floppies meant deleting `DISK_confirm` calls from map.c,
 gfx.c, object.c and sound.c, and leaving an empty function behind. Machinery state is
-synchronised in object.c's load and save. The talents change reach in Get, Move, Use and
-Drop, strength in `GetStr`, visibility in visible.c, and rest in rest.c.
+synchronised in object.c's load and save. The talents change reach in Get, Move and Use
+(and whether a thrown devil pod breaks in Drop), strength in `GetStr`, visibility in
+visible.c, and rest in rest.c.
 
 **Argument.** A feature that touches 20 files has to be designed into each one, and each
 file has to be tested again. Nothing suggests automated testing (what the programs do carry
@@ -477,7 +479,7 @@ compiler version.
 **Cost then.** High up front. The engine's modules share hundreds of near globals; MD's
 sources declare their externs by address, module by module. Drawing a line through that
 means deciding which globals belong to the engine, and paying for indirection on a 286. More
-seriously, both later games needed core changes: wrapping, double tiles, rotation. A library
+seriously, both later games needed core changes: wrapping, double tiles. A library
 would have had to absorb those as options, which is exactly the work that makes engines
 expensive. **Verdict:** worth it from the second game on, if a third and fourth were
 planned. For two games on a six-month clock, the fork was a defensible choice. The
