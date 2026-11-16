@@ -48,7 +48,7 @@ extern char far LensesAlignedMsg[];
 extern unsigned char Active;
 extern int16 MapZ;
 extern int32 GameFlags;/*0x10: in a dream*/
-extern int16 ViewRotation;/*rotation of the map view (eighths of a turn)?*/
+extern int16 ViewRotation;/*rotation of the controls (eighths of a turn)*/
 extern int16 DreamStage;
 extern unsigned char Party[];
 extern int16 Amount[];/*quantity (low byte), quality (high byte)*/

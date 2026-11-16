@@ -41,7 +41,7 @@
 /*16A8*/unsigned char PlayerIsFemale = 0;/*the player is a woman*/
 /*16A9*/unsigned char AvatarPortrait = 0;/*0: no character created yet*/
 /*16AA*/int32 GameFlags = 0;/*0x10: in a dream (the only bit used)*/
-/*16AE*/int16 ViewRotation = 0;/*rotation of the map view*/
+/*16AE*/int16 ViewRotation = 0;/*rotation of the controls (direction keys, pointer) in eighths of a turn; the map is never drawn rotated*/
 /*the talents of NPCs 0-15*/
 struct tTalents { unsigned a:4, psychic:4, c:4, d:4; };
 /*16B0*/struct tTalents Talents[16] = {0};

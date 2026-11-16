@@ -1658,7 +1658,7 @@ extern int16 AreaX, AreaY;
 			}
 		break;
 		case 0x9e:
-			/*pulls the lever (0xe9) north of him*/
+			/*stokes the furnace (0xe9) north of him*/
 			if(TryStraightMove(objNum, 0, 1))
 				break;
 			lever = OBJ_FindTypeAt(0xe9, GetX(objNum), (GetY(objNum) - 1) & 0x3ff);

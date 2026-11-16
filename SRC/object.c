@@ -43,7 +43,7 @@
  * AddInvObj/InsertObj weigh against GetStr and check what is worn; the
  * object changes of MoveObj (the rail cars 0x19a float on the canals),
  * InsertObj, __ObjectsDeserialize, OBJ_CommitBlocks and ShowObjects (machine
- * sounds, levers and plates, outlines by the talents).
+ * sounds, the doors 0xe3/0xb3 and the mirror 0x12d, outlines by the talents).
  */
 #include "se.h"
 
@@ -2220,8 +2220,8 @@ extern unsigned char TalkFlags[];
   draw the darkness of the badly lit cells. On the way: the looping sound
   of the nearest machine (MachineTypes/MachineSfx; 0x25 in the dream's stage 0x40),
   plants 0xfb of quality 0xff shrink (never: GetQual is a byte), the
-  levers 0xe3/0xb3 (with power) and the plates 0x12d react to creatures
-  standing on them, 0xc9 lights up with power. Invisible objects show
+  doors 0xe3/0xb3 (with power) react to creatures standing on them, the
+  mirror 0x12d shows the NPC south of it, 0xc9 lights up with power. Invisible objects show
   with an outline (bit 12; bits 11-12 for objects flagged 1 seen by a
   psychic, bit 11 for NPCs flagged 4) to party members with the third
   talent, else not at all.*/

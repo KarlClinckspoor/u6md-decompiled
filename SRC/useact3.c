@@ -495,7 +495,7 @@ extern char far TooManyTreesMsg[];/*"There are too many moving trees nearby.\n"*
 
 /*
  * action 32 (telescope 0x5e): on the surface by day and in caves 2/3, look
- * up to 40 squares in a direction (XRayView) from where it stands; not
+ * up to 41 squares in a direction (XRayView) from where it stands; not
  * with moving trees 0x198 (invisible) near
  */
 /*C_2FA1_0A1B*/UseTelescope(int16 obj, int16 on, int16 to) {

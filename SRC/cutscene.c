@@ -363,8 +363,8 @@ extern int16 LinesBeforeMore;
 	MUS_PlayAreaSong();
 }
 
-/*cut scene 6 (the canal pumps on: LeverMachinery 3): the objects 0xd2 of
-  frame 0-1 in (0x13b, 0x116)-(0x140, 0x11a) on MapZ 0 removed*/
+/*cut scene 6 (the ruby lenses melt the ice: LeverMachinery 3, cabinet panel 6):
+  the ice 0xd2 of frame 0-1 in (0x13b, 0x116)-(0x140, 0x11a) on MapZ 0 removed*/
 /*C_2F75_07FA*/Cutscene6() {
 	char portraits[3];
 	int16 x, y, z;
@@ -391,7 +391,8 @@ extern int16 LinesBeforeMore;
 	MUS_PlayAreaSong();
 }
 
-/*cut scene 7 (the canal pumps off: LeverMachinery 4): around (0x241,
+/*cut scene 7 (the valves open the canals: LeverMachinery 4, panel 7, the
+  valve; nothing in the game turns the pumps off again): around (0x241,
   0x27b, 0) the objects 0x1cb of frame 1 get frame 2, a new 0x1cc at
   (0x243, 0x27a)*/
 /*C_2F75_0951*/Cutscene7() {

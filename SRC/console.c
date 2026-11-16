@@ -190,7 +190,7 @@ extern int16 MapX, MapY, MapZ;
 extern char InCombat;
 extern unsigned char DefaultCommand;
 extern int32 GameFlags;
-extern int16 ViewRotation;/*rotation of the map view (eighths of a turn)?*/
+extern int16 ViewRotation;/*rotation of the controls (eighths of a turn)*/
 extern char GameStateEnd;
 extern unsigned char PartyListTop;
 extern unsigned char InvenScroll;
@@ -1112,7 +1112,7 @@ static /*C_2238_17AC*/MouseInEquipView() {
 		return 0;
 	cmd = 0;
 
-	/*combat mode button: cycles 2, 4, 5, 7, 8*/
+	/*combat mode button: cycles 2, 4, 7, 8 (3 and 5 are skipped)*/
 	if(
 		!(GameFlags & 0x10) &&
 		StatusMember != 0 &&
@@ -1221,7 +1221,7 @@ static /*C_2238_1ADC*/mkMouseCommand() {
 	switch(zone) {
 		case 0:/*map view*/
 			if(ViewRotation) {
-				/*rotated view: rotate the pointer around the party*/
+				/*rotated controls: rotate the pointer around the party*/
 				int16 dx, dy;
 
 				dx = PointerX - DirOriginX;
@@ -1491,7 +1491,7 @@ returns a key code or a command code, never 0*/
 			case 0x132: setDefaultCommand(0x86); ch = 0; break;/*<ALT M>*/
 			case 0x116: setDefaultCommand(0x87); ch = 0; break;/*<ALT U>*/
 		}
-		/*rotated view: the direction keys turn with it*/
+		/*rotated controls: the direction keys turn with them*/
 		if(ViewRotation && ch == 0x80)
 			AdvanceDir = (AdvanceDir + ViewRotation) & 7;
 		if(MouseMode == 0 && !FreeAimMode) {

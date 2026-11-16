@@ -9,8 +9,9 @@
  * chance to hatch (100: always, and always the embryo's full quantity);
  * its quality: tens 0 any time, 1 by day (6-17 h), 2 by night, units 1-4
  * the creatures' alignment (NPCStatus bits 5-6: 0, 0x20, 0x40, 0x60); an egg
- * of quality 100 or more only hatches once talk flag TalkFlags[0x46] & 8 is
- * set. An embryo's quality is the creatures' NPCMode/NPCComMode (0x1a: an
+ * of quality 100 or more is let through once talk flag TalkFlags[0x46] & 8 is
+ * set, but its quality / 10 (10 or more) matches none of the time-of-day
+ * tests 0, 1, 2, so it never hatches (a bug of the original). An embryo's quality is the creatures' NPCMode/NPCComMode (0x1a: an
  * object type >= 0x156 made as an object), its frame theirs, its
  * ObjStatus 2 and 0x80 bits theirs. Eggs hatch when their area is loaded
  * (EGG_hatchArea), once until their "hatched" status bit (0x40) is
