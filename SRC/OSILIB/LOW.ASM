@@ -252,7 +252,7 @@ C_00F4:
 	JMP	$
 ;----------------------------------------
 ;get file size?
-FileSizeByName	PROC FAR	;2674:010C
+LOAD_size	PROC FAR	;2674:010C
 	MOV	AL,2
 	MOV	AH,3Dh
 	INT	21h
@@ -273,9 +273,9 @@ FileSizeByName	PROC FAR	;2674:010C
 	POP	AX
 C_012A:
 	RET
-FileSizeByName	ENDP
+LOAD_size	ENDP
 ;----------------------------------------
-ReadFileByName	PROC FAR	;2674:012B
+LOAD_toSeg	PROC FAR	;2674:012B
 	PUSH	DS
 	PUSH	AX
 	PUSH	BX
@@ -330,7 +330,7 @@ C_016D:
 	POP	BX
 	POP	DS
 	RET
-ReadFileByName	ENDP
+LOAD_toSeg	ENDP
 ;----------------------------------------
 EVEN
 ;----------------------------------------
@@ -587,7 +587,7 @@ L23:	JMP	L1
 decompress	ENDP
 
 ;load & inflate?
-LoadLzwFile	PROC FAR	;2674:03E8
+LZW_loadFile	PROC FAR	;2674:03E8
 	MOV	output_segment,0
 	MOV	pDest,0
 	MOV	input_segment,0
@@ -672,7 +672,7 @@ C_048E:
 C_0497:
 	MOV	BX,pDest
 	RET
-LoadLzwFile	ENDP
+LZW_loadFile	ENDP
 ;----------------------------------------
 ;CF set when the file name DS:DX (any case) is in CompressedFileList (main.c;
 ;empty: its only entry is "")
@@ -722,14 +722,14 @@ LOAD_isZFile	ENDP	;C_049C (2674:049C)
 ;load a file whole (DX: its name) into memory it allocates: BX the segment,
 ;CF set on an error (a compressed file in the list D_00AC is decompressed);
 ;called by the driver loader (DRVLOAD.ASM)
-PUBLIC LoadFileWhole
-LoadFileWhole	PROC FAR	;2674:04D9
+PUBLIC LOAD_file
+LOAD_file	PROC FAR	;2674:04D9
 	CALL	LOAD_isZFile	;is file name in list?
 	JNB	C_04E3
-	JMP	LoadLzwFile	;load & inflate?
+	JMP	LZW_loadFile	;load & inflate?
 C_04E3:	;--
 	PUSH	DX
-	CALL	FileSizeByName	;get file size?
+	CALL	LOAD_size	;get file size?
 	JB	C_052C
 	PUSH	AX
 	OR	AX,AX
@@ -752,7 +752,7 @@ C_0501:
 	POP	DX
 	PUSH	BX
 	PUSH	AX
-	CALL	ReadFileByName
+	CALL	LOAD_toSeg
 	POP	BX
 	POP	CX
 	JNB	C_0521
@@ -779,7 +779,7 @@ C_052D:
 	MOV	BX,1
 	STC
 	RET
-LoadFileWhole	ENDP
+LOAD_file	ENDP
 
 CSegEnd	SEG_2674_TEXT
 

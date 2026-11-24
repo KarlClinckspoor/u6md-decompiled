@@ -9,7 +9,7 @@ INCLUDE OSI.INC
 
 EXTRN _drvName:WORD	;the drivers' file names (near pointers) by driver type (data-only module)
 EXTRN CriticalError:WORD,DriveErrorCallback:DWORD	;LOW.ASM
-EXTRN my_alloc:FAR,LoadFileWhole:FAR	;LOW.ASM: allocate BX paragraphs; load a file whole
+EXTRN my_alloc:FAR,LOAD_file:FAR	;LOW.ASM: allocate BX paragraphs; load a file whole
 
 DSegStart
 
@@ -102,7 +102,7 @@ C_0097:
 C_00A5:
 	SHL	BX,1
 	MOV	DX,_drvName[BX]
-	CALL	LoadFileWhole	;load the driver
+	CALL	LOAD_file	;load the driver
 	JB	C_00B8
 	MOV	GrDrvEntrySeg,BX
 	JNB	C_00CA
