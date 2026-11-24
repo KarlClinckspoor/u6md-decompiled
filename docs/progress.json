@@ -1,11 +1,11 @@
 {
  "GAME": {
-  "matched": 696,
+  "matched": 705,
   "attempt": 0,
-  "open": 9,
+  "open": 0,
   "aside": 0,
   "total": 705,
-  "percent": 98.7
+  "percent": 100.0
  },
  "MARTIAN": {
   "matched": 204,
@@ -16,11 +16,11 @@
   "percent": 100.0
  },
  "all": {
-  "matched": 900,
+  "matched": 909,
   "attempt": 0,
-  "open": 9,
+  "open": 0,
   "aside": 0,
   "total": 909,
-  "percent": 99.0
+  "percent": 100.0
  }
 }
