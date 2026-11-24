@@ -96,13 +96,15 @@ ProcStart	OSI_lowInit	;2674:0002
 	INT	21h
 	POP	DS
 	;--
-	CALL	C_002E
-	CALL	C_00D0
-	CALL	C_005E	;check computer speed
+	CALL	initTextWindows
+	CALL	clearSpareVars
+	CALL	measureCpuSpeed
 ProcEnd	OSI_lowInit
 
-;initialize some unused feature[text clipping]?
-C_002E	PROC NEAR
+;set up the 4 text windows at LowTextWindows, each {0,0,39,24,0,0,0Fh,0} (40x25,
+;color 0Fh; Ultima VI's console), LowCurTextWindow the first and D_2AAE 0;
+;nothing else in GAME.EXE reads them
+initTextWindows	PROC NEAR	;C_002E (2674:002E)
 	MOV	SI,OFFSET DGROUP:LowTextWindows
 	MOV	LowCurTextWindow,SI
 	;--
@@ -126,10 +128,11 @@ C_003A:
 	MOV	D_2AAE,AX
 	;--
 	RET
-C_002E	ENDP
+initTextWindows	ENDP	;C_002E (2674:002E)
 
-;check computer speed
-C_005E	PROC NEAR
+;measure the computer's speed: count loop iterations during one timer tick
+;(int 1Ch), CpuSpeed = count * 18 / 750; also store the memory size (int 12h)
+measureCpuSpeed	PROC NEAR	;C_005E (2674:005E)
 	MOV	CpuSpeed,0
 	MOV	SpeedTicks,0
 	;-- push vector 0x1c
@@ -177,7 +180,7 @@ C_008F:	;--
 	MOV	MemorySizeKB,AX
 	;--
 	RET
-C_005E	ENDP
+measureCpuSpeed	ENDP	;C_005E (2674:005E)
 ;----------------------------------------
 ;new int 1Ch [determine computer speed]
 INT_00BE:
@@ -196,13 +199,14 @@ INT_00BE:
 	POP	DS
 	IRET
 ;----------------------------------------
-C_00D0	PROC NEAR
+;clear the words D_2ACC, D_2ACE, D_2AD0 (nothing else in GAME.EXE uses them)
+clearSpareVars	PROC NEAR	;C_00D0 (2674:00D0)
 	XOR	AX,AX
 	MOV	D_2ACC,AX
 	MOV	D_2ACE,AX
 	MOV	D_2AD0,AX
 	RET
-C_00D0	ENDP
+clearSpareVars	ENDP	;C_00D0 (2674:00D0)
 ;----------------------------------------
 ;a callback?
 OSI_nullCallback	PROC FAR	;2674:00DC
@@ -288,7 +292,7 @@ ReadFileByName	PROC FAR	;2674:012B
 	DEC	CX
 C_0141:
 	PUSH	CX
-	CALL	C_0166
+	CALL	LOAD_read
 	POP	CX
 	JB	C_015C
 	CMP	AX,CX
@@ -298,7 +302,7 @@ C_0141:
 	PUSH	CX
 	MOV	DX,CX
 	MOV	CX,1
-	CALL	C_0166
+	CALL	LOAD_read
 	POP	AX
 C_015B:
 	CLC
@@ -312,13 +316,14 @@ C_015C:
 	POP	DS
 	RET
 ;----
-C_0166	PROC NEAR
+;DOS read (int 21h AH=3Fh), keeping BX
+LOAD_read	PROC NEAR	;C_0166 (2674:0166)
 	PUSH	BX
 	MOV	AH,3Fh	;read file
 	INT	21h
 	POP	BX
 	RET
-C_0166	ENDP
+LOAD_read	ENDP	;C_0166 (2674:0166)
 ;----
 C_016D:
 	POP	BX
@@ -669,8 +674,9 @@ C_0497:
 	RET
 LoadLzwFile	ENDP
 ;----------------------------------------
-;is file name in list?
-C_049C	PROC NEAR
+;CF set when the file name DS:DX (any case) is in CompressedFileList (main.c;
+;empty: its only entry is "")
+LOAD_isZFile	PROC NEAR	;C_049C (2674:049C)
 	PUSH	BX
 	PUSH	SI
 	PUSH	DI
@@ -711,14 +717,14 @@ C_04D5:
 	POP	SI
 	POP	BX
 	RET
-C_049C	ENDP
+LOAD_isZFile	ENDP	;C_049C (2674:049C)
 ;----------------------------------------
 ;load a file whole (DX: its name) into memory it allocates: BX the segment,
 ;CF set on an error (a compressed file in the list D_00AC is decompressed);
 ;called by the driver loader (DRVLOAD.ASM)
 PUBLIC LoadFileWhole
 LoadFileWhole	PROC FAR	;2674:04D9
-	CALL	C_049C	;is file name in list?
+	CALL	LOAD_isZFile	;is file name in list?
 	JNB	C_04E3
 	JMP	LoadLzwFile	;load & inflate?
 C_04E3:	;--

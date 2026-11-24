@@ -244,7 +244,7 @@ are linked after use.c, where their data are. Their stubs come after all the cod
 | **2FA1** (ovl) | 1E99 | `useact3.c` | 29A2-29F4 | use actions: lights, switch, drill, telescope, buckets, chemicals, oil, lenses, berries, doors, chests, instruments (new) *Overlay at FBOV+0F340, 24 stub entries.* |
 | - | 0 | `OSILIB/drvnames.c` | 29F4-2A28 | data only: the graphics drivers' file names (CGA/EGA/T1K/HER/MCG.DRV); empty code segment at 263D:E |
 | 263D:E | C1 | `OSILIB/DRVLOAD.ASM` | 2A28-2A6C | loading the graphics driver; its entry point and parameter block (new in MD) |
-| 264A:0 | 1DF | `OSILIB/CLIP.ASM` | 2A6C-2A7A | the driver's mode call, line clipping (new in MD; nothing calls it directly) |
+| 264A:0 | 1DF | `OSILIB/CLIP.ASM` | 2A6C-2A7A | the driver's mode call (OSI_setVideoMode), point, rectangle and line clipping (CLIP_pointInside, CLIP_rectToScreen, CLIP_line); new in MD, nothing calls it |
 | 2668:0 | 1A | `OSILIB/VIDRESET.ASM` | 2A7A-2A7C | back to the start-up video mode (new in MD) |
 | 2674:2 | 530 | `OSILIB/LOW.ASM` | 2A7C-2B12 | critical error and Ctrl-Break handlers, computer speed, memory, loading a file whole (SE LOW.ASM's third segment) |
 | 26C7:2 | 78 | `OSILIB/DELAY.ASM` | 2B12-2B1A | OSI_delay_init / OSI_delay_clean (SE's) |

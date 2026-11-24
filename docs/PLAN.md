@@ -208,8 +208,8 @@ from SE's (as SE's did against U6), `docs/MAP.md`, a writeup.
 - **Phase 6 names (2026-11-15).** Five passes gave names to the functions and variables of
   both programs (GAME.EXE in four, the overlays last; MARTIAN.EXE in one), the addresses
   kept in the comment before each definition; docs/FINDINGS.md and docs/MAP.md use the
-  names. By address still: GAME.EXE's OSILIB/CLIP.ASM routines and two unused words,
-  MARTIAN.EXE's 16 variables nothing reads.
+  names. By address still: GAME.EXE's two unused words and MARTIAN.EXE's 16
+  variables nothing reads (CLIP.ASM's routines and LOW.ASM's last five named 2026-11-23).
 
 Run from the scratchpad with `tools/se/libscan.py`'s `scan()` against both TC++ versions'
 `CM.LIB` and `OVERLAY.LIB`. Every hit matched 1.00; none matched only 1.01.

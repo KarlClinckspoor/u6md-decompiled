@@ -414,9 +414,9 @@ A byte-identical rebuild keeps every mistake in the original source. The sources
 - **TASM's fixup order.** The rule could not be found without TASM itself. The two modules
   that need it list their order by hand.
 - **Unused data and code.** MARTIAN.EXE has 16 variables that nothing reads (unused, or set
-  and never read). They keep their address names. In GAME.EXE, OSILIB/CLIP.ASM's four
-  routines (nothing calls them directly) and gamestat.c's two unused words D_1682 and
-  D_16D8 are still by address. U6 and SE leftovers such as WindDirNames, the ship and raft
+  and never read). They keep their address names. In GAME.EXE, gamestat.c's two unused words D_1682 and
+  D_16D8 are still by address; OSILIB/CLIP.ASM's four routines are named although nothing
+  calls them. U6 and SE leftovers such as WindDirNames, the ship and raft
   costs and CampOfsX/Y are named but unused.
 - **Origin's names.** Every name in the sources is ours, or SE's where the function is
   SE's. The stub order shows only that Origin's names hashed differently from ours.

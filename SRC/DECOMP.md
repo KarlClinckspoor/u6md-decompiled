@@ -74,8 +74,11 @@ apply`.
 **Names (Phase 6, 2026-11-15).** The functions and variables have names (four passes,
 resident modules then the overlays); the address stays in the comment before each
 definition (`/*C_SSSS_OOOO*/`, `/*XXXX*/`), which is how `mdsym.py` knows them. By address
-still: OSILIB/CLIP.ASM's four routines (nothing calls them directly) and gamestat.c's two
-unused words (D_1682, D_16D8).
+still: gamestat.c's two unused words (D_1682, D_16D8). The last functions named
+(2026-11-23): OSILIB/CLIP.ASM's four routines (OSI_setVideoMode, CLIP_pointInside,
+CLIP_rectToScreen, CLIP_line; no source refers to them; the .EXE's relocation table names segment 264A only in
+the segment table) and LOW.ASM's five near routines, which take Ultima VI's names (initTextWindows,
+measureCpuSpeed, clearSpareVars, LOAD_read, LOAD_isZFile: the same code).
 
 ## Documents
 

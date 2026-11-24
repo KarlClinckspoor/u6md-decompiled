@@ -3,7 +3,9 @@
 ;OSILIB/VIDRESET.ASM restores) and line clipping against the driver's
 ;clipping rectangle (DRVLOAD.ASM's GrClipLeft-GrClipBottom), Cohen-Sutherland outcodes
 ;with midpoint subdivision. New in Martian Dreams; nothing in GAME.EXE calls
-;these routines directly (no relocation points at segment 264A).
+;these routines: no source, overlays included, refers to them, and the .EXE's
+;relocation table names segment 264A only in the segment table (2F1C:00E0);
+;OSI_loadDriver (DRVLOAD.ASM), which loads the driver, is not called either.
 ;The helpers are labels inside FAR PROCs: their RET assembles to RETF even
 ;where the code reaches them with a near CALL, as in the original.
 ;----------------------------------------
@@ -27,10 +29,10 @@ DSegEnd
 
 CSegStart	SEG_264A_TEXT
 
-;void C_264A_0000(int mode) (pascal): if a driver is loaded, call its
+;void OSI_setVideoMode(int mode) (pascal): if a driver is loaded, call its
 ;function 3 with AX = mode and BX = the parameter block; the first time with a
 ;mode other than 0 the BIOS video mode is saved first (StartVideoMode)
-ProcStart	C_264A_0000	;264A:0000
+ProcStart	OSI_setVideoMode	;264A:0000
 	CMP	GrDrvEntrySeg,0
 	JZ	C_0033
 	MOV	AX,[BP+6]
@@ -49,11 +51,11 @@ C_0026:
 	MOV	GrDrvEntryOfs,3
 	CALL	DWORD PTR GrDrvEntryOfs
 C_0033:
-ProcEndN	C_264A_0000,2
+ProcEndN	OSI_setVideoMode,2
 
 ;(AX, BX) = point: CF clear if it is inside the clipping rectangle
-PUBLIC C_264A_003A
-C_264A_003A	PROC FAR	;264A:003A
+PUBLIC CLIP_pointInside
+CLIP_pointInside	PROC FAR	;264A:003A
 	CMP	AX,GrClipLeft
 	JL	C_0054
 	CMP	AX,GrClipRight
@@ -67,12 +69,12 @@ C_264A_003A	PROC FAR	;264A:003A
 C_0054:
 	STC
 	RET
-C_264A_003A	ENDP
+CLIP_pointInside	ENDP
 
 ;(AX, BX)-(CX, DX) = rectangle: order the corners (AX <= CX, BX <= DX) and
 ;clamp them to the screen (0..319, 0..199)
-PUBLIC C_264A_0056
-C_264A_0056	PROC FAR	;264A:0056
+PUBLIC CLIP_rectToScreen
+CLIP_rectToScreen	PROC FAR	;264A:0056
 	CMP	AX,CX
 	JLE	C_005B
 	XCHG	CX,AX
@@ -114,12 +116,12 @@ C_009B:
 	MOV	DX,0C7h
 C_00A4:
 	RET
-C_264A_0056	ENDP
+CLIP_rectToScreen	ENDP
 
 ;(AX, BX)-(CX, DX) = line: clip it to the clipping rectangle. CF set when it
 ;is wholly outside; otherwise CF clear and AX, BX, CX, DX the clipped line
-PUBLIC C_264A_00A5
-C_264A_00A5	PROC FAR	;264A:00A5
+PUBLIC CLIP_line
+CLIP_line	PROC FAR	;264A:00A5
 	CALL	C_0192
 	OR	SI,SI
 	JNZ	C_00B2
@@ -278,7 +280,7 @@ C_01D5:
 	db	83h,0CFh,08h	;OR DI,8 (TASM's sign-extended imm8; MASM 3.0 writes 81h)
 C_01DE:
 	RET
-C_264A_00A5	ENDP
+CLIP_line	ENDP
 
 CSegEnd	SEG_264A_TEXT
 
